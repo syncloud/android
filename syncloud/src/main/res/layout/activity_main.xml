@@ -24,11 +24,12 @@
             android:id="@+id/ebay"
             android:onClick="openEbay"/>
 
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text=""
+            android:text="searching ..."
             android:id="@+id/url"/>
 
     </LinearLayout>
