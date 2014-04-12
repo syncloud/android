@@ -3,68 +3,36 @@ package org.syncloud.android;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.net.nsd.NsdManager;
+import android.net.nsd.NsdServiceInfo;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceListener;
+import com.google.common.base.Optional;
+
+import org.syncloud.discovery.Discovery;
 
 public class MainActivity extends Activity {
 
-    private WifiManager.MulticastLock lock;
-    private Updater updater;
+    WifiManager.MulticastLock lock;
+    Handler handler = new android.os.Handler();
+    public final static String MULTICAST_LOCK_TAG = MainActivity.class.toString();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        updater = new Updater() {
-            @Override
-            public void update(final String text) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        TextView viewById = (TextView) findViewById(R.id.url);
-                        viewById.setText(viewById.getText() + "\n" + text);
-                    }
-                });
+        findSyncloudDevice();
 
-            }
-        };
-
-
-        setUp();
-
-        String type = "_http._tcp.local.";
-        updater.update("service:" + type);
-        new AsyncTask<String, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(String... types) {
-                startDiscovery(types[0]);
-                return null;
-            }
-        }.execute(type);
-    }
-
-    private void startDiscovery(String type) {
-        try {
-
-            ServiceListener listener = new EventListener(updater);
-
-            JmDNS jmdns = JmDNS.create();
-            updater.update("jmdns created");
-            jmdns.addServiceListener(type, listener);
-            updater.update("jmdns listener added");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -94,17 +62,44 @@ public class MainActivity extends Activity {
     }
 
 
-    private void setUp() { // to be called by onCreate
-        android.net.wifi.WifiManager wifi =
-                (android.net.wifi.WifiManager)
-                        getSystemService(android.content.Context.WIFI_SERVICE);
-        lock = wifi.createMulticastLock("HeeereDnssdLock");
-        lock.setReferenceCounted(true);
-        lock.acquire();
+    private void findSyncloudDevice() {
 
-        updater.update("lock acquired");
-    }
-    protected void onDestroy() {
-        if (lock != null) lock.release();
+
+        new AsyncTask<Void, Void, Optional<String>>() {
+
+            @Override
+            protected Optional<String> doInBackground(Void... voids) {
+
+                try {
+                    WifiManager wifi = (WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
+                    lock = wifi.createMulticastLock(MULTICAST_LOCK_TAG);
+                    lock.setReferenceCounted(true);
+                    lock.acquire();
+                    WifiInfo connInfo = wifi.getConnectionInfo();
+                    final int ip = connInfo.getIpAddress();
+
+                    return Discovery.getUrl(ip, "ownCloud");
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    lock.release();
+                }
+                return Optional.absent();
+            }
+
+            @Override
+            protected void onPostExecute(Optional<String> url) {
+                TextView urlView = (TextView) findViewById(R.id.url);
+                if (url.isPresent()) {
+                    urlView.setText(url.get());
+                } else {
+                    urlView.setText("not found");
+                }
+            }
+
+        }.execute();
+
+
     }
 }

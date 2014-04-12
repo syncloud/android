@@ -1,1 +1,1 @@
-include ':syncloud'
+include ':syncloud', ':discovery'

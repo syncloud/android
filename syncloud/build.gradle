@@ -17,10 +17,15 @@ android {
         }
     }
 
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+
 }
 
 dependencies {
+    compile project(':discovery')
     compile 'com.android.support:appcompat-v7:+'
-    compile 'com.github.rickyclarkson:jmdns:3.4.2-r353-1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
