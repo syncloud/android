@@ -14,9 +14,11 @@ import javax.jmdns.ServiceListener;
 
 public class EventListener implements ServiceListener {
 
+
     private static Logger logger = LogManager.getLogger(EventListener.class.getName());
 
     private CountDownLatch latch = new CountDownLatch(1);
+    private CountDownLatch discoveryLatch = new CountDownLatch(1);
     private String url = null;
     private String serviceName;
 
@@ -26,7 +28,7 @@ public class EventListener implements ServiceListener {
 
     public Optional<String> getUrl() {
         try {
-            latch.await(30, TimeUnit.SECONDS);
+            discoveryLatch.await(30, TimeUnit.SECONDS);
             return Optional.fromNullable(url);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -36,23 +38,42 @@ public class EventListener implements ServiceListener {
 
     @Override
     public void serviceAdded(final ServiceEvent event) {
-        logger.debug("add: " + event.getType());
         if (event.getName().equals(serviceName)) {
-            logger.debug("add: " + event.getInfo().getPort());
-            logger.debug("add: " + event.getInfo().getServer());
-
             ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), event.getName());
+            waitForIpv4(info);
+            url = extractUrl(info);
+            discoveryLatch.countDown();
+        }
+    }
 
-            logger.debug("more: " + info.getType());
-//            logger.debug("more: " + info.getInet4Addresses()[0].getHostAddress());
-
+    private String extractUrl(ServiceInfo info) {
+        String address = "unknown";
+        if (info.getInet4Addresses().length > 0) {
+            address = info.getInet4Addresses()[0].getHostAddress();
+        } else {
             String server = info.getServer();
             String local = ".local.";
             if (server.endsWith(local))
-                server = server.substring(0, server.length() - local.length());
+                address = server.substring(0, server.length() - local.length());
+        }
+        String url = "http://" + address + ":" + info.getPort() + info.getPropertyString("path");
 
-            url = "http://" + server + ":" + info.getPort() + info.getPropertyString("path");
-            latch.countDown();
+        logger.debug(url);
+
+        return url;
+    }
+
+    private void waitForIpv4(ServiceInfo info) {
+        //TODO: Looks like info is updated asynchronously and ipv4 arrives a bit later
+        int retry = 0;
+        while (info.getInet4Addresses().length == 0 && retry < 10) {
+            try {
+                logger.debug("waiting for ipv4");
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            retry++;
         }
     }
 

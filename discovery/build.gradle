@@ -1,9 +1,17 @@
 apply plugin: 'java'
 
 dependencies {
+
     compile 'javax.jmdns:jmdns:3.4.1'
+//    compile 'com.github.rickyclarkson:jmdns:3.4.2-r353-1'
     compile 'com.google.guava:guava:16.0'
     compile 'log4j:log4j:1.2.17'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.10'
+}
+
+sourceSets {
+    main {
+        output.resourcesDir = "build/classes/main"
+    }
 }

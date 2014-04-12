@@ -31,11 +31,14 @@ public class Discovery {
 
         try {
             EventListener listener = new EventListener(serviceName);
+            logger.info("creating jmdns");
             JmDNS jmdns = JmDNS.create(myAddress);
             jmdns.addServiceListener(TYPE, listener);
             Optional<String> url = listener.getUrl();
             jmdns.removeServiceListener(TYPE, listener);
+            logger.info("closing jmdns");
             jmdns.close();
+            logger.info("closing jmdns: done");
             return url;
         } catch (Exception e) {
             e.printStackTrace();
