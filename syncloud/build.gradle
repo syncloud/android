@@ -20,6 +20,7 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
+        exclude 'log4j.properties'
     }
 
 }

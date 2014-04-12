@@ -3,28 +3,26 @@ package org.syncloud.android;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.net.nsd.NsdManager;
-import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.common.base.Optional;
 
+import org.syncloud.android.activation.Owncloud;
 import org.syncloud.discovery.Discovery;
 
 public class MainActivity extends Activity {
 
     WifiManager.MulticastLock lock;
-    Handler handler = new android.os.Handler();
     public final static String MULTICAST_LOCK_TAG = MainActivity.class.toString();
+    private String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +91,7 @@ public class MainActivity extends Activity {
                 TextView urlView = (TextView) findViewById(R.id.url);
                 if (url.isPresent()) {
                     urlView.setText(url.get());
+                    MainActivity.this.url = url.get();
                 } else {
                     urlView.setText("not found");
                 }
@@ -101,5 +100,41 @@ public class MainActivity extends Activity {
         }.execute();
 
 
+    }
+
+    public void activate(View view) {
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected void onPreExecute() {
+                TextView status = (TextView) findViewById(R.id.status);
+                status.setText("activating ...");
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+
+                EditText login = (EditText) findViewById(R.id.login);
+                EditText pass = (EditText) findViewById(R.id.pass);
+                //TODO: Some validation
+
+                return Owncloud.finishSetup(url, login.getText().toString(), pass.getText().toString());
+            }
+
+            @Override
+            protected void onPostExecute(Boolean activated) {
+                TextView status = (TextView) findViewById(R.id.status);
+                status.setText(activated ? "activated" : "not activated");
+            }
+        }.execute();
+
+    }
+
+    public void rescan(View view) {
+
+        TextView urlView = (TextView) findViewById(R.id.url);
+        urlView.setText(R.string.searching_label);
+        findSyncloudDevice();
     }
 }
