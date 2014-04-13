@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.google.common.base.Optional;
 
 import org.syncloud.android.activation.Owncloud;
+import org.syncloud.android.activation.Result;
 import org.syncloud.discovery.Discovery;
 
 public class MainActivity extends Activity {
@@ -63,7 +64,13 @@ public class MainActivity extends Activity {
     private void findSyncloudDevice() {
 
 
-        new AsyncTask<Void, Void, Optional<String>>() {
+        discoverAsync().execute();
+
+
+    }
+
+    private AsyncTask<Void, Void, Optional<String>> discoverAsync() {
+        return new AsyncTask<Void, Void, Optional<String>>() {
 
             @Override
             protected Optional<String> doInBackground(Void... voids) {
@@ -97,14 +104,25 @@ public class MainActivity extends Activity {
                 }
             }
 
-        }.execute();
-
-
+        };
     }
 
     public void activate(View view) {
 
-        new AsyncTask<Void, Void, Boolean>() {
+        EditText loginText = (EditText) findViewById(R.id.login);
+        EditText passText = (EditText) findViewById(R.id.pass);
+        //TODO: Some validation
+
+        String login = loginText.getText().toString();
+        String pass = passText.getText().toString();
+
+
+        finishSetupAsync().execute(login, pass);
+
+    }
+
+    private AsyncTask<String, Void, Result<String>> finishSetupAsync() {
+        return new AsyncTask<String, Void, Result<String>>() {
 
             @Override
             protected void onPreExecute() {
@@ -113,22 +131,16 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            protected Boolean doInBackground(Void... voids) {
-
-                EditText login = (EditText) findViewById(R.id.login);
-                EditText pass = (EditText) findViewById(R.id.pass);
-                //TODO: Some validation
-
-                return Owncloud.finishSetup(url, login.getText().toString(), pass.getText().toString());
+            protected Result<String> doInBackground(String... input) {
+                return Owncloud.finishSetup(url, input[0], input[1]);
             }
 
             @Override
-            protected void onPostExecute(Boolean activated) {
+            protected void onPostExecute(Result<String> result) {
                 TextView status = (TextView) findViewById(R.id.status);
-                status.setText(activated ? "activated" : "not activated");
+                status.setText(result.hasError() ? result.getError() : result.getValue());
             }
-        }.execute();
-
+        };
     }
 
     public void rescan(View view) {
@@ -136,5 +148,69 @@ public class MainActivity extends Activity {
         TextView urlView = (TextView) findViewById(R.id.url);
         urlView.setText(R.string.searching_label);
         findSyncloudDevice();
+    }
+
+    public void activateName(View view) {
+
+        EditText loginText = (EditText) findViewById(R.id.name_login);
+        EditText passText = (EditText) findViewById(R.id.name_pass);
+        EditText emailText = (EditText) findViewById(R.id.name_email);
+
+        EditText owncloudUserText = (EditText) findViewById(R.id.login);
+        EditText owncloudPasswordText = (EditText) findViewById(R.id.pass);
+        //TODO: Some validation
+
+        String login = loginText.getText().toString();
+        String pass = passText.getText().toString();
+        String email = emailText.getText().toString();
+        String owncloudUser = owncloudUserText.getText().toString();
+        String owncloudPassword = owncloudPasswordText.getText().toString();
+
+        TextView status = (TextView) findViewById(R.id.name_status);
+        boolean valid = true;
+        if (login.matches("")){
+            status.setText("enter name login");
+            valid = false;
+        }
+
+        if (pass.matches("")) {
+            status.setText("enter name password");
+            valid = false;
+        }
+       /* if (email.matches(""))
+            status.setText("enter login");*/
+        if (owncloudUser.matches("")) {
+            status.setText("enter device login");
+            valid = false;
+        }
+        if (owncloudPassword.matches("")) {
+            status.setText("enter device password");
+            valid = false;
+        }
+
+        if (valid)
+            activateNameAsync().execute(login, pass, email, owncloudUser, owncloudPassword);
+    }
+
+    private AsyncTask<String, Void, Result<String>> activateNameAsync() {
+        return new AsyncTask<String, Void, Result<String>>() {
+
+            @Override
+            protected void onPreExecute() {
+                TextView status = (TextView) findViewById(R.id.name_status);
+                status.setText("activating name ...");
+            }
+
+            @Override
+            protected Result<String> doInBackground(String... input) {
+                return Owncloud.activateName(url, input[0], input[1], input[2], input[3], input[4]);
+            }
+
+            @Override
+            protected void onPostExecute(Result<String> result) {
+                TextView status = (TextView) findViewById(R.id.name_status);
+                status.setText(result.hasError() ? result.getError() : result.getValue());
+            }
+        };
     }
 }
