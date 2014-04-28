@@ -1,14 +1,12 @@
 package org.syncloud.discovery;
 
-import com.google.common.base.Optional;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.jmdns.JmDNS;
 
 public class Discovery {
@@ -17,7 +15,7 @@ public class Discovery {
 
     public static final String TYPE = "_http._tcp.local.";
 
-    public static Optional<String> getUrl(int ipAddress, String serviceName) {
+    public static List<String> getUrl(int ipAddress, String serviceName) {
 
 
         byte[] ip = ByteBuffer.allocate(4).putInt(ipAddress).array();
@@ -26,7 +24,7 @@ public class Discovery {
             myAddress = InetAddress.getByAddress(ip);
         } catch (UnknownHostException e) {
             logger.debug("Failed to get address: " + e.toString());
-            return Optional.absent();
+            return new ArrayList<String>();
         }
 
         try {
@@ -34,16 +32,16 @@ public class Discovery {
             logger.info("creating jmdns");
             JmDNS jmdns = JmDNS.create(myAddress);
             jmdns.addServiceListener(TYPE, listener);
-            Optional<String> url = listener.getUrl();
+            List<String> urls = listener.getUrl();
             jmdns.removeServiceListener(TYPE, listener);
             logger.info("closing jmdns");
             jmdns.close();
             logger.info("closing jmdns: done");
-            return url;
+            return urls;
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            return Optional.absent();
+            return new ArrayList<String>();
         }
     }
 }

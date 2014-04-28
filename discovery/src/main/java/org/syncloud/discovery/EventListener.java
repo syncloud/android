@@ -1,13 +1,12 @@
 package org.syncloud.discovery;
 
-import com.google.common.base.Optional;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
-import java.util.concurrent.CountDownLatch;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
-
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
@@ -17,32 +16,40 @@ public class EventListener implements ServiceListener {
 
     private static Logger logger = LogManager.getLogger(EventListener.class.getName());
 
-    private CountDownLatch latch = new CountDownLatch(1);
-    private CountDownLatch discoveryLatch = new CountDownLatch(1);
-    private String url = null;
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition condition = lock.newCondition();
+    private List<String> urls = new ArrayList<String>();
     private String serviceName;
 
     public EventListener(String serviceName) {
         this.serviceName = serviceName;
     }
 
-    public Optional<String> getUrl() {
+    public List<String> getUrl() {
         try {
-            discoveryLatch.await(30, TimeUnit.SECONDS);
-            return Optional.fromNullable(url);
+
+            lock.lock();
+
+            while (condition.await(2, TimeUnit.SECONDS)) {
+                logger.debug("will wait for another one");
+            }
+
+            lock.unlock();
+
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            return Optional.absent();
+            logger.error("interrupted", e);
         }
+        return urls;
     }
 
     @Override
     public void serviceAdded(final ServiceEvent event) {
-        if (event.getName().equals(serviceName)) {
-            ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), event.getName());
+        String eventName = event.getName();
+        if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
+            ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), eventName);
             waitForIpv4(info);
-            url = extractUrl(info);
-            discoveryLatch.countDown();
+            urls.add(extractUrl(info));
+            condition.signal();
         }
     }
 

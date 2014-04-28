@@ -12,8 +12,8 @@ dependencies {
     testCompile 'junit:junit:4.10'
 }
 
-/*sourceSets {
-    main {
+sourceSets {
+    test {
         output.resourcesDir = "build/classes/main"
     }
-}*/
+}
