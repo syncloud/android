@@ -13,7 +13,7 @@ dependencies {
 }
 
 sourceSets {
-    test {
+    main {
         output.resourcesDir = "build/classes/main"
     }
 }

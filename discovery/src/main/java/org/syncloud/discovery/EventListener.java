@@ -4,52 +4,38 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.TimeoutException;
+
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 
 public class EventListener implements ServiceListener {
 
-
     private static Logger logger = LogManager.getLogger(EventListener.class.getName());
 
-    private final ReentrantLock lock = new ReentrantLock();
-    private final Condition condition = lock.newCondition();
-    private List<String> urls = new ArrayList<String>();
     private String serviceName;
+    private DeviceLisener deviceLisener;
 
     public EventListener(String serviceName) {
         this.serviceName = serviceName;
     }
 
-    public List<String> getUrl() {
-        try {
-
-            lock.lock();
-
-            while (condition.await(2, TimeUnit.SECONDS)) {
-                logger.debug("will wait for another one");
-            }
-
-            lock.unlock();
-
-        } catch (InterruptedException e) {
-            logger.error("interrupted", e);
-        }
-        return urls;
+    public EventListener(String serviceName, DeviceLisener deviceLisener) {
+        this.serviceName = serviceName;
+        this.deviceLisener = deviceLisener;
     }
+
 
     @Override
     public void serviceAdded(final ServiceEvent event) {
+
         String eventName = event.getName();
         if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
-            ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), eventName);
-            waitForIpv4(info);
-            urls.add(extractUrl(info));
-            condition.signal();
+            logger.debug("service added name: " + event.getName() + ", ip4 addresses: " + event.getInfo().getInet4Addresses().length);
+            event.getDNS().getServiceInfo(event.getType(), eventName);
         }
     }
 
@@ -70,23 +56,18 @@ public class EventListener implements ServiceListener {
         return url;
     }
 
-    private void waitForIpv4(ServiceInfo info) {
-        //TODO: Looks like info is updated asynchronously and ipv4 arrives a bit later
-        int retry = 0;
-        while (info.getInet4Addresses().length == 0 && retry < 10) {
-            try {
-                logger.debug("waiting for ipv4");
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            retry++;
-        }
-    }
-
     @Override
     public void serviceRemoved(ServiceEvent event) { }
+
     @Override
-    public void serviceResolved(ServiceEvent event) { }
+    public void serviceResolved(ServiceEvent event) {
+        String eventName = event.getName();
+        logger.debug("service resolved name: " + event.getName() + ", ip4 addresses: " + event.getInfo().getInet4Addresses().length);
+        if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
+            String url = extractUrl(event.getInfo());
+            if (deviceLisener != null)
+                deviceLisener.added(url);
+        }
+    }
 
 }

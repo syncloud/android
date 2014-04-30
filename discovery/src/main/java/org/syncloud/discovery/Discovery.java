@@ -7,6 +7,8 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import javax.jmdns.JmDNS;
 
 public class Discovery {
@@ -28,11 +30,12 @@ public class Discovery {
         }
 
         try {
-            EventListener listener = new EventListener(serviceName);
+            BlockingDeviceListener deviceLisener = new BlockingDeviceListener();
+            EventListener listener = new EventListener(serviceName, deviceLisener);
             logger.info("creating jmdns");
             JmDNS jmdns = JmDNS.create(myAddress);
             jmdns.addServiceListener(TYPE, listener);
-            List<String> urls = listener.getUrl();
+            List<String> urls = deviceLisener.waitForServices(2, TimeUnit.SECONDS);
             jmdns.removeServiceListener(TYPE, listener);
             logger.info("closing jmdns");
             jmdns.close();

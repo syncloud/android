@@ -1,7 +1,5 @@
 package org.syncloud.discovery;
 
-import com.google.common.base.Optional;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -10,12 +8,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
 import java.io.IOException;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -62,6 +59,8 @@ public class DiscoveryTest {
 
         int ip = ByteBuffer.wrap(localHost.getAddress()).getInt();
         List<String> urlStrings = Discovery.getUrl(ip, OWN_CLOUD);
+
+        Collections.sort(urlStrings);
 
         logger.debug(urlStrings);
         Assert.assertEquals(urlStrings.size(), 2);
