@@ -1,11 +1,9 @@
 package org.syncloud.android.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,18 +12,22 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import org.syncloud.android.R;
-import org.syncloud.discovery.Discovery;
+import org.syncloud.android.discovery.AsyncDiscovery;
+import org.syncloud.discovery.DeviceListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DeviceList extends Activity {
 
-    WifiManager.MulticastLock lock;
-    public final static String MULTICAST_LOCK_TAG = DeviceList.class.toString();
     private ArrayAdapter<String> devicesAdapter;
+    private AsyncDiscovery asyncDiscovery;
+    private Set<String> devices = new HashSet<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +50,38 @@ public class DeviceList extends Activity {
             }
         });
 
-        discoverAsync().execute("ownCloud");
+        DeviceListener deviceListener = new DeviceListener() {
+            @Override
+            public void added(final String url) {
+                if (!devices.contains(url)) {
+                    devices.add(url);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            devicesAdapter.add(url);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void removed(final String url) {
+                if (devices.contains(url)) {
+                    devices.remove(url);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() { devicesAdapter.remove(url);
+                        }
+                    });
+                }
+            }
+        };
+
+        asyncDiscovery = new AsyncDiscovery(
+                (WifiManager) getSystemService(Context.WIFI_SERVICE),
+                deviceListener);
+        ((ToggleButton) findViewById(R.id.discoveryToggle)).setChecked(true);
+        asyncDiscovery.start();
 
     }
 
@@ -73,51 +106,14 @@ public class DeviceList extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private AsyncTask<String, Void, List<String>> discoverAsync() {
-        return new AsyncTask<String, Void, List<String>>() {
+    public void onDiscoveryToggle(View view) {
+        boolean on = ((ToggleButton) view).isChecked();
 
-            @Override
-            protected List<String> doInBackground(String... input) {
+        if (on) {
+            asyncDiscovery.start();
+        } else {
+            asyncDiscovery.stop();
+        }
 
-                try {
-                    WifiManager wifi = (WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
-                    lock = wifi.createMulticastLock(MULTICAST_LOCK_TAG);
-                    lock.setReferenceCounted(true);
-                    lock.acquire();
-                    WifiInfo connInfo = wifi.getConnectionInfo();
-                    final int ip = connInfo.getIpAddress();
-
-                    return Discovery.getUrl(ip, input[0]);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    lock.release();
-                }
-                return new ArrayList<String>();
-            }
-
-            @Override
-            protected void onPostExecute(List<String> urls) {
-                TextView urlView = (TextView) findViewById(R.id.url);
-                DeviceList.this.devicesAdapter.addAll(urls);
-                if (urls.size() > 0) {
-                    urlView.setText("done");
-                } else {
-                    urlView.setText("not found");
-
-                }
-            }
-
-        };
     }
-
-    public void rescan(View view) {
-        TextView urlView = (TextView) findViewById(R.id.url);
-        urlView.setText(R.string.searching_label);
-        discoverAsync().execute();
-    }
-
-
-
 }

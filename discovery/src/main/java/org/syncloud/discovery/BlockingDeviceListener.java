@@ -9,13 +9,13 @@ import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class BlockingDeviceListener implements DeviceLisener {
+public class BlockingDeviceListener implements DeviceListener {
 
     private static Logger logger = LogManager.getLogger(BlockingDeviceListener.class.getName());
     private List<String> urls = new ArrayList<String>();
     private final Phaser phaser = new Phaser(2);
 
-    public List<String> waitForServices(int timeout, TimeUnit timeUnit) {
+    public List<String> await(int timeout, TimeUnit timeUnit) {
         try {
             int services = phaser.getPhase();
             while (services >= 0) {

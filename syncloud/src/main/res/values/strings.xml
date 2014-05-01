@@ -8,7 +8,7 @@
     <string name="activate_button">Activate Device</string>
     <string name="password_label">Device password:</string>
     <string name="login_label">Device login:</string>
-    <string name="searching_label">searching ...</string>
+    <string name="discovery_toggle">Discovery:</string>
     <string name="rescan_label">Refresh</string>
     <string name="name_email">Email:</string>
     <string name="name_registration">Do not enter email if you have an account</string>

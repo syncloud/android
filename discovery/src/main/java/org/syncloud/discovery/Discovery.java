@@ -5,9 +5,6 @@ import org.apache.log4j.Logger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.jmdns.JmDNS;
 
@@ -16,8 +13,20 @@ public class Discovery {
     private static Logger logger = LogManager.getLogger(Discovery.class.getName());
 
     public static final String TYPE = "_http._tcp.local.";
+    private JmDNS jmdns;
+    private EventToDeviceConverter listener;
+    private boolean started = false;
 
-    public static List<String> getUrl(int ipAddress, String serviceName) {
+    public Discovery(DeviceListener deviceListener, String serviceName) {
+        listener = new EventToDeviceConverter(serviceName, deviceListener);
+    }
+
+    public void start(int ipAddress) {
+
+        if (started){
+            logger.error("already started, stop first");
+            return;
+        }
 
 
         byte[] ip = ByteBuffer.allocate(4).putInt(ipAddress).array();
@@ -26,25 +35,36 @@ public class Discovery {
             myAddress = InetAddress.getByAddress(ip);
         } catch (UnknownHostException e) {
             logger.debug("Failed to get address: " + e.toString());
-            return new ArrayList<String>();
+            return;
         }
 
         try {
-            BlockingDeviceListener deviceLisener = new BlockingDeviceListener();
-            EventListener listener = new EventListener(serviceName, deviceLisener);
             logger.info("creating jmdns");
-            JmDNS jmdns = JmDNS.create(myAddress);
+            jmdns = JmDNS.create(myAddress);
             jmdns.addServiceListener(TYPE, listener);
-            List<String> urls = deviceLisener.waitForServices(2, TimeUnit.SECONDS);
+            started = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+    }
+
+    public void stop() {
+
+        if (!started) {
+            logger.error("not started, start first");
+            return;
+        }
+
+        try {
             jmdns.removeServiceListener(TYPE, listener);
             logger.info("closing jmdns");
             jmdns.close();
             logger.info("closing jmdns: done");
-            return urls;
+            started = false;
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            return new ArrayList<String>();
         }
     }
 }

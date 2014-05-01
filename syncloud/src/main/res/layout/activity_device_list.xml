@@ -7,29 +7,41 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="org.syncloud.android.activity.DeviceList"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:configChanges="keyboardHidden|orientation">
 
         <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/rescan"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight=".50"
-                    android:onClick="rescan"
-                    android:text="@string/rescan_label" />
+            <TextView
+                android:id="@+id/url"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/discovery_toggle"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <ToggleButton
+                android:id="@+id/discoveryToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="ON"
+                android:textOff="OFF"
+                android:enabled="true"
+                android:onClick="onDiscoveryToggle"/>
+
+            <TextView
+                android:id="@+id/discoveryStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/url"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/searching_label"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+
 
             <ListView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/devices"

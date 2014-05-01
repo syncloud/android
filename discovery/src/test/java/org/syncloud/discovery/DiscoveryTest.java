@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -57,21 +58,24 @@ public class DiscoveryTest {
     @Test
     public void testDiscovery() throws IOException {
 
-        int ip = ByteBuffer.wrap(localHost.getAddress()).getInt();
-        List<String> urlStrings = Discovery.getUrl(ip, OWN_CLOUD);
+        BlockingDeviceListener blockingDeviceListener = new BlockingDeviceListener();
+        Discovery discovery = new Discovery(blockingDeviceListener, OWN_CLOUD);
+        discovery.start(ByteBuffer.wrap(localHost.getAddress()).getInt());
+        List<String> devices = blockingDeviceListener.await(10, TimeUnit.SECONDS);
+        discovery.stop();
 
-        Collections.sort(urlStrings);
+        Collections.sort(devices);
 
-        logger.debug(urlStrings);
-        Assert.assertEquals(urlStrings.size(), 2);
+        logger.debug(devices);
+        Assert.assertEquals(devices.size(), 2);
 
-        URL url = new URL(urlStrings.get(0));
+        URL url = new URL(devices.get(0));
         Assert.assertEquals("http", url.getProtocol());
         Assert.assertEquals(8080, url.getPort());
         Assert.assertEquals("/owncloud", url.getPath());
         Assert.assertTrue(IPAddressUtil.isIPv4LiteralAddress(url.getHost()));
 
-        url = new URL(urlStrings.get(1));
+        url = new URL(devices.get(1));
         Assert.assertEquals("http", url.getProtocol());
         Assert.assertEquals(8081, url.getPort());
         Assert.assertEquals("/owncloud", url.getPath());
