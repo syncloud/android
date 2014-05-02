@@ -24,5 +24,7 @@
     <string name="owncloud_label">ownCloud: File storage</string>
     <string name="title_activity_app_details">AppDetails</string>
     <string name="device_ip">device ip</string>
+    <string name="app_install">Install</string>
+    <string name="app_remove">Remove</string>
 
 </resources>
