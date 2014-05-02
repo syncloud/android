@@ -2,8 +2,8 @@ package org.syncloud.discovery;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.syncloud.model.Device;
 
-import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +17,7 @@ public class EventToDeviceConverter implements ServiceListener {
 
     private String serviceName;
     private DeviceListener deviceListener;
-    private Map<String, String> serviceToUrl = new HashMap<String, String>();
+    private Map<String, Device> serviceToUrl = new HashMap<String, Device>();
 
     public EventToDeviceConverter(String serviceName, DeviceListener deviceListener) {
         this.serviceName = serviceName;
@@ -33,10 +33,10 @@ public class EventToDeviceConverter implements ServiceListener {
             ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), eventName);
             waitForIpv4(info);
 
-            String url = extractUrl(info);
-            serviceToUrl.put(eventName, url);
+            Device device = extractDevice(info);
+            serviceToUrl.put(eventName, device);
             if (deviceListener != null)
-                deviceListener.added(url);
+                deviceListener.added(device);
 
         }
     }
@@ -56,7 +56,7 @@ public class EventToDeviceConverter implements ServiceListener {
     }
 
 
-    private String extractUrl(ServiceInfo info) {
+    private Device extractDevice(ServiceInfo info) {
         String address = "unknown";
         if (info.getInet4Addresses().length > 0) {
             address = info.getInet4Addresses()[0].getHostAddress();
@@ -66,11 +66,12 @@ public class EventToDeviceConverter implements ServiceListener {
             if (server.endsWith(local))
                 address = server.substring(0, server.length() - local.length());
         }
-        String url = "http://" + address + ":" + info.getPort() + info.getPropertyString("path");
 
-        logger.debug(url);
+        Device device = new Device(address, info.getPort(), info.getPropertyString("path"));
 
-        return url;
+        logger.debug(device.getOwnCloudUrl());
+
+        return device;
     }
 
     @Override
@@ -78,21 +79,15 @@ public class EventToDeviceConverter implements ServiceListener {
         logger.debug("service removed name: " + event.getName() + ", ip4 addresses: " + event.getInfo().getInet4Addresses().length);
         String eventName = event.getName();
         if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
-            String url = serviceToUrl.remove(eventName);
+            Device device = serviceToUrl.remove(eventName);
             if (deviceListener != null)
-                deviceListener.removed(url);
+                deviceListener.removed(device);
         }
     }
 
     @Override
     public void serviceResolved(ServiceEvent event) {
-        String eventName = event.getName();
-        logger.debug("service resolved name: " + event.getName() + ", ip4 addresses: " + event.getInfo().getInet4Addresses().length);
-        /*if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
-            String url = extractUrl(event.getInfo());
-            if (deviceListener != null)
-                deviceListener.added(url);
-        }*/
+        //TODO: Not using this as sometime it is not even called
     }
 
 }

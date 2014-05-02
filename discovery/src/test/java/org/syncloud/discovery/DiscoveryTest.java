@@ -8,11 +8,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.syncloud.model.Device;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -61,21 +64,26 @@ public class DiscoveryTest {
         BlockingDeviceListener blockingDeviceListener = new BlockingDeviceListener();
         Discovery discovery = new Discovery(blockingDeviceListener, OWN_CLOUD);
         discovery.start(ByteBuffer.wrap(localHost.getAddress()).getInt());
-        List<String> devices = blockingDeviceListener.await(10, TimeUnit.SECONDS);
+        List<Device> devices = blockingDeviceListener.await(10, TimeUnit.SECONDS);
         discovery.stop();
 
-        Collections.sort(devices);
+        Collections.sort(devices, new Comparator<Device>() {
+            @Override
+            public int compare(Device device, Device device2) {
+                return device.getOwnCloudUrl().compareTo(device2.getOwnCloudUrl());
+            }
+        });
 
         logger.debug(devices);
         Assert.assertEquals(devices.size(), 2);
 
-        URL url = new URL(devices.get(0));
+        URL url = new URL(devices.get(0).getOwnCloudUrl());
         Assert.assertEquals("http", url.getProtocol());
         Assert.assertEquals(8080, url.getPort());
         Assert.assertEquals("/owncloud", url.getPath());
         Assert.assertTrue(IPAddressUtil.isIPv4LiteralAddress(url.getHost()));
 
-        url = new URL(devices.get(1));
+        url = new URL(devices.get(1).getOwnCloudUrl());
         Assert.assertEquals("http", url.getProtocol());
         Assert.assertEquals(8081, url.getPort());
         Assert.assertEquals("/owncloud", url.getPath());

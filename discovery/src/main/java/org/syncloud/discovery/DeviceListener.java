@@ -1,7 +1,8 @@
 package org.syncloud.discovery;
 
-public interface DeviceListener {
-    public void added(String url);
-    public void removed(String url);
+import org.syncloud.model.Device;
 
+public interface DeviceListener {
+    public void added(Device device);
+    public void removed(Device device);
 }

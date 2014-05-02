@@ -8,7 +8,8 @@ dependencies {
     compile 'log4j:log4j:1.2.17'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 //    compile 'org.apache.httpcomponents:httpclient:4.3.3'
-    compile 'org.apache.httpcomponents:httpclient-android:4.3.3'
+    compile 'org.apache.httpcomponents:httpclient:4.3.3'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
     testCompile 'junit:junit:4.10'
 }
 

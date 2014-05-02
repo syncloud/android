@@ -7,17 +7,22 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.syncloud.android.R;
-import org.syncloud.android.activation.Owncloud;
-import org.syncloud.android.activation.Result;
+import org.syncloud.app.Repo;
+import org.syncloud.model.App;
+
+import java.util.List;
 
 
 public class Device extends Activity {
 
-    private String url;
+    private String address;
+    private Repo repo = new Repo();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,8 +30,40 @@ public class Device extends Activity {
         setContentView(R.layout.activity_device);
 
         TextView deviceAddress = (TextView) findViewById(R.id.device_address);
-        url = getIntent().getExtras().getString("url");
-        deviceAddress.setText(url);
+        address = getIntent().getExtras().getString("address");
+        deviceAddress.setText(address);
+
+        final ListView listview = (ListView) findViewById(R.id.app_list);
+        final ArrayAdapter<App> appsAdapter = new ArrayAdapter<App>(this,
+                android.R.layout.simple_list_item_1);
+        listview.setAdapter(appsAdapter);
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                final List<App> apps = repo.list();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        appsAdapter.addAll(apps);
+                    }
+                });
+            }
+        });
+
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                                    long id) {
+                App app = (App) parent.getAdapter().getItem(position);
+                Intent intent = new Intent(Device.this, AppDetails.class);
+                intent.putExtra("device_address", address);
+                intent.putExtra("app_name", app.getName());
+                intent.putExtra("app_url", repo.getUrl());
+                intent.putExtra("app_script", app.scriptName());
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -49,15 +86,15 @@ public class Device extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-   public void dns(View view) {
-       Intent intent = new Intent(this, DnsActivity.class);
-       intent.putExtra("url", url);
-       startActivity(intent);
-   }
+    public void dns(View view) {
+        Intent intent = new Intent(this, DnsActivity.class);
+        intent.putExtra("address", address);
+        startActivity(intent);
+    }
 
     public void owncloud(View view) {
         Intent intent = new Intent(this, OwncloudActivity.class);
-        intent.putExtra("url", url);
+        intent.putExtra("address", address);
         startActivity(intent);
     }
 }

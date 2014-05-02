@@ -2,6 +2,7 @@ package org.syncloud.discovery;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.syncloud.model.Device;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +13,10 @@ import java.util.concurrent.TimeoutException;
 public class BlockingDeviceListener implements DeviceListener {
 
     private static Logger logger = LogManager.getLogger(BlockingDeviceListener.class.getName());
-    private List<String> urls = new ArrayList<String>();
+    private List<Device> devices = new ArrayList<Device>();
     private final Phaser phaser = new Phaser(2);
 
-    public List<String> await(int timeout, TimeUnit timeUnit) {
+    public List<Device> await(int timeout, TimeUnit timeUnit) {
         try {
             int services = phaser.getPhase();
             while (services >= 0) {
@@ -29,18 +30,18 @@ public class BlockingDeviceListener implements DeviceListener {
         } catch (TimeoutException e) {
             logger.debug("no more waiting");
         }
-        return urls;
+        return devices;
     }
 
     @Override
-    public void added(String url) {
-        urls.add(url);
+    public void added(Device device) {
+        devices.add(device);
         int services = phaser.arriveAndAwaitAdvance();
         logger.debug("discovered: " + services);
     }
 
     @Override
-    public void removed(String url) {
+    public void removed(Device device) {
 
     }
 }

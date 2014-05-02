@@ -13,23 +13,18 @@
         <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/url"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/discovery_toggle"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:orientation="horizontal"
+                android:gravity="center">
 
             <ToggleButton
                 android:id="@+id/discoveryToggle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textOn="ON"
-                android:textOff="OFF"
+                android:textOn="Discovery ON"
+                android:textOff="Discovery OFF"
                 android:enabled="true"
-                android:onClick="onDiscoveryToggle"/>
+                android:onClick="onDiscoveryToggle"
+                />
 
             <TextView
                 android:id="@+id/discoveryStatus"
@@ -39,9 +34,6 @@
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             </LinearLayout>
-
-
-
 
             <ListView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/devices"

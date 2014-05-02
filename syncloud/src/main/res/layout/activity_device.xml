@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,13 +6,39 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="org.syncloud.android.activity.Device">
+    tools:context="org.syncloud.android.activity.Device"
+    android:orientation="vertical"
+    >
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/device"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/device_label"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            />
+
+        <TextView
+            android:id="@+id/device_address"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/device_ip"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    </LinearLayout>
+
+
+    <!--<ScrollView-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content">-->
+
+        <!--<LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -21,19 +47,6 @@
             android:layout_alignParentRight="true"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/device"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/device_label"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/device_address"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <Button
                 android:id="@+id/app_dns"
@@ -52,7 +65,13 @@
                 android:onClick="owncloud"/>
 
 
-        </LinearLayout>
-    </ScrollView>
+        </LinearLayout>-->
 
-</RelativeLayout>
+        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/app_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    <!--</ScrollView>-->
+
+</LinearLayout>

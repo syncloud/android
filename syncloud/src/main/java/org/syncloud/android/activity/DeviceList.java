@@ -11,23 +11,20 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import org.syncloud.android.R;
 import org.syncloud.android.discovery.AsyncDiscovery;
 import org.syncloud.discovery.DeviceListener;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class DeviceList extends Activity {
 
     private ArrayAdapter<String> devicesAdapter;
     private AsyncDiscovery asyncDiscovery;
-    private Set<String> devices = new HashSet<String>();
+    private Set<org.syncloud.model.Device> devices = new HashSet<org.syncloud.model.Device>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,38 +36,40 @@ public class DeviceList extends Activity {
                 android.R.layout.simple_list_item_1);
         listview.setAdapter(devicesAdapter);
 
+        devicesAdapter.add("127.0.0.1 (Demo)");
+
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
-                String url = (String) parent.getAdapter().getItem(position);
+                String address = (String) parent.getAdapter().getItem(position);
                 Intent intent = new Intent(DeviceList.this, Device.class);
-                intent.putExtra("url", url);
+                intent.putExtra("address", address);
                 startActivity(intent);
             }
         });
 
         DeviceListener deviceListener = new DeviceListener() {
             @Override
-            public void added(final String url) {
-                if (!devices.contains(url)) {
-                    devices.add(url);
+            public void added(final org.syncloud.model.Device device) {
+                if (!devices.contains(device)) {
+                    devices.add(device);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            devicesAdapter.add(url);
+                            devicesAdapter.add(device.getIp());
                         }
                     });
                 }
             }
 
             @Override
-            public void removed(final String url) {
-                if (devices.contains(url)) {
-                    devices.remove(url);
+            public void removed(final org.syncloud.model.Device device) {
+                if (devices.contains(device)) {
+                    devices.remove(device);
                     runOnUiThread(new Runnable() {
                         @Override
-                        public void run() { devicesAdapter.remove(url);
+                        public void run() { devicesAdapter.remove(device.getIp());
                         }
                     });
                 }

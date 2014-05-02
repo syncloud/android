@@ -17,10 +17,12 @@
     <string name="name_login_label">Name login:</string>
     <string name="name_for_app_label">For app: device.[login].syncloud.it:[port]/owncloud</string>
     <string name="title_activity_device">Device</string>
-    <string name="device_label">Device</string>
+    <string name="device_label">Device:</string>
     <string name="title_activity_owncloud">owncloud</string>
     <string name="title_activity_dns">dns</string>
     <string name="dns_label">Public Name</string>
     <string name="owncloud_label">ownCloud: File storage</string>
+    <string name="title_activity_app_details">AppDetails</string>
+    <string name="device_ip">device ip</string>
 
 </resources>
