@@ -31,6 +31,7 @@
         android:gravity="center">
 
         <Button
+            android:id="@+id/install_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/app_install"
@@ -38,10 +39,28 @@
             />
 
         <Button
+            android:id="@+id/remove_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/app_remove"
             android:onClick="remove"
+            />
+
+        <Button
+            android:id="@+id/update_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_update"
+            android:onClick="update"
+            android:visibility="gone"
+            />
+
+        <Button
+            android:id="@+id/verify_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_verify"
+            android:onClick="verify"
             />
     </LinearLayout>
 

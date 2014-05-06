@@ -21,10 +21,6 @@ public class App {
         this.id = id;
     }
 
-    public String scriptName() {
-        return id + ".sh";
-    }
-
     @Override
     public String toString() {
         return name;

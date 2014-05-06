@@ -26,5 +26,7 @@
     <string name="device_ip">device ip</string>
     <string name="app_install">Install</string>
     <string name="app_remove">Remove</string>
+    <string name="app_verify">Verify</string>
+    <string name="app_update">Update</string>
 
 </resources>

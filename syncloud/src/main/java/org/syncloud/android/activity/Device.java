@@ -60,7 +60,7 @@ public class Device extends Activity {
                 intent.putExtra("device_address", address);
                 intent.putExtra("app_name", app.getName());
                 intent.putExtra("app_url", repo.getUrl());
-                intent.putExtra("app_script", app.scriptName());
+                intent.putExtra("app", app.getId());
                 startActivity(intent);
             }
         });
