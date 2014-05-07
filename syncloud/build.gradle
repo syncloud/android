@@ -8,12 +8,32 @@ android {
         minSdkVersion 16
         targetSdkVersion 19
         versionCode 1
-        versionName "1.1"
+        versionName "0.1"
     }
+
+    productFlavors {
+        beta {
+            packageName "org.syncloud.android.beta"
+        }
+
+        prod {
+            packageName "org.syncloud.android"
+        }
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('syncloud.keystore')
+            storePassword ''
+            keyAlias ''
+            keyPassword ''
+        }
+    }
+
     buildTypes {
         release {
-            runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            debuggable false
+            signingConfig signingConfigs.release
         }
     }
 
@@ -21,6 +41,30 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
         exclude 'log4j.properties'
+    }
+
+    allprojects {
+        afterEvaluate { project ->
+
+            /*
+            Generate using:
+            keytool -genkey -v -keystore syncloud.keystore -alias syncloud -keyalg RSA -keysize 2048 -validity 10000
+
+            keystore.properties contents:
+            storePassword=
+            keyPassword=
+            keyAlias=syncloud
+            storeFile=/path/to/syncloud.keystore
+            */
+
+            def props = new Properties()
+            props.load(new FileInputStream(rootProject.file('keystore.properties')))
+
+            android.signingConfigs['release'].storeFile = file(props['storeFile'])
+            android.signingConfigs['release'].storePassword = props['storePassword']
+            android.signingConfigs['release'].keyAlias = props['keyAlias']
+            android.signingConfigs['release'].keyPassword = props['keyPassword']
+        }
     }
 
 }
