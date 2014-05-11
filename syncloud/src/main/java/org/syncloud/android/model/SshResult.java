@@ -16,4 +16,8 @@ public class SshResult {
     public String getMessage() {
         return message;
     }
+
+    public boolean ok() {
+        return exitCode == 0;
+    }
 }

@@ -4,6 +4,7 @@ public class App {
 
     private String name;
     private String id;
+    private Boolean isDev;
 
     public String getName() {
         return name;
@@ -24,5 +25,13 @@ public class App {
     @Override
     public String toString() {
         return name;
+    }
+
+    public Boolean getIsDev() {
+        return isDev;
+    }
+
+    public void setIsDev(Boolean isDev) {
+        this.isDev = isDev;
     }
 }
