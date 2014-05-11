@@ -23,6 +23,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.syncloud.model.Result;
 
 import java.io.IOException;
 import java.util.ArrayList;

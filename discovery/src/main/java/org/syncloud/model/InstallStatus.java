@@ -1,4 +1,4 @@
-package org.syncloud.android.model;
+package org.syncloud.model;
 
 public class InstallStatus {
     private boolean installed = false;

@@ -11,10 +11,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.syncloud.android.R;
-import org.syncloud.android.activation.Result;
-import org.syncloud.android.model.InstallStatus;
-import org.syncloud.android.model.VerifyStatus;
-import org.syncloud.android.ssh.Ssh;
+import org.syncloud.model.Result;
+import org.syncloud.model.InstallStatus;
+import org.syncloud.ssh.Spm;
 
 public class AppDetails extends Activity {
 
@@ -78,7 +77,7 @@ public class AppDetails extends Activity {
             @Override
             protected String doInBackground(String... strings) {
                 try {
-                    return Ssh.install(strings[0], strings[1]);
+                    return Spm.install(strings[0], strings[1]);
                 } catch (final Exception e) {
                     return e.getMessage();
                 }
@@ -90,32 +89,6 @@ public class AppDetails extends Activity {
                 status(true);
             }
         }.execute(deviceAddress, app);
-
-        /*AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                final String status;
-                try {
-                    status = Ssh.install(deviceAddress, app);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            executeStatus.setText(status);
-                            status(true);
-                        }
-                    });
-                } catch (final Exception e) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            executeStatus.setText(e.getMessage());
-                            status(true);
-                        }
-                    });
-                }
-
-            }
-        });*/
     }
 
     public void status(final boolean append) {
@@ -129,7 +102,7 @@ public class AppDetails extends Activity {
             @Override
             protected Result<InstallStatus> doInBackground(String... strings) {
                 try {
-                    return Result.value(Ssh.status(strings[0], strings[1]));
+                    return Result.value(Spm.status(strings[0], strings[1]));
                 } catch (final Exception e) {
                     return Result.error(e.getMessage());
                 }
@@ -161,43 +134,6 @@ public class AppDetails extends Activity {
             }
         }.execute(deviceAddress, app);
 
-        /*AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final InstallStatus status = Ssh.status(deviceAddress, app);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (status.isInstalled()) {
-                                installBtn.setVisibility(View.GONE);
-                                removeBtn.setVisibility(View.VISIBLE);
-                                verifyBtn.setVisibility(View.VISIBLE);
-                            } else {
-                                installBtn.setVisibility(View.VISIBLE);
-                                removeBtn.setVisibility(View.GONE);
-                                verifyBtn.setVisibility(View.GONE);
-                            }
-                            String message = "Status: " + status.getMessage();
-                            if (append) {
-                                executeStatus.setText(executeStatus.getText() + "\n" + message);
-                            } else {
-                                executeStatus.setText(message);
-                            }
-                            progress.hide();
-                        }
-                    });
-                } catch (final Exception e) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            executeStatus.setText(e.getMessage());
-                        }
-                    });
-                }
-
-            }
-        });*/
     }
 
     public void remove(View view) {
@@ -211,7 +147,7 @@ public class AppDetails extends Activity {
             @Override
             protected String doInBackground(String... strings) {
                 try {
-                    return Ssh.remove(strings[0], strings[1]);
+                    return Spm.remove(strings[0], strings[1]);
                 } catch (final Exception e) {
                     return e.getMessage();
                 }
@@ -224,25 +160,6 @@ public class AppDetails extends Activity {
             }
         }.execute(deviceAddress, app);
 
-        /*AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                String status;
-                try {
-                    status = Ssh.remove(deviceAddress, app);
-                } catch (final Exception e) {
-                    status = e.getMessage();
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        executeStatus.setText(status);
-                        status(true);
-                    }
-                });
-
-            }
-        });*/
     }
 
     public void update(View view) {
@@ -259,7 +176,7 @@ public class AppDetails extends Activity {
             @Override
             protected String doInBackground(String... strings) {
                 try {
-                    return Ssh.verify(strings[0], strings[1]).getMessage();
+                    return Spm.verify(strings[0], strings[1]).getMessage();
                 } catch (final Exception e) {
                     return e.getMessage();
                 }
@@ -272,28 +189,5 @@ public class AppDetails extends Activity {
             }
         }.execute(deviceAddress, app);
 
-        /*AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                final VerifyStatus status;
-                try {
-                    status = Ssh.verify(deviceAddress, app);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            executeStatus.setText(status.getMessage());
-                        }
-                    });
-                } catch (final Exception e) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            executeStatus.setText(e.getMessage());
-                        }
-                    });
-                }
-
-            }
-        });*/
     }
 }

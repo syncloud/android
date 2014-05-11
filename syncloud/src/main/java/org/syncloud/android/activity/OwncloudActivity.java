@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import org.syncloud.android.R;
 import org.syncloud.android.activation.Owncloud;
-import org.syncloud.android.activation.Result;
+import org.syncloud.model.Result;
 
 
 public class OwncloudActivity extends Activity {

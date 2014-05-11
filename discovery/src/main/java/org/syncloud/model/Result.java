@@ -1,4 +1,4 @@
-package org.syncloud.android.activation;
+package org.syncloud.model;
 
 import com.google.common.base.Optional;
 

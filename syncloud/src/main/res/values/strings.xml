@@ -28,5 +28,7 @@
     <string name="app_remove">Remove</string>
     <string name="app_verify">Verify</string>
     <string name="app_update">Update</string>
+    <string name="title_activity_device_settings">DeviceSettings</string>
+    <string name="remote_access_label">Remote app management:</string>
 
 </resources>

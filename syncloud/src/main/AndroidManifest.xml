@@ -45,6 +45,10 @@
             android:name="org.syncloud.android.activity.AppDetails"
             android:label="@string/title_activity_app_details" >
         </activity>
+        <activity
+            android:name="org.syncloud.android.activity.DeviceSettings"
+            android:label="@string/title_activity_device_settings" >
+        </activity>
     </application>
 
 </manifest>
