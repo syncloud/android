@@ -6,4 +6,8 @@
         android:title="@string/action_settings"
         android:orderInCategory="100"
         app:showAsAction="never" />
+    <item android:id="@+id/action_reinstall_spm"
+        android:title="@string/reinstall_spm"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
 </menu>

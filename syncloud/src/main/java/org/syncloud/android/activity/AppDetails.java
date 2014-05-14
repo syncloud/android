@@ -41,9 +41,9 @@ public class AppDetails extends Activity {
         app = getIntent().getExtras().getString("app");
         deviceAddress = getIntent().getExtras().getString("device_address");
         progress = new ProgressDialog(this);
-        progress.setMessage("Talking to the device" );
+        progress.setMessage("Talking to the device");
         progress.show();
-        status(false);
+//        status(false);
     }
 
 
@@ -66,31 +66,9 @@ public class AppDetails extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void install(View view) {
 
-        new AsyncTask<String, String, String>() {
-            @Override
-            protected void onPreExecute() {
-                progress.show();
-            }
 
-            @Override
-            protected String doInBackground(String... strings) {
-                try {
-                    return Spm.install(strings[0], strings[1]);
-                } catch (final Exception e) {
-                    return e.getMessage();
-                }
-            }
-
-            @Override
-            protected void onPostExecute(String status) {
-                executeStatus.setText(status);
-                status(true);
-            }
-        }.execute(deviceAddress, app);
-    }
-
+/*
     public void status(final boolean append) {
 
         new AsyncTask<String, String, Result<InstallStatus>>() {
@@ -135,8 +113,9 @@ public class AppDetails extends Activity {
         }.execute(deviceAddress, app);
 
     }
+*/
 
-    public void remove(View view) {
+    /*public void remove(View view) {
 
         new AsyncTask<String, String, String>() {
             @Override
@@ -146,11 +125,8 @@ public class AppDetails extends Activity {
 
             @Override
             protected String doInBackground(String... strings) {
-                try {
-                    return Spm.remove(strings[0], strings[1]);
-                } catch (final Exception e) {
-                    return e.getMessage();
-                }
+                Result<String> result = Spm.run(Spm.Commnand.Remove, strings[0], strings[1]);
+                return result.hasError() ? result.getError() : result.getValue();
             }
 
             @Override
@@ -160,12 +136,12 @@ public class AppDetails extends Activity {
             }
         }.execute(deviceAddress, app);
 
-    }
+    }*/
 
     public void update(View view) {
     }
 
-    public void verify(View view) {
+    /*public void verify(View view) {
 
         new AsyncTask<String, String, String>() {
             @Override
@@ -189,5 +165,5 @@ public class AppDetails extends Activity {
             }
         }.execute(deviceAddress, app);
 
-    }
+    }*/
 }

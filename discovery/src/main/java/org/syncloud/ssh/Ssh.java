@@ -7,6 +7,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 import org.apache.commons.lang3.StringUtils;
+import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
 
 import java.io.ByteArrayOutputStream;
@@ -22,7 +23,15 @@ public class Ssh {
     public static final String PASSWORD = "syncloud";
 
 
-    public static SshResult execute(String hostname, List<String> commands) throws JSchException, IOException {
+    public static Result<SshResult> execute(String hostname, List<String> commands) {
+        try {
+            return Result.value(run(hostname, commands));
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    private static SshResult run(String hostname, List<String> commands) throws JSchException, IOException {
         JSch jsch = new JSch();
         Session session = jsch.getSession(USERNAME, hostname, 22);
         session.setPassword(PASSWORD);
