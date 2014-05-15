@@ -1,6 +1,7 @@
 package org.syncloud.android;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.syncloud.android.activity.Device;
+import org.syncloud.android.app.Remote_Access;
 import org.syncloud.model.App;
 import org.syncloud.ssh.Spm;
 
@@ -29,6 +31,14 @@ public class AppsAdapter extends ArrayAdapter<App> {
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_app, null);
         TextView textView = (TextView) rowView.findViewById(R.id.app_name);
+        final App app = getItem(position);
+        textView.setText(app.getName());
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                activity.openApp(app.getId());
+            }
+        });
 
         Button install = (Button) rowView.findViewById(R.id.install_app);
         install.setVisibility(View.GONE);
@@ -36,9 +46,6 @@ public class AppsAdapter extends ArrayAdapter<App> {
         remove.setVisibility(View.GONE);
         Button upgrade = (Button) rowView.findViewById(R.id.upgrade_app);
         upgrade.setVisibility(View.GONE);
-
-        final App app = getItem(position);
-        textView.setText(app.getName());
 
         if (app.getInstalled()) {
             if (!app.getInstalledVersion().equals(app.getVersion())) {

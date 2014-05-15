@@ -31,5 +31,6 @@
     <string name="title_activity_device_settings">DeviceSettings</string>
     <string name="remote_access_label">Remote app management:</string>
     <string name="reinstall_spm">Reinstall Package Manager</string>
+    <string name="title_activity_remote__access">Remote_Access</string>
 
 </resources>

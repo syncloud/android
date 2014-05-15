@@ -46,8 +46,12 @@
             android:label="@string/title_activity_app_details" >
         </activity>
         <activity
-            android:name="org.syncloud.android.activity.DeviceSettings"
+            android:name=".app.Remote_Access"
             android:label="@string/title_activity_device_settings" >
+        </activity>
+        <activity
+            android:name="org.syncloud.android.app.Remote_Access"
+            android:label="@string/title_activity_remote__access" >
         </activity>
     </application>
 

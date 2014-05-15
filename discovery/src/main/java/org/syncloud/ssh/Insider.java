@@ -36,8 +36,7 @@ public class Insider {
             if (sshResult.ok()) {
                 String[] lines = sshResult.getMessage().split("\\r?\\n");
                 for (String line : lines) {
-                    String json = line.replace(PORT_LIST_PREFIX, "");
-                    mappings.add(mapper.readValue(json, PortMapping.class));
+                    mappings.add(mapper.readValue(line, PortMapping.class));
                 }
             }
             return Result.value(mappings);

@@ -1,4 +1,4 @@
-package org.syncloud.android.activity;
+package org.syncloud.android.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,12 +15,13 @@ import org.syncloud.model.Result;
 import org.syncloud.model.PortMapping;
 import org.syncloud.model.SshResult;
 import org.syncloud.ssh.Insider;
+import org.syncloud.ssh.Ssh;
 
 import java.util.List;
 
-public class DeviceSettings extends Activity {
+public class Remote_Access extends Activity {
 
-    public static final int REMOTE_ACCESS_PORT = 22;
+    public static final int REMOTE_ACCESS_PORT = 1022;
     private ProgressDialog progress;
     private Switch remoteAccessSwitch;
 
@@ -28,7 +29,7 @@ public class DeviceSettings extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_device_settings);
+        setContentView(R.layout.activity_remote_access);
         progress = new ProgressDialog(this);
         progress.setMessage("Talking to the device");
         final String address = getIntent().getExtras().getString("device_address" );
@@ -57,6 +58,10 @@ public class DeviceSettings extends Activity {
             @Override
             protected Result<SshResult> doInBackground(String... strings) {
                 return Insider.addPort(strings[0], REMOTE_ACCESS_PORT);
+                //TODO: Need to:
+                //TODO: 1. Generate root ssh key
+                //TODO: 2. Bookmark this device using name/port/key
+//                Ssh.execute("");
             }
 
             @Override
@@ -64,7 +69,7 @@ public class DeviceSettings extends Activity {
                 progress.hide();
 
                 if (result.hasError()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(DeviceSettings.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Remote_Access.this);
                     builder.setMessage(result.getError());
                     remoteAccessSwitch.setChecked(false);
                 }
@@ -90,11 +95,12 @@ public class DeviceSettings extends Activity {
 
                 remoteAccessSwitch.setChecked(!result.hasError() && result.getValue().contains(new PortMapping(REMOTE_ACCESS_PORT)));
 
-                progress.hide();
 
                 if (result.hasError()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(DeviceSettings.this);
-                    builder.setMessage(result.getError());
+                    progress.setMessage(result.getError());
+                    progress.setCancelable(true);
+                } else {
+                    progress.hide();
                 }
 
             }
@@ -118,7 +124,7 @@ public class DeviceSettings extends Activity {
                 progress.hide();
 
                 if (result.hasError()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(DeviceSettings.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Remote_Access.this);
                     builder.setMessage(result.getError());
                     remoteAccessSwitch.setChecked(true);
                 }

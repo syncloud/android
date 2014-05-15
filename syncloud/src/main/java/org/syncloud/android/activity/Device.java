@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import org.syncloud.android.AppsAdapter;
 import org.syncloud.android.R;
+import org.syncloud.android.app.Remote_Access;
 import org.syncloud.model.App;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
@@ -146,9 +147,6 @@ public class Device extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(Device.this, DeviceSettings.class);
-            intent.putExtra("device_address", address);
-            startActivity(intent);
             return true;
         } else if (id == R.id.action_reinstall_spm) {
             Spm.installedSpm(address);
@@ -179,6 +177,14 @@ public class Device extends Activity {
 
             }
         });
+    }
+
+    public void openApp(String appId) {
+        if (appId.equals("remote_access")) {
+                Intent intent = new Intent(this, Remote_Access.class);
+                intent.putExtra("device_address", address);
+                startActivity(intent);
+        }
     }
 
     /*public void dns(View view) {
