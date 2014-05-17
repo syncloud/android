@@ -1,43 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/app_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="app name"
-        />
+        <TextView
+            android:id="@+id/app_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/app_buttons"
+            android:text="app name (v0.1)" />
+
 
     <LinearLayout
+        android:id="@+id/app_buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
         android:layout_alignParentRight="true"
-        >
+        android:layout_gravity="right">
 
         <Button
             android:id="@+id/install_app"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="[ + ]"/>
+            android:text="[ + ]" />
 
         <Button
             android:id="@+id/upgrade_app"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="[ ^ ]"/>
+            android:text="[ ^ ]" />
 
         <Button
             android:id="@+id/remove_app"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="[ - ]"/>
+            android:text="[ - ]" />
 
-        </LinearLayout>
+    </LinearLayout>
 
 
 </RelativeLayout>

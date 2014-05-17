@@ -1,21 +1,12 @@
-package org.syncloud.ssh;
+package org.syncloud.integration.ssh;
 
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcraft.jsch.JSchException;
 
 import org.syncloud.model.App;
-import org.syncloud.model.InstallStatus;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
-import org.syncloud.model.VerifyStatus;
+import org.syncloud.parser.JsonParser;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Arrays.asList;
 
@@ -35,7 +26,11 @@ public class Spm {
     }
 
     public static Result<SshResult> installedSpm(String hostname) {
-        return Ssh.execute(hostname, asList(UPDATE_REPO));
+        Result<SshResult> result = Ssh.execute(hostname, asList(UPDATE_REPO));
+        if (result.hasError())
+            return result;
+
+        return run(Commnand.Install, hostname, SPM_APP_NAME);
     }
 
     private static Result<SshResult> spmInstalled(String hostname) {
@@ -51,7 +46,7 @@ public class Spm {
     public static Result<SshResult> ensureSpmInstalled(String hostname) {
 
         Result<SshResult> spmResult = spmInstalled(hostname);
-        if (!spmResult.hasError() && spmResult.getValue().ok()) {
+        if (!spmResult.hasError() && !spmResult.getValue().ok()) {
             return installedSpm(hostname);
         }
         return spmResult;
@@ -74,18 +69,7 @@ public class Spm {
             return Result.error(sshResult.getMessage());
         }
 
-        List<App> apps = new ArrayList<App>();
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            String[] lines = sshResult.getMessage().split("\\r?\\n");
-            for (String line : lines) {
-                apps.add(mapper.readValue(line, App.class));
-            }
-            return Result.value(apps);
-
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
+        return JsonParser.parse(sshResult, App.class);
 
     }
 }

@@ -1,4 +1,4 @@
-package org.syncloud.ssh;
+package org.syncloud.integration.ssh;
 
 import junit.framework.Assert;
 
@@ -9,7 +9,7 @@ import org.syncloud.model.SshResult;
 
 import java.util.List;
 
-public class InsiderIntegration {
+public class InsiderTest {
 
     public static final String TEST_DEVICE = "192.168.1.65";
     public static final int TEST_PORT = 10000;

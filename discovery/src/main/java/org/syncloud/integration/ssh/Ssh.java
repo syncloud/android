@@ -1,4 +1,4 @@
-package org.syncloud.ssh;
+package org.syncloud.integration.ssh;
 
 import com.google.common.io.ByteStreams;
 import com.jcraft.jsch.ChannelExec;
@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
-//TODO: Can be moved out of android module
 public class Ssh {
 
     public static final String USERNAME = "root";

@@ -3,11 +3,9 @@ apply plugin: 'java'
 dependencies {
 
     compile 'javax.jmdns:jmdns:3.4.1'
-//    compile 'com.github.rickyclarkson:jmdns:3.4.2-r353-1'
-    compile 'com.google.guava:guava:16.0'
+    compile 'com.google.guava:guava:16.0.1'
     compile 'log4j:log4j:1.2.17'
     compile fileTree(dir: 'libs', include: ['*.jar'])
-//    compile 'org.apache.httpcomponents:httpclient:4.3.3'
     compile 'org.apache.httpcomponents:httpclient:4.3.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
     compile 'com.jcraft:jsch:0.1.51'
@@ -16,7 +14,14 @@ dependencies {
 
 }
 
+//TODO: studio does not include gradle resources (build/resources/test) by default
+//TODO: You should uncomment this to run tests
+//TODO: You should comment this to build apk :(
 /*sourceSets {
+    test {
+        output.resourcesDir = "build/classes/test"
+    }
+
     main {
         output.resourcesDir = "build/classes/main"
     }

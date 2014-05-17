@@ -1,7 +1,5 @@
 package org.syncloud.android;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,11 +8,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.syncloud.android.activity.Device;
-import org.syncloud.android.app.Remote_Access;
 import org.syncloud.model.App;
-import org.syncloud.ssh.Spm;
 
-import static org.syncloud.ssh.Spm.Commnand.*;
+import static org.syncloud.integration.ssh.Spm.Commnand.*;
 
 public class AppsAdapter extends ArrayAdapter<App> {
     private Device activity;
@@ -32,7 +28,7 @@ public class AppsAdapter extends ArrayAdapter<App> {
         View rowView = inflater.inflate(R.layout.layout_app, null);
         TextView textView = (TextView) rowView.findViewById(R.id.app_name);
         final App app = getItem(position);
-        textView.setText(app.getName());
+        textView.setText(app.getName() + " " + app.getVersion());
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

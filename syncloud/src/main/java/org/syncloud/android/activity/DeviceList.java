@@ -15,7 +15,7 @@ import android.widget.ToggleButton;
 
 import org.syncloud.android.R;
 import org.syncloud.android.discovery.AsyncDiscovery;
-import org.syncloud.discovery.DeviceListener;
+import org.syncloud.integration.discovery.DeviceListener;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -14,8 +14,7 @@ import org.syncloud.android.R;
 import org.syncloud.model.Result;
 import org.syncloud.model.PortMapping;
 import org.syncloud.model.SshResult;
-import org.syncloud.ssh.Insider;
-import org.syncloud.ssh.Ssh;
+import org.syncloud.integration.ssh.Insider;
 
 import java.util.List;
 

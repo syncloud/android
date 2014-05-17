@@ -3,8 +3,8 @@ package org.syncloud.android.discovery;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
-import org.syncloud.discovery.DeviceListener;
-import org.syncloud.discovery.Discovery;
+import org.syncloud.integration.discovery.DeviceListener;
+import org.syncloud.integration.discovery.Discovery;
 
 public class AsyncDiscovery {
 

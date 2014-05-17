@@ -1,4 +1,4 @@
-package org.syncloud.discovery;
+package org.syncloud.integration.discovery;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;

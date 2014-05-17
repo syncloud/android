@@ -12,13 +12,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.StringUtils;
 import org.syncloud.android.AppsAdapter;
 import org.syncloud.android.R;
 import org.syncloud.android.app.Remote_Access;
 import org.syncloud.model.App;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
-import org.syncloud.ssh.Spm;
+import org.syncloud.integration.ssh.Spm;
 
 import java.util.List;
 
@@ -118,7 +119,7 @@ public class Device extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                progress.setMessage(message);
+                progress.setMessage(StringUtils.right(message, 500));
                 progress.setCancelable(true);
             }
         });
@@ -149,7 +150,24 @@ public class Device extends Activity {
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_reinstall_spm) {
-            Spm.installedSpm(address);
+
+            progress.setMessage("Reinstalling package manager");
+            progress.show();
+            AsyncTask.execute(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            final Result<SshResult> result = Spm.installedSpm(address);
+                            if (result.hasError()) {
+                                progressError(result.getError());
+                                return;
+                            }
+
+                            listApps();
+                        }
+                    }
+            );
+
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -168,7 +186,7 @@ public class Device extends Activity {
                 }
 
                 SshResult sshResult = result.getValue();
-                if (!sshResult.ok()){
+                if (!sshResult.ok()) {
                     progressError(sshResult.getMessage());
                     return;
                 }
@@ -181,9 +199,9 @@ public class Device extends Activity {
 
     public void openApp(String appId) {
         if (appId.equals("remote_access")) {
-                Intent intent = new Intent(this, Remote_Access.class);
-                intent.putExtra("device_address", address);
-                startActivity(intent);
+            Intent intent = new Intent(this, Remote_Access.class);
+            intent.putExtra("device_address", address);
+            startActivity(intent);
         }
     }
 

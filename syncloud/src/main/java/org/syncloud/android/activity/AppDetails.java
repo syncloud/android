@@ -2,7 +2,6 @@ package org.syncloud.android.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,9 +10,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.syncloud.android.R;
-import org.syncloud.model.Result;
-import org.syncloud.model.InstallStatus;
-import org.syncloud.ssh.Spm;
 
 public class AppDetails extends Activity {
 
