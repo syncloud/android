@@ -10,11 +10,12 @@ import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
+import org.syncloud.android.Params;
 import org.syncloud.android.R;
+import org.syncloud.integration.ssh.InsiderManager;
 import org.syncloud.model.Result;
 import org.syncloud.model.PortMapping;
 import org.syncloud.model.SshResult;
-import org.syncloud.integration.ssh.Insider;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class Remote_Access extends Activity {
         setContentView(R.layout.activity_remote_access);
         progress = new ProgressDialog(this);
         progress.setMessage("Talking to the device");
-        final String address = getIntent().getExtras().getString("device_address" );
+        final String address = getIntent().getExtras().getString(Params.DEVICE_ADDRESS);
         remoteAccessSwitch = (Switch) findViewById(R.id.remote_access);
         remoteAccessSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -56,7 +57,7 @@ public class Remote_Access extends Activity {
 
             @Override
             protected Result<SshResult> doInBackground(String... strings) {
-                return Insider.addPort(strings[0], REMOTE_ACCESS_PORT);
+                return InsiderManager.addPort(strings[0], REMOTE_ACCESS_PORT);
                 //TODO: Need to:
                 //TODO: 1. Generate root ssh key
                 //TODO: 2. Bookmark this device using name/port/key
@@ -86,7 +87,7 @@ public class Remote_Access extends Activity {
 
             @Override
             protected Result<List<PortMapping>> doInBackground(String... strings) {
-                return Insider.listPortMappings(strings[0]);
+                return InsiderManager.listPortMappings(strings[0]);
             }
 
             @Override
@@ -115,7 +116,7 @@ public class Remote_Access extends Activity {
 
             @Override
             protected Result<SshResult> doInBackground(String... strings) {
-                return Insider.removePort(strings[0], REMOTE_ACCESS_PORT);
+                return InsiderManager.removePort(strings[0], REMOTE_ACCESS_PORT);
             }
 
             @Override

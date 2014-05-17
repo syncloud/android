@@ -25,7 +25,7 @@ public class Spm {
         return Ssh.execute(hostname, asList(SPM_BIN + " " + commnand.name().toLowerCase() + " " + app));
     }
 
-    public static Result<SshResult> installedSpm(String hostname) {
+    public static Result<SshResult> installSpm(String hostname) {
         Result<SshResult> result = Ssh.execute(hostname, asList(UPDATE_REPO));
         if (result.hasError())
             return result;
@@ -47,7 +47,7 @@ public class Spm {
 
         Result<SshResult> spmResult = spmInstalled(hostname);
         if (!spmResult.hasError() && !spmResult.getValue().ok()) {
-            return installedSpm(hostname);
+            return installSpm(hostname);
         }
         return spmResult;
 

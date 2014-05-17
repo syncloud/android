@@ -13,7 +13,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
+import org.syncloud.android.AppUiRegistry;
 import org.syncloud.android.AppsAdapter;
+import org.syncloud.android.Params;
 import org.syncloud.android.R;
 import org.syncloud.android.app.Remote_Access;
 import org.syncloud.model.App;
@@ -22,6 +24,8 @@ import org.syncloud.model.SshResult;
 import org.syncloud.integration.ssh.Spm;
 
 import java.util.List;
+
+import static org.syncloud.android.AppUiRegistry.registry;
 
 
 public class Device extends Activity {
@@ -157,7 +161,7 @@ public class Device extends Activity {
                     new Runnable() {
                         @Override
                         public void run() {
-                            final Result<SshResult> result = Spm.installedSpm(address);
+                            final Result<SshResult> result = Spm.installSpm(address);
                             if (result.hasError()) {
                                 progressError(result.getError());
                                 return;
@@ -198,9 +202,9 @@ public class Device extends Activity {
     }
 
     public void openApp(String appId) {
-        if (appId.equals("remote_access")) {
-            Intent intent = new Intent(this, Remote_Access.class);
-            intent.putExtra("device_address", address);
+        if (registry.containsKey(appId)) {
+            Intent intent = new Intent(this, registry.get(appId));
+            intent.putExtra(Params.DEVICE_ADDRESS, address);
             startActivity(intent);
         }
     }

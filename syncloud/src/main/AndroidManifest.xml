@@ -38,7 +38,7 @@
             android:label="@string/title_activity_owncloud" >
         </activity>
         <activity
-            android:name="org.syncloud.android.activity.DnsActivity"
+            android:name=".app.Insider"
             android:label="@string/title_activity_dns" >
         </activity>
         <activity
@@ -46,12 +46,16 @@
             android:label="@string/title_activity_app_details" >
         </activity>
         <activity
-            android:name=".app.Remote_Access"
+            android:name="org.syncloud.android.app.Remote_Access"
             android:label="@string/title_activity_device_settings" >
         </activity>
         <activity
             android:name="org.syncloud.android.app.Remote_Access"
             android:label="@string/title_activity_remote__access" >
+        </activity>
+        <activity
+            android:name="org.syncloud.android.app.Insider"
+            android:label="@string/title_activity_insider" >
         </activity>
     </application>
 
