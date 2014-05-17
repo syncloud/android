@@ -6,10 +6,23 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="org.syncloud.android.activity.OwncloudActivity"
+    tools:context="org.syncloud.android.app.Owncloud"
     android:orientation="vertical">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/owncloud_url_label"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/owncloud_url"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="url"/>
+
     <LinearLayout
+        android:id="@+id/owncloud_login_row"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -32,6 +45,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/owncloud_pass_row"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -54,19 +68,12 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/activate"
+        android:id="@+id/owncloud_activate"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:onClick="activate"
         android:text="@string/activate_button"
 
         />
-
-    <TextView
-        android:id="@+id/owncloud_status"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </LinearLayout>

@@ -1,18 +1,13 @@
 package org.syncloud.android.activation;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -29,12 +24,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Owncloud {
+public class OwncloudManager {
 
-    private static Logger logger = LogManager.getLogger(Owncloud.class.getName());
+    private static Logger logger = LogManager.getLogger(OwncloudManager.class.getName());
+    public static int OWNCLOUD_PORT = 80;
 
 
-    public static Result<String> finishSetup(String url, String login, String password) {
+    public static Result<String> finishSetup(String device, String login, String password) {
+
+        String url = url(device);
 
         CloseableHttpClient http = HttpClients.custom()
                 .setRedirectStrategy(new LaxRedirectStrategy())
@@ -87,6 +85,14 @@ public class Owncloud {
 
         return Result.error("unable to activate");
 
+    }
+
+    private static int port() {
+        return OWNCLOUD_PORT;
+    }
+
+    public static String url(String device) {
+        return String.format("http://%s:%s/owncloud", device, port());
     }
 
     private static Result<OwncloudAuth> getRequestToken(String url, String username, String password) {
@@ -151,64 +157,4 @@ public class Owncloud {
         return Result.error("unable to get request token");
     }
 
-    public static Result<String> activateName(
-            String url,
-            String username, String password, String email,
-            String owncloudUsername, String owncloudPassword) {
-
-        Result<OwncloudAuth> owncloudAuth = getRequestToken(url, owncloudUsername, owncloudPassword);
-        if (owncloudAuth.hasError())
-            return Result.error(owncloudAuth.getError());
-
-        CloseableHttpClient http = HttpClients.createDefault();
-
-        try {
-
-            URIBuilder builder = new URIBuilder(url + "/index.php/apps/syncloud/ajax/setDns.php");
-            builder.addParameter("username", username);
-            builder.addParameter("password", password);
-            if (!email.isEmpty())
-                builder.addParameter("email", password);
-
-            HttpGet get = new HttpGet(builder.build());
-            get.setHeader("requesttoken", owncloudAuth.getValue().getRequestToken());
-
-            HttpClientContext context = HttpClientContext.create();
-            context.setCookieStore(owncloudAuth.getValue().getCookieStore());
-
-            CloseableHttpResponse response = http.execute(get, context);
-
-            try {
-
-                HttpEntity entity = response.getEntity();
-                String result = EntityUtils.toString(entity);
-
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode data = mapper.readTree(result);
-                String status = data.get("status").textValue();
-                if (status.equals("error")) {
-                    return Result.error(data.get("data").get("message").textValue());
-                } else {
-                    return Result.value(status);
-                }
-
-
-            } finally {
-                response.close();
-            }
-
-
-
-        } catch (Exception e) {
-            logger.error("unable to finish setup", e);
-        } finally {
-            try {
-                http.close();
-            } catch (IOException e) {
-                logger.error("unable to close http client", e);
-            }
-        }
-
-        return Result.error("unable to activate name");
-    }
 }
