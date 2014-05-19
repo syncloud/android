@@ -12,15 +12,15 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.common.base.Optional;
+
 import org.syncloud.android.Params;
 import org.syncloud.android.R;
 import org.syncloud.android.activation.OwncloudManager;
-import org.syncloud.integration.ssh.InsiderManager;
+import org.syncloud.app.InsiderManager;
 import org.syncloud.model.PortMapping;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
-
-import java.util.List;
 
 
 public class Owncloud extends Activity {
@@ -102,12 +102,15 @@ public class Owncloud extends Activity {
                     @Override
                     public void run() {
 
-                        Result<List<PortMapping>> posrResult = InsiderManager.listPortMappings(device);
+                        Result<Optional<PortMapping>> posrResult = InsiderManager
+                                .localPortMapping(device, OwncloudManager.OWNCLOUD_PORT);
 
-                        if (posrResult.hasError())
+                        if (posrResult.hasError()) {
                             showError(posrResult.getError());
+                            return;
+                        }
 
-                        if (mapped(posrResult, OwncloudManager.OWNCLOUD_PORT)) {
+                        if (posrResult.getValue().isPresent()) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -140,18 +143,9 @@ public class Owncloud extends Activity {
         activateBtn.setVisibility(active ? View.GONE : View.VISIBLE);
     }
 
-    private boolean mapped(Result<List<PortMapping>> posrResult, int owncloudPort) {
-        for (PortMapping mapping : posrResult.getValue()) {
-            if (mapping.getLocal_port() == owncloudPort) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void finishSetupAsync(final String device, final String login, final String pass) {
 
-        progress.setMessage("activating ...");
+        progress.setMessage("Activating ...");
         progress.show();
 
         AsyncTask.execute(new Runnable() {

@@ -1,29 +1,36 @@
 package org.syncloud.android.app;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
+import com.google.common.base.Optional;
+
 import org.syncloud.android.Params;
 import org.syncloud.android.R;
-import org.syncloud.integration.ssh.InsiderManager;
+import org.syncloud.android.db.SavedDevice;
+import org.syncloud.app.InsiderManager;
+import org.syncloud.model.InsiderConfig;
+import org.syncloud.model.InsiderDnsConfig;
+import org.syncloud.ssh.Scp;
+import org.syncloud.ssh.Ssh;
 import org.syncloud.model.Result;
 import org.syncloud.model.PortMapping;
 import org.syncloud.model.SshResult;
 
-import java.util.List;
+import static android.os.AsyncTask.execute;
+import static java.util.Arrays.asList;
 
 public class Remote_Access extends Activity {
 
     public static final int REMOTE_ACCESS_PORT = 1022;
     private ProgressDialog progress;
     private Switch remoteAccessSwitch;
+    private SavedDevice savedDevice;
 
 
     @Override
@@ -31,6 +38,7 @@ public class Remote_Access extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_remote_access);
         progress = new ProgressDialog(this);
+        savedDevice = new SavedDevice(this);
         progress.setMessage("Talking to the device");
         final String address = getIntent().getExtras().getString(Params.DEVICE_ADDRESS);
         remoteAccessSwitch = (Switch) findViewById(R.id.remote_access);
@@ -38,99 +46,165 @@ public class Remote_Access extends Activity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean on) {
                 if (on) {
-                    asyncEnable(address);
+                    enable(address);
                 } else {
-                    asyncDisable(address);
+                    disable(address);
                 }
             }
         });
-        asyncStatus(address);
+        status(address);
 
     }
 
-    private void asyncEnable(String address) {
-        new AsyncTask<String, String, Result<SshResult>>() {
-            @Override
-            protected void onPreExecute() {
-                progress.show();
-            }
+    private void enable(final String address) {
 
-            @Override
-            protected Result<SshResult> doInBackground(String... strings) {
-                return InsiderManager.addPort(strings[0], REMOTE_ACCESS_PORT);
-                //TODO: Need to:
-                //TODO: 1. Generate root ssh key
-                //TODO: 2. Bookmark this device using name/port/key
-//                Ssh.execute("");
-            }
+        progress.setMessage("Enabling");
+        progress.show();
 
+        execute(new Runnable() {
             @Override
-            protected void onPostExecute(Result<SshResult> result) {
-                progress.hide();
-
+            public void run() {
+                Result<SshResult> result = InsiderManager.addPort(address, REMOTE_ACCESS_PORT);
+//
                 if (result.hasError()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(Remote_Access.this);
-                    builder.setMessage(result.getError());
-                    remoteAccessSwitch.setChecked(false);
+                    showError(result.getError());
+                    return;
                 }
 
+                Result<SshResult> execute = Ssh.execute(address, asList(
+                        "mkdir -p /root/.ssh",
+                        "rm -rf /root/.ssh/id_dsa_syncloud_master*",
+                        "ssh-keygen -b 1024 -t dsa -f /root/.ssh/id_dsa_syncloud_master -N ''",
+                        "cat /root/.ssh/id_dsa_syncloud_master.pub > /root/.ssh/authorized_keys"));
+
+                if (execute.hasError()) {
+                    showError(execute.getError());
+                    return;
+                }
+
+                Result<String> key = Scp.getFile(address, "/root/.ssh/id_dsa_syncloud_master");
+                if (key.hasError()) {
+                    showError(key.getError());
+                    return;
+                }
+
+                Result<Optional<PortMapping>> localPortMapping = InsiderManager.localPortMapping(address, REMOTE_ACCESS_PORT);
+                if (localPortMapping.hasError()) {
+                    showError(localPortMapping.getError());
+                    return;
+                }
+
+                Optional<PortMapping> value = localPortMapping.getValue();
+                if (!value.isPresent()) {
+                    showError("unable to get external port");
+                    return;
+                }
+
+                Result<Optional<InsiderDnsConfig>> dnsResult = InsiderManager.dnsConfig(address);
+                if (dnsResult.hasError()) {
+                    showError(dnsResult.getError());
+                    return;
+                }
+
+                Result<InsiderConfig> configResult = InsiderManager.config(address);
+                if (configResult.hasError()) {
+                    showError(configResult.getError());
+                    return;
+                }
+
+                Optional<InsiderDnsConfig> dns = dnsResult.getValue();
+                String host;
+                if (dns.isPresent())
+                    host = "device." + dns.get().getUser_domain() + "." + configResult.getValue().getDomain();
+                else
+                    host = address;
+
+                savedDevice.insert(host, value.get().getExternal_port(), key.getValue());
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        status(address);
+                    }
+                });
             }
-        }.execute(address);
+        });
+
     }
 
-    private void asyncStatus(String address) {
-        new AsyncTask<String, String, Result<List<PortMapping>>>() {
+    private void showError(final String error) {
+        runOnUiThread(new Runnable() {
             @Override
-            protected void onPreExecute() {
-                progress.show();
+            public void run() {
+                progress.setMessage(error);
+                progress.setCancelable(true);
             }
+        });
+    }
 
+    private void status(final String address) {
+
+        progress.setMessage("Checking status");
+        progress.show();
+
+        execute(new Runnable() {
             @Override
-            protected Result<List<PortMapping>> doInBackground(String... strings) {
-                return InsiderManager.listPortMappings(strings[0]);
-            }
+            public void run() {
 
-            @Override
-            protected void onPostExecute(Result<List<PortMapping>> result) {
+                final Result<Optional<PortMapping>> result = InsiderManager
+                        .localPortMapping(address, REMOTE_ACCESS_PORT);
 
-                remoteAccessSwitch.setChecked(!result.hasError() && result.getValue().contains(new PortMapping(REMOTE_ACCESS_PORT)));
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        boolean checked = !result.hasError() && result.getValue().isPresent();
+                        remoteAccessSwitch.setChecked(checked);
+                    }
+                });
 
                 if (result.hasError()) {
-                    progress.setMessage(result.getError());
-                    progress.setCancelable(true);
+                    showError(result.getError());
                 } else {
-                    progress.hide();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progress.hide();
+                        }
+                    });
                 }
-
             }
-        }.execute(address);
+        });
     }
 
-    private void asyncDisable(String address) {
-        new AsyncTask<String, String, Result<SshResult>>() {
-            @Override
-            protected void onPreExecute() {
-                progress.show();
-            }
+    private void disable(final String address) {
 
-            @Override
-            protected Result<SshResult> doInBackground(String... strings) {
-                return InsiderManager.removePort(strings[0], REMOTE_ACCESS_PORT);
-            }
+        progress.show();
+        progress.setMessage("Disabling");
 
+        execute(new Runnable() {
             @Override
-            protected void onPostExecute(Result<SshResult> result) {
-                progress.hide();
+            public void run() {
+
+                final Result<SshResult> result = InsiderManager.removePort(address, REMOTE_ACCESS_PORT);
 
                 if (result.hasError()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(Remote_Access.this);
-                    builder.setMessage(result.getError());
-                    remoteAccessSwitch.setChecked(true);
+                    showError(result.getError());
+                    return;
                 }
 
+                savedDevice.remove(address);
+
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        status(address);
+                    }
+                });
+
             }
-        }.execute(address);
+        });
+
     }
 
 

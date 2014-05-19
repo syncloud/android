@@ -1,11 +1,14 @@
 package org.syncloud.integration.ssh;
 
+import com.google.common.base.Optional;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
 import org.syncloud.model.PortMapping;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
+import org.syncloud.app.InsiderManager;
 
 import java.util.List;
 
@@ -17,12 +20,12 @@ public class InsiderManagerTest {
     @Test
     public void testStatus() {
 
-        Result<List<PortMapping>> ports = InsiderManager.listPortMappings(TEST_DEVICE);
+        Result<Optional<PortMapping>> ports = InsiderManager.localPortMapping(TEST_DEVICE, TEST_PORT);
         if (ports.hasError()) {
             Assert.fail("unable to get port list: " + ports.getError());
         }
 
-        if (ports.getValue().contains(new PortMapping(TEST_PORT))){
+        if (ports.getValue().isPresent()){
             Result<SshResult> removeResult = InsiderManager.removePort(TEST_DEVICE, TEST_PORT);
             if (ports.hasError()) {
                 Assert.fail("unable to remove test port: " + removeResult.getError());

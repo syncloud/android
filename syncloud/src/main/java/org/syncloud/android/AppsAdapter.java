@@ -7,15 +7,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.syncloud.android.activity.Device;
+import org.syncloud.android.activity.DeviceActivity;
 import org.syncloud.model.App;
 
-import static org.syncloud.integration.ssh.Spm.Commnand.*;
+import static org.syncloud.ssh.Spm.Commnand.*;
 
 public class AppsAdapter extends ArrayAdapter<App> {
-    private Device activity;
+    private DeviceActivity activity;
 
-    public AppsAdapter(Device activity) {
+    public AppsAdapter(DeviceActivity activity) {
         super(activity, R.layout.layout_app);
         this.activity = activity;
     }

@@ -1,4 +1,4 @@
-package org.syncloud.integration.discovery;
+package org.syncloud.discovery;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -67,11 +67,7 @@ public class EventToDeviceConverter implements ServiceListener {
                 address = server.substring(0, server.length() - local.length());
         }
 
-        Device device = new Device(address, info.getPort(), info.getPropertyString("path"));
-
-        logger.debug(device.getOwnCloudUrl());
-
-        return device;
+        return new Device(address, info.getPort());
     }
 
     @Override

@@ -1,18 +1,25 @@
 package org.syncloud.model;
 
-public class Device {
+import org.syncloud.ssh.Ssh;
+
+import java.io.Serializable;
+
+public class Device implements Serializable {
     private String ip;
     private int port;
-    private String ownCloudPath;
+    private String login = Ssh.USERNAME;
+    private String password = Ssh.PASSWORD;
+    private String key;
 
-    public Device(String ip, int port, String ownCloudPath) {
+    public Device(String ip, int port) {
         this.ip = ip;
         this.port = port;
-        this.ownCloudPath = ownCloudPath;
     }
 
-    public String getOwnCloudUrl() {
-        return  "http://" + ip + ":" + port + ownCloudPath;
+    public Device(String ip, int port, String key) {
+        this.key = key;
+        this.ip = ip;
+        this.port = port;
     }
 
     public String getIp() {
@@ -21,6 +28,18 @@ public class Device {
 
     public int getPort() {
         return port;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     @Override
@@ -32,8 +51,6 @@ public class Device {
 
         if (port != device.port) return false;
         if (ip != null ? !ip.equals(device.ip) : device.ip != null) return false;
-        if (ownCloudPath != null ? !ownCloudPath.equals(device.ownCloudPath) : device.ownCloudPath != null)
-            return false;
 
         return true;
     }
@@ -42,7 +59,6 @@ public class Device {
     public int hashCode() {
         int result = ip != null ? ip.hashCode() : 0;
         result = 31 * result + port;
-        result = 31 * result + (ownCloudPath != null ? ownCloudPath.hashCode() : 0);
         return result;
     }
 }

@@ -1,4 +1,6 @@
-package org.syncloud.integration.ssh;
+package org.syncloud.app;
+
+import com.google.common.base.Optional;
 
 import org.syncloud.model.InsiderConfig;
 import org.syncloud.model.InsiderDnsConfig;
@@ -6,6 +8,7 @@ import org.syncloud.model.PortMapping;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
 import org.syncloud.parser.JsonParser;
+import org.syncloud.ssh.Ssh;
 
 import java.util.List;
 
@@ -36,6 +39,20 @@ public class InsiderManager {
 
     }
 
+    public static Result<Optional<PortMapping>> localPortMapping(String hostname, int localPort) {
+        Result<List<PortMapping>> listResult = listPortMappings(hostname);
+        if(listResult.hasError())
+            return Result.error(listResult.getError());
+
+        PortMapping found = null;
+        for (PortMapping portMapping : listResult.getValue()) {
+            if (portMapping.getLocal_port() == localPort)
+                found = portMapping;
+        }
+
+        return Result.value(Optional.fromNullable(found));
+    }
+
     public static Result<List<PortMapping>> listPortMappings(String hostname) {
 
         Result<SshResult> result = Ssh.execute(hostname, asList(INSIDER_BIN + " list_ports"));
@@ -64,7 +81,7 @@ public class InsiderManager {
 
     }
 
-    public static Result<List<InsiderDnsConfig>> dnsConfig(String hostname) {
+    public static Result<Optional<InsiderDnsConfig>> dnsConfig(String hostname) {
 
         Result<SshResult> result = Ssh.execute(hostname, asList(INSIDER_BIN + " show_dns"));
         if (result.hasError())
@@ -75,7 +92,10 @@ public class InsiderManager {
         if (list.hasError())
             return Result.error(list.getError());
 
-        return list;
+        if (list.getValue().size() != 1)
+            return Result.value(Optional.<InsiderDnsConfig>absent());
+        else
+            return Result.value(Optional.fromNullable(list.getValue().get(0)));
 
     }
 

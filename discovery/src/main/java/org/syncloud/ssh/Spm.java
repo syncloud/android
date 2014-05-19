@@ -1,7 +1,8 @@
-package org.syncloud.integration.ssh;
+package org.syncloud.ssh;
 
 
 import org.syncloud.model.App;
+import org.syncloud.model.Device;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
 import org.syncloud.parser.JsonParser;
@@ -21,20 +22,20 @@ public class Spm {
 
     public enum Commnand {Install, Verify, Upgrade, Remove}
 
-    public static Result<SshResult> run(Commnand commnand, String hostname, String app) {
-        return Ssh.execute(hostname, asList(SPM_BIN + " " + commnand.name().toLowerCase() + " " + app));
+    public static Result<SshResult> run(Commnand commnand, Device device, String app) {
+        return Ssh.execute(device, asList(SPM_BIN + " " + commnand.name().toLowerCase() + " " + app));
     }
 
-    public static Result<SshResult> installSpm(String hostname) {
-        Result<SshResult> result = Ssh.execute(hostname, asList(UPDATE_REPO));
+    public static Result<SshResult> installSpm(Device device) {
+        Result<SshResult> result = Ssh.execute(device, asList(UPDATE_REPO));
         if (result.hasError())
             return result;
 
-        return run(Commnand.Install, hostname, SPM_APP_NAME);
+        return run(Commnand.Install, device, SPM_APP_NAME);
     }
 
-    private static Result<SshResult> spmInstalled(String hostname) {
-        return Ssh.execute(hostname, asList("[ -d " + REPO_DIR + " ]"));
+    private static Result<SshResult> spmInstalled(Device device) {
+        return Ssh.execute(device, asList("[ -d " + REPO_DIR + " ]"));
     }
 
     /*public static InstallStatus status(String hostname, String app) throws Exception {
@@ -43,11 +44,11 @@ public class Spm {
         return new InstallStatus(result.getExitCode() == 0, "", result.getMessage());
     }*/
 
-    public static Result<SshResult> ensureSpmInstalled(String hostname) {
+    public static Result<SshResult> ensureSpmInstalled(Device device) {
 
-        Result<SshResult> spmResult = spmInstalled(hostname);
+        Result<SshResult> spmResult = spmInstalled(device);
         if (!spmResult.hasError() && !spmResult.getValue().ok()) {
-            return installSpm(hostname);
+            return installSpm(device);
         }
         return spmResult;
 
@@ -58,9 +59,9 @@ public class Spm {
         return new VerifyStatus(result.getExitCode() == 0, result.getMessage());
     }*/
 
-    public static Result<List<App>> list(String hostname) {
+    public static Result<List<App>> list(Device device) {
 
-        Result<SshResult> result = Ssh.execute(hostname, asList(SPM_BIN + " list"));
+        Result<SshResult> result = Ssh.execute(device, asList(SPM_BIN + " list"));
         if (result.hasError())
             return Result.error(result.getError());
 

@@ -28,6 +28,7 @@
     <orderEntry type="library" exported="" name="jackson-databind-2.3.3" level="project" />
     <orderEntry type="library" exported="" name="jsch-0.1.51" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.3.2" level="project" />
+    <orderEntry type="library" exported="" name="ganymed-ssh2-262" level="project" />
     <orderEntry type="library" exported="" name="httpcore-4.3.2" level="project" />
     <orderEntry type="library" exported="" name="commons-logging-1.1.3" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.6" level="project" />
@@ -35,6 +36,16 @@
     <orderEntry type="library" exported="" name="jackson-core-2.3.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.10" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="slf4j-api-1.6.6" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="mina-core-2.0.7" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="sshd-core-0.11.0" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="sshd-sftp-0.11.0" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="sshd-pam-0.11.0" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="slf4j-jdk14-1.6.4" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="bcprov-jdk15on-1.49" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="bcpg-jdk15on-1.49" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="bcpkix-jdk15on-1.49" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="tomcat-apr-5.5.23" level="project" />
   </component>
 </module>
 

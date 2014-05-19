@@ -13,18 +13,22 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ToggleButton;
 
+import org.syncloud.android.DevicesAdapter;
 import org.syncloud.android.R;
+import org.syncloud.android.db.SavedDevice;
 import org.syncloud.android.discovery.AsyncDiscovery;
-import org.syncloud.integration.discovery.DeviceListener;
+import org.syncloud.discovery.DeviceListener;
+import org.syncloud.model.Device;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class DeviceList extends Activity {
 
-    private ArrayAdapter<String> devicesAdapter;
+    private DevicesAdapter devicesAdapter;
     private AsyncDiscovery asyncDiscovery;
     private Set<org.syncloud.model.Device> devices = new HashSet<org.syncloud.model.Device>();
+    private SavedDevice savedDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,22 +36,11 @@ public class DeviceList extends Activity {
         setContentView(R.layout.activity_device_list);
 
         final ListView listview = (ListView) findViewById(R.id.devices);
-        devicesAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1);
+        devicesAdapter = new DevicesAdapter(this);
+        savedDevice = new SavedDevice(this);
         listview.setAdapter(devicesAdapter);
 
-        devicesAdapter.add("127.0.0.1 (Demo)");
-
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                                    long id) {
-                String address = (String) parent.getAdapter().getItem(position);
-                Intent intent = new Intent(DeviceList.this, Device.class);
-                intent.putExtra("address", address);
-                startActivity(intent);
-            }
-        });
+        refreshSaved();
 
         DeviceListener deviceListener = new DeviceListener() {
             @Override
@@ -57,7 +50,7 @@ public class DeviceList extends Activity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            devicesAdapter.add(device.getIp());
+                            devicesAdapter.add(device);
                         }
                     });
                 }
@@ -69,7 +62,8 @@ public class DeviceList extends Activity {
                     devices.remove(device);
                     runOnUiThread(new Runnable() {
                         @Override
-                        public void run() { devicesAdapter.remove(device.getIp());
+                        public void run() {
+                            devicesAdapter.remove(device);
                         }
                     });
                 }
@@ -82,6 +76,16 @@ public class DeviceList extends Activity {
         ((ToggleButton) findViewById(R.id.discoveryToggle)).setChecked(true);
         asyncDiscovery.start();
 
+    }
+
+    private void refreshSaved() {
+        devicesAdapter.addAll(savedDevice.list());
+    }
+
+    public void open(Device device) {
+        Intent intent = new Intent(DeviceList.this, DeviceActivity.class);
+        intent.putExtra("device", device);
+        startActivity(intent);
     }
 
 
@@ -114,5 +118,16 @@ public class DeviceList extends Activity {
             asyncDiscovery.stop();
         }
 
+    }
+
+    public void refresh(View view) {
+        devices.clear();
+        devicesAdapter.clear();
+        refreshSaved();
+    }
+
+    public void remove(Device device) {
+        savedDevice.remove(device.getIp());
+        devicesAdapter.remove(device);
     }
 }

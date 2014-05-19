@@ -10,9 +10,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.common.base.Optional;
+
 import org.syncloud.android.Params;
 import org.syncloud.android.R;
-import org.syncloud.integration.ssh.InsiderManager;
+import org.syncloud.app.InsiderManager;
 import org.syncloud.model.InsiderConfig;
 import org.syncloud.model.InsiderDnsConfig;
 import org.syncloud.model.Result;
@@ -93,7 +95,7 @@ public class Insider extends Activity {
                         }
                     });
 
-                    final Result<List<InsiderDnsConfig>> dnsConfig = InsiderManager.dnsConfig(device);
+                    final Result<Optional<InsiderDnsConfig>> dnsConfig = InsiderManager.dnsConfig(device);
                     if (dnsConfig.hasError()) {
                         showError(dnsConfig.getError());
                     } else {
@@ -101,9 +103,9 @@ public class Insider extends Activity {
                             @Override
                             public void run() {
 
-                                List<InsiderDnsConfig> dnsConfigs = dnsConfig.getValue();
-                                if (dnsConfigs.size() > 0)
-                                    userDomainName.setText(dnsConfigs.get(0).getUser_domain());
+                                Optional<InsiderDnsConfig> dnsConfigs = dnsConfig.getValue();
+                                if (dnsConfigs.isPresent())
+                                    userDomainName.setText(dnsConfigs.get().getUser_domain());
                                 else
                                     userDomainName.setText("");
                                 progress.hide();

@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.syncloud.discovery.BlockingDeviceListener;
+import org.syncloud.discovery.Discovery;
 import org.syncloud.model.Device;
 
 import java.io.IOException;
@@ -70,24 +72,12 @@ public class DiscoveryTest {
         Collections.sort(devices, new Comparator<Device>() {
             @Override
             public int compare(Device device, Device device2) {
-                return device.getOwnCloudUrl().compareTo(device2.getOwnCloudUrl());
+                return device.getPort() - device2.getPort();
             }
         });
 
         logger.debug(devices);
         Assert.assertEquals(devices.size(), 2);
-
-        URL url = new URL(devices.get(0).getOwnCloudUrl());
-        Assert.assertEquals("http", url.getProtocol());
-        Assert.assertEquals(8080, url.getPort());
-        Assert.assertEquals("/owncloud", url.getPath());
-        Assert.assertTrue(IPAddressUtil.isIPv4LiteralAddress(url.getHost()));
-
-        url = new URL(devices.get(1).getOwnCloudUrl());
-        Assert.assertEquals("http", url.getProtocol());
-        Assert.assertEquals(8081, url.getPort());
-        Assert.assertEquals("/owncloud", url.getPath());
-        Assert.assertTrue(IPAddressUtil.isIPv4LiteralAddress(url.getHost()));
 
     }
 

@@ -13,26 +13,27 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
-import org.syncloud.android.AppUiRegistry;
 import org.syncloud.android.AppsAdapter;
 import org.syncloud.android.Params;
 import org.syncloud.android.R;
-import org.syncloud.android.app.Remote_Access;
 import org.syncloud.model.App;
+import org.syncloud.model.Device;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
-import org.syncloud.integration.ssh.Spm;
+import org.syncloud.ssh.Spm;
 
+import java.io.Serializable;
 import java.util.List;
 
 import static org.syncloud.android.AppUiRegistry.registry;
 
 
-public class Device extends Activity {
+public class DeviceActivity extends Activity {
 
     private String address;
     private ProgressDialog progress;
     private AppsAdapter appsAdapter;
+    private Device device;
 
 
     @Override
@@ -43,7 +44,8 @@ public class Device extends Activity {
         progress = new ProgressDialog(this);
 
         TextView deviceAddress = (TextView) findViewById(R.id.device_address);
-        address = getIntent().getExtras().getString("address");
+        device = (Device)getIntent().getSerializableExtra("device");
+        address = device.getIp();
         deviceAddress.setText(address);
 
         final ListView listview = (ListView) findViewById(R.id.app_list);
@@ -51,20 +53,6 @@ public class Device extends Activity {
         listview.setAdapter(appsAdapter);
 
         checkSystem();
-
-        listview.setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        App app = (App) parent.getAdapter().getItem(position);
-                        Intent intent = new Intent(Device.this, AppDetails.class);
-                        intent.putExtra("device_address", address);
-                        intent.putExtra("app_name", app.getName());
-                        intent.putExtra("app", app.getId());
-                        startActivity(intent);
-                    }
-                }
-        );
     }
 
     private void checkSystem() {
@@ -74,7 +62,7 @@ public class Device extends Activity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        final Result<SshResult> result = Spm.ensureSpmInstalled(address);
+                        final Result<SshResult> result = Spm.ensureSpmInstalled(device);
                         if (result.hasError()) {
                             progressError(result.getError());
                             return;
@@ -92,7 +80,7 @@ public class Device extends Activity {
                     @Override
                     public void run() {
                         progressUpdate("Refreshing app list");
-                        final Result<List<App>> appsResult = Spm.list(address);
+                        final Result<List<App>> appsResult = Spm.list(device);
                         if (!appsResult.hasError()) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -161,7 +149,7 @@ public class Device extends Activity {
                     new Runnable() {
                         @Override
                         public void run() {
-                            final Result<SshResult> result = Spm.installSpm(address);
+                            final Result<SshResult> result = Spm.installSpm(device);
                             if (result.hasError()) {
                                 progressError(result.getError());
                                 return;
@@ -183,7 +171,7 @@ public class Device extends Activity {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                final Result<SshResult> result = Spm.run(action, address, app);
+                final Result<SshResult> result = Spm.run(action, device, app);
                 if (result.hasError()) {
                     progressError(result.getError());
                     return;

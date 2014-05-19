@@ -1,4 +1,4 @@
-package org.syncloud.integration.discovery;
+package org.syncloud.discovery;
 
 import org.syncloud.model.Device;
 

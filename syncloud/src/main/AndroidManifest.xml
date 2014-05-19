@@ -30,16 +30,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.syncloud.android.activity.Device"
+            android:name=".activity.DeviceActivity"
             android:label="@string/title_activity_device" >
         </activity>
         <activity
             android:name="org.syncloud.android.app.Owncloud"
             android:label="@string/title_activity_owncloud" >
-        </activity>
-        <activity
-            android:name="org.syncloud.android.activity.AppDetails"
-            android:label="@string/title_activity_app_details" >
         </activity>
         <activity
             android:name="org.syncloud.android.app.Remote_Access"

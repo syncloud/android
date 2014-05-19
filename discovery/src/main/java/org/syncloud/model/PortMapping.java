@@ -1,22 +1,17 @@
 package org.syncloud.model;
 
 public class PortMapping {
-    private String external_port;
+    private int external_port;
     private int local_port;
 
     public PortMapping() {
     }
 
-    public PortMapping(int local_port) {
-        this.external_port = "unknown";
-        this.local_port = local_port;
-    }
-
-    public String getExternal_port() {
+    public int getExternal_port() {
         return external_port;
     }
 
-    public void setExternal_port(String external_port) {
+    public void setExternal_port(int external_port) {
         this.external_port = external_port;
     }
 
