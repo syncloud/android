@@ -1,4 +1,4 @@
-package org.syncloud.android;
+package org.syncloud.android.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.syncloud.android.R;
 import org.syncloud.android.activity.DeviceActivity;
 import org.syncloud.model.App;
 

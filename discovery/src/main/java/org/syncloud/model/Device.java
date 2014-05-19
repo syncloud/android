@@ -1,29 +1,27 @@
 package org.syncloud.model;
 
-import org.syncloud.ssh.Ssh;
-
 import java.io.Serializable;
 
 public class Device implements Serializable {
-    private String ip;
+    private String host;
     private int port;
-    private String login = Ssh.USERNAME;
-    private String password = Ssh.PASSWORD;
+    private String login = "root";
+    private String password = "syncloud";
     private String key;
 
-    public Device(String ip, int port) {
-        this.ip = ip;
+    public Device(String host, int port) {
+        this.host = host;
         this.port = port;
     }
 
-    public Device(String ip, int port, String key) {
+    public Device(String host, int port, String key) {
         this.key = key;
-        this.ip = ip;
+        this.host = host;
         this.port = port;
     }
 
-    public String getIp() {
-        return ip;
+    public String getHost() {
+        return host;
     }
 
     public int getPort() {
@@ -43,22 +41,27 @@ public class Device implements Serializable {
     }
 
     @Override
+    public String toString() {
+        return "Device{" +
+                "host='" + host + '\'' +
+                ", port=" + port +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         Device device = (Device) o;
 
-        if (port != device.port) return false;
-        if (ip != null ? !ip.equals(device.ip) : device.ip != null) return false;
+        if (host != null ? !host.equals(device.host) : device.host != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = ip != null ? ip.hashCode() : 0;
-        result = 31 * result + port;
-        return result;
+        return host != null ? host.hashCode() : 0;
     }
 }

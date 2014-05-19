@@ -1,4 +1,4 @@
-package org.syncloud.android.app;
+package org.syncloud.android.activity.app;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -14,10 +14,11 @@ import android.widget.TextView;
 
 import com.google.common.base.Optional;
 
-import org.syncloud.android.Params;
+import org.syncloud.android.config.Params;
 import org.syncloud.android.R;
 import org.syncloud.android.activation.OwncloudManager;
 import org.syncloud.app.InsiderManager;
+import org.syncloud.model.Device;
 import org.syncloud.model.PortMapping;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
@@ -25,7 +26,7 @@ import org.syncloud.model.SshResult;
 
 public class Owncloud extends Activity {
 
-    private String device;
+    private Device device;
     private ProgressDialog progress;
     private TextView owncloudUrl;
     private LinearLayout logibRow;
@@ -38,7 +39,7 @@ public class Owncloud extends Activity {
         setContentView(R.layout.activity_owncloud);
 
         progress = new ProgressDialog(this);
-        device = getIntent().getExtras().getString(Params.DEVICE_ADDRESS);
+        device = (Device) getIntent().getSerializableExtra(Params.DEVICE);
 
         owncloudUrl = (TextView) findViewById(R.id.owncloud_url);
         logibRow = (LinearLayout) findViewById(R.id.owncloud_login_row);
@@ -46,7 +47,7 @@ public class Owncloud extends Activity {
         activateBtn = (Button) findViewById(R.id.owncloud_activate);
 
 
-        status(device);
+        status();
     }
 
 
@@ -93,7 +94,7 @@ public class Owncloud extends Activity {
         });
     }
 
-    private void status(final String device) {
+    private void status() {
         progress.setMessage("Checking ownCloud status ...");
         progress.show();
 
@@ -143,7 +144,7 @@ public class Owncloud extends Activity {
         activateBtn.setVisibility(active ? View.GONE : View.VISIBLE);
     }
 
-    private void finishSetupAsync(final String device, final String login, final String pass) {
+    private void finishSetupAsync(final Device device, final String login, final String pass) {
 
         progress.setMessage("Activating ...");
         progress.show();
@@ -162,7 +163,7 @@ public class Owncloud extends Activity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            status(device);
+                            status();
                             progress.hide();
                         }
                     });

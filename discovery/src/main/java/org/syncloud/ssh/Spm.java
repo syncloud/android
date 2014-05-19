@@ -38,12 +38,6 @@ public class Spm {
         return Ssh.execute(device, asList("[ -d " + REPO_DIR + " ]"));
     }
 
-    /*public static InstallStatus status(String hostname, String app) throws Exception {
-//        ensureSpmInstalled(hostname);
-        SshResult result = Ssh.execute(hostname, asList(SPM_BIN + " status " + app));
-        return new InstallStatus(result.getExitCode() == 0, "", result.getMessage());
-    }*/
-
     public static Result<SshResult> ensureSpmInstalled(Device device) {
 
         Result<SshResult> spmResult = spmInstalled(device);
@@ -53,11 +47,6 @@ public class Spm {
         return spmResult;
 
     }
-
-    /*public static VerifyStatus verify(String hostname, String app) throws Exception {
-        SshResult result = Ssh.execute(hostname, asList(SPM_BIN + " verify " + app));
-        return new VerifyStatus(result.getExitCode() == 0, result.getMessage());
-    }*/
 
     public static Result<List<App>> list(Device device) {
 

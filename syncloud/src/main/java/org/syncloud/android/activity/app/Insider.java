@@ -1,4 +1,4 @@
-package org.syncloud.android.app;
+package org.syncloud.android.activity.app;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -12,20 +12,19 @@ import android.widget.TextView;
 
 import com.google.common.base.Optional;
 
-import org.syncloud.android.Params;
+import org.syncloud.android.config.Params;
 import org.syncloud.android.R;
 import org.syncloud.app.InsiderManager;
+import org.syncloud.model.Device;
 import org.syncloud.model.InsiderConfig;
 import org.syncloud.model.InsiderDnsConfig;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
 
-import java.util.List;
-
 
 public class Insider extends Activity {
 
-    private String device;
+    private Device device;
     private ProgressDialog progress;
     private TextView managedDomain;
     private TextView userDomainName;
@@ -40,9 +39,9 @@ public class Insider extends Activity {
         managedDomain = (TextView) findViewById(R.id.managed_domain);
         userDomainName = (TextView) findViewById(R.id.user_domain_name);
 
-        device = getIntent().getExtras().getString(Params.DEVICE_ADDRESS);
+        device = (Device) getIntent().getSerializableExtra(Params.DEVICE);
 
-        status(device);
+        status();
     }
 
 
@@ -75,7 +74,7 @@ public class Insider extends Activity {
         });
     }
 
-    private void status(final String device) {
+    private void status() {
 
         progress.setMessage("Checking name status ...");
         progress.show();
@@ -149,13 +148,13 @@ public class Insider extends Activity {
 
         if (valid) {
             if (domain.matches(""))
-                existingName(device, email, pass);
+                existingName(email, pass);
             else
-                newName(device, email, pass, domain);
+                newName(email, pass, domain);
         }
     }
 
-    private void newName(final String device, final String email, final String pass, final String domain) {
+    private void newName(final String email, final String pass, final String domain) {
 
         progress.setMessage("Activating new name ...");
 
@@ -179,7 +178,7 @@ public class Insider extends Activity {
         });
     }
 
-    private void existingName(final String device, final String email, final String pass) {
+    private void existingName(final String email, final String pass) {
 
         progress.setMessage("Activating existing name ...");
         progress.show();
@@ -197,7 +196,7 @@ public class Insider extends Activity {
                             progress.setCancelable(true);
                         } else {
                             progress.hide();
-                            status(device);
+                            status();
                         }
                     }
                 });

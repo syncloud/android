@@ -2,6 +2,7 @@ package org.syncloud.app;
 
 import com.google.common.base.Optional;
 
+import org.syncloud.model.Device;
 import org.syncloud.model.InsiderConfig;
 import org.syncloud.model.InsiderDnsConfig;
 import org.syncloud.model.PortMapping;
@@ -18,29 +19,29 @@ public class InsiderManager {
 
     private static final String INSIDER_BIN = "/opt/insider/bin/insider";
 
-    public static Result<SshResult> addPort(String hostname, int port) {
-        return Ssh.execute(hostname, asList(
+    public static Result<SshResult> addPort(Device device, int port) {
+        return Ssh.execute(device, asList(
                 INSIDER_BIN + " add_port " + port,
                 INSIDER_BIN + " cron_on "));
 
     }
 
-    public static Result<SshResult> newName(String hostname, String email, String pass, String userDomain) {
-        return Ssh.execute(hostname, asList(
+    public static Result<SshResult> newName(Device device, String email, String pass, String userDomain) {
+        return Ssh.execute(device, asList(
                 String.format("%s new_dns %s %s %s", INSIDER_BIN, userDomain, email, pass),
                 INSIDER_BIN + " cron_on "));
 
     }
 
-    public static Result<SshResult> activateExistingName(String hostname, String email, String pass) {
-        return Ssh.execute(hostname, asList(
+    public static Result<SshResult> activateExistingName(Device device, String email, String pass) {
+        return Ssh.execute(device, asList(
                 String.format("%s existing_dns %s %s", INSIDER_BIN, email, pass),
                 INSIDER_BIN + " cron_on "));
 
     }
 
-    public static Result<Optional<PortMapping>> localPortMapping(String hostname, int localPort) {
-        Result<List<PortMapping>> listResult = listPortMappings(hostname);
+    public static Result<Optional<PortMapping>> localPortMapping(Device device, int localPort) {
+        Result<List<PortMapping>> listResult = listPortMappings(device);
         if(listResult.hasError())
             return Result.error(listResult.getError());
 
@@ -53,9 +54,9 @@ public class InsiderManager {
         return Result.value(Optional.fromNullable(found));
     }
 
-    public static Result<List<PortMapping>> listPortMappings(String hostname) {
+    public static Result<List<PortMapping>> listPortMappings(Device device) {
 
-        Result<SshResult> result = Ssh.execute(hostname, asList(INSIDER_BIN + " list_ports"));
+        Result<SshResult> result = Ssh.execute(device, asList(INSIDER_BIN + " list_ports"));
         if (result.hasError())
             return Result.error(result.getError());
 
@@ -63,9 +64,9 @@ public class InsiderManager {
 
     }
 
-    public static Result<InsiderConfig> config(String hostname) {
+    public static Result<InsiderConfig> config(Device device) {
 
-        Result<SshResult> result = Ssh.execute(hostname, asList(INSIDER_BIN + " config"));
+        Result<SshResult> result = Ssh.execute(device, asList(INSIDER_BIN + " config"));
         if (result.hasError())
             return Result.error(result.getError());
 
@@ -81,9 +82,9 @@ public class InsiderManager {
 
     }
 
-    public static Result<Optional<InsiderDnsConfig>> dnsConfig(String hostname) {
+    public static Result<Optional<InsiderDnsConfig>> dnsConfig(Device device) {
 
-        Result<SshResult> result = Ssh.execute(hostname, asList(INSIDER_BIN + " show_dns"));
+        Result<SshResult> result = Ssh.execute(device, asList(INSIDER_BIN + " show_dns"));
         if (result.hasError())
             return Result.error(result.getError());
 
@@ -99,7 +100,7 @@ public class InsiderManager {
 
     }
 
-    public static Result<SshResult> removePort(String hostname, int port) {
-        return Ssh.execute(hostname, asList(INSIDER_BIN + " remove_port " + port));
+    public static Result<SshResult> removePort(Device device, int port) {
+        return Ssh.execute(device, asList(INSIDER_BIN + " remove_port " + port));
     }
 }

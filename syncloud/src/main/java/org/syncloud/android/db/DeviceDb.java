@@ -12,7 +12,7 @@ import org.syncloud.model.Device;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SavedDevice extends SQLiteOpenHelper {
+public class DeviceDb extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "syncloud";
@@ -27,7 +27,7 @@ public class SavedDevice extends SQLiteOpenHelper {
                     PORT_COLUMN + " INTEGER" +
                     ");";
 
-    public SavedDevice(Context context) {
+    public DeviceDb(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -38,16 +38,6 @@ public class SavedDevice extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
-
-    }
-
-    public void insert(String hostname, int port, String key) {
-
-        ContentValues values = new ContentValues();
-        values.put(HOST_COLUMN, hostname);
-        values.put(PORT_COLUMN, port);
-        values.put(SSHKEY_COLUMN, key);
-        getWritableDatabase().insert(DEVICE_TABLE, null, values);
 
     }
 
@@ -75,10 +65,18 @@ public class SavedDevice extends SQLiteOpenHelper {
         return devices;
     }
 
-    public void remove(String hostname) {
+    public void remove(Device device) {
 
-        getWritableDatabase().delete(DEVICE_TABLE, HOST_COLUMN + "=?", new String[] { hostname });
+        getWritableDatabase().delete(
+                DEVICE_TABLE, HOST_COLUMN + "=?", new String[] { device.getHost() });
 
     }
 
+    public void insert(Device device) {
+        ContentValues values = new ContentValues();
+        values.put(HOST_COLUMN, device.getHost());
+        values.put(PORT_COLUMN, device.getPort());
+        values.put(SSHKEY_COLUMN, device.getKey());
+        getWritableDatabase().insert(DEVICE_TABLE, null, values);
+    }
 }

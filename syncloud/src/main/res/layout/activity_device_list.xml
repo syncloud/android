@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="org.syncloud.android.activity.DeviceList"
+    tools:context="org.syncloud.android.activity.DeviceListActivity"
     android:orientation="vertical"
     android:configChanges="keyboardHidden|orientation">
 
@@ -14,23 +14,18 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center">
+                android:gravity="center"
+                android:paddingBottom="20dp" >
 
             <ToggleButton
                 android:id="@+id/discoveryToggle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textOn="Discovery ON"
-                android:textOff="Discovery OFF"
+                android:textOn="Discover"
+                android:textOff="Discover"
                 android:enabled="true"
                 android:onClick="onDiscoveryToggle"
                 />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Refresh"
-                android:onClick="refresh"/>
 
             </LinearLayout>
 

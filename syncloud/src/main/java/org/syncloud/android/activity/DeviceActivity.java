@@ -7,14 +7,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
-import org.syncloud.android.AppsAdapter;
-import org.syncloud.android.Params;
+import org.syncloud.android.adapter.AppsAdapter;
+import org.syncloud.android.config.Params;
 import org.syncloud.android.R;
 import org.syncloud.model.App;
 import org.syncloud.model.Device;
@@ -22,15 +20,13 @@ import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
 import org.syncloud.ssh.Spm;
 
-import java.io.Serializable;
 import java.util.List;
 
-import static org.syncloud.android.AppUiRegistry.registry;
+import static org.syncloud.android.config.AppRegistry.registry;
 
 
 public class DeviceActivity extends Activity {
 
-    private String address;
     private ProgressDialog progress;
     private AppsAdapter appsAdapter;
     private Device device;
@@ -44,9 +40,8 @@ public class DeviceActivity extends Activity {
         progress = new ProgressDialog(this);
 
         TextView deviceAddress = (TextView) findViewById(R.id.device_address);
-        device = (Device)getIntent().getSerializableExtra("device");
-        address = device.getIp();
-        deviceAddress.setText(address);
+        device = (Device)getIntent().getSerializableExtra(Params.DEVICE);
+        deviceAddress.setText(device.getHost());
 
         final ListView listview = (ListView) findViewById(R.id.app_list);
         appsAdapter = new AppsAdapter(this);
@@ -192,42 +187,10 @@ public class DeviceActivity extends Activity {
     public void openApp(String appId) {
         if (registry.containsKey(appId)) {
             Intent intent = new Intent(this, registry.get(appId));
-            intent.putExtra(Params.DEVICE_ADDRESS, address);
+            intent.putExtra(Params.DEVICE, device);
             startActivity(intent);
         }
     }
 
-    /*public void dns(View view) {
-        Intent intent = new Intent(this, DnsActivity.class);
-        intent.putExtra("address", address);
-        startActivity(intent);
-    }
 
-    public void owncloud(View view) {
-        Intent intent = new Intent(this, OwncloudActivity.class);
-        intent.putExtra("address", address);
-        startActivity(intent);
-    }*/
-
-    /*public void install(View view) {
-
-        new AsyncTask<String, String, String>() {
-            @Override
-            protected void onPreExecute() {
-                progress.show();
-            }
-
-            @Override
-            protected String doInBackground(String... strings) {
-                Result<String> result = Spm.run(Spm.Commnand.Install, strings[0], strings[1]);
-                return result.hasError() ? result.getError() : result.getValue();
-            }
-
-            @Override
-            protected void onPostExecute(String status) {
-                executeStatus.setText(status);
-                status(true);
-            }
-        }.execute(address, app);
-    }*/
 }

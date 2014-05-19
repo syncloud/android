@@ -20,18 +20,8 @@ import java.util.Properties;
 
 public class Ssh {
 
-    public static final String USERNAME = "root";
-    public static final String PASSWORD = "syncloud";
     public static final int SSH_SERVER_PORT = 22;
 
-
-    public static Result<SshResult> execute(String hostname, List<String> commands) {
-        try {
-            return Result.value(run(new Device(hostname, SSH_SERVER_PORT), commands));
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
-    }
 
     public static Result<SshResult> execute(Device device, List<String> commands) {
         try {
@@ -45,7 +35,7 @@ public class Ssh {
 
         JSch jsch = new JSch();
 
-        Session session = jsch.getSession(device.getLogin(), device.getIp(), device.getPort());
+        Session session = jsch.getSession(device.getLogin(), device.getHost(), device.getPort());
         if (device.getKey() == null) {
             session.setPassword(device.getPassword());
         } else {

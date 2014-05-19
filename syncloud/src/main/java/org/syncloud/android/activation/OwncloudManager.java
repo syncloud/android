@@ -18,6 +18,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.syncloud.model.Device;
 import org.syncloud.model.Result;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class OwncloudManager {
     public static int OWNCLOUD_PORT = 80;
 
 
-    public static Result<String> finishSetup(String device, String login, String password) {
+    public static Result<String> finishSetup(Device device, String login, String password) {
 
         String url = url(device);
 
@@ -91,11 +92,14 @@ public class OwncloudManager {
         return OWNCLOUD_PORT;
     }
 
-    public static String url(String device) {
-        return String.format("http://%s:%s/owncloud", device, port());
+    public static String url(Device device) {
+        return String.format("http://%s:%s/owncloud", device.getHost(), port());
     }
 
-    private static Result<OwncloudAuth> getRequestToken(String url, String username, String password) {
+
+    //TODO: Currently activated owncloud or not is checked by locating port mapping,
+    //TODO: maybe we should be able aks owncloud
+    private static Result<Boolean> isActivated(String url, String username, String password) {
 
 
         CloseableHttpClient http = HttpClients.custom()
@@ -132,12 +136,7 @@ public class OwncloudManager {
                         .select(":has(input[hidden=true], input[install=true])")
                         .size() == 0;
 
-                if(!installed)
-                    return Result.error("syncloud is not activated yet");
-
-                String token = doc.select("head").attr("data-requesttoken");
-                return Result.value(new OwncloudAuth(token, cookieStore));
-
+                return Result.value(installed);
 
             } finally {
                 response.close();
