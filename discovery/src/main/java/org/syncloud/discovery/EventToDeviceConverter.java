@@ -3,6 +3,7 @@ package org.syncloud.discovery;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.syncloud.model.Device;
+import org.syncloud.ssh.Ssh;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,7 +68,7 @@ public class EventToDeviceConverter implements ServiceListener {
                 address = server.substring(0, server.length() - local.length());
         }
 
-        return new Device(address, info.getPort());
+        return new Device(address, Ssh.SSH_SERVER_PORT);
     }
 
     @Override

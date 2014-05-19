@@ -45,11 +45,11 @@ public class Ssh {
 
         JSch jsch = new JSch();
 
-        Session session = jsch.getSession(USERNAME, device.getIp(), device.getPort());
+        Session session = jsch.getSession(device.getLogin(), device.getIp(), device.getPort());
         if (device.getKey() == null) {
-            session.setPassword(PASSWORD);
+            session.setPassword(device.getPassword());
         } else {
-            jsch.addIdentity(USERNAME, device.getKey().getBytes(), null, new byte[0]);
+            jsch.addIdentity(device.getLogin(), device.getKey().getBytes(), null, new byte[0]);
             session.setUserInfo(new UserInfo() {
                 @Override
                 public String getPassphrase() {
