@@ -2,6 +2,8 @@ package org.syncloud.android.activity.app;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,12 +16,11 @@ import android.widget.TextView;
 
 import com.google.common.base.Optional;
 
-import org.syncloud.android.config.Params;
 import org.syncloud.android.R;
-import org.syncloud.android.activation.OwncloudManager;
+import org.syncloud.android.SyncloudApplication;
+import org.syncloud.app.OwncloudManager;
 import org.syncloud.app.InsiderManager;
 import org.syncloud.model.Device;
-import org.syncloud.model.PortMapping;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
 
@@ -28,10 +29,12 @@ public class Owncloud extends Activity {
 
     private Device device;
     private ProgressDialog progress;
-    private TextView owncloudUrl;
-    private LinearLayout logibRow;
+    private TextView url;
+    private LinearLayout loginRow;
     private LinearLayout passRow;
     private Button activateBtn;
+    private Button webBtn;
+    private Button mobileBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +42,17 @@ public class Owncloud extends Activity {
         setContentView(R.layout.activity_owncloud);
 
         progress = new ProgressDialog(this);
-        device = (Device) getIntent().getSerializableExtra(Params.DEVICE);
+        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
-        owncloudUrl = (TextView) findViewById(R.id.owncloud_url);
-        logibRow = (LinearLayout) findViewById(R.id.owncloud_login_row);
+        url = (TextView) findViewById(R.id.owncloud_url);
+        loginRow = (LinearLayout) findViewById(R.id.owncloud_login_row);
         passRow = (LinearLayout) findViewById(R.id.owncloud_pass_row);
         activateBtn = (Button) findViewById(R.id.owncloud_activate);
 
+        webBtn = (Button) findViewById(R.id.owncloud_web_btn);
+        mobileBtn = (Button) findViewById(R.id.owncloud_mobile_btn);
+
+        setVisibility(View.GONE, View.GONE);
 
         status();
     }
@@ -103,20 +110,20 @@ public class Owncloud extends Activity {
                     @Override
                     public void run() {
 
-                        Result<Optional<PortMapping>> posrResult = InsiderManager
-                                .localPortMapping(device, OwncloudManager.OWNCLOUD_PORT);
+                        final Result<Optional<String>> result = OwncloudManager.owncloudUrl(device);
 
-                        if (posrResult.hasError()) {
-                            showError(posrResult.getError());
+                        if (result.hasError()) {
+                            showError(result.getError());
                             return;
                         }
 
-                        if (posrResult.getValue().isPresent()) {
+
+                        if (result.getValue().isPresent()) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    owncloudUrl.setText(OwncloudManager.url(device));
-                                    activated(true);
+                                    url.setText(result.getValue().get());
+                                    setVisibility(View.VISIBLE, View.GONE);
                                     progress.hide();
                                 }
                             });
@@ -125,7 +132,7 @@ public class Owncloud extends Activity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    activated(false);
+                                    setVisibility(View.GONE, View.VISIBLE);
                                     progress.hide();
                                 }
                             });
@@ -136,12 +143,15 @@ public class Owncloud extends Activity {
         );
     }
 
-    private void activated(boolean active) {
+    private void setVisibility(int activeControls, int inactiveControls) {
 
-        owncloudUrl.setVisibility(active ? View.VISIBLE : View.GONE);
-        logibRow.setVisibility(active ? View.GONE : View.VISIBLE);
-        passRow.setVisibility(active ? View.GONE : View.VISIBLE);
-        activateBtn.setVisibility(active ? View.GONE : View.VISIBLE);
+        url.setVisibility(activeControls);
+        webBtn.setVisibility(activeControls);
+        mobileBtn.setVisibility(activeControls);
+
+        loginRow.setVisibility(inactiveControls);
+        passRow.setVisibility(inactiveControls);
+        activateBtn.setVisibility(inactiveControls);
     }
 
     private void finishSetupAsync(final Device device, final String login, final String pass) {
@@ -172,5 +182,29 @@ public class Owncloud extends Activity {
             }
         });
 
+    }
+
+    public void showWeb(View view) {
+        CharSequence text = url.getText();
+        if (text != null && !text.toString().isEmpty()) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(text.toString()));
+            startActivity(browserIntent);
+        } else {
+            progress.setMessage("url is not set");
+            progress.show();
+            progress.setCancelable(true);
+        }
+    }
+
+    public void showMobile(View view) {
+        CharSequence text = url.getText();
+        if (text != null && !text.toString().isEmpty()) {
+            Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("com.owncloud.android");
+            startActivity(LaunchIntent);
+        } else {
+            progress.setMessage("url is not set");
+            progress.show();
+            progress.setCancelable(true);
+        }
     }
 }

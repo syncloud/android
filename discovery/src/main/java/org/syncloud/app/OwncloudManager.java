@@ -1,4 +1,6 @@
-package org.syncloud.android.activation;
+package org.syncloud.app;
+
+import com.google.common.base.Optional;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -19,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.syncloud.model.Device;
+import org.syncloud.model.PortMapping;
 import org.syncloud.model.Result;
 
 import java.io.IOException;
@@ -33,7 +36,7 @@ public class OwncloudManager {
 
     public static Result<String> finishSetup(Device device, String login, String password) {
 
-        String url = url(device);
+        String url = url(device.getHost(), OWNCLOUD_PORT);
 
         CloseableHttpClient http = HttpClients.custom()
                 .setRedirectStrategy(new LaxRedirectStrategy())
@@ -88,17 +91,29 @@ public class OwncloudManager {
 
     }
 
-    private static int port() {
-        return OWNCLOUD_PORT;
+    public static Result<Optional<String>> owncloudUrl(Device device) {
+        Result<Optional<PortMapping>> portResult = InsiderManager
+                .localPortMapping(device, OwncloudManager.OWNCLOUD_PORT);
+
+        if (portResult.hasError()) {
+            return Result.error(portResult.getError());
+        } else {
+            if (portResult.getValue().isPresent()) {
+                int port = portResult.getValue().get().getExternal_port();
+                return Result.value(Optional.fromNullable(url(device.getHost(), port)));
+            } else {
+                return Result.value(Optional.<String>absent());
+            }
+        }
     }
 
-    public static String url(Device device) {
-        return String.format("http://%s:%s/owncloud", device.getHost(), port());
+    private static String url(String host, int port) {
+        return String.format("http://%s:%s/owncloud", host, port);
     }
 
 
     //TODO: Currently activated owncloud or not is checked by locating port mapping,
-    //TODO: maybe we should be able aks owncloud
+    //TODO: maybe we should aks owncloud instead or in addition
     private static Result<Boolean> isActivated(String url, String username, String password) {
 
 

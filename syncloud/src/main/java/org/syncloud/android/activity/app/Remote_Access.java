@@ -10,10 +10,9 @@ import android.widget.Switch;
 
 import com.google.common.base.Optional;
 
+import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DevicesAdapter;
-import org.syncloud.android.config.Params;
-import org.syncloud.android.R;
 import org.syncloud.app.RemoteAccessManager;
 import org.syncloud.model.Device;
 import org.syncloud.model.Result;
@@ -33,7 +32,7 @@ public class Remote_Access extends Activity {
         setContentView(R.layout.activity_remote_access);
         progress = new ProgressDialog(this);
         progress.setMessage("Talking to the device");
-        device = (Device) getIntent().getSerializableExtra(Params.DEVICE);
+        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
         remoteAccessSwitch = (Switch) findViewById(R.id.remote_access);
         status();
 

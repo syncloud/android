@@ -33,5 +33,7 @@
     <string name="title_activity_remote__access">Remote_Access</string>
     <string name="title_activity_insider">Insider</string>
     <string name="owncloud_url_label">ownCloud url:</string>
+    <string name="owncloud_web_btn_text">Web</string>
+    <string name="owncloud_mobile_btn_text">Mobile</string>
 
 </resources>

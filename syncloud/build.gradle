@@ -75,6 +75,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:19.+'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.3'
-    compile 'org.jsoup:jsoup:1.7.3'
     compile 'com.google.guava:guava:17.0'
 }

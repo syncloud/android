@@ -11,9 +11,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
-import org.syncloud.android.adapter.AppsAdapter;
-import org.syncloud.android.config.Params;
 import org.syncloud.android.R;
+import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.adapter.AppsAdapter;
 import org.syncloud.model.App;
 import org.syncloud.model.Device;
 import org.syncloud.model.Result;
@@ -22,8 +22,7 @@ import org.syncloud.ssh.Spm;
 
 import java.util.List;
 
-import static org.syncloud.android.config.AppRegistry.registry;
-
+import static org.syncloud.android.SyncloudApplication.appRegistry;
 
 public class DeviceActivity extends Activity {
 
@@ -40,7 +39,7 @@ public class DeviceActivity extends Activity {
         progress = new ProgressDialog(this);
 
         TextView deviceAddress = (TextView) findViewById(R.id.device_address);
-        device = (Device)getIntent().getSerializableExtra(Params.DEVICE);
+        device = (Device)getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
         deviceAddress.setText(device.getHost());
 
         final ListView listview = (ListView) findViewById(R.id.app_list);
@@ -185,9 +184,9 @@ public class DeviceActivity extends Activity {
     }
 
     public void openApp(String appId) {
-        if (registry.containsKey(appId)) {
-            Intent intent = new Intent(this, registry.get(appId));
-            intent.putExtra(Params.DEVICE, device);
+        if (appRegistry.containsKey(appId)) {
+            Intent intent = new Intent(this, appRegistry.get(appId));
+            intent.putExtra(SyncloudApplication.DEVICE, device);
             startActivity(intent);
         }
     }

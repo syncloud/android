@@ -12,8 +12,8 @@ import android.widget.TextView;
 
 import com.google.common.base.Optional;
 
-import org.syncloud.android.config.Params;
 import org.syncloud.android.R;
+import org.syncloud.android.SyncloudApplication;
 import org.syncloud.app.InsiderManager;
 import org.syncloud.model.Device;
 import org.syncloud.model.InsiderConfig;
@@ -39,7 +39,7 @@ public class Insider extends Activity {
         managedDomain = (TextView) findViewById(R.id.managed_domain);
         userDomainName = (TextView) findViewById(R.id.user_domain_name);
 
-        device = (Device) getIntent().getSerializableExtra(Params.DEVICE);
+        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
         status();
     }

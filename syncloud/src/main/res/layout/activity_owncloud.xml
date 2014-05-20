@@ -10,22 +10,44 @@
     android:orientation="vertical">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/owncloud_url_label"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
         android:id="@+id/owncloud_url"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="url"/>
 
     <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="2.0"
+        android:paddingTop="20dp">
+
+        <Button
+            android:id="@+id/owncloud_web_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/owncloud_web_btn_text"
+            android:layout_weight="1"
+            android:onClick="showWeb"
+            />
+
+        <Button
+            android:id="@+id/owncloud_mobile_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/owncloud_mobile_btn_text"
+            android:layout_weight="1"
+            android:onClick="showMobile"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/owncloud_login_row"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingTop="20dp"
+        >
 
         <TextView
             android:id="@+id/login_label"
@@ -40,7 +62,8 @@
             android:layout_height="wrap_content"
             android:inputType="text"
             android:text=""
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            />
 
     </LinearLayout>
 

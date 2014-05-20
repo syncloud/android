@@ -1,7 +1,6 @@
 package org.syncloud.android.activity;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
@@ -12,11 +11,9 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.ToggleButton;
 
+import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DevicesAdapter;
-import org.syncloud.android.config.Params;
-import org.syncloud.android.R;
-import org.syncloud.android.db.DeviceDb;
 import org.syncloud.android.discovery.AsyncDiscovery;
 import org.syncloud.discovery.DeviceListener;
 import org.syncloud.model.Device;
@@ -79,7 +76,7 @@ public class DeviceListActivity extends Activity {
 
     public void open(Device device) {
         Intent intent = new Intent(DeviceListActivity.this, DeviceActivity.class);
-        intent.putExtra(Params.DEVICE, device);
+        intent.putExtra(SyncloudApplication.DEVICE, device);
         startActivity(intent);
     }
 
