@@ -14,13 +14,9 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DevicesAdapter;
 import org.syncloud.android.config.Params;
 import org.syncloud.android.R;
-import org.syncloud.android.db.DeviceDb;
-import org.syncloud.app.InsiderManager;
 import org.syncloud.app.RemoteAccessManager;
 import org.syncloud.model.Device;
 import org.syncloud.model.Result;
-import org.syncloud.model.PortMapping;
-import org.syncloud.model.SshResult;
 
 import static android.os.AsyncTask.execute;
 
@@ -39,16 +35,6 @@ public class Remote_Access extends Activity {
         progress.setMessage("Talking to the device");
         device = (Device) getIntent().getSerializableExtra(Params.DEVICE);
         remoteAccessSwitch = (Switch) findViewById(R.id.remote_access);
-        remoteAccessSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean on) {
-                if (on) {
-                    enable();
-                } else {
-                    disable();
-                }
-            }
-        });
         status();
 
     }
@@ -73,7 +59,7 @@ public class Remote_Access extends Activity {
                     @Override
                     public void run() {
                         devicesAdapter.save(result.getValue());
-                        status();
+                        progress.hide();
                     }
                 });
             }
@@ -100,16 +86,27 @@ public class Remote_Access extends Activity {
             @Override
             public void run() {
 
-                final Result<Boolean> enabled = RemoteAccessManager.isEnabled(device);
-                if (enabled.hasError()){
-                    showError(enabled.getError());
+                final Result<Optional<Device>> remoteDevice = RemoteAccessManager.getRemoteDevice(device);
+                if (remoteDevice.hasError()){
+                    showError(remoteDevice.getError());
                     return;
                 }
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        remoteAccessSwitch.setChecked(enabled.getValue());
+                        remoteAccessSwitch.setOnCheckedChangeListener(null);
+                        remoteAccessSwitch.setChecked(remoteDevice.getValue().isPresent());
+                        remoteAccessSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton compoundButton, boolean on) {
+                                if (on) {
+                                    enable();
+                                } else {
+                                    disable();
+                                }
+                            }
+                        });
                         progress.hide();
                         }
                     });
@@ -125,6 +122,17 @@ public class Remote_Access extends Activity {
         execute(new Runnable() {
             @Override
             public void run() {
+
+                final Result<Optional<Device>> remoteDevice = RemoteAccessManager.getRemoteDevice(device);
+                if (remoteDevice.hasError()){
+                    showError(remoteDevice.getError());
+                    return;
+                }
+
+                if (!remoteDevice.getValue().isPresent()){
+                    showError("not enabled");
+                    return;
+                }
 
                 Result<Boolean> disabled = RemoteAccessManager.disable(device);
 
@@ -143,8 +151,8 @@ public class Remote_Access extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        devicesAdapter.removeSaved(device);
-                        status();
+                        devicesAdapter.removeSaved(remoteDevice.getValue().get());
+                        progress.hide();
                     }
                 });
 

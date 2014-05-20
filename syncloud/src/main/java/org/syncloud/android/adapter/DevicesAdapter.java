@@ -30,7 +30,8 @@ public class DevicesAdapter extends ArrayAdapter<Device> {
     }
 
     public void save(Device device) {
-        deviceDb.insert(device);
+        if (!deviceDb.list().contains(device))
+            deviceDb.insert(device);
         add(device);
     }
 
@@ -41,8 +42,18 @@ public class DevicesAdapter extends ArrayAdapter<Device> {
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_device, null);
         TextView deviceHost = (TextView) rowView.findViewById(R.id.device_host);
+        TextView deviceRemove = (TextView) rowView.findViewById(R.id.device_remove);
         final Device device = getItem(position);
-        deviceHost.setText(device.getHost());
+        if (device.getKey() == null) {
+            deviceRemove.setVisibility(View.GONE);
+        }
+        deviceRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                remove(device);
+            }
+        });
+        deviceHost.setText(device.getHost() + ":" + device.getPort());
         deviceHost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -1,5 +1,7 @@
 package org.syncloud.integration.app;
 
+import com.google.common.base.Optional;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.syncloud.app.RemoteAccessManager;
@@ -12,20 +14,21 @@ public class RemoteAccessManagerTest {
 
     @Test
     public void testRemoteAccessSeveralTimes() {
-        for(int i = 0; i < 5; i++) {
+        for(int i = 0; i < 2; i++) {
             System.out.println("Iteration: " + (i + 1));
             testRemoteAccess();
         }
     }
 
     public void testRemoteAccess() {
-        Result<Boolean> enabled = RemoteAccessManager.isEnabled(testDevice);
-        if (enabled.hasError()) {
-            Assert.fail(enabled.getError());
+        Result<Optional<Device>> remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice);
+        if (remoteDevice.hasError()) {
+            Assert.fail(remoteDevice.getError());
         }
 
-        Boolean wasEnabled = enabled.getValue();
+        Boolean wasEnabled = remoteDevice.getValue().isPresent();
         if (wasEnabled) {
+            System.out.println(remoteDevice.getValue().get());
             System.out.println("was enabled, disabling");
             Result<Boolean> disabled = RemoteAccessManager.disable(testDevice);
             if (disabled.hasError()) {
@@ -33,11 +36,11 @@ public class RemoteAccessManagerTest {
             }
             Assert.assertTrue(disabled.getValue());
 
-            enabled = RemoteAccessManager.isEnabled(testDevice);
-            if (enabled.hasError()) {
-                Assert.fail(enabled.getError());
+            remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice);
+            if (remoteDevice.hasError()) {
+                Assert.fail(remoteDevice.getError());
             }
-            Assert.assertFalse(enabled.getValue());
+            Assert.assertFalse(remoteDevice.getValue().isPresent());
 
         }
 
@@ -50,6 +53,13 @@ public class RemoteAccessManagerTest {
         Assert.assertNotNull(device.getValue().getHost());
         Assert.assertNotNull(device.getValue().getPort());
         System.out.println(device.getValue());
+
+        remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice);
+        if (remoteDevice.hasError()) {
+            Assert.fail(remoteDevice.getError());
+        }
+        System.out.println(remoteDevice.getValue().get());
+
 
         System.out.println("disabling");
         Result<Boolean> disabled = RemoteAccessManager.disable(testDevice);

@@ -55,6 +55,7 @@ public class Device implements Serializable {
 
         Device device = (Device) o;
 
+        if (port != device.port) return false;
         if (host != null ? !host.equals(device.host) : device.host != null) return false;
 
         return true;
@@ -62,6 +63,8 @@ public class Device implements Serializable {
 
     @Override
     public int hashCode() {
-        return host != null ? host.hashCode() : 0;
+        int result = host != null ? host.hashCode() : 0;
+        result = 31 * result + port;
+        return result;
     }
 }

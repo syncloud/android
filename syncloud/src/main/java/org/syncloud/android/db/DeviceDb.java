@@ -68,7 +68,9 @@ public class DeviceDb extends SQLiteOpenHelper {
     public void remove(Device device) {
 
         getWritableDatabase().delete(
-                DEVICE_TABLE, HOST_COLUMN + "=?", new String[] { device.getHost() });
+                DEVICE_TABLE,
+                HOST_COLUMN + "=? AND " + PORT_COLUMN+ "=?",
+                new String[] { device.getHost(), String.valueOf(device.getPort()) });
 
     }
 

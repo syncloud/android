@@ -18,13 +18,20 @@ public class RemoteAccessManager {
     public static final int REMOTE_ACCESS_PORT = 1022;
     private static final String KEY_FILE = "/root/.ssh/id_dsa_syncloud_master";
 
-    public static Result<Boolean> isEnabled(Device device) {
+    public static Result<Optional<Device>> getRemoteDevice(Device device) {
         Result<Optional<PortMapping>> result = InsiderManager
                 .localPortMapping(device, REMOTE_ACCESS_PORT);
         if (result.hasError())
             return Result.error(result.getError());
 
-        return Result.value(result.getValue().isPresent());
+        if (!result.getValue().isPresent())
+            return Result.value(Optional.<Device>absent());
+
+        Result<Device> remoteDevice = getRemote(device);
+        if (remoteDevice.hasError())
+            return Result.error(remoteDevice.getError());
+
+        return Result.value(Optional.fromNullable(remoteDevice.getValue()));
     }
 
     public static Result<Boolean> disable(Device device) {
@@ -50,15 +57,17 @@ public class RemoteAccessManager {
             return Result.error(execute.getError());
 
 
-        Result<String> key = Scp.getFile(device, KEY_FILE);
-        if (key.hasError())
-            return Result.error(key.getError());
-
         Result<SshResult> result = InsiderManager.addPort(device, REMOTE_ACCESS_PORT);
-//
         if (result.hasError())
             return Result.error(result.getError());
 
+        return getRemote(device);
+    }
+
+    private static Result<Device> getRemote(Device device) {
+        Result<String> key = Scp.getFile(device, KEY_FILE);
+        if (key.hasError())
+            return Result.error(key.getError());
 
         Result<Optional<InsiderDnsConfig>> dnsResult = InsiderManager.dnsConfig(device);
         if (dnsResult.hasError()) {
