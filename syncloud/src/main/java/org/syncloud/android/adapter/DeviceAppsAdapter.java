@@ -5,18 +5,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.syncloud.android.R;
-import org.syncloud.android.activity.DeviceActivity;
+import org.syncloud.android.activity.DeviceAppsActivity;
 import org.syncloud.model.App;
 
 import static org.syncloud.ssh.Spm.Commnand.*;
 
-public class AppsAdapter extends ArrayAdapter<App> {
-    private DeviceActivity activity;
+public class DeviceAppsAdapter extends ArrayAdapter<App> {
+    private DeviceAppsActivity activity;
 
-    public AppsAdapter(DeviceActivity activity) {
+    public DeviceAppsAdapter(DeviceAppsActivity activity) {
         super(activity, R.layout.layout_app);
         this.activity = activity;
     }
@@ -37,11 +38,11 @@ public class AppsAdapter extends ArrayAdapter<App> {
             }
         });
 
-        Button install = (Button) rowView.findViewById(R.id.install_app);
+        ImageButton install = (ImageButton) rowView.findViewById(R.id.install_app);
         install.setVisibility(View.GONE);
-        Button remove = (Button) rowView.findViewById(R.id.remove_app);
+        ImageButton remove = (ImageButton) rowView.findViewById(R.id.remove_app);
         remove.setVisibility(View.GONE);
-        Button upgrade = (Button) rowView.findViewById(R.id.upgrade_app);
+        ImageButton upgrade = (ImageButton) rowView.findViewById(R.id.upgrade_app);
         upgrade.setVisibility(View.GONE);
 
         if (app.getInstalled()) {

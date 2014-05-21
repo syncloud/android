@@ -39,7 +39,7 @@ public class Owncloud extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_owncloud);
+        setContentView(R.layout.activity_app_owncloud);
 
         progress = new ProgressDialog(this);
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);

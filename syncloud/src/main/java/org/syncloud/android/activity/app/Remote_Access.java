@@ -12,7 +12,7 @@ import com.google.common.base.Optional;
 
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.adapter.DevicesAdapter;
+import org.syncloud.android.db.Db;
 import org.syncloud.app.RemoteAccessManager;
 import org.syncloud.model.Device;
 import org.syncloud.model.Result;
@@ -29,7 +29,7 @@ public class Remote_Access extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_remote_access);
+        setContentView(R.layout.activity_app_remote_access);
         progress = new ProgressDialog(this);
         progress.setMessage("Talking to the device");
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
@@ -52,12 +52,12 @@ public class Remote_Access extends Activity {
                     return;
                 }
 
-                final DevicesAdapter devicesAdapter = ((SyncloudApplication) getApplication()).getDevicesAdapter();
+                final Db db = ((SyncloudApplication) getApplication()).getDb();
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        devicesAdapter.save(result.getValue());
+                        db.insert(result.getValue());
                         progress.hide();
                     }
                 });
@@ -145,12 +145,12 @@ public class Remote_Access extends Activity {
                     return;
                 }
 
-                final DevicesAdapter devicesAdapter = ((SyncloudApplication) getApplication()).getDevicesAdapter();
+                final Db db = ((SyncloudApplication) getApplication()).getDb();
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        devicesAdapter.removeSaved(remoteDevice.getValue().get());
+                        db.remove(remoteDevice.getValue().get());
                         progress.hide();
                     }
                 });

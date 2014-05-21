@@ -2,10 +2,10 @@ package org.syncloud.android;
 
 import android.app.Application;
 
-import org.syncloud.android.activity.app.Insider;
+import org.syncloud.android.activity.DeviceActivateActivity;
 import org.syncloud.android.activity.app.Owncloud;
 import org.syncloud.android.activity.app.Remote_Access;
-import org.syncloud.android.adapter.DevicesAdapter;
+import org.syncloud.android.db.Db;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,20 +13,21 @@ import java.util.Map;
 public class SyncloudApplication extends Application {
 
     public static String DEVICE = "device";
-    public static String DEVICE_ADAPTER = "device_adapter";
 
     public static Map<String, Class> appRegistry = new HashMap<String, Class>() {{
         put("remote_access", Remote_Access.class);
-        put("insider", Insider.class);
+        put("insider", DeviceActivateActivity.class);
         put("owncloud", Owncloud.class);
     }};
-    private DevicesAdapter devicesAdapter;
+    private Db db;
 
-    public DevicesAdapter getDevicesAdapter() {
-        return devicesAdapter;
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        db = new Db(getApplicationContext());
     }
 
-    public void setDevicesAdapter(DevicesAdapter devicesAdapter) {
-        this.devicesAdapter = devicesAdapter;
+    public Db getDb() {
+        return db;
     }
 }

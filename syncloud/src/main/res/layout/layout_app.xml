@@ -1,45 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingTop="20dp">
 
-    <TextView
-        android:id="@+id/app_name"
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/app_buttons"
-        android:text="app name (v0.1)" />
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:id="@+id/app_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/app_buttons"
+            android:text="app name (v0.1) sd fds sd sd ds fsd" />
 
 
-    <LinearLayout
-        android:id="@+id/app_buttons"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="right">
-
-        <Button
-            android:id="@+id/install_app"
+        <LinearLayout
+            android:id="@+id/app_buttons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="[ + ]" />
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right">
 
-        <Button
-            android:id="@+id/upgrade_app"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="[ ^ ]" />
+            <ImageButton
+                android:id="@+id/install_app"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_download" />
 
-        <Button
-            android:id="@+id/remove_app"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="[ - ]" />
+            <ImageButton
+                android:id="@+id/upgrade_app"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_replay" />
 
-    </LinearLayout>
+            <ImageButton
+                android:id="@+id/remove_app"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_remove" />
 
+        </LinearLayout>
 
-</RelativeLayout>
+    </RelativeLayout>
+</LinearLayout>

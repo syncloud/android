@@ -13,7 +13,7 @@ import android.widget.TextView;
 import org.apache.commons.lang3.StringUtils;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.adapter.AppsAdapter;
+import org.syncloud.android.adapter.DeviceAppsAdapter;
 import org.syncloud.model.App;
 import org.syncloud.model.Device;
 import org.syncloud.model.Result;
@@ -24,17 +24,17 @@ import java.util.List;
 
 import static org.syncloud.android.SyncloudApplication.appRegistry;
 
-public class DeviceActivity extends Activity {
+public class DeviceAppsActivity extends Activity {
 
     private ProgressDialog progress;
-    private AppsAdapter appsAdapter;
+    private DeviceAppsAdapter deviceAppsAdapter;
     private Device device;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_device);
+        setContentView(R.layout.activity_device_apps);
 
         progress = new ProgressDialog(this);
 
@@ -43,8 +43,8 @@ public class DeviceActivity extends Activity {
         deviceAddress.setText(device.getHost());
 
         final ListView listview = (ListView) findViewById(R.id.app_list);
-        appsAdapter = new AppsAdapter(this);
-        listview.setAdapter(appsAdapter);
+        deviceAppsAdapter = new DeviceAppsAdapter(this);
+        listview.setAdapter(deviceAppsAdapter);
 
         checkSystem();
     }
@@ -79,8 +79,8 @@ public class DeviceActivity extends Activity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    appsAdapter.clear();
-                                    appsAdapter.addAll(appsResult.getValue());
+                                    deviceAppsAdapter.clear();
+                                    deviceAppsAdapter.addAll(appsResult.getValue());
                                 }
                             });
                             progressDone();
