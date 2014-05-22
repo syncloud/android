@@ -42,7 +42,7 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
 
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_device_saved, null);
-        TextView deviceHost = (TextView) rowView.findViewById(R.id.device_host);
+        TextView deviceName = (TextView) rowView.findViewById(R.id.device_host);
         ImageButton deviceRemove = (ImageButton) rowView.findViewById(R.id.device_remove);
         final Device device = getItem(position);
         deviceRemove.setOnClickListener(new View.OnClickListener() {
@@ -51,8 +51,8 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
                 removeSaved(device);
             }
         });
-        deviceHost.setText(device.getHost() + ":" + device.getPort());
-        deviceHost.setOnClickListener(new View.OnClickListener() {
+        deviceName.setText(device.getDisplayName());
+        deviceName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 activity.open(device);

@@ -14,21 +14,26 @@ import java.util.List;
 
 public class Db extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "syncloud";
     public static final String DEVICE_TABLE = "device";
+    public static final String NAME_COLUMN = "name";
     public static final String HOST_COLUMN = "host";
     public static final String PORT_COLUMN = "port";
     public static final String SSHKEY_COLUMN = "key";
+
     private static final String DEVICE_TABLE_CREATE =
             "CREATE TABLE " + DEVICE_TABLE + " (" +
+                    NAME_COLUMN + " TEXT, " +
                     HOST_COLUMN + " TEXT, " +
                     SSHKEY_COLUMN + " TEXT, " +
                     PORT_COLUMN + " INTEGER" +
                     ");";
+    private Context context;
 
     public Db(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -38,7 +43,8 @@ public class Db extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
-
+        context.deleteDatabase(DATABASE_NAME);
+        onCreate(sqLiteDatabase);
     }
 
     public List<Device> list() {
@@ -55,7 +61,8 @@ public class Db extends SQLiteOpenHelper {
                         new Device(
                                 cursor.getString(cursor.getColumnIndex(HOST_COLUMN)),
                                 cursor.getInt(cursor.getColumnIndex(PORT_COLUMN)),
-                                cursor.getString(cursor.getColumnIndex(SSHKEY_COLUMN)))
+                                cursor.getString(cursor.getColumnIndex(SSHKEY_COLUMN)),
+                                cursor.getString(cursor.getColumnIndex(NAME_COLUMN)))
                 );
             }
         } finally {
@@ -80,5 +87,20 @@ public class Db extends SQLiteOpenHelper {
         values.put(PORT_COLUMN, device.getPort());
         values.put(SSHKEY_COLUMN, device.getKey());
         getWritableDatabase().insert(DEVICE_TABLE, null, values);
+    }
+
+    public void update(Device device) {
+        ContentValues values = new ContentValues();
+        values.put(HOST_COLUMN, device.getHost());
+        values.put(PORT_COLUMN, device.getPort());
+        values.put(SSHKEY_COLUMN, device.getKey());
+        values.put(NAME_COLUMN, device.getName());
+
+        int update = getWritableDatabase().update(
+                DEVICE_TABLE,
+                values,
+                HOST_COLUMN + "=? AND " + PORT_COLUMN + "=?",
+                new String[]{device.getHost(), String.valueOf(device.getPort())});
+        System.out.println(update);
     }
 }

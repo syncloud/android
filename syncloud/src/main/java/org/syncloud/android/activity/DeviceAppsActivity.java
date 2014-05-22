@@ -1,19 +1,27 @@
 package org.syncloud.android.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.chainsaw.Main;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DeviceAppsAdapter;
+import org.syncloud.android.db.Db;
 import org.syncloud.model.App;
 import org.syncloud.model.Device;
 import org.syncloud.model.Result;
@@ -22,6 +30,7 @@ import org.syncloud.ssh.Spm;
 
 import java.util.List;
 
+import static android.os.AsyncTask.execute;
 import static org.syncloud.android.SyncloudApplication.appRegistry;
 
 public class DeviceAppsActivity extends Activity {
@@ -29,6 +38,8 @@ public class DeviceAppsActivity extends Activity {
     private ProgressDialog progress;
     private DeviceAppsAdapter deviceAppsAdapter;
     private Device device;
+    private Db db;
+    private TextView deviceName;
 
 
     @Override
@@ -38,10 +49,17 @@ public class DeviceAppsActivity extends Activity {
 
         progress = new ProgressDialog(this);
 
-        TextView deviceAddress = (TextView) findViewById(R.id.device_address);
-        device = (Device)getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
-        deviceAddress.setText(device.getHost());
-
+        deviceName = (TextView) findViewById(R.id.device_name);
+        ImageButton nameEditBtn = (ImageButton) findViewById(R.id.device_name_edit_btn);
+        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
+        db = ((SyncloudApplication) getApplication()).getDb();
+        deviceName.setText(device.getDisplayName());
+        nameEditBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showNameChange();
+            }
+        });
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
@@ -49,16 +67,41 @@ public class DeviceAppsActivity extends Activity {
         checkSystem();
     }
 
+    private void showNameChange() {
+        final EditText input = new EditText(this);
+        input.setText(device.getDisplayName());
+        new AlertDialog.Builder(this)
+                .setTitle("Name change")
+                .setMessage("Enter name for the device")
+                .setView(input)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        final Editable name = input.getText();
+                        device.setName(name.toString());
+                        deviceName.setText(device.getDisplayName());
+                        execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                db.update(device);
+                            }
+                        });
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        }).show();
+    }
+
     private void checkSystem() {
         progress.setMessage("Checking system");
         progress.show();
-        AsyncTask.execute(
+        execute(
                 new Runnable() {
                     @Override
                     public void run() {
                         final Result<SshResult> result = Spm.ensureSpmInstalled(device);
                         if (result.hasError()) {
-                            progressError(result.getError());
+                            progressUpdate(result.getError());
                             return;
                         }
 
@@ -69,7 +112,7 @@ public class DeviceAppsActivity extends Activity {
     }
 
     private void listApps() {
-        AsyncTask.execute(
+        execute(
                 new Runnable() {
                     @Override
                     public void run() {
@@ -85,7 +128,7 @@ public class DeviceAppsActivity extends Activity {
                             });
                             progressDone();
                         } else {
-                            progressError(appsResult.getError());
+                            progressUpdate(appsResult.getError());
                         }
                     }
                 }
@@ -101,21 +144,11 @@ public class DeviceAppsActivity extends Activity {
         });
     }
 
-    private void progressError(final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progress.setMessage(StringUtils.right(message, 500));
-                progress.setCancelable(true);
-            }
-        });
-    }
-
     private void progressUpdate(final String message) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                progress.setMessage(message);
+                progress.setMessage(StringUtils.right(message, 500));
             }
         });
     }
@@ -139,13 +172,13 @@ public class DeviceAppsActivity extends Activity {
 
             progress.setMessage("Reinstalling package manager");
             progress.show();
-            AsyncTask.execute(
+            execute(
                     new Runnable() {
                         @Override
                         public void run() {
                             final Result<SshResult> result = Spm.installSpm(device);
                             if (result.hasError()) {
-                                progressError(result.getError());
+                                progressUpdate(result.getError());
                                 return;
                             }
 
@@ -162,18 +195,18 @@ public class DeviceAppsActivity extends Activity {
     public void run(final Spm.Commnand action, final String app) {
         progress.setMessage("Running " + action.name().toLowerCase() + " for " + app);
         progress.show();
-        AsyncTask.execute(new Runnable() {
+        execute(new Runnable() {
             @Override
             public void run() {
                 final Result<SshResult> result = Spm.run(action, device, app);
                 if (result.hasError()) {
-                    progressError(result.getError());
+                    progressUpdate(result.getError());
                     return;
                 }
 
                 SshResult sshResult = result.getValue();
                 if (!sshResult.ok()) {
-                    progressError(sshResult.getMessage());
+                    progressUpdate(sshResult.getMessage());
                     return;
                 }
 

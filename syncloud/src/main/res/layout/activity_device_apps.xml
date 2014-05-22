@@ -14,14 +14,34 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="20dp">
+        android:paddingBottom="20dp"
+        >
 
-        <TextView
-            android:id="@+id/device_address"
+        <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="device name"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:layout_gravity="right"
+            >
+
+            <TextView
+                android:id="@+id/device_name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="device name a sd a "
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/device_name_edit_btn"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                />
+
+            <ImageButton
+                android:id="@+id/device_name_edit_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/ic_action_edit"
+                />
+
+        </RelativeLayout>
 
     </LinearLayout>
 

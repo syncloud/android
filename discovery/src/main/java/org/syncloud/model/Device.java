@@ -8,6 +8,7 @@ public class Device implements Serializable {
     private String login = "root";
     private String password = "syncloud";
     private String key;
+    private String name;
 
     public Device(String host, int port) {
         this.host = host;
@@ -18,6 +19,25 @@ public class Device implements Serializable {
         this.key = key;
         this.host = host;
         this.port = port;
+    }
+
+    public Device(String host, int port, String key, String name) {
+        this.key = key;
+        this.host = host;
+        this.port = port;
+        this.name = name;
+    }
+
+    public String getDisplayName() {
+        String address = getHost() + ":" + getPort();
+        return getName() != null ? getName() : address;
+    }
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getHost() {

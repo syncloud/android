@@ -31,7 +31,7 @@ public class DevicesSavedActivity extends Activity {
     public void open(Device device) {
         Intent intent = new Intent(this, DeviceAppsActivity.class);
         intent.putExtra(SyncloudApplication.DEVICE, device);
-        startActivity(intent);
+        startActivityForResult(intent, 1);
     }
 
     @Override
