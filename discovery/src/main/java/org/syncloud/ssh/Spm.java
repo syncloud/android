@@ -18,12 +18,6 @@ public class Spm {
     public static final String REPO_DIR = "/opt/syncloud/repo";
     public static final String SPM_BIN = REPO_DIR + "/system/spm";
 
-    public static final String APP_INSIDER = "insider";
-    public static final String APP_REMOTE_ACCESS = "remote_access";
-
-    //TODO: We may get list of system tools from spm
-    public static List<String> systemTools = asList(APP_INSIDER, APP_REMOTE_ACCESS);
-
     public static String SPM_APP_NAME = "spm";
 
     public enum Commnand {Install, Verify, Upgrade, Remove, Status}
@@ -44,14 +38,6 @@ public class Spm {
         return Ssh.execute(device, asList("[ -d " + REPO_DIR + " ]"));
     }
 
-    private static Result<Boolean> installed(Device device, String app) {
-        Result<SshResult> result = run(Commnand.Status, device, app);
-        if (result.hasError())
-            return Result.error(result.getError());
-
-        return Result.value(result.getValue().ok());
-    }
-
     public static Result<SshResult> ensureSpmInstalled(Device device) {
 
         Result<SshResult> spmResult = spmInstalled(device);
@@ -68,15 +54,24 @@ public class Spm {
         if (result.hasError())
             return Result.error(result.getError());
 
-        for (String systemTool : systemTools) {
-            Result<Boolean> installed = installed(device, systemTool);
-            if (installed.hasError())
-                return Result.error(installed.getError());
+        Result<List<App>> list = list(device);
+        if (list.hasError())
+            return Result.error(list.getError());
 
-            if(installed.getValue())
+        for (App app : list.getValue()) {
+            if (!app.getIsDev())
                 continue;
 
-            Result<SshResult> install = run(Commnand.Install, device, systemTool);
+            Commnand commnand;
+            if(!app.getInstalled()) {
+                commnand = Commnand.Install;
+            } else {
+                if (!app.getVersion().equals(app.getInstalledVersion()))
+                    commnand = Commnand.Upgrade;
+                else
+                    continue;
+            }
+            Result<SshResult> install = run(commnand, device, app.getId());
             if (install.hasError())
                 return Result.error(install.getError());
         }

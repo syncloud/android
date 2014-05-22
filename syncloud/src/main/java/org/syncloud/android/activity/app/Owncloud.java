@@ -91,12 +91,11 @@ public class Owncloud extends Activity {
 
     }
 
-    private void showError(final String error) {
+    private void progressUpdate(final String error) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progress.setMessage(error);
-                progress.setCancelable(true);
             }
         });
     }
@@ -113,7 +112,7 @@ public class Owncloud extends Activity {
                         final Result<Optional<String>> result = OwncloudManager.owncloudUrl(device);
 
                         if (result.hasError()) {
-                            showError(result.getError());
+                            progressUpdate(result.getError());
                             return;
                         }
 
@@ -164,11 +163,11 @@ public class Owncloud extends Activity {
             public void run() {
                 Result<String> result = OwncloudManager.finishSetup(device, login, pass);
                 if (result.hasError())
-                    showError(result.getError());
+                    progressUpdate(result.getError());
 
                 Result<SshResult> portResult = InsiderManager.addPort(device, OwncloudManager.OWNCLOUD_PORT);
                 if (portResult.hasError()) {
-                    showError(portResult.getError());
+                    progressUpdate(portResult.getError());
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override

@@ -20,23 +20,38 @@ public class InsiderManager {
     private static final String INSIDER_BIN = "/opt/insider/bin/insider";
 
     public static Result<SshResult> addPort(Device device, int port) {
-        return Ssh.execute(device, asList(
-                INSIDER_BIN + " add_port " + port,
-                INSIDER_BIN + " cron_on "));
+        Result<SshResult> result = Ssh.execute(device, asList(INSIDER_BIN + " add_port " + port));
+        if (!result.hasError() && !result.getValue().ok())
+            return Result.error(result.getValue().getMessage());
+
+        return enableCron(device);
 
     }
 
+    private static Result<SshResult> enableCron(Device device) {
+        Result<SshResult> result = Ssh.execute(device, asList(INSIDER_BIN + " cron_on "));
+        if (!result.hasError() && !result.getValue().ok())
+            return Result.error(result.getValue().getMessage());
+
+        return result;
+    }
+
     public static Result<SshResult> newName(Device device, String email, String pass, String userDomain) {
-        return Ssh.execute(device, asList(
-                String.format("%s new_dns %s %s %s", INSIDER_BIN, userDomain, email, pass),
-                INSIDER_BIN + " cron_on "));
+
+        Result<SshResult> result = Ssh.execute(device, asList(String.format("%s new_dns %s %s %s", INSIDER_BIN, userDomain, email, pass)));
+        if (!result.hasError() && !result.getValue().ok())
+            return Result.error(result.getValue().getMessage());
+
+        return enableCron(device);
 
     }
 
     public static Result<SshResult> activateExistingName(Device device, String email, String pass) {
-        return Ssh.execute(device, asList(
-                String.format("%s existing_dns %s %s", INSIDER_BIN, email, pass),
-                INSIDER_BIN + " cron_on "));
+        Result<SshResult> result = Ssh.execute(device, asList(String.format("%s existing_dns %s %s", INSIDER_BIN, email, pass)));
+        if (!result.hasError() && !result.getValue().ok())
+            return Result.error(result.getValue().getMessage());
+
+        return enableCron(device);
 
     }
 
