@@ -4,7 +4,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -12,7 +11,7 @@ import org.syncloud.android.R;
 import org.syncloud.android.activity.DeviceAppsActivity;
 import org.syncloud.model.App;
 
-import static org.syncloud.ssh.Spm.Commnand.*;
+import static org.syncloud.ssh.Spm.Command.*;
 
 public class DeviceAppsAdapter extends ArrayAdapter<App> {
     private DeviceAppsActivity activity;

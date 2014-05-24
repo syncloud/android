@@ -1,6 +1,11 @@
 package org.syncloud.ssh;
 
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 import org.syncloud.model.App;
 import org.syncloud.model.Device;
 import org.syncloud.model.Result;
@@ -20,18 +25,14 @@ public class Spm {
 
     public static String SPM_APP_NAME = "spm";
 
-    public enum Commnand {Install, Verify, Upgrade, Remove, Status}
+    public enum Command {Install, Verify, Upgrade, Remove, Status}
 
-    public static Result<SshResult> run(Commnand commnand, Device device, String app) {
-        return Ssh.execute(device, asList(SPM_BIN + " " + commnand.name().toLowerCase() + " " + app));
+    public static Result<SshResult> run(Command command, Device device, String app) {
+        return Ssh.execute(device, asList(SPM_BIN + " " + command.name().toLowerCase() + " " + app));
     }
 
     public static Result<SshResult> installSpm(Device device) {
-        Result<SshResult> result = Ssh.execute(device, asList(UPDATE_REPO));
-        if (result.hasError())
-            return result;
-
-        return run(Commnand.Install, device, SPM_APP_NAME);
+        return Ssh.execute(device, asList(UPDATE_REPO));
     }
 
     private static Result<SshResult> spmInstalled(Device device) {
@@ -48,30 +49,32 @@ public class Spm {
 
     }
 
-    public static Result<Boolean> ensureSystemToolsInstalled(Device device) {
+    public static Result<Boolean> ensureAdminToolsInstalled(Device device, Function<String, String> progress) {
 
-        Result<SshResult> result = ensureSpmInstalled(device);
+        progress.apply("installing spm");
+        Result<SshResult> result = installSpm(device);
         if (result.hasError())
             return Result.error(result.getError());
 
+        progress.apply("getting list of apps");
         Result<List<App>> list = list(device);
         if (list.hasError())
             return Result.error(list.getError());
 
-        for (App app : list.getValue()) {
-            if (!app.getIsDev())
-                continue;
+        for (App app : filter(list.getValue(), App.Type.admin)) {
 
-            Commnand commnand;
+            Command command;
             if(!app.getInstalled()) {
-                commnand = Commnand.Install;
+                command = Command.Install;
             } else {
                 if (!app.getVersion().equals(app.getInstalledVersion()))
-                    commnand = Commnand.Upgrade;
+                    command = Command.Upgrade;
                 else
                     continue;
             }
-            Result<SshResult> install = run(commnand, device, app.getId());
+
+            progress.apply("installing " + app.getName());
+            Result<SshResult> install = run(command, device, app.getId());
             if (install.hasError())
                 return Result.error(install.getError());
         }
@@ -90,7 +93,29 @@ public class Spm {
             return Result.error(sshResult.getMessage());
         }
 
-        return JsonParser.parse(sshResult, App.class);
+        Result<List<App>> parse = JsonParser.parse(sshResult, App.class);
+        if (!parse.hasError()) {
+            return Result.value(filterNot(parse.getValue(), App.Type.system));
+        }
+        return Result.error(parse.getError());
 
+    }
+
+    private static List<App> filterNot(List<App> apps, final App.Type type) {
+        return  Lists.newArrayList(Iterables.filter(apps, new Predicate<App>() {
+            @Override
+            public boolean apply(App input) {
+                return input.getAppType() != type;
+            }
+        }));
+    }
+
+    private static List<App> filter(List<App> apps, final App.Type type) {
+        return  Lists.newArrayList(Iterables.filter(apps, new Predicate<App>() {
+            @Override
+            public boolean apply(App input) {
+                return input.getAppType() == type;
+            }
+        }));
     }
 }

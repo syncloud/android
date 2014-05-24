@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
 import org.syncloud.android.R;
@@ -28,6 +29,7 @@ import org.syncloud.ssh.Spm;
 
 public class DeviceActivateActivity extends Activity {
 
+    private Function<String, String> progressFunction;
     private Device device;
     private ProgressDialog progress;
     private TextView managedDomain;
@@ -35,13 +37,19 @@ public class DeviceActivateActivity extends Activity {
     private boolean dnsReady = false;
     private LinearLayout dnsControl;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_activate);
         progress = new ProgressDialog(this);
+        progressFunction = new Function<String, String>() {
+            @Override
+            public String apply(String input) {
+                showProgress(input);
+                return null;
+            }
 
+        };
         managedDomain = (TextView) findViewById(R.id.managed_domain);
         userDomainName = (TextView) findViewById(R.id.user_domain_name);
         dnsControl = (LinearLayout) findViewById(R.id.dns_control);
@@ -147,7 +155,7 @@ public class DeviceActivateActivity extends Activity {
 
                 showProgress("Installing system tools");
 
-                Result<Boolean> systemTools = Spm.ensureSystemToolsInstalled(device);
+                Result<Boolean> systemTools = Spm.ensureAdminToolsInstalled(device, progressFunction);
                 if (systemTools.hasError()) {
                     showProgress(systemTools.getError());
                     return;

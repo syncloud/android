@@ -13,8 +13,12 @@ import ch.ethz.ssh2.SCPInputStream;
 
 public class Scp {
     public static Result<String> getFile(Device device, String file) {
+
+        Connection conn = null;
+
         try {
-            final Connection conn = new Connection(device.getHost(), device.getPort());
+
+            conn = new Connection(device.getHost(), device.getPort());
             conn.connect(null, 5000, 0);
             if (device.getKey() != null)
                 conn.authenticateWithPublicKey(device.getLogin(), device.getKey().toCharArray(), null);
@@ -23,11 +27,20 @@ public class Scp {
             final SCPClient scp_client = new SCPClient(conn);
             SCPInputStream scpInputStream = scp_client.get(file);
 
-            return Result.value(new String(ByteStreams.toByteArray(scpInputStream)));
+            String key = new String(ByteStreams.toByteArray(scpInputStream));
+            scpInputStream.close();
+
+            return Result.value(key);
 
 
         } catch (IOException e) {
             return Result.error(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ignore) {}
+            }
         }
     }
 }

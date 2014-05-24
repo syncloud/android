@@ -1,15 +1,33 @@
 package org.syncloud.model;
 
+import com.google.common.collect.Sets;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class App {
 
     private String id;
     private String name;
-    private Boolean isDev;
+    private String type;
 
     private Boolean installed;
     private String version;
     private String script;
     private String installedVersion;
+
+    public App() {
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getName() {
         return name;
@@ -30,14 +48,6 @@ public class App {
     @Override
     public String toString() {
         return name;
-    }
-
-    public Boolean getIsDev() {
-        return isDev;
-    }
-
-    public void setIsDev(Boolean isDev) {
-        this.isDev = isDev;
     }
 
     public Boolean getInstalled() {
@@ -71,4 +81,14 @@ public class App {
     public void setInstalledVersion(String installedVersion) {
         this.installedVersion = installedVersion;
     }
+
+    public Type getAppType() {
+        try {
+            return Type.valueOf(type);
+        } catch (Exception ignored) {
+            return Type.unknown;
+        }
+    }
+
+    public static enum Type {unknown, system, admin, user, dev}
 }

@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.Menu;
@@ -17,7 +16,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.chainsaw.Main;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DeviceAppsAdapter;
@@ -192,7 +190,7 @@ public class DeviceAppsActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void run(final Spm.Commnand action, final String app) {
+    public void run(final Spm.Command action, final String app) {
         progress.setMessage("Running " + action.name().toLowerCase() + " for " + app);
         progress.show();
         execute(new Runnable() {

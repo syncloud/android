@@ -29,7 +29,7 @@ public class JsonParserTest {
 
         Assert.assertEquals(apps.get(0).getId(), "id");
         Assert.assertEquals(apps.get(0).getName(), "test app");
-        Assert.assertTrue(apps.get(0).getIsDev());
+        Assert.assertEquals(apps.get(0).getAppType(), App.Type.admin);
         Assert.assertTrue(apps.get(0).getInstalled());
         Assert.assertEquals(apps.get(0).getVersion(), "v0.2");
         Assert.assertEquals(apps.get(0).getScript(), "script");
@@ -50,8 +50,8 @@ public class JsonParserTest {
     public void testParseError() {
 
         Result<List<App>> result = JsonParser.parse(new SshResult(0, "error"), App.class);
-        Assert.assertTrue(result.hasError());
-        Assert.assertTrue(result.getError().contains("Unrecognized token"));
+        Assert.assertFalse(result.hasError());
+        Assert.assertTrue(result.getValue().isEmpty());
 
     }
 }

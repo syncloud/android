@@ -1,2 +1,2 @@
-{"id": "id", "name": "test app", "isDev": "true", "installed": "true", "version": "v0.2", "script": "script", "installedVersion": "v0.1"}
-{"id": "id1", "name": "test app1", "isDev": "false", "installed": "false", "version": "v0.1", "script": "script1", "installedVersion": "v0.1"}"
+{"id": "id", "name": "test app", "type": "admin", "installed": "true", "version": "v0.2", "script": "script", "installedVersion": "v0.1"}
+{"id": "id1", "name": "test app1", "type": "user", "installed": "false", "version": "v0.1", "script": "script1", "installedVersion": "v0.1"}"

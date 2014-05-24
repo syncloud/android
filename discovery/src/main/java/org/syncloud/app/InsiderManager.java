@@ -48,7 +48,10 @@ public class InsiderManager {
 
     public static Result<SshResult> activateExistingName(Device device, String email, String pass) {
         Result<SshResult> result = Ssh.execute(device, asList(String.format("%s existing_dns %s %s", INSIDER_BIN, email, pass)));
-        if (!result.hasError() && !result.getValue().ok())
+        if (result.hasError())
+            return result;
+
+        if(!result.getValue().ok())
             return Result.error(result.getValue().getMessage());
 
         return enableCron(device);
