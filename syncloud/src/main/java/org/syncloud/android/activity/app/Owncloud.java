@@ -19,7 +19,6 @@ import com.google.common.base.Optional;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.app.OwncloudManager;
-import org.syncloud.app.InsiderManager;
 import org.syncloud.model.Device;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
@@ -83,11 +82,31 @@ public class Owncloud extends Activity {
         EditText passText = (EditText) findViewById(R.id.pass);
         //TODO: Some validation
 
-        String login = loginText.getText().toString();
-        String pass = passText.getText().toString();
+        final String login = loginText.getText().toString();
+        final String pass = passText.getText().toString();
 
 
-        finishSetupAsync(device, login, pass);
+        progress.setMessage("Activating ...");
+        progress.show();
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                Result<SshResult> result = OwncloudManager.finishSetup(device, login, pass);
+                if (result.hasError()) {
+                    progressUpdate(result.getError());
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        status();
+                        progress.hide();
+                    }
+                });
+
+            }
+        });
 
     }
 
@@ -151,32 +170,6 @@ public class Owncloud extends Activity {
         loginRow.setVisibility(inactiveControls);
         passRow.setVisibility(inactiveControls);
         activateBtn.setVisibility(inactiveControls);
-    }
-
-    private void finishSetupAsync(final Device device, final String login, final String pass) {
-
-        progress.setMessage("Activating ...");
-        progress.show();
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                Result<SshResult> result = OwncloudManager.finishSetup(device, login, pass);
-                if (result.hasError()) {
-                    progressUpdate(result.getError());
-                }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        status();
-                        progress.hide();
-                    }
-                });
-
-            }
-        });
-
     }
 
     public void showWeb(View view) {
