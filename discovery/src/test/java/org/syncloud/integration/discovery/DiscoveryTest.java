@@ -14,7 +14,6 @@ import org.syncloud.model.Device;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,14 +24,12 @@ import java.util.concurrent.TimeUnit;
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 
-import sun.net.util.IPAddressUtil;
-
 @RunWith(JUnit4.class)
 public class DiscoveryTest {
 
     private static Logger logger = LogManager.getLogger(DiscoveryTest.class.getName());
 
-    public static final String OWN_CLOUD = "ownCloudLocal";
+    public static final String TEST_SERVICE_NAME = "syncloudLocal";
     private JmDNS jmdns;
     private InetAddress localHost;
 
@@ -44,17 +41,13 @@ public class DiscoveryTest {
 
         jmdns = JmDNS.create(localHost);
         jmdns.registerService(ServiceInfo.create(
-                Discovery.TYPE, OWN_CLOUD, 8080, 0, 0,
-                new HashMap<String, String>() {{
-                    put("path", "/owncloud");
-                }}
+                Discovery.TYPE, TEST_SERVICE_NAME, 8080, 0, 0,
+                new HashMap<String, String>()
         ));
 
         jmdns.registerService(ServiceInfo.create(
-                Discovery.TYPE, OWN_CLOUD, 8081, 0, 0,
-                new HashMap<String, String>() {{
-                    put("path", "/owncloud");
-                }}
+                Discovery.TYPE, TEST_SERVICE_NAME, 8081, 0, 0,
+                new HashMap<String, String>()
         ));
 
         logger.debug("setting up test broadcast: done");
@@ -64,7 +57,7 @@ public class DiscoveryTest {
     public void testDiscovery() throws IOException {
 
         BlockingDeviceListener blockingDeviceListener = new BlockingDeviceListener();
-        Discovery discovery = new Discovery(blockingDeviceListener, OWN_CLOUD);
+        Discovery discovery = new Discovery(blockingDeviceListener, TEST_SERVICE_NAME);
         discovery.start(ByteBuffer.wrap(localHost.getAddress()).getInt());
         List<Device> devices = blockingDeviceListener.await(10, TimeUnit.SECONDS);
         discovery.stop();

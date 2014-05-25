@@ -12,7 +12,7 @@ public class Discovery {
 
     private static Logger logger = LogManager.getLogger(Discovery.class.getName());
 
-    public static final String TYPE = "_http._tcp.local.";
+    public static final String TYPE = "_ssh._tcp.local.";
     private JmDNS jmdns;
     private EventToDeviceConverter listener;
     private boolean started = false;

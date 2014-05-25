@@ -15,7 +15,7 @@ public class AsyncDiscovery {
 
     public AsyncDiscovery(WifiManager wifi, DeviceListener deviceListener) {
         this.wifi = wifi;
-        discovery = new Discovery(deviceListener, "ownCloud");
+        discovery = new Discovery(deviceListener, "syncloud");
 
     }
 
