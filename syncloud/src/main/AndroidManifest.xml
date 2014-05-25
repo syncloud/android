@@ -23,7 +23,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".activity.DevicesSavedActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,23 +33,28 @@
         </activity>
         <activity
             android:name=".activity.DeviceAppsActivity"
-            android:label="@string/title_activity_device" >
+            android:label="@string/title_activity_device"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" >
         </activity>
         <activity
             android:name="org.syncloud.android.activity.app.Owncloud"
-            android:label="@string/title_activity_owncloud" >
+            android:label="@string/title_activity_owncloud"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
         </activity>
         <activity
             android:name="org.syncloud.android.activity.app.Remote_Access"
-            android:label="@string/title_activity_remote__access" >
+            android:label="@string/title_activity_remote__access"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
         </activity>
         <activity
             android:name=".activity.DeviceActivateActivity"
-            android:label="@string/title_activity_insider" >
+            android:label="@string/title_activity_insider"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
         </activity>
         <activity
             android:name=".activity.DevicesDiscoveryActivity"
-            android:label="@string/title_activity_discovery" >
+            android:label="@string/title_activity_discovery"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
         </activity>
     </application>
 

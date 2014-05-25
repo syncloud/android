@@ -156,7 +156,7 @@
         android:id="@+id/name_activate"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:onClick="activateName"
+        android:onClick="activate"
         android:text="Activate"
 
         />

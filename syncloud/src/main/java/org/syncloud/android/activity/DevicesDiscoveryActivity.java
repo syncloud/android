@@ -25,14 +25,12 @@ import static android.os.AsyncTask.execute;
 public class DevicesDiscoveryActivity extends Activity {
 
     private AsyncDiscovery asyncDiscovery;
-    private ProgressDialog progress;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_devices_discovery);
-        progress = new ProgressDialog(this);
         final ListView listview = (ListView) findViewById(R.id.devices_discovered);
         final DevicesDiscoveredAdapter listAdapter = new DevicesDiscoveredAdapter(this);
         listview.setAdapter(listAdapter);

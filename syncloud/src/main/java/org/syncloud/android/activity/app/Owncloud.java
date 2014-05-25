@@ -54,6 +54,7 @@ public class Owncloud extends Activity {
         setVisibility(View.GONE, View.GONE);
 
         progress.setMessage("Checking ownCloud status ...");
+        progress.setCancelable(false);
         progress.show();
 
         status();
@@ -97,11 +98,11 @@ public class Owncloud extends Activity {
             public void run() {
                 Result<SshResult> result = OwncloudManager.finishSetup(device, login, pass);
                 if (result.hasError()) {
-                    progressUpdate(result.getError());
+                    showError(result.getError());
                     return;
                 }
                 if (!result.getValue().ok()){
-                    progressUpdate(result.getValue().getMessage());
+                    showError(result.getValue().getMessage());
                     return;
                 }
 
@@ -117,11 +118,12 @@ public class Owncloud extends Activity {
 
     }
 
-    private void progressUpdate(final String error) {
+    private void showError(final String error) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progress.setMessage(error);
+                progress.setCancelable(true);
             }
         });
     }
@@ -136,7 +138,7 @@ public class Owncloud extends Activity {
                         final Result<Optional<String>> result = OwncloudManager.owncloudUrl(device);
 
                         if (result.hasError()) {
-                            progressUpdate(result.getError());
+                            showError(result.getError());
                             return;
                         }
 

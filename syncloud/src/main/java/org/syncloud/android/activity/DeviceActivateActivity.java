@@ -88,9 +88,20 @@ public class DeviceActivateActivity extends Activity {
         });
     }
 
+    private void showError(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progress.setMessage(message);
+                progress.setCancelable(true);
+            }
+        });
+    }
+
     private void status() {
 
         progress.setMessage("Checking device status ...");
+        progress.setCancelable(false);
         progress.show();
 
         AsyncTask.execute(new Runnable() {
@@ -144,10 +155,11 @@ public class DeviceActivateActivity extends Activity {
         });
     }
 
-    public void activateName(View view) {
+    public void activate(View view) {
 
-        progress.show();
         progress.setMessage("Connecting to the device");
+        progress.setCancelable(false);
+        progress.show();
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -157,7 +169,7 @@ public class DeviceActivateActivity extends Activity {
 
                 Result<Boolean> systemTools = Spm.ensureAdminToolsInstalled(device, progressFunction);
                 if (systemTools.hasError()) {
-                    showProgress(systemTools.getError());
+                    showError(systemTools.getError());
                     return;
                 }
 
@@ -175,17 +187,19 @@ public class DeviceActivateActivity extends Activity {
                     boolean valid = true;
 
                     if (email.matches("")) {
-                        status.setText("enter name password");
+                        status.setText("enter email");
                         valid = false;
                     }
 
                     if (pass.matches("")) {
-                        status.setText("enter name password");
+                        status.setText("enter password");
                         valid = false;
                     }
 
-                    if (!valid)
+                    if (!valid) {
+                        showError("fix errors");
                         return;
+                    }
 
                     showProgress("Activating public name");
 
@@ -197,7 +211,7 @@ public class DeviceActivateActivity extends Activity {
                     }
 
                     if (result.hasError()) {
-                        showProgress(result.getError());
+                        showError(result.getError());
                         return;
                     }
                 }
@@ -206,7 +220,7 @@ public class DeviceActivateActivity extends Activity {
 
                 final Result<Device> remoteDeviceResult = RemoteAccessManager.enable(device);
                 if (remoteDeviceResult.hasError()) {
-                    showProgress(remoteDeviceResult.getError());
+                    showError(remoteDeviceResult.getError());
                     return;
                 }
 

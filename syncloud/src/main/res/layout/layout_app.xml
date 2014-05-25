@@ -32,19 +32,22 @@
                 android:id="@+id/install_app"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_download" />
+                android:padding="25dp"
+                android:background="@drawable/ic_action_download" />
 
             <ImageButton
                 android:id="@+id/upgrade_app"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_replay" />
+                android:padding="25dp"
+                android:background="@drawable/ic_action_replay" />
 
             <ImageButton
                 android:id="@+id/remove_app"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_remove" />
+                android:padding="25dp"
+                android:background="@drawable/ic_action_remove" />
 
         </LinearLayout>
 

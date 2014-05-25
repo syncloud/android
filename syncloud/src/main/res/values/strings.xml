@@ -16,7 +16,7 @@
     <string name="name_password_label">Password:</string>
     <string name="name_login_label">Domain name:</string>
     <string name="name_for_app_label">For app: device.[login].syncloud.it:[port]/owncloud</string>
-    <string name="title_activity_device">Device</string>
+    <string name="title_activity_device">Apps</string>
     <string name="device_label">Device:</string>
     <string name="title_activity_owncloud">owncloud</string>
     <string name="title_activity_dns">dns</string>
@@ -31,10 +31,10 @@
     <string name="remote_access_label">Remote app management:</string>
     <string name="reinstall_spm">Reinstall Package Manager</string>
     <string name="title_activity_remote__access">Remote_Access</string>
-    <string name="title_activity_insider">Insider</string>
+    <string name="title_activity_insider">Activation</string>
     <string name="owncloud_url_label">ownCloud url:</string>
     <string name="owncloud_web_btn_text">Web</string>
     <string name="owncloud_mobile_btn_text">Mobile</string>
-    <string name="title_activity_discovery">DiscoveryActivity</string>
+    <string name="title_activity_discovery">Discovery</string>
 
 </resources>

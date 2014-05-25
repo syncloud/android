@@ -92,6 +92,7 @@ public class DeviceAppsActivity extends Activity {
 
     private void checkSystem() {
         progress.setMessage("Checking system");
+        progress.setCancelable(false);
         progress.show();
         execute(
                 new Runnable() {
@@ -99,7 +100,7 @@ public class DeviceAppsActivity extends Activity {
                     public void run() {
                         final Result<SshResult> result = Spm.ensureSpmInstalled(device);
                         if (result.hasError()) {
-                            progressUpdate(result.getError());
+                            progressError(result.getError());
                             return;
                         }
 
@@ -126,7 +127,7 @@ public class DeviceAppsActivity extends Activity {
                             });
                             progressDone();
                         } else {
-                            progressUpdate(appsResult.getError());
+                            progressError(appsResult.getError());
                         }
                     }
                 }
@@ -146,7 +147,17 @@ public class DeviceAppsActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                progress.setMessage(message);
+            }
+        });
+    }
+
+    private void progressError(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
                 progress.setMessage(StringUtils.right(message, 500));
+                progress.setCancelable(true);
             }
         });
     }
@@ -169,6 +180,7 @@ public class DeviceAppsActivity extends Activity {
         } else if (id == R.id.action_reinstall_spm) {
 
             progress.setMessage("Reinstalling package manager");
+            progress.setCancelable(false);
             progress.show();
             execute(
                     new Runnable() {
@@ -176,7 +188,7 @@ public class DeviceAppsActivity extends Activity {
                         public void run() {
                             final Result<SshResult> result = Spm.installSpm(device);
                             if (result.hasError()) {
-                                progressUpdate(result.getError());
+                                progressError(result.getError());
                                 return;
                             }
 
@@ -192,19 +204,20 @@ public class DeviceAppsActivity extends Activity {
 
     public void run(final Spm.Command action, final String app) {
         progress.setMessage("Running " + action.name().toLowerCase() + " for " + app);
+        progress.setCancelable(false);
         progress.show();
         execute(new Runnable() {
             @Override
             public void run() {
                 final Result<SshResult> result = Spm.run(action, device, app);
                 if (result.hasError()) {
-                    progressUpdate(result.getError());
+                    progressError(result.getError());
                     return;
                 }
 
                 SshResult sshResult = result.getValue();
                 if (!sshResult.ok()) {
-                    progressUpdate(sshResult.getMessage());
+                    progressError(sshResult.getMessage());
                     return;
                 }
 

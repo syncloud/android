@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:configChanges="keyboardHidden|orientation"
+    android:configChanges="keyboardHidden|orientation|screenSize"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -14,8 +14,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="20dp"
-        android:weightSum="2.0">
+        android:paddingBottom="20dp">
 
         <Button
             android:id="@+id/discovery_btn"
@@ -23,16 +22,8 @@
             android:layout_height="wrap_content"
             android:onClick="discover"
             android:layout_weight="1"
-            android:text="Discover" />
+            android:text="Discover"/>
 
-        <Button
-            android:id="@+id/buy_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="buy"
-            android:layout_weight="1"
-            android:text="Buy"
-            />
 
     </LinearLayout>
 
