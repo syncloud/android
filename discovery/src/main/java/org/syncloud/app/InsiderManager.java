@@ -21,7 +21,10 @@ public class InsiderManager {
 
     public static Result<SshResult> addPort(Device device, int port) {
         Result<SshResult> result = Ssh.execute(device, asList(INSIDER_BIN + " add_port " + port));
-        if (!result.hasError() && !result.getValue().ok())
+        if (result.hasError())
+            return result;
+
+        if(!result.getValue().ok())
             return Result.error(result.getValue().getMessage());
 
         return enableCron(device);
@@ -39,7 +42,10 @@ public class InsiderManager {
     public static Result<SshResult> newName(Device device, String email, String pass, String userDomain) {
 
         Result<SshResult> result = Ssh.execute(device, asList(String.format("%s new_dns %s %s %s", INSIDER_BIN, userDomain, email, pass)));
-        if (!result.hasError() && !result.getValue().ok())
+        if (result.hasError())
+            return result;
+
+        if(!result.getValue().ok())
             return Result.error(result.getValue().getMessage());
 
         return enableCron(device);

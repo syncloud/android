@@ -23,152 +23,35 @@ import org.jsoup.nodes.Document;
 import org.syncloud.model.Device;
 import org.syncloud.model.PortMapping;
 import org.syncloud.model.Result;
+import org.syncloud.model.SshResult;
+import org.syncloud.ssh.Ssh;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+import static org.syncloud.ssh.Ssh.execute;
+
 public class OwncloudManager {
 
-    private static Logger logger = LogManager.getLogger(OwncloudManager.class.getName());
-    public static int OWNCLOUD_PORT = 80;
+    private static String OWNCLOUD_CTL_BIN = "/opt/owncloud-ctl/bin/owncloud-ctl";
 
-
-    public static Result<String> finishSetup(Device device, String login, String password) {
-
-        String url = url(device.getHost(), OWNCLOUD_PORT);
-
-        CloseableHttpClient http = HttpClients.custom()
-                .setRedirectStrategy(new LaxRedirectStrategy())
-                .build();
-
-        try {
-
-
-            HttpPost httpPost = new HttpPost(url + "/index.php");
-
-            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-
-            nvps.add(new BasicNameValuePair("install", "true"));
-            nvps.add(new BasicNameValuePair("adminlogin", login));
-            nvps.add(new BasicNameValuePair("adminpass", password));
-            nvps.add(new BasicNameValuePair("adminpass-clone", password));
-            nvps.add(new BasicNameValuePair("dbtype", "mysql"));
-            nvps.add(new BasicNameValuePair("dbname", "owncloud"));
-            nvps.add(new BasicNameValuePair("dbuser", "root"));
-            nvps.add(new BasicNameValuePair("dbpass", "root"));
-            nvps.add(new BasicNameValuePair("dbhost", "localhost"));
-            nvps.add(new BasicNameValuePair("directory", "/data"));
-
-            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
-            CloseableHttpResponse response = http.execute(httpPost);
-
-            try {
-
-                if (response.getStatusLine().getStatusCode() == 200) {
-                    return Result.value("activated");
-                }
-
-                HttpEntity entity = response.getEntity();
-                // do something useful with the response body
-                // and ensure it is fully consumed
-                String result = EntityUtils.toString(entity);
-
-            } finally {
-                response.close();
-            }
-        } catch (Exception e) {
-            logger.error("unable to finish setup", e);
-        } finally {
-            try {
-                http.close();
-            } catch (IOException e) {
-                logger.error("unable to close http client", e);
-            }
-        }
-
-        return Result.error("unable to activate");
-
+    public static Result<SshResult> finishSetup(Device device, String login, String password) {
+        return execute(device, asList(String.format("%s finish %s %s", OWNCLOUD_CTL_BIN, login, password)));
     }
 
     public static Result<Optional<String>> owncloudUrl(Device device) {
-        Result<Optional<PortMapping>> portResult = InsiderManager
-                .localPortMapping(device, OwncloudManager.OWNCLOUD_PORT);
 
-        if (portResult.hasError()) {
-            return Result.error(portResult.getError());
-        } else {
-            if (portResult.getValue().isPresent()) {
-                int port = portResult.getValue().get().getExternal_port();
-                return Result.value(Optional.fromNullable(url(device.getHost(), port)));
-            } else {
-                return Result.value(Optional.<String>absent());
-            }
-        }
-    }
+        Result<SshResult> execute = execute(device, asList(String.format("%s url", OWNCLOUD_CTL_BIN)));
+        if (execute.hasError())
+            return Result.error(execute.getError());
 
-    private static String url(String host, int port) {
-        return String.format("http://%s:%s/owncloud", host, port);
-    }
+        if (!execute.getValue().ok())
+            return Result.value(Optional.<String>absent());
+        else
+            return Result.value(Optional.fromNullable(execute.getValue().getMessage()));
 
-
-    //TODO: Currently activated owncloud or not is checked by locating port mapping,
-    //TODO: maybe we should aks owncloud instead or in addition
-    private static Result<Boolean> isActivated(String url, String username, String password) {
-
-
-        CloseableHttpClient http = HttpClients.custom()
-                .setRedirectStrategy(new LaxRedirectStrategy())
-                .build();
-
-        try {
-
-            HttpPost post = new HttpPost(url + "/");
-            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-            nvps.add(new BasicNameValuePair("user", username));
-            nvps.add(new BasicNameValuePair("password", password));
-            post.setEntity(new UrlEncodedFormEntity(nvps));
-
-            HttpClientContext context = HttpClientContext.create();
-            CookieStore cookieStore = new BasicCookieStore();
-            context.setCookieStore(cookieStore);
-
-            CloseableHttpResponse response = http.execute(post, context);
-
-
-            try {
-
-                StatusLine statusLine = response.getStatusLine();
-                if (statusLine.getStatusCode() != 200)
-                    return Result.error("unable to access syncloud");
-
-                HttpEntity entity = response.getEntity();
-                String result = EntityUtils.toString(entity);
-
-                Document doc = Jsoup.parse(result);
-
-                boolean installed = doc
-                        .select(":has(input[hidden=true], input[install=true])")
-                        .size() == 0;
-
-                return Result.value(installed);
-
-            } finally {
-                response.close();
-            }
-
-
-        } catch (Exception e) {
-            logger.error("unable to get installation status", e);
-        } finally {
-            try {
-                http.close();
-            } catch (IOException e) {
-                logger.error("unable to close http client", e);
-            }
-        }
-
-        return Result.error("unable to get request token");
     }
 
 }

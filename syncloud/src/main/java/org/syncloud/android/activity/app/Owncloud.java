@@ -161,22 +161,18 @@ public class Owncloud extends Activity {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                Result<String> result = OwncloudManager.finishSetup(device, login, pass);
-                if (result.hasError())
+                Result<SshResult> result = OwncloudManager.finishSetup(device, login, pass);
+                if (result.hasError()) {
                     progressUpdate(result.getError());
-
-                Result<SshResult> portResult = InsiderManager.addPort(device, OwncloudManager.OWNCLOUD_PORT);
-                if (portResult.hasError()) {
-                    progressUpdate(portResult.getError());
-                } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            status();
-                            progress.hide();
-                        }
-                    });
                 }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        status();
+                        progress.hide();
+                    }
+                });
 
             }
         });
