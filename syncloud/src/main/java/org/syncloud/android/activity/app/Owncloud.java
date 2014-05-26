@@ -2,6 +2,8 @@ package org.syncloud.android.activity.app;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -34,6 +36,8 @@ public class Owncloud extends Activity {
     private Button activateBtn;
     private Button webBtn;
     private Button mobileBtn;
+    private LinearLayout activatedControls;
+    private LinearLayout notActivatedControls;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,8 @@ public class Owncloud extends Activity {
         progress = new ProgressDialog(this);
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
+        activatedControls = (LinearLayout) findViewById(R.id.owncloud_activated_controls);
+        notActivatedControls = (LinearLayout) findViewById(R.id.owncloud_not_activated_controls);
         url = (TextView) findViewById(R.id.owncloud_url);
         loginRow = (LinearLayout) findViewById(R.id.owncloud_login_row);
         passRow = (LinearLayout) findViewById(R.id.owncloud_pass_row);
@@ -169,14 +175,8 @@ public class Owncloud extends Activity {
     }
 
     private void setVisibility(int activeControls, int inactiveControls) {
-
-        url.setVisibility(activeControls);
-        webBtn.setVisibility(activeControls);
-        mobileBtn.setVisibility(activeControls);
-
-        loginRow.setVisibility(inactiveControls);
-        passRow.setVisibility(inactiveControls);
-        activateBtn.setVisibility(inactiveControls);
+        activatedControls.setVisibility(activeControls);
+        notActivatedControls.setVisibility(inactiveControls);
     }
 
     public void showWeb(View view) {
@@ -201,5 +201,11 @@ public class Owncloud extends Activity {
             progress.show();
             progress.setCancelable(true);
         }
+    }
+
+    public void copyUrl(View view) {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("url", url.getText());
+        clipboard.setPrimaryClip(clip);
     }
 }
