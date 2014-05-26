@@ -83,7 +83,7 @@
                 android:id="@+id/login_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/login_label"
+                android:text="@string/owncloud_login_label"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <EditText
@@ -106,7 +106,7 @@
                 android:id="@+id/pass_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/password_label"
+                android:text="@string/owncloud_password_label"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <EditText

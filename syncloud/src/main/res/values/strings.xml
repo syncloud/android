@@ -5,9 +5,9 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="ebay">Buy new</string>
-    <string name="activate_button">Activate Device</string>
-    <string name="password_label">Device password:</string>
-    <string name="login_label">Device login:</string>
+    <string name="activate_button">Activate</string>
+    <string name="owncloud_password_label">Password:</string>
+    <string name="owncloud_login_label">Login:</string>
     <string name="discovery_toggle">Discovery:</string>
     <string name="rescan_label">Refresh</string>
     <string name="name_email">Email:</string>
