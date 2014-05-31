@@ -100,7 +100,9 @@ public class DeviceAppsActivity extends Activity {
                     public void run() {
                         final Result<SshResult> result = Spm.ensureSpmInstalled(device);
                         if (result.hasError()) {
-                            progressError(result.getError());
+                            String message = "Initial name setup may take up to 10 minutes, " +
+                                    "try in several minutes\n\n";
+                            progressError(message + result.getError());
                             return;
                         }
 

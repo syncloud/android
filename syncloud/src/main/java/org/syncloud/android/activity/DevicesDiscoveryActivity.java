@@ -1,38 +1,45 @@
 package org.syncloud.android.activity;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DevicesDiscoveredAdapter;
-import org.syncloud.android.db.Db;
 import org.syncloud.android.discovery.AsyncDiscovery;
-import org.syncloud.app.RemoteAccessManager;
 import org.syncloud.discovery.DeviceListener;
 import org.syncloud.model.Device;
-import org.syncloud.model.Result;
 
-import static android.os.AsyncTask.execute;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class DevicesDiscoveryActivity extends Activity {
 
     private AsyncDiscovery asyncDiscovery;
-
+    private final ScheduledExecutorService scheduler =
+            Executors.newScheduledThreadPool(1);
+    private ImageButton refreshBtn;
+    private ProgressBar progressBar;
+    private DevicesDiscoveredAdapter listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_devices_discovery);
         final ListView listview = (ListView) findViewById(R.id.devices_discovered);
-        final DevicesDiscoveredAdapter listAdapter = new DevicesDiscoveredAdapter(this);
+        progressBar = (ProgressBar) findViewById(R.id.discovery_progress);
+        refreshBtn = (ImageButton) findViewById(R.id.discovery_refresh_btn);
+        listAdapter = new DevicesDiscoveredAdapter(this);
         listview.setAdapter(listAdapter);
 
         DeviceListener deviceListener = new DeviceListener() {
@@ -57,13 +64,36 @@ public class DevicesDiscoveryActivity extends Activity {
             }
         };
 
-
         asyncDiscovery = new AsyncDiscovery(
                 (WifiManager) getSystemService(Context.WIFI_SERVICE),
                 deviceListener);
-        asyncDiscovery.start();
+
+        discoveryStart();
     }
 
+    private void discoveryStart() {
+        listAdapter.clear();
+        refreshBtn.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+        asyncDiscovery.start();
+        scheduler.schedule(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        discoveryStop();
+                    }
+                });
+            }
+        },30, TimeUnit.SECONDS );
+    }
+
+    private void discoveryStop() {
+        asyncDiscovery.stop();
+        progressBar.setVisibility(View.GONE);
+        refreshBtn.setVisibility(View.VISIBLE);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -98,5 +128,9 @@ public class DevicesDiscoveryActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         asyncDiscovery.stop();
+    }
+
+    public void refresh(View view) {
+        discoveryStart();
     }
 }
