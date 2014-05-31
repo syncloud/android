@@ -38,6 +38,7 @@ public class DeviceAppsActivity extends Activity {
     private Device device;
     private Db db;
     private TextView deviceName;
+    private boolean connected = false;
 
 
     @Override
@@ -46,6 +47,13 @@ public class DeviceAppsActivity extends Activity {
         setContentView(R.layout.activity_device_apps);
 
         progress = new ProgressDialog(this);
+        progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                if (!connected)
+                    finish();
+            }
+        });
 
         deviceName = (TextView) findViewById(R.id.device_name);
         ImageButton nameEditBtn = (ImageButton) findViewById(R.id.device_name_edit_btn);
@@ -105,7 +113,7 @@ public class DeviceAppsActivity extends Activity {
                             progressError(message + result.getError());
                             return;
                         }
-
+                        connected = true;
                         listApps();
                     }
                 }
