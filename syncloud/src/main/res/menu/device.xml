@@ -2,8 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="org.syncloud.android.activity.DeviceAppsActivity" >
+
     <item android:id="@+id/action_reinstall_spm"
         android:title="@string/reinstall_spm"
         android:orderInCategory="100"
         app:showAsAction="never" />
+
+    <item android:id="@+id/action_dev_mode"
+        android:title="@string/dev_mode"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:checkable="true"
+        />
 </menu>

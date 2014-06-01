@@ -39,7 +39,7 @@ public class DeviceAppsActivity extends Activity {
     private Db db;
     private TextView deviceName;
     private boolean connected = false;
-
+    private boolean devMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,9 +99,8 @@ public class DeviceAppsActivity extends Activity {
     }
 
     private void checkSystem() {
-        progress.setMessage("Checking system");
-        progress.setCancelable(false);
-        progress.show();
+        String message = "Checking system";
+        startProgress(message);
         execute(
                 new Runnable() {
                     @Override
@@ -120,6 +119,12 @@ public class DeviceAppsActivity extends Activity {
         );
     }
 
+    private void startProgress(String message) {
+        progress.setMessage(message);
+        progress.setCancelable(false);
+        progress.show();
+    }
+
     private void listApps() {
         execute(
                 new Runnable() {
@@ -132,7 +137,10 @@ public class DeviceAppsActivity extends Activity {
                                 @Override
                                 public void run() {
                                     deviceAppsAdapter.clear();
-                                    deviceAppsAdapter.addAll(appsResult.getValue());
+                                    for (App app : appsResult.getValue()) {
+                                        if (devMode || app.getAppType() == App.Type.user)
+                                            deviceAppsAdapter.add(app);
+                                    }
                                 }
                             });
                             progressDone();
@@ -187,9 +195,7 @@ public class DeviceAppsActivity extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_reinstall_spm) {
 
-            progress.setMessage("Reinstalling package manager");
-            progress.setCancelable(false);
-            progress.show();
+            startProgress("Reinstalling package manager");
             execute(
                     new Runnable() {
                         @Override
@@ -206,14 +212,17 @@ public class DeviceAppsActivity extends Activity {
             );
 
             return true;
+        } else if (id == R.id.action_dev_mode) {
+            startProgress("Changing mode");
+            item.setChecked(!item.isChecked());
+            devMode = item.isChecked();
+            listApps();
         }
         return super.onOptionsItemSelected(item);
     }
 
     public void run(final Spm.Command action, final String app) {
-        progress.setMessage("Running " + action.name().toLowerCase() + " for " + app);
-        progress.setCancelable(false);
-        progress.show();
+        startProgress("Running " + action.name().toLowerCase() + " for " + app);
         execute(new Runnable() {
             @Override
             public void run() {
