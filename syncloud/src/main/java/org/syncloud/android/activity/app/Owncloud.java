@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,6 +30,7 @@ import org.syncloud.model.SshResult;
 
 public class Owncloud extends Activity {
 
+    public static final String COM_OWNCLOUD_ANDROID = "com.owncloud.android";
     private Device device;
     private ProgressDialog progress;
     private TextView url;
@@ -194,12 +197,28 @@ public class Owncloud extends Activity {
     public void showMobile(View view) {
         CharSequence text = url.getText();
         if (text != null && !text.toString().isEmpty()) {
-            Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("com.owncloud.android");
-            startActivity(LaunchIntent);
+            if (isInstalled(COM_OWNCLOUD_ANDROID)) {
+                Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(COM_OWNCLOUD_ANDROID);
+                startActivity(LaunchIntent);
+            } else {
+                Intent marketIntent = new Intent(Intent.ACTION_VIEW);
+                marketIntent.setData(Uri.parse("market://details?id=" + COM_OWNCLOUD_ANDROID));
+                startActivity(marketIntent);
+            }
         } else {
             progress.setMessage("url is not set");
             progress.show();
             progress.setCancelable(true);
+        }
+    }
+
+    public boolean isInstalled(String app)
+    {
+        try{
+            getPackageManager().getApplicationInfo(app, 0);
+            return true;
+        } catch( PackageManager.NameNotFoundException e ){
+            return false;
         }
     }
 
