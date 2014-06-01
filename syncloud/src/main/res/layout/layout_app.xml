@@ -12,13 +12,37 @@
         android:orientation="horizontal"
         >
 
+        <LinearLayout
+            android:id="@+id/app_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:layout_centerVertical="true"
+            >
+
+            <ImageButton
+                android:id="@+id/app_icon_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:background="@drawable/ic_action_computer"/>
+
+            <ImageButton
+                android:id="@+id/app_icon_util"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:background="@drawable/ic_action_settings"/>
+
+            </LinearLayout>
         <TextView
             android:id="@+id/app_name"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/app_buttons"
-            android:text="app name (v0.1) sd fds sd sd ds fsd" />
+            android:layout_toRightOf="@+id/app_icon"
+            android:text="app name (v0.1) sd ffsd sdf sdf sd  sd sd sd " />
 
 
         <LinearLayout

@@ -44,6 +44,17 @@ public class DeviceAppsAdapter extends ArrayAdapter<App> {
         ImageButton upgrade = (ImageButton) rowView.findViewById(R.id.upgrade_app);
         upgrade.setVisibility(View.GONE);
 
+        ImageButton appTypeUser = (ImageButton) rowView.findViewById(R.id.app_icon_user);
+        ImageButton appTypeUtil = (ImageButton) rowView.findViewById(R.id.app_icon_util);
+
+        if (app.getAppType() == App.Type.user) {
+            appTypeUser.setVisibility(View.VISIBLE);
+            appTypeUtil.setVisibility(View.GONE);
+        } else {
+            appTypeUtil.setVisibility(View.VISIBLE);
+            appTypeUser.setVisibility(View.GONE);
+        }
+
         if (app.getInstalled()) {
             if (!app.getInstalledVersion().equals(app.getVersion())) {
                 upgrade.setVisibility(View.VISIBLE);
