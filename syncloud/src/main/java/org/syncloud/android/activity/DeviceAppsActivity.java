@@ -185,9 +185,7 @@ public class DeviceAppsActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == R.id.action_reinstall_spm) {
+        if (id == R.id.action_reinstall_spm) {
 
             progress.setMessage("Reinstalling package manager");
             progress.setCancelable(false);
