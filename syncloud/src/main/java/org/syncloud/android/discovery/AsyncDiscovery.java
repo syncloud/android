@@ -25,14 +25,12 @@ public class AsyncDiscovery {
             public void run() {
                 try {
                     lock = wifi.createMulticastLock(MULTICAST_LOCK_TAG);
-                    lock.setReferenceCounted(true);
+                    lock.setReferenceCounted(false);
                     lock.acquire();
                     WifiInfo connInfo = wifi.getConnectionInfo();
                     discovery.start(connInfo.getIpAddress());
                 } catch (Exception e) {
                     e.printStackTrace();
-                } finally {
-                    lock.release();
                 }
 
             }
@@ -47,6 +45,10 @@ public class AsyncDiscovery {
                     discovery.stop();
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    if (lock != null)
+                        lock.release();
+                    lock = null;
                 }
             }
         });
