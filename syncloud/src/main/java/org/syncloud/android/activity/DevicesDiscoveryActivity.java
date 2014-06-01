@@ -86,7 +86,7 @@ public class DevicesDiscoveryActivity extends Activity {
                     }
                 });
             }
-        },30, TimeUnit.SECONDS );
+        }, 10, TimeUnit.SECONDS );
     }
 
     private void discoveryStop() {
