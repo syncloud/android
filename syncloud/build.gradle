@@ -58,12 +58,17 @@ android {
             */
 
             def props = new Properties()
-            props.load(new FileInputStream(rootProject.file('keystore.properties')))
-
-            android.signingConfigs['release'].storeFile = file(props['storeFile'])
-            android.signingConfigs['release'].storePassword = props['storePassword']
-            android.signingConfigs['release'].keyAlias = props['keyAlias']
-            android.signingConfigs['release'].keyPassword = props['keyPassword']
+            def keystoreProperies = 'keystore.properties'
+            def keyProps = rootProject.file(keystoreProperies)
+            if (keyProps.exists()) {
+                props.load(new FileInputStream(keyProps))
+                android.signingConfigs['release'].storeFile = file(props['storeFile'])
+                android.signingConfigs['release'].storePassword = props['storePassword']
+                android.signingConfigs['release'].keyAlias = props['keyAlias']
+                android.signingConfigs['release'].keyPassword = props['keyPassword']
+            } else {
+                logger.warn(keystoreProperies + ' is not available, will not be able to publish to Google Play')
+            }
         }
     }
 
