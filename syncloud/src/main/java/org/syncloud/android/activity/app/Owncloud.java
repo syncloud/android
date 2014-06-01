@@ -147,7 +147,7 @@ public class Owncloud extends Activity {
                         final Result<Optional<String>> result = OwncloudManager.owncloudUrl(device);
 
                         if (result.hasError()) {
-                            showError(result.getError());
+                            showError("Unable to read status:\n" + result.getError());
                             return;
                         }
 

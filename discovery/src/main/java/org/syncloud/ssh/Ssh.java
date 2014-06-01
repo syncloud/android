@@ -77,35 +77,40 @@ public class Ssh {
         prop.put("StrictHostKeyChecking", "no");
         session.setConfig(prop);
 
-        session.connect();
+        try {
+            session.connect();
 
-        ChannelExec channel = (ChannelExec)
-                session.openChannel("exec");
+            ChannelExec channel = (ChannelExec)
+                    session.openChannel("exec");
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        channel.setOutputStream(baos);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            channel.setOutputStream(baos);
 
-        ByteArrayOutputStream err = new ByteArrayOutputStream();
-        channel.setErrStream(err);
+            ByteArrayOutputStream err = new ByteArrayOutputStream();
+            channel.setErrStream(err);
 
-        channel.setCommand(StringUtils.join(commands, "; "));
-        InputStream inputStream = channel.getInputStream();
+            channel.setCommand(StringUtils.join(commands, "; "));
+            InputStream inputStream = channel.getInputStream();
 
-        channel.connect();
-        String otput = new String(ByteStreams.toByteArray(inputStream));
-        while (channel.getExitStatus() == -1) {
             try {
-                Thread.sleep(1000);
-            } catch (Exception ignored) {}
+                channel.connect();
+                String otput = new String(ByteStreams.toByteArray(inputStream));
+                while (channel.getExitStatus() == -1) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception ignored) {
+                    }
+                }
+                int exitStatus = channel.getExitStatus();
+                //TODO: export output stream for progress monitor
+                return new SshResult(exitStatus, baos.toString() + otput + err.toString());
+            } finally {
+                if (channel.isConnected())
+                    channel.disconnect();
+            }
+        } finally {
+            if (session.isConnected())
+                session.disconnect();
         }
-        int exitStatus = channel.getExitStatus();
-        channel.disconnect();
-        session.disconnect();
-
-        //TODO: export output stream for progress monitor
-
-        return new SshResult(exitStatus, baos.toString() + otput + err.toString());
     }
-
-
 }
