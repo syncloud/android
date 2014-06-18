@@ -3,11 +3,13 @@ android:
   components:
     - build-tools-19.1.0
 
+script: ./gradlew clean test assembleBetaDebug
+
 deploy:
   provider: releases
   api_key:
     secure: h/IJQeT3FtpzjVpxjG8Z1zY3BGhVy8GF5q0pHiBgah24MHbedOz60IxXstUxBjrmJmhMe95unURYN77WmN2wY+5MGtjdJXV49ntYc8KbLicjss36Pk8ce86e9LU9qH2mHIZfdVjTWdeFWJhBvGgJ/bBQDAb9ts0MDwVQRFJtfZI=
-  file: syncloud/build/apk/syncloud-beta-release.apk
+  file: syncloud/build/outputs/apk/syncloud-beta-debug.apk
   skip_cleanup: true
   on:
     repo: syncloud/android
