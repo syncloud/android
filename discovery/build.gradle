@@ -17,6 +17,12 @@ dependencies {
 
 }
 
+test {
+    filter {
+        includeTestsMatching "org.syncloud.unit.*"
+    }
+}
+
 //TODO: studio does not include gradle resources (build/resources/test) by default
 //TODO: You should uncomment this to run tests
 //TODO: You should comment this to build apk :(
