@@ -12,4 +12,5 @@ deploy:
   file: syncloud/build/outputs/apk/syncloud-beta-debug.apk
   skip_cleanup: true
   on:
+    tags: true
     repo: syncloud/android
