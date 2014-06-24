@@ -29,13 +29,13 @@
     <string name="app_update">Update</string>
     <string name="title_activity_device_settings">DeviceSettings</string>
     <string name="remote_access_label">Remote app management:</string>
-    <string name="reinstall_spm">Reinstall package manager</string>
+    <string name="update_spm">Update apps</string>
     <string name="title_activity_remote__access">Remote_Access</string>
     <string name="title_activity_insider">Activation</string>
     <string name="owncloud_url_label">ownCloud url:</string>
     <string name="owncloud_web_btn_text">Web</string>
     <string name="owncloud_mobile_btn_text">Mobile</string>
     <string name="title_activity_discovery">Discovery</string>
-    <string name="dev_mode">Developer mode</string>
+    <string name="all_apps">Show admin apps</string>
 
 </resources>

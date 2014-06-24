@@ -18,12 +18,10 @@ import static java.util.Arrays.asList;
 
 public class Spm {
 
-    public static final String REPO_URL = "https://raw.githubusercontent.com/syncloud/apps/master";
-    public static final String UPDATE_REPO = "wget -qO- " + REPO_URL + "/spm | bash -s install";
+    public static final String REPO_URL = "https://raw.githubusercontent.com/syncloud/apps/SYNCLOUD-1.0";
+    public static final String INSTALL_SPM = "wget -qO- " + REPO_URL + "/spm | bash -s install";
     public static final String REPO_DIR = "/opt/syncloud/repo";
     public static final String SPM_BIN = REPO_DIR + "/system/spm";
-
-    public static String SPM_APP_NAME = "spm";
 
     public enum Command {Install, Verify, Upgrade, Remove, Status}
 
@@ -31,28 +29,34 @@ public class Spm {
         return Ssh.execute(device, asList(SPM_BIN + " " + command.name().toLowerCase() + " " + app));
     }
 
-    public static Result<SshResult> installSpm(Device device) {
-        return Ssh.execute(device, asList(UPDATE_REPO));
+    private static Result<SshResult> installSpm(Device device) {
+        return  Ssh.execute(device, asList(INSTALL_SPM));
     }
 
     private static Result<SshResult> spmInstalled(Device device) {
         return Ssh.execute(device, asList("[ -d " + REPO_DIR + " ]"));
     }
 
+    public static Result<SshResult> updateSpm(Device device) {
+        return installSpm(device);
+    }
+
     public static Result<SshResult> ensureSpmInstalled(Device device) {
 
-        Result<SshResult> spmResult = spmInstalled(device);
-        if (!spmResult.hasError() && !spmResult.getValue().ok()) {
-            return installSpm(device);
-        }
-        return spmResult;
+        Result<SshResult> spmInstalled = spmInstalled(device);
+        if (spmInstalled.hasError())
+            return Result.error(spmInstalled.getError());
 
+        if (!spmInstalled.getValue().ok())
+            return installSpm(device);
+
+        return spmInstalled;
     }
 
     public static Result<Boolean> ensureAdminToolsInstalled(Device device, Function<String, String> progress) {
 
         progress.apply("installing spm");
-        Result<SshResult> result = installSpm(device);
+        Result<SshResult> result = ensureSpmInstalled(device);
         if (result.hasError())
             return Result.error(result.getError());
 

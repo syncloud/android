@@ -39,7 +39,7 @@ public class DeviceAppsActivity extends Activity {
     private Db db;
     private TextView deviceName;
     private boolean connected = false;
-    private boolean devMode = false;
+    private boolean showAdminApps = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +138,7 @@ public class DeviceAppsActivity extends Activity {
                                 public void run() {
                                     deviceAppsAdapter.clear();
                                     for (App app : appsResult.getValue()) {
-                                        if (devMode || app.getAppType() == App.Type.user)
+                                        if (showAdminApps || app.getAppType() == App.Type.user)
                                             deviceAppsAdapter.add(app);
                                     }
                                 }
@@ -194,31 +194,32 @@ public class DeviceAppsActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_reinstall_spm) {
-
-            startProgress("Reinstalling package manager");
-            execute(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            final Result<SshResult> result = Spm.installSpm(device);
-                            if (result.hasError()) {
-                                progressError(result.getError());
-                                return;
-                            }
-
-                            listApps();
-                        }
-                    }
-            );
-
-            return true;
-        } else if (id == R.id.action_dev_mode) {
-            startProgress("Changing mode");
+            updateSpm();
+        } else if (id == R.id.action_show_admin_apps) {
+            startProgress("Changing apps filter");
             item.setChecked(!item.isChecked());
-            devMode = item.isChecked();
+            showAdminApps = item.isChecked();
             listApps();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateSpm() {
+        startProgress("Updating app list");
+        execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        final Result<SshResult> result = Spm.updateSpm(device);
+                        if (result.hasError()) {
+                            progressError(result.getError());
+                            return;
+                        }
+
+                        listApps();
+                    }
+                }
+        );
     }
 
     public void run(final Spm.Command action, final String app) {

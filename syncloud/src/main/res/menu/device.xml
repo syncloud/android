@@ -4,12 +4,12 @@
     tools:context="org.syncloud.android.activity.DeviceAppsActivity" >
 
     <item android:id="@+id/action_reinstall_spm"
-        android:title="@string/reinstall_spm"
+        android:title="@string/update_spm"
         android:orderInCategory="100"
         app:showAsAction="never" />
 
-    <item android:id="@+id/action_dev_mode"
-        android:title="@string/dev_mode"
+    <item android:id="@+id/action_show_admin_apps"
+        android:title="@string/all_apps"
         android:orderInCategory="100"
         app:showAsAction="never"
         android:checkable="true"
