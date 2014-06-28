@@ -3,7 +3,9 @@ android:
   components:
     - build-tools-19.1.0
 
-script: ./gradlew clean test assembleBetaDebug
+script:
+    - android list sdk --no-ui --all --extended
+    - ./gradlew clean test assembleBetaDebug
 
 deploy:
   provider: releases
