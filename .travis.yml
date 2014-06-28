@@ -1,7 +1,7 @@
 language: android
 android:
   components:
-    - build-tools-19.1
+    - build-tools-19.1.0
 
 script:
     - android list sdk --no-ui --all --extended
