@@ -24,6 +24,8 @@ import org.syncloud.model.InsiderConfig;
 import org.syncloud.model.InsiderDnsConfig;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
+import org.syncloud.model.User;
+import org.syncloud.redirect.UserService;
 import org.syncloud.ssh.Spm;
 
 
@@ -36,11 +38,13 @@ public class DeviceActivateActivity extends Activity {
     private TextView userDomainName;
     private boolean dnsReady = false;
     private LinearLayout dnsControl;
+    private UserService userService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_activate);
+        userService = ((SyncloudApplication) getApplication()).getUserService();
         progress = new ProgressDialog(this);
         progressFunction = new Function<String, String>() {
             @Override
@@ -205,10 +209,16 @@ public class DeviceActivateActivity extends Activity {
 
                     final Result<SshResult> result;
                     if (domain.matches("")) {
-                        result = InsiderManager.activateExistingName(device, email, pass);
+                        Result<User> user = userService.getUser(email, pass);
+                        if (user.hasError()) {
+                            showError(user.getError());
+                            return;
+                        }
                     } else {
-                        result = InsiderManager.newName(device, email, pass, domain);
+                        userService.getOrCreate(email, pass, domain);
                     }
+
+                    result = InsiderManager.activateExistingName(device, email, pass);
 
                     if (result.hasError()) {
                         showError(result.getError());

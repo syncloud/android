@@ -6,6 +6,11 @@
         <option name="GRADLE_PROJECT_PATH" value=":discovery" />
       </configuration>
     </facet>
+    <facet type="java-gradle" name="Java-Gradle">
+      <configuration>
+        <option name="BUILD_FOLDER_PATH" />
+      </configuration>
+    </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/classes/main" />
@@ -36,6 +41,7 @@
     <orderEntry type="library" exported="" name="jackson-annotations-2.3.0" level="project" />
     <orderEntry type="library" exported="" name="jackson-core-2.3.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.10" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="jersey-container-grizzly2-servlet-2.10.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="slf4j-api-1.6.6" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="mina-core-2.0.7" level="project" />
@@ -47,6 +53,29 @@
     <orderEntry type="library" exported="" scope="TEST" name="bcpg-jdk15on-1.49" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="bcpkix-jdk15on-1.49" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="tomcat-apr-5.5.23" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="javax.servlet-api-3.0.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="javax.ws.rs-api-2.0" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="javax.inject-2.3.0-b05" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="javax.annotation-api-1.2" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="jersey-guava-2.10.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="javax.inject-1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="hk2-utils-2.3.0-b05" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="aopalliance-repackaged-2.3.0-b05" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="hk2-api-2.3.0-b05" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="javassist-3.18.1-GA" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="hk2-locator-2.3.0-b05" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="osgi-resource-locator-1.0.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="jersey-common-2.10.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="jersey-client-2.10.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="validation-api-1.1.0.Final" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="jersey-server-2.10.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="jersey-container-servlet-core-2.10.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="jersey-container-servlet-2.10.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="grizzly-framework-2.3.8" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="grizzly-http-2.3.8" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="grizzly-http-server-2.3.8" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="jersey-container-grizzly2-http-2.10.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="grizzly-http-servlet-2.3.8" level="project" />
   </component>
 </module>
 

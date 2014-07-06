@@ -37,5 +37,6 @@
     <string name="owncloud_mobile_btn_text">Mobile</string>
     <string name="title_activity_discovery">Discovery</string>
     <string name="all_apps">Show admin apps</string>
+    <string name="api_url">http://api.syncloud.it</string>
 
 </resources>

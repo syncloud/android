@@ -39,7 +39,7 @@ public class InsiderManager {
         return result;
     }
 
-    public static Result<SshResult> newName(Device device, String email, String pass, String userDomain) {
+    /*public static Result<SshResult> newName(Device device, String email, String pass, String userDomain) {
 
         Result<SshResult> result = Ssh.execute(device, asList(String.format("%s new_dns %s %s %s", INSIDER_BIN, userDomain, email, pass)));
         if (result.hasError())
@@ -50,7 +50,7 @@ public class InsiderManager {
 
         return enableCron(device);
 
-    }
+    }*/
 
     public static Result<SshResult> activateExistingName(Device device, String email, String pass) {
         Result<SshResult> result = Ssh.execute(device, asList(String.format("%s existing_dns %s %s", INSIDER_BIN, email, pass)));
