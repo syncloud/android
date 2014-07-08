@@ -3,7 +3,6 @@ package org.syncloud.unit.redirect;
 import org.junit.After;
 import org.junit.Test;
 import org.syncloud.model.Result;
-import org.syncloud.model.User;
 import org.syncloud.redirect.UserService;
 import org.syncloud.unit.redirect.server.Rest;
 import static org.junit.Assert.assertEquals;
@@ -18,30 +17,20 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetUserActivated() {
-        Rest.start(Rest.ExistingActivatedUser.class);
+    public void testGetUserExisting() {
+        Rest.start(Rest.ExistingUser.class);
         UserService service = new UserService(Rest.URL);
-        Result<User> result = service.getUser("test", "test");
+        Result<Boolean> result = service.getUser("test", "test");
 
         assertFalse(result.getErrorOrEmpty(), result.hasError());
-        assertEquals(true, result.getValue().getActive());
-    }
-
-    @Test
-    public void testGetUserNotActivated() {
-        Rest.start(Rest.ExistingNotActivatedUser.class);
-        UserService service = new UserService(Rest.URL);
-        Result<User> result = service.getUser("test", "test");
-
-        assertFalse(result.getErrorOrEmpty(), result.hasError());
-        assertEquals(false, result.getValue().getActive());
+        assertEquals(true, result.getValue());
     }
 
     @Test
     public void testGetUserMissing() {
         Rest.start(Rest.MissingUser.class);
         UserService service = new UserService(Rest.URL);
-        Result<User> result = service.getUser("test", "test");
+        Result<Boolean> result = service.getUser("test", "test");
 
         assertTrue(result.getErrorOrEmpty(), result.hasError());
     }
@@ -57,7 +46,7 @@ public class UserServiceTest {
 
     @Test
     public void testCreateUserExisting() {
-        Rest.start(Rest.ExistingActivatedUser.class);
+        Rest.start(Rest.ExistingUser.class);
         UserService service = new UserService(Rest.URL);
         Result<String> result = service.createUser("test", "test", "user_domain");
 

@@ -38,7 +38,7 @@ public class Rest {
 
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public static class ExistingActivatedUser {
+    public static class ExistingUser {
 
         @GET
         @Path("/user/get")
@@ -66,24 +66,6 @@ public class Rest {
 
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public static class ExistingNotActivatedUser {
-
-        @GET
-        @Path("/user/get")
-        public String get() {
-            return "{\n" +
-                    "  \"active\": false, \n" +
-                    "  \"email\": \"ribalkin1@gmail.com\", \n" +
-                    "  \"ip\": null, \n" +
-                    "  \"port\": null, \n" +
-                    "  \"update_token\": null, \n" +
-                    "  \"user_domain\": null\n" +
-                    "}";
-        }
-    }
-
-    @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
     public static class MissingUser {
 
         @GET
@@ -101,8 +83,8 @@ public class Rest {
         public Response create() {
             return Response.ok().entity(
                     "{\n" +
-                    "  \"message\": \"User was created\"\n" +
-                    "}"
+                            "  \"message\": \"User was created\"\n" +
+                            "}"
             ).build();
         }
     }

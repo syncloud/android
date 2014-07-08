@@ -10,9 +10,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.syncloud.model.RestMessage;
 import org.syncloud.model.Result;
-import org.syncloud.model.User;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class UserService {
         this.apiUrl = apiUrl;
     }
 
-    public Result<User> getUser(String email, String password) {
+    public Result<Boolean> getUser(String email, String password) {
 
         CloseableHttpClient http = HttpClients.createDefault();
         HttpGet get = new HttpGet(apiUrl +
@@ -33,10 +33,16 @@ public class UserService {
 
         try {
             CloseableHttpResponse response = http.execute(get);
-            ObjectMapper mapper = new ObjectMapper();
-            User user = mapper.readValue(response.getEntity().getContent(), User.class);
+
+            int statusCode = response.getStatusLine().getStatusCode();
             response.close();
-            return Result.value(user);
+            if (statusCode == 200) {
+                return Result.value(true);
+            } else {
+                ObjectMapper mapper = new ObjectMapper();
+                RestMessage reply = mapper.readValue(response.getEntity().getContent(), RestMessage.class);
+                return Result.error(reply.getMessage());
+            }
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
@@ -54,21 +60,22 @@ public class UserService {
         try {
             post.setEntity(new UrlEncodedFormEntity(nvps));
             CloseableHttpResponse response = http.execute(post);
-            String result = EntityUtils.toString(response.getEntity());
+            ObjectMapper mapper = new ObjectMapper();
+            RestMessage reply = mapper.readValue(response.getEntity().getContent(), RestMessage.class);
             int statusCode = response.getStatusLine().getStatusCode();
             response.close();
             if (statusCode == 200) {
-                return Result.value(result);
+                return Result.value(reply.getMessage());
             } else {
-                return Result.error(result);
+                return Result.error(reply.getMessage());
             }
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
 
-    public Result<User> getOrCreate(String email, String password, String domain) {
-        Result<User> user = getUser(email, password);
+    public Result<Boolean> getOrCreate(String email, String password, String domain) {
+        Result<Boolean> user = getUser(email, password);
         if (user.hasError()) {
             Result<String> create = createUser(email, password, domain);
             if (create.hasError())
