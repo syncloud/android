@@ -24,7 +24,6 @@ import org.syncloud.model.InsiderConfig;
 import org.syncloud.model.InsiderDnsConfig;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
-import org.syncloud.model.User;
 import org.syncloud.redirect.UserService;
 import org.syncloud.ssh.Spm;
 
@@ -209,7 +208,7 @@ public class DeviceActivateActivity extends Activity {
 
                     final Result<SshResult> result;
                     if (domain.matches("")) {
-                        Result<User> user = userService.getUser(email, pass);
+                        Result<Boolean> user = userService.getUser(email, pass);
                         if (user.hasError()) {
                             showError(user.getError());
                             return;
