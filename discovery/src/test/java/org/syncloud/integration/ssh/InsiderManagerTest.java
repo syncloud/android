@@ -11,8 +11,6 @@ import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
 import org.syncloud.app.InsiderManager;
 
-import java.util.List;
-
 public class InsiderManagerTest {
 
     public static final Device testDevice = new Device("192.168.1.65", 22);
@@ -33,7 +31,7 @@ public class InsiderManagerTest {
             }
         }
 
-        Result<SshResult> addResult = InsiderManager.addPort(testDevice, TEST_PORT);
+        Result<SshResult> addResult = InsiderManager.addService(testDevice, "ssh", "ssh", "_ssh._tcp", TEST_PORT, "");
         if (ports.hasError()) {
             Assert.fail("unable to add test port: " + addResult.getError());
         }

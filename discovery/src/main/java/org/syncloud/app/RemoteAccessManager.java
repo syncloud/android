@@ -12,6 +12,9 @@ import org.syncloud.ssh.Scp;
 import org.syncloud.ssh.Ssh;
 
 import static java.util.Arrays.asList;
+import static org.syncloud.app.InsiderManager.localPortMapping;
+import static org.syncloud.model.Result.error;
+import static org.syncloud.ssh.Ssh.execute;
 
 public class RemoteAccessManager {
 
@@ -19,17 +22,17 @@ public class RemoteAccessManager {
     private static final String KEY_FILE = "/root/.ssh/id_dsa_syncloud_master";
 
     public static Result<Optional<Device>> getRemoteDevice(Device device) {
-        Result<Optional<PortMapping>> result = InsiderManager
-                .localPortMapping(device, REMOTE_ACCESS_PORT);
+        Result<Optional<PortMapping>> result =
+                localPortMapping(device, REMOTE_ACCESS_PORT);
         if (result.hasError())
-            return Result.error(result.getError());
+            return error(result.getError());
 
         if (!result.getValue().isPresent())
             return Result.value(Optional.<Device>absent());
 
         Result<Device> remoteDevice = getRemote(device);
         if (remoteDevice.hasError())
-            return Result.error(remoteDevice.getError());
+            return error(remoteDevice.getError());
 
         return Result.value(Optional.fromNullable(remoteDevice.getValue()));
     }
@@ -37,7 +40,7 @@ public class RemoteAccessManager {
     public static Result<Boolean> disable(Device device) {
         final Result<SshResult> result = InsiderManager.removePort(device, REMOTE_ACCESS_PORT);
         if (result.hasError())
-            return Result.error(result.getError());
+            return error(result.getError());
 
         return Result.value(result.getValue().ok());
 
@@ -47,19 +50,19 @@ public class RemoteAccessManager {
 
 
 
-        Result<SshResult> execute = Ssh.execute(device, asList(
+        Result<SshResult> execute = execute(device, asList(
                 "mkdir -p /root/.ssh",
                 String.format("rm -rf %s*", KEY_FILE),
                 String.format("ssh-keygen -b 1024 -t dsa -f %s -N ''", KEY_FILE),
                 String.format("cat %s.pub > /root/.ssh/authorized_keys", KEY_FILE)));
 
         if (execute.hasError())
-            return Result.error(execute.getError());
+            return error(execute.getError());
 
 
-        Result<SshResult> result = InsiderManager.addPort(device, REMOTE_ACCESS_PORT);
+        Result<SshResult> result = InsiderManager.addService(device, "ssh", "ssh", "_ssh._tcp", REMOTE_ACCESS_PORT, "ssh");
         if (result.hasError())
-            return Result.error(result.getError());
+            return error(result.getError());
 
         return getRemote(device);
     }
@@ -67,31 +70,31 @@ public class RemoteAccessManager {
     private static Result<Device> getRemote(Device device) {
         Result<String> key = Scp.getFile(device, KEY_FILE);
         if (key.hasError())
-            return Result.error(key.getError());
+            return error(key.getError());
 
         Result<Optional<InsiderDnsConfig>> dnsResult = InsiderManager.dnsConfig(device);
         if (dnsResult.hasError()) {
-            return Result.error(dnsResult.getError());
+            return error(dnsResult.getError());
         }
 
         Result<InsiderConfig> configResult = InsiderManager.config(device);
         if (configResult.hasError()) {
-            return Result.error(configResult.getError());
+            return error(configResult.getError());
         }
 
         Optional<InsiderDnsConfig> dns = dnsResult.getValue();
         if (!dns.isPresent()) {
-            return Result.error("unable to get public name for the device");
+            return error("unable to get public name for the device");
         }
 
-        Result<Optional<PortMapping>> localPortMapping = InsiderManager.localPortMapping(device, REMOTE_ACCESS_PORT);
+        Result<Optional<PortMapping>> localPortMapping = localPortMapping(device, REMOTE_ACCESS_PORT);
         if (localPortMapping.hasError()) {
-            return Result.error(localPortMapping.getError());
+            return error(localPortMapping.getError());
         }
 
         Optional<PortMapping> localPortMappingValue = localPortMapping.getValue();
         if (!localPortMappingValue.isPresent()) {
-            return Result.error("unable to get external port");
+            return error("unable to get external port");
         }
 
         return Result.value(new Device(

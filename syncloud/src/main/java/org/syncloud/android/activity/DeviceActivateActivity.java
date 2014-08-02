@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -113,6 +114,19 @@ public class DeviceActivateActivity extends Activity {
                 final Result<InsiderConfig> config = InsiderManager.config(device);
 
                 if (config.hasError()) {
+                    showError(config.getError());
+                    return;
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        managedDomain.setText(config.getValue().getDomain());
+                    }
+                });
+
+                final Result<Optional<InsiderDnsConfig>> dnsConfig = InsiderManager.dnsConfig(device);
+                if (dnsConfig.hasError()) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -123,37 +137,21 @@ public class DeviceActivateActivity extends Activity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            managedDomain.setText(config.getValue().getDomain());
+
+                            Optional<InsiderDnsConfig> dnsConfigs = dnsConfig.getValue();
+                            if (dnsConfigs.isPresent()) {
+                                dnsReady = true;
+                                dnsControl.setVisibility(View.GONE);
+                                userDomainName.setText(dnsConfigs.get().getUser_domain());
+                            } else {
+                                userDomainName.setText("");
+                            }
+                            progress.hide();
                         }
                     });
 
-                    final Result<Optional<InsiderDnsConfig>> dnsConfig = InsiderManager.dnsConfig(device);
-                    if (dnsConfig.hasError()) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progress.hide();
-                            }
-                        });
-                    } else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                Optional<InsiderDnsConfig> dnsConfigs = dnsConfig.getValue();
-                                if (dnsConfigs.isPresent()) {
-                                    dnsReady = true;
-                                    dnsControl.setVisibility(View.GONE);
-                                    userDomainName.setText(dnsConfigs.get().getUser_domain());
-                                } else {
-                                    userDomainName.setText("");
-                                }
-                                progress.hide();
-                            }
-                        });
-
-                    }
                 }
+
             }
         });
     }
@@ -181,6 +179,7 @@ public class DeviceActivateActivity extends Activity {
                     EditText emailText = (EditText) findViewById(R.id.name_email);
                     EditText passText = (EditText) findViewById(R.id.name_pass);
                     EditText userDomainText = (EditText) findViewById(R.id.user_domain);
+                    CheckBox existingUserCheck = (CheckBox) findViewById(R.id.existing_user_check);
 
                     final String email = emailText.getText().toString();
                     final String pass = passText.getText().toString();
@@ -199,6 +198,11 @@ public class DeviceActivateActivity extends Activity {
                         valid = false;
                     }
 
+                    if (domain.matches("")) {
+                        status.setText("enter domain");
+                        valid = false;
+                    }
+
                     if (!valid) {
                         showError("fix errors");
                         return;
@@ -207,17 +211,15 @@ public class DeviceActivateActivity extends Activity {
                     showProgress("Activating public name");
 
                     final Result<SshResult> result;
-                    if (domain.matches("")) {
-                        Result<Boolean> user = userService.getUser(email, pass);
+                    if (!existingUserCheck.isChecked()) {
+                        Result<Boolean> user = userService.getOrCreate(email, pass, domain);
                         if (user.hasError()) {
                             showError(user.getError());
                             return;
                         }
-                    } else {
-                        userService.getOrCreate(email, pass, domain);
                     }
 
-                    result = InsiderManager.activateExistingName(device, email, pass);
+                    result = InsiderManager.acquireDomain(device, email, pass, domain);
 
                     if (result.hasError()) {
                         showError(result.getError());
