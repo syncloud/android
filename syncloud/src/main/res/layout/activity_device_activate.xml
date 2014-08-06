@@ -11,59 +11,27 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="20sp">
 
         <TextView
             android:id="@+id/managed_domain_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Your domain name:"
+            android:text="Device name:"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="15sp" />
 
         <TextView
-            android:id="@+id/user_domain_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:text="subdomain"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/managed_domain_dot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="."
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/managed_domain"
+            android:id="@+id/device_url"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="domain"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            android:paddingLeft="10sp"/>
 
     </LinearLayout>
-
-
-    <!--<TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/name_example"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="15sp"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/name_for_app_label"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="15sp"
-        />-->
 
 
     <LinearLayout

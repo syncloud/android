@@ -15,18 +15,19 @@ import android.widget.TextView;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
+import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
 import org.syncloud.app.InsiderManager;
 import org.syncloud.app.RemoteAccessManager;
 import org.syncloud.model.Device;
-import org.syncloud.model.InsiderConfig;
-import org.syncloud.model.InsiderDnsConfig;
+import org.syncloud.model.InsiderResult;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
-import org.syncloud.redirect.UserService;
 import org.syncloud.ssh.Spm;
+
+import static org.syncloud.redirect.UserService.getOrCreate;
 
 
 public class DeviceActivateActivity extends Activity {
@@ -34,17 +35,19 @@ public class DeviceActivateActivity extends Activity {
     private Function<String, String> progressFunction;
     private Device device;
     private ProgressDialog progress;
-    private TextView managedDomain;
-    private TextView userDomainName;
+    private TextView url;
+//    private TextView userDomainName;
     private boolean dnsReady = false;
     private LinearLayout dnsControl;
-    private UserService userService;
+    private Preferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_activate);
-        userService = ((SyncloudApplication) getApplication()).getUserService();
+
+        preferences = ((SyncloudApplication) getApplication()).getPreferences();
+
         progress = new ProgressDialog(this);
         progressFunction = new Function<String, String>() {
             @Override
@@ -54,8 +57,8 @@ public class DeviceActivateActivity extends Activity {
             }
 
         };
-        managedDomain = (TextView) findViewById(R.id.managed_domain);
-        userDomainName = (TextView) findViewById(R.id.user_domain_name);
+        url = (TextView) findViewById(R.id.device_url);
+//        userDomainName = (TextView) findViewById(R.id.user_domain_name);
         dnsControl = (LinearLayout) findViewById(R.id.dns_control);
 
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
@@ -111,22 +114,16 @@ public class DeviceActivateActivity extends Activity {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                final Result<InsiderConfig> config = InsiderManager.config(device);
-
-                if (config.hasError()) {
-                    showError(config.getError());
-                    return;
-                }
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        managedDomain.setText(config.getValue().getDomain());
+                        url.setText("[user]." + preferences.getDomain());
                     }
                 });
 
-                final Result<Optional<InsiderDnsConfig>> dnsConfig = InsiderManager.dnsConfig(device);
-                if (dnsConfig.hasError()) {
+                final Result<Optional<InsiderResult>> fullNameResult = InsiderManager.fullName(device);
+                if (fullNameResult.hasError()) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -138,13 +135,13 @@ public class DeviceActivateActivity extends Activity {
                         @Override
                         public void run() {
 
-                            Optional<InsiderDnsConfig> dnsConfigs = dnsConfig.getValue();
-                            if (dnsConfigs.isPresent()) {
+                            Optional<InsiderResult> fullName = fullNameResult.getValue();
+                            if (fullName.isPresent()) {
                                 dnsReady = true;
                                 dnsControl.setVisibility(View.GONE);
-                                userDomainName.setText(dnsConfigs.get().getUser_domain());
+                                url.setText(fullName.get().getData());
                             } else {
-                                userDomainName.setText("");
+                                url.setText("");
                             }
                             progress.hide();
                         }
@@ -212,13 +209,14 @@ public class DeviceActivateActivity extends Activity {
 
                     final Result<SshResult> result;
                     if (!existingUserCheck.isChecked()) {
-                        Result<Boolean> user = userService.getOrCreate(email, pass, domain);
+                        Result<Boolean> user = getOrCreate(email, pass, domain, preferences.getApiUrl());
                         if (user.hasError()) {
                             showError(user.getError());
                             return;
                         }
                     }
 
+                    showProgress("Acquiring domain");
                     result = InsiderManager.acquireDomain(device, email, pass, domain);
 
                     if (result.hasError()) {

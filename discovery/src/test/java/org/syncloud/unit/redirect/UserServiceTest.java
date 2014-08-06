@@ -8,6 +8,8 @@ import org.syncloud.unit.redirect.server.Rest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.syncloud.redirect.UserService.createUser;
+import static org.syncloud.redirect.UserService.getUser;
 
 public class UserServiceTest {
 
@@ -19,8 +21,7 @@ public class UserServiceTest {
     @Test
     public void testGetUserExisting() {
         Rest.start(Rest.ExistingUser.class);
-        UserService service = new UserService(Rest.URL);
-        Result<Boolean> result = service.getUser("test", "test");
+        Result<Boolean> result = getUser("test", "test", Rest.URL);
 
         assertFalse(result.getErrorOrEmpty(), result.hasError());
         assertEquals(true, result.getValue());
@@ -29,8 +30,7 @@ public class UserServiceTest {
     @Test
     public void testGetUserMissing() {
         Rest.start(Rest.MissingUser.class);
-        UserService service = new UserService(Rest.URL);
-        Result<Boolean> result = service.getUser("test", "test");
+        Result<Boolean> result = getUser("test", "test", Rest.URL);
 
         assertTrue(result.getErrorOrEmpty(), result.hasError());
     }
@@ -38,8 +38,7 @@ public class UserServiceTest {
     @Test
     public void testCreateUserNew() {
         Rest.start(Rest.MissingUser.class);
-        UserService service = new UserService(Rest.URL);
-        Result<String> result = service.createUser("test", "test", "user_domain");
+        Result<String> result = createUser("test", "test", "user_domain", Rest.URL);
 
         assertFalse(result.getErrorOrEmpty(), result.hasError());
     }
@@ -47,8 +46,7 @@ public class UserServiceTest {
     @Test
     public void testCreateUserExisting() {
         Rest.start(Rest.ExistingUser.class);
-        UserService service = new UserService(Rest.URL);
-        Result<String> result = service.createUser("test", "test", "user_domain");
+        Result<String> result = createUser("test", "test", "user_domain", Rest.URL);
 
         assertTrue(result.getErrorOrEmpty(), result.hasError());
     }

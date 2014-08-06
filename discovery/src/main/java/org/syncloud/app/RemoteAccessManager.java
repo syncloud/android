@@ -3,13 +3,11 @@ package org.syncloud.app;
 import com.google.common.base.Optional;
 
 import org.syncloud.model.Device;
-import org.syncloud.model.InsiderConfig;
-import org.syncloud.model.InsiderDnsConfig;
+import org.syncloud.model.InsiderResult;
 import org.syncloud.model.PortMapping;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
 import org.syncloud.ssh.Scp;
-import org.syncloud.ssh.Ssh;
 
 import static java.util.Arrays.asList;
 import static org.syncloud.app.InsiderManager.localPortMapping;
@@ -48,8 +46,6 @@ public class RemoteAccessManager {
 
     public static Result<Device> enable(Device device) {
 
-
-
         Result<SshResult> execute = execute(device, asList(
                 "mkdir -p /root/.ssh",
                 String.format("rm -rf %s*", KEY_FILE),
@@ -72,18 +68,13 @@ public class RemoteAccessManager {
         if (key.hasError())
             return error(key.getError());
 
-        Result<Optional<InsiderDnsConfig>> dnsResult = InsiderManager.dnsConfig(device);
-        if (dnsResult.hasError()) {
-            return error(dnsResult.getError());
+        Result<Optional<InsiderResult>> fullNameResult = InsiderManager.fullName(device);
+        if (fullNameResult.hasError()) {
+            return error(fullNameResult.getError());
         }
 
-        Result<InsiderConfig> configResult = InsiderManager.config(device);
-        if (configResult.hasError()) {
-            return error(configResult.getError());
-        }
-
-        Optional<InsiderDnsConfig> dns = dnsResult.getValue();
-        if (!dns.isPresent()) {
+        Optional<InsiderResult> url = fullNameResult.getValue();
+        if (!url.isPresent()) {
             return error("unable to get public name for the device");
         }
 
@@ -98,7 +89,7 @@ public class RemoteAccessManager {
         }
 
         return Result.value(new Device(
-                "device." + dns.get().getUser_domain() + "." + configResult.getValue().getDomain(),
+                url.get().getData(),
                 localPortMappingValue.get().getExternal_port(),
                 key.getValue()));
     }

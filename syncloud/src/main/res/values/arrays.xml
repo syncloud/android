@@ -1,0 +1,12 @@
+<resources>
+
+    <string name="pref_title_api_url">DNS</string>
+    <string-array name="pref_api_url_titles">
+        <item>Main: http://syncloud.it</item>
+        <item>Test: http://syncloud.info:81</item>
+    </string-array>
+    <string-array name="pref_api_url_values">
+        <item>http://syncloud.it</item>
+        <item>http://syncloud.info:81</item>
+    </string-array>
+</resources>

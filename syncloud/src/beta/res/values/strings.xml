@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Syncloud Beta</string>
-    <string name="api_url">http://api.syncloud.info:81</string>
-
 </resources>

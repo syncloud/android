@@ -18,16 +18,10 @@ import java.util.List;
 
 public class UserService {
 
-    private String apiUrl;
-
-    public UserService(String apiUrl) {
-        this.apiUrl = apiUrl;
-    }
-
-    public Result<Boolean> getUser(String email, String password) {
+    public static Result<Boolean> getUser(String email, String password, String apiUrl1) {
 
         CloseableHttpClient http = HttpClients.createDefault();
-        HttpGet get = new HttpGet(apiUrl +
+        HttpGet get = new HttpGet(apiUrl1 +
                 "/user/get?email=" + email +
                 "&password=" + password);
 
@@ -48,10 +42,10 @@ public class UserService {
         }
     }
 
-    public Result<String> createUser(String email, String password, String domain) {
+    public static Result<String> createUser(String email, String password, String domain, String apiUrl1) {
 
         CloseableHttpClient http = HttpClients.createDefault();
-        HttpPost post = new HttpPost(apiUrl + "/user/create");
+        HttpPost post = new HttpPost(apiUrl1 + "/user/create");
 
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("email", email));
@@ -74,13 +68,13 @@ public class UserService {
         }
     }
 
-    public Result<Boolean> getOrCreate(String email, String password, String domain) {
-        Result<Boolean> user = getUser(email, password);
+    public static Result<Boolean> getOrCreate(String email, String password, String domain, String apiUrl1) {
+        Result<Boolean> user = getUser(email, password, apiUrl1);
         if (user.hasError()) {
-            Result<String> create = createUser(email, password, domain);
+            Result<String> create = createUser(email, password, domain, apiUrl1);
             if (create.hasError())
                 return Result.error(create.getError());
-            user = getUser(email, password);
+            user = getUser(email, password, apiUrl1);
         }
         return user;
     }

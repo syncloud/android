@@ -1,0 +1,10 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="pref_api_url"
+        android:title="Public Name Service"
+        android:dialogTitle="Url"
+        android:entries="@array/pref_api_url_titles"
+        android:entryValues="@array/pref_api_url_values"
+        android:defaultValue="http://syncloud.it">
+        </ListPreference>
+</PreferenceScreen>

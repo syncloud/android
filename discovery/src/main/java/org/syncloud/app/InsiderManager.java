@@ -3,13 +3,11 @@ package org.syncloud.app;
 import com.google.common.base.Optional;
 
 import org.syncloud.model.Device;
-import org.syncloud.model.InsiderConfig;
-import org.syncloud.model.InsiderDnsConfig;
+import org.syncloud.model.InsiderResult;
 import org.syncloud.model.PortMapping;
 import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
 import org.syncloud.parser.JsonParser;
-import org.syncloud.ssh.Ssh;
 
 import java.util.List;
 
@@ -19,7 +17,7 @@ import static org.syncloud.ssh.Ssh.execute;
 
 public class InsiderManager {
 
-    private static final String INSIDER_BIN = "insidercli";
+    private static final String INSIDER_BIN = "insider";
 
     public static Result<SshResult> addService(Device device, String name, String protocol, String type, int port, String url) {
         Result<SshResult> result = execute(device, asList(
@@ -41,19 +39,6 @@ public class InsiderManager {
 
         return result;
     }
-
-    /*public static Result<SshResult> newName(Device device, String email, String pass, String userDomain) {
-
-        Result<SshResult> result = Ssh.execute(device, asList(String.format("%s new_dns %s %s %s", INSIDER_BIN, userDomain, email, pass)));
-        if (result.hasError())
-            return result;
-
-        if(!result.getValue().ok())
-            return Result.error(result.getValue().getMessage());
-
-        return enableCron(device);
-
-    }*/
 
     public static Result<SshResult> acquireDomain(
             Device device, String email, String pass, String domain) {
@@ -95,37 +80,19 @@ public class InsiderManager {
 
     }
 
-    public static Result<InsiderConfig> config(Device device) {
+    public static Result<Optional<InsiderResult>> fullName(Device device) {
 
-        Result<SshResult> result = execute(device, asList(INSIDER_BIN + " config"));
+        Result<SshResult> result = execute(device, asList(INSIDER_BIN + " full_name"));
         if (result.hasError())
             return Result.error(result.getError());
 
-        Result<List<InsiderConfig>> list = JsonParser.parse(result.getValue(), InsiderConfig.class);
+        Result<List<InsiderResult>> list = JsonParser.parse(result.getValue(), InsiderResult.class);
 
         if (list.hasError())
             return Result.error(list.getError());
 
         if (list.getValue().size() != 1)
-            return Result.error("unable to read configuration");
-
-        return Result.value(list.getValue().get(0));
-
-    }
-
-    public static Result<Optional<InsiderDnsConfig>> dnsConfig(Device device) {
-
-        Result<SshResult> result = execute(device, asList(INSIDER_BIN + " show_dns"));
-        if (result.hasError())
-            return Result.error(result.getError());
-
-        Result<List<InsiderDnsConfig>> list = JsonParser.parse(result.getValue(), InsiderDnsConfig.class);
-
-        if (list.hasError())
-            return Result.error(list.getError());
-
-        if (list.getValue().size() != 1)
-            return Result.value(Optional.<InsiderDnsConfig>absent());
+            return Result.value(Optional.<InsiderResult>absent());
         else
             return Result.value(Optional.fromNullable(list.getValue().get(0)));
 

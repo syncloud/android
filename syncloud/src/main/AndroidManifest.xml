@@ -66,6 +66,10 @@
             android:name=".activity.AuthActivity"
             android:label="@string/title_activity_auth" >
         </activity>
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
     </application>
 
 </manifest>
