@@ -68,14 +68,9 @@ public class RemoteAccessManager {
         if (key.hasError())
             return error(key.getError());
 
-        Result<Optional<InsiderResult>> fullNameResult = InsiderManager.fullName(device);
+        Result<InsiderResult> fullNameResult = InsiderManager.fullName(device);
         if (fullNameResult.hasError()) {
             return error(fullNameResult.getError());
-        }
-
-        Optional<InsiderResult> url = fullNameResult.getValue();
-        if (!url.isPresent()) {
-            return error("unable to get public name for the device");
         }
 
         Result<Optional<PortMapping>> localPortMapping = localPortMapping(device, REMOTE_ACCESS_PORT);
@@ -89,7 +84,7 @@ public class RemoteAccessManager {
         }
 
         return Result.value(new Device(
-                url.get().getData(),
+                fullNameResult.getValue().getData(),
                 localPortMappingValue.get().getExternal_port(),
                 key.getValue()));
     }

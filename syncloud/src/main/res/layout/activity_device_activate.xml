@@ -141,6 +141,15 @@
 
         />
 
+    <Button
+        android:id="@+id/name_deactivate"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="deactivate"
+        android:text="Deactivate"
+
+        />
+
     <TextView
         android:id="@+id/dns_status"
         android:layout_width="fill_parent"

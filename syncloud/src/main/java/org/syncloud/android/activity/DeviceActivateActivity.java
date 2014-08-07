@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -36,10 +37,10 @@ public class DeviceActivateActivity extends Activity {
     private Device device;
     private ProgressDialog progress;
     private TextView url;
-//    private TextView userDomainName;
     private boolean dnsReady = false;
     private LinearLayout dnsControl;
     private Preferences preferences;
+    private Button deactivateButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +59,10 @@ public class DeviceActivateActivity extends Activity {
 
         };
         url = (TextView) findViewById(R.id.device_url);
-//        userDomainName = (TextView) findViewById(R.id.user_domain_name);
-        dnsControl = (LinearLayout) findViewById(R.id.dns_control);
+        deactivateButton = (Button) findViewById(R.id.name_deactivate);
+        deactivateButton.setVisibility(View.GONE);
 
+        dnsControl = (LinearLayout) findViewById(R.id.dns_control);
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
         status();
@@ -122,27 +124,25 @@ public class DeviceActivateActivity extends Activity {
                     }
                 });
 
-                final Result<Optional<InsiderResult>> fullNameResult = InsiderManager.fullName(device);
+                final Result<InsiderResult> fullNameResult = InsiderManager.fullName(device);
                 if (fullNameResult.hasError()) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             progress.hide();
+                            dnsControl.setVisibility(View.VISIBLE);
+                            deactivateButton.setVisibility(View.GONE);
                         }
                     });
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
-                            Optional<InsiderResult> fullName = fullNameResult.getValue();
-                            if (fullName.isPresent()) {
-                                dnsReady = true;
-                                dnsControl.setVisibility(View.GONE);
-                                url.setText(fullName.get().getData());
-                            } else {
-                                url.setText("");
-                            }
+                            InsiderResult fullName = fullNameResult.getValue();
+                            dnsReady = true;
+                            dnsControl.setVisibility(View.GONE);
+                            deactivateButton.setVisibility(View.VISIBLE);
+                            url.setText(fullName.getData());
                             progress.hide();
                         }
                     });
@@ -151,6 +151,41 @@ public class DeviceActivateActivity extends Activity {
 
             }
         });
+    }
+
+    public void deactivate(View view) {
+
+        progress.setMessage("Connecting to the device");
+        progress.setCancelable(false);
+        progress.show();
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                showProgress("Checking system tools");
+                Result<Boolean> systemTools = Spm.ensureAdminToolsInstalled(device, progressFunction);
+                if (systemTools.hasError()) {
+                    showError(systemTools.getError());
+                    return;
+                }
+
+                showProgress("Deactivating device");
+                final Result<SshResult> redirectResult = InsiderManager.dropDomain(device);
+                if (redirectResult.hasError()) {
+                    showError(redirectResult.getError());
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progress.hide();
+                        status();
+                    }
+                });
+            }
+        });
+
     }
 
     public void activate(View view) {
@@ -163,7 +198,7 @@ public class DeviceActivateActivity extends Activity {
             @Override
             public void run() {
 
-                showProgress("Installing system tools");
+                showProgress("Checking system tools");
 
                 Result<Boolean> systemTools = Spm.ensureAdminToolsInstalled(device, progressFunction);
                 if (systemTools.hasError()) {
@@ -205,9 +240,15 @@ public class DeviceActivateActivity extends Activity {
                         return;
                     }
 
-                    showProgress("Activating public name");
+                    showProgress("Setting redirect info");
 
-                    final Result<SshResult> result;
+                    final Result<SshResult> redirectResult = InsiderManager.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
+                    if (redirectResult.hasError()) {
+                        showError(redirectResult.getError());
+                        return;
+                    }
+
+                    showProgress("Activating public name");
                     if (!existingUserCheck.isChecked()) {
                         Result<Boolean> user = getOrCreate(email, pass, domain, preferences.getApiUrl());
                         if (user.hasError()) {
@@ -217,8 +258,7 @@ public class DeviceActivateActivity extends Activity {
                     }
 
                     showProgress("Acquiring domain");
-                    result = InsiderManager.acquireDomain(device, email, pass, domain);
-
+                    final Result<SshResult> result = InsiderManager.acquireDomain(device, email, pass, domain);
                     if (result.hasError()) {
                         showError(result.getError());
                         return;

@@ -20,7 +20,7 @@ public class Preferences {
 
     public String getDomain() {
         try {
-            return new URL(getApiUrl()).getHost().split("api\\.")[0];
+            return new URL(getApiUrl()).getHost().replace("api.", "");
         } catch (MalformedURLException e) {
             return "syncloud.it";
         }

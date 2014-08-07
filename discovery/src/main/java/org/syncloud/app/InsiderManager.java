@@ -1,5 +1,7 @@
 package org.syncloud.app;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
 import org.syncloud.model.Device;
@@ -9,6 +11,7 @@ import org.syncloud.model.Result;
 import org.syncloud.model.SshResult;
 import org.syncloud.parser.JsonParser;
 
+import java.io.IOException;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -56,6 +59,22 @@ public class InsiderManager {
 
     }
 
+    public static Result<SshResult> setRedirectInfo(Device device, String domain, String apiUl) {
+
+        return execute(
+                device,
+                asList(format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl)));
+
+    }
+
+    public static Result<SshResult> dropDomain(Device device) {
+
+        return execute(
+                device,
+                asList(format("%s drop_domain", INSIDER_BIN)));
+
+    }
+
     public static Result<Optional<PortMapping>> localPortMapping(Device device, int localPort) {
         Result<List<PortMapping>> listResult = listPortMappings(device);
         if(listResult.hasError())
@@ -76,25 +95,27 @@ public class InsiderManager {
         if (result.hasError())
             return Result.error(result.getError());
 
-        return JsonParser.parse(result.getValue(), PortMapping.class);
+        Result<InsiderResult> insiderResult = JsonParser.parseSingle(result.getValue(), InsiderResult.class);
+        if (insiderResult.hasError())
+            return Result.error(result.getError());
+
+        try {
+            return new ObjectMapper().readValue(
+                    insiderResult.getValue().getData(),
+                    new TypeReference<List<PortMapping>>() {});
+        } catch (IOException e) {
+            return Result.error(e.getMessage());
+        }
 
     }
 
-    public static Result<Optional<InsiderResult>> fullName(Device device) {
+    public static Result<InsiderResult> fullName(Device device) {
 
         Result<SshResult> result = execute(device, asList(INSIDER_BIN + " full_name"));
         if (result.hasError())
             return Result.error(result.getError());
 
-        Result<List<InsiderResult>> list = JsonParser.parse(result.getValue(), InsiderResult.class);
-
-        if (list.hasError())
-            return Result.error(list.getError());
-
-        if (list.getValue().size() != 1)
-            return Result.value(Optional.<InsiderResult>absent());
-        else
-            return Result.value(Optional.fromNullable(list.getValue().get(0)));
+        return JsonParser.parseSingle(result.getValue(), InsiderResult.class);
 
     }
 

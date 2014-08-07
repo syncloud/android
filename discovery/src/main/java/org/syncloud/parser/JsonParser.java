@@ -1,5 +1,6 @@
 package org.syncloud.parser;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.syncloud.model.Result;
@@ -28,4 +29,17 @@ public class JsonParser {
             return Result.error(e.getMessage());
         }
     }
+
+    public static <T> Result<T> parseSingle(SshResult sshResult, Class<T> valueType) {
+
+        if (!sshResult.ok())
+            return Result.error(sshResult.getMessage());
+
+        try {
+            return Result.value(new ObjectMapper().readValue(sshResult.getMessage(), valueType));
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
 }

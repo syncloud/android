@@ -5,6 +5,6 @@
         android:dialogTitle="Url"
         android:entries="@array/pref_api_url_titles"
         android:entryValues="@array/pref_api_url_values"
-        android:defaultValue="http://syncloud.it">
+        android:defaultValue="http://api.syncloud.it">
         </ListPreference>
 </PreferenceScreen>
