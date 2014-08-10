@@ -1,8 +1,10 @@
 package org.syncloud.ssh.model;
 
+import java.io.Serializable;
+
 import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 
-public class DeviceEndpoint {
+public class DeviceEndpoint implements Serializable {
     private String host;
     private int port;
     private String login;
@@ -12,6 +14,14 @@ public class DeviceEndpoint {
     public DeviceEndpoint(String host, int port) {
         this.host = host;
         this.port = port;
+    }
+
+    public DeviceEndpoint(String host, int port, String login, String password, String key) {
+        this.host = host;
+        this.port = port;
+        this.login = login;
+        this.password = password;
+        this.key = key;
     }
 
     public String getHost() {

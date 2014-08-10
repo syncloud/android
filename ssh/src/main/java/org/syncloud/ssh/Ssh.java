@@ -60,7 +60,37 @@ public class Ssh {
             session.setPassword(endpoint.getPassword());
         } else {
             jsch.addIdentity(endpoint.getLogin(), endpoint.getKey().getBytes(), null, new byte[0]);
-            session.setUserInfo(new DummyUserInfo());
+            session.setUserInfo(new UserInfo() {
+                @Override
+                public String getPassphrase() {
+                    return null;
+                }
+
+                @Override
+                public String getPassword() {
+                    return null;
+                }
+
+                @Override
+                public boolean promptPassword(String message) {
+                    return false;
+                }
+
+                @Override
+                public boolean promptPassphrase(String message) {
+                    return false;
+                }
+
+                @Override
+                public boolean promptYesNo(String message) {
+                    return false;
+                }
+
+                @Override
+                public void showMessage(String message) {
+
+                }
+            });
         }
 
         Properties prop = new Properties();
@@ -107,35 +137,4 @@ public class Ssh {
         }
     }
 
-    private static class DummyUserInfo implements UserInfo {
-        @Override
-        public String getPassphrase() {
-            return null;
-        }
-
-        @Override
-        public String getPassword() {
-            return null;
-        }
-
-        @Override
-        public boolean promptPassword(String message) {
-            return false;
-        }
-
-        @Override
-        public boolean promptPassphrase(String message) {
-            return false;
-        }
-
-        @Override
-        public boolean promptYesNo(String message) {
-            return false;
-        }
-
-        @Override
-        public void showMessage(String message) {
-
-        }
-    }
 }

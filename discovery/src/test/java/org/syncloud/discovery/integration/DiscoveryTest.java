@@ -65,7 +65,7 @@ public class DiscoveryTest {
         Collections.sort(devices, new Comparator<Device>() {
             @Override
             public int compare(Device device, Device device2) {
-                return device.getExternalPort() - device2.getExternalPort();
+                return device.getLocalEndpoint().getPort() - device2.getLocalEndpoint().getPort();
             }
         });
 

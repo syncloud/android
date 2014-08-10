@@ -3,12 +3,11 @@ package org.syncloud.insider.integration;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.syncloud.common.model.Result;
+import org.syncloud.insider.InsiderManager;
 import org.syncloud.insider.model.Endpoint;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.common.model.Result;
 import org.syncloud.ssh.model.DeviceEndpoint;
-import org.syncloud.ssh.model.SshResult;
-import org.syncloud.insider.InsiderManager;
 
 public class InsiderManagerTest {
 
@@ -26,7 +25,7 @@ public class InsiderManagerTest {
             }
         }
 
-        Result<SshResult> addResult = InsiderManager.addService(testDevice, "ssh", "ssh", "_ssh._tcp", TEST_PORT, "");
+        Result<String> addResult = InsiderManager.addService(testDevice, "ssh", "ssh", "_ssh._tcp", TEST_PORT, "");
         if (ports.hasError()) {
             Assert.fail("unable to add test port: " + addResult.getError());
         }

@@ -1,14 +1,11 @@
 package org.syncloud.android;
 
 import android.app.Application;
-import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import org.syncloud.android.activity.DeviceActivateActivity;
 import org.syncloud.android.activity.app.Owncloud;
-import org.syncloud.android.activity.app.Remote_Access;
 import org.syncloud.android.db.Db;
-import org.syncloud.redirect.UserService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +15,7 @@ public class SyncloudApplication extends Application {
     public static String DEVICE = "device";
 
     public static Map<String, Class> appRegistry = new HashMap<String, Class>() {{
-        put("remote", Remote_Access.class);
+//        put("remote", Remote_Access.class);
         put("insider", DeviceActivateActivity.class);
         put("owncloud", Owncloud.class);
     }};

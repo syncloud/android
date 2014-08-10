@@ -10,6 +10,7 @@ import java.util.List;
 
 public class JsonParser {
 
+    //TODO: Migrate spm to single json reply and remove this class
     public static <T> Result<List<T>> parse(SshResult sshResult, Class<T> valueType) {
 
         if (!sshResult.ok())
@@ -24,18 +25,6 @@ public class JsonParser {
                     objs.add(mapper.readValue(line, valueType));
             }
             return Result.value(objs);
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
-    }
-
-    public static <T> Result<T> parseSingle(SshResult sshResult, Class<T> valueType) {
-
-        if (!sshResult.ok())
-            return Result.error(sshResult.getMessage());
-
-        try {
-            return Result.value(new ObjectMapper().readValue(sshResult.getMessage(), valueType));
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }

@@ -49,6 +49,10 @@ public class Result<T> {
             }
     }
 
+    public <A> Result<A> flatMap(Function<T, Result<A>> func) {
+        return Results.flatten(map(func));
+    }
+
     public static interface Function<F, T> {
         T apply(F input) throws Exception;
     }
