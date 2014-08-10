@@ -5,3 +5,9 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.10'
 }
+
+test {
+    filter {
+        excludeTestsMatching "org.syncloud.insider.integration.*"
+    }
+}

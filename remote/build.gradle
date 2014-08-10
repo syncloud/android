@@ -6,3 +6,9 @@ dependencies {
     testCompile 'junit:junit:4.10'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+test {
+    filter {
+        excludeTestsMatching "org.syncloud.remote.integration.*"
+    }
+}

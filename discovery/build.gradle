@@ -12,7 +12,7 @@ dependencies {
 
 test {
     filter {
-        includeTestsMatching "org.syncloud.discovery.unit.*"
+        excludeTestsMatching "org.syncloud.discovery.integration.*"
     }
 }
 
