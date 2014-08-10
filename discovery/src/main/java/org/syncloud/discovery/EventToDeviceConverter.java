@@ -18,12 +18,12 @@ public class EventToDeviceConverter implements ServiceListener {
     private static Logger logger = LogManager.getLogger(EventToDeviceConverter.class.getName());
 
     private String serviceName;
-    private DeviceListener deviceListener;
-    private Map<String, Device> serviceToUrl = new HashMap<String, Device>();
+    private DeviceEndpointListener deviceEndpointListener;
+    private Map<String, DeviceEndpoint> serviceToUrl = new HashMap<String, DeviceEndpoint>();
 
-    public EventToDeviceConverter(String serviceName, DeviceListener deviceListener) {
+    public EventToDeviceConverter(String serviceName, DeviceEndpointListener deviceEndpointListener) {
         this.serviceName = serviceName;
-        this.deviceListener = deviceListener;
+        this.deviceEndpointListener = deviceEndpointListener;
     }
 
     @Override
@@ -35,10 +35,10 @@ public class EventToDeviceConverter implements ServiceListener {
             ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), eventName);
             waitForIpv4(info);
 
-            Device device = extractDevice(info);
+            DeviceEndpoint device = extractDevice(info);
             serviceToUrl.put(eventName, device);
-            if (deviceListener != null)
-                deviceListener.added(device);
+            if (deviceEndpointListener != null)
+                deviceEndpointListener.added(device);
 
         }
     }
@@ -58,7 +58,7 @@ public class EventToDeviceConverter implements ServiceListener {
     }
 
 
-    private Device extractDevice(ServiceInfo info) {
+    private DeviceEndpoint extractDevice(ServiceInfo info) {
         String address = "unknown";
         if (info.getInet4Addresses().length > 0) {
             address = info.getInet4Addresses()[0].getHostAddress();
@@ -69,7 +69,7 @@ public class EventToDeviceConverter implements ServiceListener {
                 address = server.substring(0, server.length() - local.length());
         }
 
-        return new Device(new DeviceEndpoint(address, Ssh.SSH_SERVER_PORT));
+        return new DeviceEndpoint(address, Ssh.SSH_SERVER_PORT, "root", "syncloud", null);
     }
 
     @Override
@@ -77,9 +77,9 @@ public class EventToDeviceConverter implements ServiceListener {
         logger.debug("service removed name: " + event.getName() + ", ip4 addresses: " + event.getInfo().getInet4Addresses().length);
         String eventName = event.getName();
         if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
-            Device device = serviceToUrl.remove(eventName);
-            if (deviceListener != null)
-                deviceListener.removed(device);
+            DeviceEndpoint device = serviceToUrl.remove(eventName);
+            if (deviceEndpointListener != null)
+                deviceEndpointListener.removed(device);
         }
     }
 

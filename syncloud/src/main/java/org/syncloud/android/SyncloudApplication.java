@@ -13,6 +13,7 @@ import java.util.Map;
 public class SyncloudApplication extends Application {
 
     public static String DEVICE = "device";
+    public static String DEVICE_ENDPOINT = "device_endpoint";
 
     public static Map<String, Class> appRegistry = new HashMap<String, Class>() {{
 //        put("remote", Remote_Access.class);

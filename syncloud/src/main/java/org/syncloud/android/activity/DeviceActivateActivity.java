@@ -19,27 +19,26 @@ import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
+import org.syncloud.common.model.Result;
 import org.syncloud.insider.InsiderManager;
 import org.syncloud.redirect.UserService;
 import org.syncloud.remote.RemoteAccessManager;
-import org.syncloud.ssh.model.Device;
-import org.syncloud.insider.model.InsiderResult;
-import org.syncloud.common.model.Result;
-import org.syncloud.ssh.model.SshResult;
 import org.syncloud.spm.Spm;
-
+import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.DeviceEndpoint;
 
 
 public class DeviceActivateActivity extends Activity {
 
     private Function<String, String> progressFunction;
-    private Device device;
+    private DeviceEndpoint endpoint;
     private ProgressDialog progress;
     private TextView url;
     private boolean dnsReady = false;
     private LinearLayout dnsControl;
     private Preferences preferences;
     private Button deactivateButton;
+    private Device discoveredDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +48,7 @@ public class DeviceActivateActivity extends Activity {
         preferences = ((SyncloudApplication) getApplication()).getPreferences();
 
         progress = new ProgressDialog(this);
+//        progress.setF
         progressFunction = new Function<String, String>() {
             @Override
             public String apply(String input) {
@@ -62,8 +62,8 @@ public class DeviceActivateActivity extends Activity {
         deactivateButton.setVisibility(View.GONE);
 
         dnsControl = (LinearLayout) findViewById(R.id.dns_control);
-        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
-
+        endpoint = (DeviceEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
+        discoveredDevice = new Device(null, endpoint);
         status();
     }
 
@@ -91,7 +91,7 @@ public class DeviceActivateActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                progress.setMessage(message);
+                progress.setTitle(message);
             }
         });
     }
@@ -108,7 +108,8 @@ public class DeviceActivateActivity extends Activity {
 
     private void status() {
 
-        progress.setMessage("Checking device status ...");
+        progress.setTitle("Checking device status ...");
+        progress.setMessage("");
         progress.setCancelable(false);
         progress.show();
 
@@ -123,11 +124,12 @@ public class DeviceActivateActivity extends Activity {
                     }
                 });
 
-                final Result<String> fullNameResult = InsiderManager.fullName(device);
-                if (fullNameResult.hasError()) {
+                final Result<String> fullName = InsiderManager.fullName(discoveredDevice);
+                if (fullName.hasError()) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            dnsReady = false;
                             progress.hide();
                             dnsControl.setVisibility(View.VISIBLE);
                             deactivateButton.setVisibility(View.GONE);
@@ -140,7 +142,7 @@ public class DeviceActivateActivity extends Activity {
                             dnsReady = true;
                             dnsControl.setVisibility(View.GONE);
                             deactivateButton.setVisibility(View.VISIBLE);
-                            url.setText(fullNameResult.getValue());
+                            url.setText(fullName.getValue());
                             progress.hide();
                         }
                     });
@@ -153,7 +155,8 @@ public class DeviceActivateActivity extends Activity {
 
     public void deactivate(View view) {
 
-        progress.setMessage("Connecting to the device");
+        progress.setTitle("Connecting to the device");
+        progress.setMessage("");
         progress.setCancelable(false);
         progress.show();
 
@@ -162,14 +165,14 @@ public class DeviceActivateActivity extends Activity {
             public void run() {
 
                 showProgress("Checking system tools");
-                Result<Boolean> systemTools = Spm.ensureAdminToolsInstalled(device, progressFunction);
+                Result<Boolean> systemTools = Spm.ensureAdminToolsInstalled(discoveredDevice, progressFunction);
                 if (systemTools.hasError()) {
                     showError(systemTools.getError());
                     return;
                 }
 
                 showProgress("Deactivating device");
-                final Result<String> redirectResult = InsiderManager.dropDomain(device);
+                final Result<String> redirectResult = InsiderManager.dropDomain(discoveredDevice);
                 if (redirectResult.hasError()) {
                     showError(redirectResult.getError());
                 }
@@ -188,7 +191,8 @@ public class DeviceActivateActivity extends Activity {
 
     public void activate(View view) {
 
-        progress.setMessage("Connecting to the device");
+        progress.setTitle("Connecting to the device");
+        progress.setMessage("");
         progress.setCancelable(false);
         progress.show();
 
@@ -198,7 +202,7 @@ public class DeviceActivateActivity extends Activity {
 
                 showProgress("Checking system tools");
 
-                Result<Boolean> systemTools = Spm.ensureAdminToolsInstalled(device, progressFunction);
+                Result<Boolean> systemTools = Spm.ensureAdminToolsInstalled(discoveredDevice, progressFunction);
                 if (systemTools.hasError()) {
                     showError(systemTools.getError());
                     return;
@@ -240,7 +244,7 @@ public class DeviceActivateActivity extends Activity {
 
                     showProgress("Setting redirect info");
 
-                    final Result<String> redirectResult = InsiderManager.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
+                    final Result<String> redirectResult = InsiderManager.setRedirectInfo(discoveredDevice, preferences.getDomain(), preferences.getApiUrl());
                     if (redirectResult.hasError()) {
                         showError(redirectResult.getError());
                         return;
@@ -256,7 +260,7 @@ public class DeviceActivateActivity extends Activity {
                     }
 
                     showProgress("Acquiring domain");
-                    final Result<String> result = InsiderManager.acquireDomain(device, email, pass, domain);
+                    final Result<String> result = InsiderManager.acquireDomain(discoveredDevice, email, pass, domain);
                     if (result.hasError()) {
                         showError(result.getError());
                         return;
@@ -264,17 +268,22 @@ public class DeviceActivateActivity extends Activity {
                 }
 
                 showProgress("Activating remote access");
-
-                final Result<Device> remoteDevice = RemoteAccessManager.enable(device);
-                if (remoteDevice.hasError()) {
-                    showError(remoteDevice.getError());
+                final Result<String> enabled = RemoteAccessManager.enable(discoveredDevice);
+                if (enabled.hasError()) {
+                    showError(enabled.getError());
                     return;
                 }
 
+                showProgress("Collecting device info");
+                Result<Device> remote = RemoteAccessManager.getRemoteDevice(discoveredDevice);
+                if (remote.hasError()) {
+                    showError(remote.getError());
+                    return;
+                }
                 showProgress("Saving device");
 
                 Db db = ((SyncloudApplication) getApplication()).getDb();
-                db.insert(remoteDevice.getValue());
+                db.insert(remote.getValue());
 
                 runOnUiThread(new Runnable() {
                     @Override

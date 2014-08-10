@@ -1,7 +1,5 @@
 package org.syncloud.remote.integration;
 
-import com.google.common.base.Optional;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.syncloud.remote.RemoteAccessManager;
@@ -11,7 +9,7 @@ import org.syncloud.ssh.model.DeviceEndpoint;
 
 public class RemoteAccessManagerTest {
 
-    public static final Device testDevice = new Device(new DeviceEndpoint("192.168.1.70", 22));
+    public static final Device testDevice = new Device(null, new DeviceEndpoint("192.168.1.70", 22));
 
     @Test
     public void testRemoteAccessSeveralTimes() {
@@ -22,7 +20,7 @@ public class RemoteAccessManagerTest {
     }
 
     public void testRemoteAccess() {
-        Result<Device> remoteDevice = RemoteAccessManager.getRemote(testDevice);
+        Result<Device> remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice);
         Boolean wasEnabled = !remoteDevice.hasError();
         if (wasEnabled) {
             System.out.println(remoteDevice.getValue().getDisplayName());
@@ -32,7 +30,7 @@ public class RemoteAccessManagerTest {
                 Assert.fail(disabled.getError());
             }
 
-            remoteDevice = RemoteAccessManager.getRemote(testDevice);
+            remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice);
             Assert.assertTrue(remoteDevice.hasError());
         }
 
@@ -47,7 +45,7 @@ public class RemoteAccessManagerTest {
         Assert.assertNotNull(device.getValue().getLocalEndpoint().getPort());
         System.out.println(device.getValue());
 
-        remoteDevice = RemoteAccessManager.getRemote(testDevice);
+        remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice);
         if (remoteDevice.hasError()) {
             Assert.fail(remoteDevice.getError());
         }

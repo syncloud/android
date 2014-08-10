@@ -11,7 +11,7 @@ import org.syncloud.ssh.model.DeviceEndpoint;
 
 public class InsiderManagerTest {
 
-    public static final Device testDevice = new Device(new DeviceEndpoint("192.168.1.65", 22));
+    public static final Device testDevice = new Device(null, new DeviceEndpoint("192.168.1.65", 22));
     public static final int TEST_PORT = 10000;
 
     @Test

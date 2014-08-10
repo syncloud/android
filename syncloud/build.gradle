@@ -12,6 +12,10 @@ android {
     }
 
     productFlavors {
+        local {
+            packageName "org.syncloud.android.local"
+        }
+
         beta {
             packageName "org.syncloud.android.beta"
         }

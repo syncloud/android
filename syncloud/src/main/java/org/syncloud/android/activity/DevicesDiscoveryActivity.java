@@ -16,8 +16,9 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.AsyncDiscovery;
-import org.syncloud.discovery.DeviceListener;
+import org.syncloud.discovery.DeviceEndpointListener;
 import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.DeviceEndpoint;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,23 +43,23 @@ public class DevicesDiscoveryActivity extends Activity {
         listAdapter = new DevicesDiscoveredAdapter(this);
         listview.setAdapter(listAdapter);
 
-        DeviceListener deviceListener = new DeviceListener() {
+        DeviceEndpointListener deviceEndpointListener = new DeviceEndpointListener() {
             @Override
-            public void added(final Device device) {
+            public void added(final DeviceEndpoint endpoint) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        listAdapter.add(device);
+                        listAdapter.add(endpoint);
                     }
                 });
             }
 
             @Override
-            public void removed(final Device device) {
+            public void removed(final DeviceEndpoint endpoint) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        listAdapter.remove(device);
+                        listAdapter.remove(endpoint);
                     }
                 });
             }
@@ -66,7 +67,7 @@ public class DevicesDiscoveryActivity extends Activity {
 
         asyncDiscovery = new AsyncDiscovery(
                 (WifiManager) getSystemService(Context.WIFI_SERVICE),
-                deviceListener);
+                deviceEndpointListener);
 
         discoveryStart();
     }
@@ -114,9 +115,9 @@ public class DevicesDiscoveryActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void open(final Device device) {
+    public void open(final DeviceEndpoint endpoint) {
         Intent intent = new Intent(this, DeviceActivateActivity.class);
-        intent.putExtra(SyncloudApplication.DEVICE, device);
+        intent.putExtra(SyncloudApplication.DEVICE_ENDPOINT, endpoint);
         startActivity(intent);
         setResult(Activity.RESULT_OK, new Intent(this, DevicesSavedActivity.class));
         finish();

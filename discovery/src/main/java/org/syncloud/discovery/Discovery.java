@@ -17,8 +17,8 @@ public class Discovery {
     private EventToDeviceConverter listener;
     private boolean started = false;
 
-    public Discovery(DeviceListener deviceListener, String serviceName) {
-        listener = new EventToDeviceConverter(serviceName, deviceListener);
+    public Discovery(DeviceEndpointListener deviceEndpointListener, String serviceName) {
+        listener = new EventToDeviceConverter(serviceName, deviceEndpointListener);
     }
 
     public void start(int ipAddress) {

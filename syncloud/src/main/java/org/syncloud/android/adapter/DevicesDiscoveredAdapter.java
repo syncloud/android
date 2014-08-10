@@ -10,8 +10,9 @@ import android.widget.TextView;
 import org.syncloud.android.R;
 import org.syncloud.android.activity.DevicesDiscoveryActivity;
 import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.DeviceEndpoint;
 
-public class DevicesDiscoveredAdapter extends ArrayAdapter<Device> {
+public class DevicesDiscoveredAdapter extends ArrayAdapter<DeviceEndpoint> {
     private DevicesDiscoveryActivity activity;
 
     public DevicesDiscoveredAdapter(DevicesDiscoveryActivity activity) {
@@ -25,18 +26,18 @@ public class DevicesDiscoveredAdapter extends ArrayAdapter<Device> {
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_device_discovered, null);
 
-        final Device device = getItem(position);
+        final DeviceEndpoint endpoint = getItem(position);
 
         ImageButton deviceAdd = (ImageButton) rowView.findViewById(R.id.device_add);
         deviceAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.open(device);
+                activity.open(endpoint);
             }
         });
 
         TextView deviceHost = (TextView) rowView.findViewById(R.id.device_discovered_host);
-        deviceHost.setText(device.getDisplayName());
+        deviceHost.setText(endpoint.getDisplayName());
 
         return rowView;
 

@@ -7,6 +7,7 @@ import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.DeviceEndpoint;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import static com.google.common.base.Optional.fromNullable;
@@ -18,7 +19,11 @@ public class EndpointChecker {
             @Override
             public boolean apply(DeviceEndpoint endpoint) {
                 try {
-                    new Socket(endpoint.getHost(), endpoint.getPort()).close();
+
+                    Socket socket = new Socket();
+                    socket.setSoTimeout(3000);
+                    socket.connect(new InetSocketAddress(endpoint.getHost(), endpoint.getPort()), 3000);
+                    socket.close();
                     return true;
                 } catch (IOException e) {
                     return false;

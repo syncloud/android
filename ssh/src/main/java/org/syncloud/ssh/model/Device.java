@@ -17,10 +17,6 @@ public class Device implements Serializable {
     private DeviceEndpoint localEndpoint;
     private String name;
 
-    public Device(DeviceEndpoint localEndpoint) {
-        this.localEndpoint = localEndpoint;
-    }
-
     public Device(DeviceEndpoint externalEndpoint, DeviceEndpoint localEndpoint) {
         this.externalEndpoint = externalEndpoint;
         this.localEndpoint = localEndpoint;

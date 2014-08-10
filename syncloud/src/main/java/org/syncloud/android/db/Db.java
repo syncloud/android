@@ -15,7 +15,7 @@ import java.util.List;
 
 public class Db extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "syncloud";
     public static final String DEVICE_TABLE = "device";
     public static final String NAME_COLUMN = "name";
@@ -33,10 +33,12 @@ public class Db extends SQLiteOpenHelper {
                     DEVICE_ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     NAME_COLUMN + " TEXT, " +
                     EXTERNAL_HOST_COLUMN + " TEXT, " +
+                    EXTERNAL_PORT_COLUMN + " INTEGER," +
+                    LOCAL_HOST_COLUMN + " TEXT, " +
+                    LOCAL_PORT_COLUMN + " INTEGER," +
                     LOGIN_COLUMN + " TEXT, " +
                     PASSWORD_COLUMN + " TEXT, " +
-                    SSHKEY_COLUMN + " TEXT, " +
-                    EXTERNAL_PORT_COLUMN + " INTEGER" +
+                    SSHKEY_COLUMN + " TEXT " +
                     ");";
     private Context context;
 

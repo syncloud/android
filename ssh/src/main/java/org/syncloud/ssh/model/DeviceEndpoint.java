@@ -64,6 +64,11 @@ public class DeviceEndpoint implements Serializable {
         this.key = key;
     }
 
+
+    public String  getDisplayName() {
+        return host;
+    }
+
     @Override
     public String toString() {
         return "DeviceEndpoint{" +
