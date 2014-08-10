@@ -35,15 +35,10 @@ public class RemoteAccessManagerTest {
         }
 
         System.out.println("enabling");
-        Result<Device> device = RemoteAccessManager.enable(testDevice);
-        if (device.hasError()) {
-            Assert.fail(device.getError());
+        Result<String> enabled = RemoteAccessManager.enable(testDevice);
+        if (enabled.hasError()) {
+            Assert.fail(enabled.getError());
         }
-
-        Assert.assertNotNull(device.getValue().getLocalEndpoint().getKey());
-        Assert.assertNotNull(device.getValue().getLocalEndpoint().getHost());
-        Assert.assertNotNull(device.getValue().getLocalEndpoint().getPort());
-        System.out.println(device.getValue());
 
         remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice);
         if (remoteDevice.hasError()) {

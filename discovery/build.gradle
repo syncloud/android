@@ -11,9 +11,7 @@ dependencies {
 }
 
 test {
-    filter {
-        excludeTestsMatching "org.syncloud.discovery.integration.*"
-    }
+    exclude "org/syncloud/discovery/integration/**"
 }
 
 //TODO: studio does not include gradle resources (build/resources/test) by default

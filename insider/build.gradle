@@ -7,7 +7,5 @@ dependencies {
 }
 
 test {
-    filter {
-        excludeTestsMatching "org.syncloud.insider.integration.*"
-    }
+    exclude "org/syncloud/insider/integration/**"
 }

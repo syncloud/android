@@ -8,7 +8,5 @@ dependencies {
 }
 
 test {
-    filter {
-        excludeTestsMatching "org.syncloud.remote.integration.*"
-    }
+    exclude "org/syncloud/remote/integration/**"
 }
