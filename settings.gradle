@@ -1,1 +1,1 @@
-include ':syncloud', ':discovery'
+include ':syncloud', ':discovery', ':insider', ':remote', ':ssh', ':common', ':spm', ':redirect', ':owncloud'

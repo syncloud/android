@@ -14,21 +14,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
-import org.syncloud.app.InsiderManager;
-import org.syncloud.app.RemoteAccessManager;
-import org.syncloud.model.Device;
-import org.syncloud.model.InsiderResult;
-import org.syncloud.model.Result;
-import org.syncloud.model.SshResult;
-import org.syncloud.ssh.Spm;
+import org.syncloud.insider.InsiderManager;
+import org.syncloud.redirect.UserService;
+import org.syncloud.remote.RemoteAccessManager;
+import org.syncloud.ssh.model.Device;
+import org.syncloud.insider.model.InsiderResult;
+import org.syncloud.common.model.Result;
+import org.syncloud.ssh.model.SshResult;
+import org.syncloud.spm.Spm;
 
-import static org.syncloud.redirect.UserService.getOrCreate;
 
 
 public class DeviceActivateActivity extends Activity {
@@ -124,7 +123,7 @@ public class DeviceActivateActivity extends Activity {
                     }
                 });
 
-                final Result<InsiderResult> fullNameResult = InsiderManager.fullName(device);
+                final Result<String> fullNameResult = InsiderManager.fullName(device);
                 if (fullNameResult.hasError()) {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -138,11 +137,10 @@ public class DeviceActivateActivity extends Activity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            InsiderResult fullName = fullNameResult.getValue();
                             dnsReady = true;
                             dnsControl.setVisibility(View.GONE);
                             deactivateButton.setVisibility(View.VISIBLE);
-                            url.setText(fullName.getData());
+                            url.setText(fullNameResult.getValue());
                             progress.hide();
                         }
                     });
@@ -171,7 +169,7 @@ public class DeviceActivateActivity extends Activity {
                 }
 
                 showProgress("Deactivating device");
-                final Result<SshResult> redirectResult = InsiderManager.dropDomain(device);
+                final Result<String> redirectResult = InsiderManager.dropDomain(device);
                 if (redirectResult.hasError()) {
                     showError(redirectResult.getError());
                 }
@@ -242,7 +240,7 @@ public class DeviceActivateActivity extends Activity {
 
                     showProgress("Setting redirect info");
 
-                    final Result<SshResult> redirectResult = InsiderManager.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
+                    final Result<String> redirectResult = InsiderManager.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
                     if (redirectResult.hasError()) {
                         showError(redirectResult.getError());
                         return;
@@ -250,7 +248,7 @@ public class DeviceActivateActivity extends Activity {
 
                     showProgress("Activating public name");
                     if (!existingUserCheck.isChecked()) {
-                        Result<Boolean> user = getOrCreate(email, pass, domain, preferences.getApiUrl());
+                        Result<Boolean> user = UserService.getOrCreate(email, pass, domain, preferences.getApiUrl());
                         if (user.hasError()) {
                             showError(user.getError());
                             return;
@@ -258,7 +256,7 @@ public class DeviceActivateActivity extends Activity {
                     }
 
                     showProgress("Acquiring domain");
-                    final Result<SshResult> result = InsiderManager.acquireDomain(device, email, pass, domain);
+                    final Result<String> result = InsiderManager.acquireDomain(device, email, pass, domain);
                     if (result.hasError()) {
                         showError(result.getError());
                         return;
@@ -267,16 +265,16 @@ public class DeviceActivateActivity extends Activity {
 
                 showProgress("Activating remote access");
 
-                final Result<Device> remoteDeviceResult = RemoteAccessManager.enable(device);
-                if (remoteDeviceResult.hasError()) {
-                    showError(remoteDeviceResult.getError());
+                final Result<Device> remoteDevice = RemoteAccessManager.enable(device);
+                if (remoteDevice.hasError()) {
+                    showError(remoteDevice.getError());
                     return;
                 }
 
                 showProgress("Saving device");
 
-                final Db db = ((SyncloudApplication) getApplication()).getDb();
-                db.insert(remoteDeviceResult.getValue());
+                Db db = ((SyncloudApplication) getApplication()).getDb();
+                db.insert(remoteDevice.getValue());
 
                 runOnUiThread(new Runnable() {
                     @Override

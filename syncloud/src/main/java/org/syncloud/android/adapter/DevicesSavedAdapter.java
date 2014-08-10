@@ -11,7 +11,7 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.activity.DevicesSavedActivity;
 import org.syncloud.android.db.Db;
-import org.syncloud.model.Device;
+import org.syncloud.ssh.model.Device;
 
 public class DevicesSavedAdapter extends ArrayAdapter<Device> {
     private DevicesSavedActivity activity;

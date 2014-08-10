@@ -7,27 +7,34 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 
-import org.syncloud.model.Device;
+import org.syncloud.ssh.model.Device;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Db extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "syncloud";
     public static final String DEVICE_TABLE = "device";
     public static final String NAME_COLUMN = "name";
-    public static final String HOST_COLUMN = "host";
-    public static final String PORT_COLUMN = "port";
+    public static final String EXTERNAL_HOST_COLUMN = "external_host";
+    public static final String EXTERNAL_PORT_COLUMN = "external_port";
+    public static final String LOCAL_HOST_COLUMN = "local_host";
+    public static final String LOCAL_PORT_COLUMN = "local_port";
+    public static final String LOGIN_COLUMN = "login";
+    public static final String PASSWORD_COLUMN = "password";
     public static final String SSHKEY_COLUMN = "key";
 
     private static final String DEVICE_TABLE_CREATE =
             "CREATE TABLE " + DEVICE_TABLE + " (" +
+                    "device_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     NAME_COLUMN + " TEXT, " +
-                    HOST_COLUMN + " TEXT, " +
+                    EXTERNAL_HOST_COLUMN + " TEXT, " +
+                    LOGIN_COLUMN + " TEXT, " +
+                    PASSWORD_COLUMN + " TEXT, " +
                     SSHKEY_COLUMN + " TEXT, " +
-                    PORT_COLUMN + " INTEGER" +
+                    EXTERNAL_PORT_COLUMN + " INTEGER" +
                     ");";
     private Context context;
 
@@ -59,8 +66,12 @@ public class Db extends SQLiteOpenHelper {
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
                 devices.add(
                         new Device(
-                                cursor.getString(cursor.getColumnIndex(HOST_COLUMN)),
-                                cursor.getInt(cursor.getColumnIndex(PORT_COLUMN)),
+                                cursor.getString(cursor.getColumnIndex(EXTERNAL_HOST_COLUMN)),
+                                cursor.getInt(cursor.getColumnIndex(EXTERNAL_PORT_COLUMN)),
+                                cursor.getString(cursor.getColumnIndex(LOCAL_HOST_COLUMN)),
+                                cursor.getInt(cursor.getColumnIndex(LOCAL_PORT_COLUMN)),
+                                cursor.getString(cursor.getColumnIndex(LOGIN_COLUMN)),
+                                cursor.getString(cursor.getColumnIndex(PASSWORD_COLUMN)),
                                 cursor.getString(cursor.getColumnIndex(SSHKEY_COLUMN)),
                                 cursor.getString(cursor.getColumnIndex(NAME_COLUMN)))
                 );
@@ -76,31 +87,35 @@ public class Db extends SQLiteOpenHelper {
 
         getWritableDatabase().delete(
                 DEVICE_TABLE,
-                HOST_COLUMN + "=? AND " + PORT_COLUMN+ "=?",
-                new String[] { device.getHost(), String.valueOf(device.getPort()) });
+                EXTERNAL_HOST_COLUMN + "=? AND " + EXTERNAL_PORT_COLUMN + "=?",
+                new String[] { device.getExternalHost(), String.valueOf(device.getExternalPort()) });
 
     }
 
     public void insert(Device device) {
         ContentValues values = new ContentValues();
-        values.put(HOST_COLUMN, device.getHost());
-        values.put(PORT_COLUMN, device.getPort());
+        values.put(EXTERNAL_HOST_COLUMN, device.getExternalHost());
+        values.put(EXTERNAL_PORT_COLUMN, device.getExternalPort());
+        values.put(LOCAL_HOST_COLUMN, device.getLocalHost());
+        values.put(LOCAL_PORT_COLUMN, device.getLocalPort());
+        values.put(LOGIN_COLUMN, "root");
+        values.put(PASSWORD_COLUMN, "syncloud");
         values.put(SSHKEY_COLUMN, device.getKey());
         getWritableDatabase().insert(DEVICE_TABLE, null, values);
     }
 
     public void update(Device device) {
         ContentValues values = new ContentValues();
-        values.put(HOST_COLUMN, device.getHost());
-        values.put(PORT_COLUMN, device.getPort());
+        values.put(EXTERNAL_HOST_COLUMN, device.getExternalHost());
+        values.put(EXTERNAL_PORT_COLUMN, device.getExternalPort());
         values.put(SSHKEY_COLUMN, device.getKey());
         values.put(NAME_COLUMN, device.getName());
 
         int update = getWritableDatabase().update(
                 DEVICE_TABLE,
                 values,
-                HOST_COLUMN + "=? AND " + PORT_COLUMN + "=?",
-                new String[]{device.getHost(), String.valueOf(device.getPort())});
+                EXTERNAL_HOST_COLUMN + "=? AND " + EXTERNAL_PORT_COLUMN + "=?",
+                new String[]{device.getExternalHost(), String.valueOf(device.getExternalPort())});
         System.out.println(update);
     }
 }

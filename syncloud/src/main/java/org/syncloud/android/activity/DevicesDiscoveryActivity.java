@@ -17,7 +17,7 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.AsyncDiscovery;
 import org.syncloud.discovery.DeviceListener;
-import org.syncloud.model.Device;
+import org.syncloud.ssh.model.Device;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,7 +44,7 @@ public class DevicesDiscoveryActivity extends Activity {
 
         DeviceListener deviceListener = new DeviceListener() {
             @Override
-            public void added(final org.syncloud.model.Device device) {
+            public void added(final Device device) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -54,7 +54,7 @@ public class DevicesDiscoveryActivity extends Activity {
             }
 
             @Override
-            public void removed(final org.syncloud.model.Device device) {
+            public void removed(final Device device) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

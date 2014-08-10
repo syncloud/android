@@ -8,11 +8,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.syncloud.android.R;
-import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.activity.DevicesDiscoveryActivity;
-import org.syncloud.android.activity.DevicesSavedActivity;
-import org.syncloud.android.db.Db;
-import org.syncloud.model.Device;
+import org.syncloud.ssh.model.Device;
 
 public class DevicesDiscoveredAdapter extends ArrayAdapter<Device> {
     private DevicesDiscoveryActivity activity;
@@ -39,7 +36,7 @@ public class DevicesDiscoveredAdapter extends ArrayAdapter<Device> {
         });
 
         TextView deviceHost = (TextView) rowView.findViewById(R.id.device_discovered_host);
-        deviceHost.setText(device.getHost() + ":" + device.getPort());
+        deviceHost.setText(device.getDisplayName());
 
         return rowView;
 

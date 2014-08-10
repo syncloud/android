@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -22,10 +21,10 @@ import com.google.common.base.Optional;
 
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.app.OwncloudManager;
-import org.syncloud.model.Device;
-import org.syncloud.model.Result;
-import org.syncloud.model.SshResult;
+import org.syncloud.owncloud.OwncloudManager;
+import org.syncloud.ssh.model.Device;
+import org.syncloud.common.model.Result;
+import org.syncloud.ssh.model.SshResult;
 
 
 public class Owncloud extends Activity {

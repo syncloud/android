@@ -12,7 +12,7 @@ import android.widget.ListView;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DevicesSavedAdapter;
-import org.syncloud.model.Device;
+import org.syncloud.ssh.model.Device;
 
 public class DevicesSavedActivity extends Activity {
 
