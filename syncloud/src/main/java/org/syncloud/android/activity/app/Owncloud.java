@@ -61,7 +61,7 @@ public class Owncloud extends Activity {
 
         setVisibility(View.GONE, View.GONE);
 
-        progress.setMessage("Checking ownCloud status ...");
+        progress.setTitle("Checking ownCloud status ...");
         progress.setCancelable(false);
         progress.show();
 
@@ -98,22 +98,17 @@ public class Owncloud extends Activity {
         final String pass = passText.getText().toString();
 
 
-        progress.setMessage("Activating ...");
+        progress.setTitle("Activating ...");
         progress.show();
 
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                Result<SshResult> result = OwncloudManager.finishSetup(device, login, pass);
+                Result<String> result = OwncloudManager.finishSetup(device, login, pass);
                 if (result.hasError()) {
                     showError(result.getError());
                     return;
                 }
-                if (!result.getValue().ok()){
-                    showError(result.getValue().getMessage());
-                    return;
-                }
-
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -143,19 +138,13 @@ public class Owncloud extends Activity {
                     @Override
                     public void run() {
 
-                        final Result<Optional<String>> result = OwncloudManager.owncloudUrl(device);
+                        final Result<String> result = OwncloudManager.owncloudUrl(device);
 
-                        if (result.hasError()) {
-                            showError("Unable to read status:\n" + result.getError());
-                            return;
-                        }
-
-
-                        if (result.getValue().isPresent()) {
+                        if (!result.hasError()) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    url.setText(result.getValue().get());
+                                    url.setText(result.getValue());
                                     setVisibility(View.VISIBLE, View.GONE);
                                     progress.hide();
                                 }

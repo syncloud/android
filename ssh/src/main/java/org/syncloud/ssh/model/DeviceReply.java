@@ -1,6 +1,6 @@
-package org.syncloud.insider.model;
+package org.syncloud.ssh.model;
 
-public class InsiderResult {
+public class DeviceReply {
     private String data;
     private String message;
     private Boolean success;

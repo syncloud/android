@@ -3,9 +3,9 @@ package org.syncloud.insider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.syncloud.common.model.Result;
+import org.syncloud.ssh.model.DeviceReply;
 import org.syncloud.insider.model.Endpoint;
 import org.syncloud.insider.model.EndpointResult;
-import org.syncloud.insider.model.InsiderResult;
 import org.syncloud.ssh.model.Device;
 
 import static java.lang.String.format;
@@ -79,7 +79,7 @@ public class InsiderManager {
                 .map(new Result.Function<String, String>() {
                     @Override
                     public String apply(String input) throws Exception {
-                        return JSON.readValue(input, InsiderResult.class).getData();
+                        return JSON.readValue(input, DeviceReply.class).getData();
                     }
                 });
 
