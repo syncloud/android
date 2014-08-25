@@ -10,8 +10,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.syncloud.discovery.BlockingDeviceEndpointListener;
 import org.syncloud.discovery.Discovery;
-import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DeviceEndpoint;
+import org.syncloud.ssh.model.DirectEndpoint;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -60,12 +59,12 @@ public class DiscoveryTest {
         BlockingDeviceEndpointListener blockingDeviceListener = new BlockingDeviceEndpointListener();
         Discovery discovery = new Discovery(blockingDeviceListener, TEST_SERVICE_NAME);
         discovery.start(ByteBuffer.wrap(localHost.getAddress()).getInt());
-        List<DeviceEndpoint> devices = blockingDeviceListener.await(10, TimeUnit.SECONDS);
+        List<DirectEndpoint> devices = blockingDeviceListener.await(10, TimeUnit.SECONDS);
         discovery.stop();
 
-        Collections.sort(devices, new Comparator<DeviceEndpoint>() {
+        Collections.sort(devices, new Comparator<DirectEndpoint>() {
             @Override
-            public int compare(DeviceEndpoint endpoint, DeviceEndpoint endpoint1) {
+            public int compare(DirectEndpoint endpoint, DirectEndpoint endpoint1) {
                 return endpoint.getPort() - endpoint1.getPort();
             }
         });

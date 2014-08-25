@@ -8,19 +8,18 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DeviceEndpoint;
+import org.syncloud.ssh.model.DirectEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Db extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "syncloud";
     public static final String DEVICE_TABLE = "device";
     public static final String NAME_COLUMN = "name";
-    public static final String EXTERNAL_HOST_COLUMN = "external_host";
-    public static final String EXTERNAL_PORT_COLUMN = "external_port";
+    public static final String USER_DOMAIN = "user_domain";
     public static final String LOCAL_HOST_COLUMN = "local_host";
     public static final String LOCAL_PORT_COLUMN = "local_port";
     public static final String LOGIN_COLUMN = "login";
@@ -32,8 +31,7 @@ public class Db extends SQLiteOpenHelper {
             "CREATE TABLE " + DEVICE_TABLE + " (" +
                     DEVICE_ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     NAME_COLUMN + " TEXT, " +
-                    EXTERNAL_HOST_COLUMN + " TEXT, " +
-                    EXTERNAL_PORT_COLUMN + " INTEGER," +
+                    USER_DOMAIN + " TEXT, " +
                     LOCAL_HOST_COLUMN + " TEXT, " +
                     LOCAL_PORT_COLUMN + " INTEGER," +
                     LOGIN_COLUMN + " TEXT, " +
@@ -72,13 +70,8 @@ public class Db extends SQLiteOpenHelper {
                         new Device(
                                 cursor.getInt(cursor.getColumnIndex(DEVICE_ID_COLUMN)),
                                 cursor.getString(cursor.getColumnIndex(NAME_COLUMN)),
-                                new DeviceEndpoint(
-                                        cursor.getString(cursor.getColumnIndex(EXTERNAL_HOST_COLUMN)),
-                                        cursor.getInt(cursor.getColumnIndex(EXTERNAL_PORT_COLUMN)),
-                                        cursor.getString(cursor.getColumnIndex(LOGIN_COLUMN)),
-                                        cursor.getString(cursor.getColumnIndex(PASSWORD_COLUMN)),
-                                        cursor.getString(cursor.getColumnIndex(SSHKEY_COLUMN))),
-                                new DeviceEndpoint(
+                                cursor.getString(cursor.getColumnIndex(USER_DOMAIN)),
+                                new DirectEndpoint(
                                         cursor.getString(cursor.getColumnIndex(LOCAL_HOST_COLUMN)),
                                         cursor.getInt(cursor.getColumnIndex(LOCAL_PORT_COLUMN)),
                                         cursor.getString(cursor.getColumnIndex(LOGIN_COLUMN)),
@@ -121,13 +114,12 @@ public class Db extends SQLiteOpenHelper {
 
     private ContentValues toFields(Device device) {
         ContentValues values = new ContentValues();
-        values.put(EXTERNAL_HOST_COLUMN, device.getExternalEndpoint().getHost());
-        values.put(EXTERNAL_PORT_COLUMN, device.getExternalEndpoint().getPort());
+        values.put(USER_DOMAIN, device.getUserDomain());
         values.put(LOCAL_HOST_COLUMN, device.getLocalEndpoint().getHost());
         values.put(LOCAL_PORT_COLUMN, device.getLocalEndpoint().getPort());
-        values.put(LOGIN_COLUMN, device.getExternalEndpoint().getLogin());
-        values.put(PASSWORD_COLUMN, device.getExternalEndpoint().getPassword());
-        values.put(SSHKEY_COLUMN, device.getExternalEndpoint().getKey());
+        values.put(LOGIN_COLUMN, device.getLocalEndpoint().getLogin());
+        values.put(PASSWORD_COLUMN, device.getLocalEndpoint().getPassword());
+        values.put(SSHKEY_COLUMN, device.getLocalEndpoint().getKey());
         return values;
     }
 }

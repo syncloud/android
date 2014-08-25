@@ -9,8 +9,6 @@ import org.syncloud.android.fragment.SettingsFragment;
 
 public class SettingsActivity extends PreferenceActivity {
 
-    public static final String KEY_PREF_API_URL = "pref_api_url";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -7,4 +7,11 @@
         android:entryValues="@array/pref_api_url_values"
         android:defaultValue="http://api.syncloud.it">
         </ListPreference>
+    <CheckBoxPreference
+        android:key="pref_debug_mode"
+        android:title="Debug mode"
+        android:summary="Shows more technical information in various places"
+        android:defaultValue="false">
+
+    </CheckBoxPreference>
 </PreferenceScreen>

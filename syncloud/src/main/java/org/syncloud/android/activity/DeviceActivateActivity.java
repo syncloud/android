@@ -25,13 +25,13 @@ import org.syncloud.redirect.UserService;
 import org.syncloud.remote.RemoteAccessManager;
 import org.syncloud.spm.Spm;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DeviceEndpoint;
+import org.syncloud.ssh.model.DirectEndpoint;
 
 
 public class DeviceActivateActivity extends Activity {
 
     private Function<String, String> progressFunction;
-    private DeviceEndpoint endpoint;
+    private DirectEndpoint endpoint;
     private ProgressDialog progress;
     private TextView url;
     private boolean dnsReady = false;
@@ -62,8 +62,8 @@ public class DeviceActivateActivity extends Activity {
         deactivateButton.setVisibility(View.GONE);
 
         dnsControl = (LinearLayout) findViewById(R.id.dns_control);
-        endpoint = (DeviceEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
-        discoveredDevice = new Device(null, endpoint);
+        endpoint = (DirectEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
+        discoveredDevice = new Device(null, null, null, endpoint);
         status();
     }
 
@@ -275,7 +275,7 @@ public class DeviceActivateActivity extends Activity {
                 }
 
                 showProgress("Collecting device info");
-                Result<Device> remote = RemoteAccessManager.getRemoteDevice(discoveredDevice);
+                Result<Device> remote = RemoteAccessManager.getRemoteDevice(discoveredDevice, preferences.getDomain());
                 if (remote.hasError()) {
                     showError(remote.getError());
                     return;

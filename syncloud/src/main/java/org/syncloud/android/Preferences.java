@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static org.syncloud.android.fragment.SettingsFragment.KEY_PREF_API_URL;
+import static org.syncloud.android.fragment.SettingsFragment.KEY_PREF_DEBUG_MODE;
 
 public class Preferences {
     private SharedPreferences preferences;
@@ -24,5 +25,9 @@ public class Preferences {
         } catch (MalformedURLException e) {
             return "syncloud.it";
         }
+    }
+
+    public Boolean isDebug() {
+        return preferences.getBoolean(KEY_PREF_DEBUG_MODE, false);
     }
 }

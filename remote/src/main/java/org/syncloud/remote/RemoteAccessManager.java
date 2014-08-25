@@ -4,13 +4,15 @@ import org.syncloud.common.model.Result;
 import org.syncloud.insider.model.Endpoint;
 import org.syncloud.ssh.Scp;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DeviceEndpoint;
+import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.ProxyEndpoint;
 
 import static java.util.Arrays.asList;
 import static org.syncloud.insider.InsiderManager.addService;
 import static org.syncloud.insider.InsiderManager.removeService;
 import static org.syncloud.insider.InsiderManager.serviceInfo;
-import static org.syncloud.ssh.Ssh.execute1;
+import static org.syncloud.insider.InsiderManager.userDomain;
+import static org.syncloud.ssh.Ssh.execute;
 
 public class RemoteAccessManager {
 
@@ -24,7 +26,7 @@ public class RemoteAccessManager {
 
     public static Result<String> enable(final Device device) {
 
-        Result<String> result = execute1(device, asList(
+        Result<String> result = execute(device, asList(
                 "mkdir -p /root/.ssh",
                 String.format("rm -rf %s*", KEY_FILE),
                 String.format("ssh-keygen -b 1024 -t dsa -f %s -N ''", KEY_FILE),
@@ -38,17 +40,18 @@ public class RemoteAccessManager {
         });
     }
 
-    public static Result<Device> getRemoteDevice(final Device device) {
+    public static Result<Device> getRemoteDevice(final Device device, final String domain) {
 
-        return Scp.getFile(device, KEY_FILE)
+        final DirectEndpoint directEndpoint = device.getLocalEndpoint();
+        return Scp.getFile(directEndpoint, KEY_FILE)
                 .flatMap(new Result.Function<String, Result<Device>>() {
                     @Override
                     public Result<Device> apply(final String key) throws Exception {
-                        return serviceInfo(device, SERVICE_NAME)
-                                .map(new Result.Function<Endpoint, Device>() {
+                        return userDomain(device)
+                                .map(new Result.Function<String, Device>() {
                                     @Override
-                                    public Device apply(Endpoint endpoint) throws Exception {
-                                        return convert(endpoint, device.getLocalEndpoint(), key);
+                                    public Device apply(String userDomain) throws Exception {
+                                        return convert(userDomain + "." + domain, directEndpoint, key);
                                     }
                                 });
                     }
@@ -56,15 +59,14 @@ public class RemoteAccessManager {
 
     }
 
-    private static Device convert(Endpoint syncloudSshEndpoint, DeviceEndpoint defaultSshEndpoint, String key) {
+    private static Device convert(String userDomain, DirectEndpoint directEndpoint, String key) {
         return new Device(
-                new DeviceEndpoint(
-                        syncloudSshEndpoint.getExternal_host(),
-                        syncloudSshEndpoint.getExternal_port(),
-                        null, null, key),
-                new DeviceEndpoint(
-                        defaultSshEndpoint.getHost(),
-                        syncloudSshEndpoint.getService().getPort(),
+                null,
+                null,
+                userDomain,
+                new DirectEndpoint(
+                        directEndpoint.getHost(),
+                        REMOTE_ACCESS_PORT,
                         "root", "syncloud", key)
         );
     }

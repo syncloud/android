@@ -10,7 +10,6 @@ import org.syncloud.spm.model.App;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.common.model.Result;
-import org.syncloud.ssh.model.SshResult;
 import org.syncloud.ssh.parser.JsonParser;
 
 import java.util.List;
@@ -26,38 +25,34 @@ public class Spm {
 
     public enum Command {Install, Verify, Upgrade, Remove, Status}
 
-    public static Result<SshResult> run(Command command, Device device, String app) {
+    public static Result<String> run(Command command, Device device, String app) {
         return Ssh.execute(device, asList(SPM_BIN + " " + command.name().toLowerCase() + " " + app));
     }
 
-    private static Result<SshResult> installSpm(Device device) {
+    private static Result<String> installSpm(Device device) {
         return  Ssh.execute(device, asList(INSTALL_SPM));
     }
 
-    private static Result<SshResult> spmInstalled(Device device) {
+    private static Result<String> spmInstalled(Device device) {
         return Ssh.execute(device, asList("[ -d " + REPO_DIR + " ]"));
     }
 
-    public static Result<SshResult> updateSpm(Device device) {
+    public static Result<String> updateSpm(Device device) {
         return installSpm(device);
     }
 
-    public static Result<SshResult> ensureSpmInstalled(Device device) {
-
-        Result<SshResult> spmInstalled = spmInstalled(device);
-        if (spmInstalled.hasError())
-            return Result.error(spmInstalled.getError());
-
-        if (!spmInstalled.getValue().ok())
-            return installSpm(device);
-
-        return spmInstalled;
+    public static Result<String> ensureSpmInstalled(final Device device) {
+        return spmInstalled(device).flatMap(new Result.Function<String, Result<String>>() {
+            @Override
+            public Result<String> apply(String input) throws Exception {return installSpm(device);
+            }
+        });
     }
 
     public static Result<Boolean> ensureAdminToolsInstalled(Device device, Function<String, String> progress) {
 
         progress.apply("installing spm");
-        Result<SshResult> result = ensureSpmInstalled(device);
+        Result<String> result = ensureSpmInstalled(device);
         if (result.hasError())
             return Result.error(result.getError());
 
@@ -79,7 +74,7 @@ public class Spm {
             }
 
             progress.apply("installing " + app.getName());
-            Result<SshResult> install = run(command, device, app.getId());
+            Result<String> install = run(command, device, app.getId());
             if (install.hasError())
                 return Result.error(install.getError());
         }
@@ -89,20 +84,17 @@ public class Spm {
 
     public static Result<List<App>> list(Device device) {
 
-        Result<SshResult> result = Ssh.execute(device, asList(SPM_BIN + " list"));
-        if (result.hasError())
-            return Result.error(result.getError());
-
-        SshResult sshResult = result.getValue();
-        if (!sshResult.ok()) {
-            return Result.error(sshResult.getMessage());
-        }
-
-        Result<List<App>> parse = JsonParser.parse(sshResult, App.class);
-        if (!parse.hasError()) {
-            return Result.value(filterNot(parse.getValue(), App.Type.system));
-        }
-        return Result.error(parse.getError());
+        return Ssh.execute(device, asList(SPM_BIN + " list"))
+                .flatMap(new Result.Function<String, Result<List<App>>>() {
+                    @Override
+                    public Result<List<App>> apply(String input) throws Exception {return JsonParser.parse(input, App.class);
+                    }
+                })
+                .map(new Result.Function<List<App>, List<App>>() {
+                    @Override
+                    public List<App> apply(List<App> input) throws Exception {return filterNot(input, App.Type.system);
+                    }
+                });
 
     }
 

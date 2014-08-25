@@ -17,8 +17,7 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.AsyncDiscovery;
 import org.syncloud.discovery.DeviceEndpointListener;
-import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DeviceEndpoint;
+import org.syncloud.ssh.model.DirectEndpoint;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -45,7 +44,7 @@ public class DevicesDiscoveryActivity extends Activity {
 
         DeviceEndpointListener deviceEndpointListener = new DeviceEndpointListener() {
             @Override
-            public void added(final DeviceEndpoint endpoint) {
+            public void added(final DirectEndpoint endpoint) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -55,7 +54,7 @@ public class DevicesDiscoveryActivity extends Activity {
             }
 
             @Override
-            public void removed(final DeviceEndpoint endpoint) {
+            public void removed(final DirectEndpoint endpoint) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -115,7 +114,7 @@ public class DevicesDiscoveryActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void open(final DeviceEndpoint endpoint) {
+    public void open(final DirectEndpoint endpoint) {
         Intent intent = new Intent(this, DeviceActivateActivity.class);
         intent.putExtra(SyncloudApplication.DEVICE_ENDPOINT, endpoint);
         startActivity(intent);

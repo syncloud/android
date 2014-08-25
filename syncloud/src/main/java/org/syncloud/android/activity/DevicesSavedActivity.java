@@ -59,7 +59,7 @@ public class DevicesSavedActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
+            startActivityForResult(new Intent(this, SettingsActivity.class), 2);
         }
         return super.onOptionsItemSelected(item);
     }

@@ -16,15 +16,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.google.common.base.Optional;
-
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.common.model.Result;
 import org.syncloud.owncloud.OwncloudManager;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.common.model.Result;
-import org.syncloud.ssh.model.SshResult;
 
 
 public class Owncloud extends Activity {

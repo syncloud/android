@@ -12,6 +12,7 @@ import org.syncloud.android.activity.SettingsActivity;
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String KEY_PREF_API_URL = "pref_api_url";
+    public static final String KEY_PREF_DEBUG_MODE = "pref_debug_mode";
 
 
     @Override

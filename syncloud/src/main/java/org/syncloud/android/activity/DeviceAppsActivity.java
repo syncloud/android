@@ -20,11 +20,10 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
+import org.syncloud.common.model.Result;
+import org.syncloud.spm.Spm;
 import org.syncloud.spm.model.App;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.common.model.Result;
-import org.syncloud.ssh.model.SshResult;
-import org.syncloud.spm.Spm;
 
 import java.util.List;
 
@@ -105,7 +104,7 @@ public class DeviceAppsActivity extends Activity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        final Result<SshResult> result = Spm.ensureSpmInstalled(device);
+                        final Result<String> result = Spm.ensureSpmInstalled(device);
                         if (result.hasError()) {
                             String message = "Initial name setup may take up to 10 minutes, " +
                                     "try in several minutes\n\n";
@@ -210,7 +209,7 @@ public class DeviceAppsActivity extends Activity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        final Result<SshResult> result = Spm.updateSpm(device);
+                        final Result<String> result = Spm.updateSpm(device);
                         if (result.hasError()) {
                             progressError(result.getError());
                             return;
@@ -227,15 +226,9 @@ public class DeviceAppsActivity extends Activity {
         execute(new Runnable() {
             @Override
             public void run() {
-                final Result<SshResult> result = Spm.run(action, device, app);
+                final Result<String> result = Spm.run(action, device, app);
                 if (result.hasError()) {
                     progressError(result.getError());
-                    return;
-                }
-
-                SshResult sshResult = result.getValue();
-                if (!sshResult.ok()) {
-                    progressError(sshResult.getMessage());
                     return;
                 }
 
