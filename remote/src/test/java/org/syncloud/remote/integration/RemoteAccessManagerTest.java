@@ -10,6 +10,7 @@ import org.syncloud.ssh.model.DirectEndpoint;
 public class RemoteAccessManagerTest {
 
     public static final Device testDevice = new Device(null, null, null, new DirectEndpoint("192.168.1.70", 22, "root", "syncloud", null));
+    public static final String SYNCLOUD_INFO = "syncloud.info";
 
     @Test
     public void testRemoteAccessSeveralTimes() {
@@ -20,7 +21,7 @@ public class RemoteAccessManagerTest {
     }
 
     public void testRemoteAccess() {
-        Result<Device> remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice, preferences.getDomain());
+        Result<Device> remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice, SYNCLOUD_INFO);
         Boolean wasEnabled = !remoteDevice.hasError();
         if (wasEnabled) {
             System.out.println(remoteDevice.getValue().getDisplayName());
@@ -30,7 +31,7 @@ public class RemoteAccessManagerTest {
                 Assert.fail(disabled.getError());
             }
 
-            remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice, preferences.getDomain());
+            remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice, SYNCLOUD_INFO);
             Assert.assertTrue(remoteDevice.hasError());
         }
 
@@ -40,7 +41,7 @@ public class RemoteAccessManagerTest {
             Assert.fail(enabled.getError());
         }
 
-        remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice, preferences.getDomain());
+        remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice, SYNCLOUD_INFO);
         if (remoteDevice.hasError()) {
             Assert.fail(remoteDevice.getError());
         }
