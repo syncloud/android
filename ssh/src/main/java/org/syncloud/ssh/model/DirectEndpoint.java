@@ -53,4 +53,24 @@ public class DirectEndpoint implements Serializable {
                 ", key='" + (isNoneBlank(key) ? "[available]" : "[none]") +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DirectEndpoint that = (DirectEndpoint) o;
+
+        if (port != that.port) return false;
+        if (host != null ? !host.equals(that.host) : that.host != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = host != null ? host.hashCode() : 0;
+        result = 31 * result + port;
+        return result;
+    }
 }

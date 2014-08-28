@@ -1,6 +1,5 @@
 package org.syncloud.ssh;
 
-import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -17,8 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
-
-import static org.syncloud.ssh.EndpointChecker.findDirectEndpoint;
 
 public class Ssh {
 
@@ -37,7 +34,8 @@ public class Ssh {
 
         JSch jsch = new JSch();
 
-        Result<DirectEndpoint> reachableEndpoint = findDirectEndpoint(device, SSH_TYPE);
+        EndpointResolver resolver = new EndpointResolver(new Dns(), new EndpointVisibility());
+        Result<DirectEndpoint> reachableEndpoint = resolver.findDirectEndpoint(device, SSH_TYPE);
         if (reachableEndpoint.hasError())
             return Result.error(reachableEndpoint.getError());
 

@@ -14,11 +14,9 @@ import ch.ethz.ssh2.SCPInputStream;
 public class Scp {
     public static Result<String> getFile(DirectEndpoint endpoint, String file) {
 
-        Connection conn = null;
+        Connection conn = new Connection(endpoint.getHost(), endpoint.getPort());
 
         try {
-
-            conn = new Connection(endpoint.getHost(), endpoint.getPort());
             conn.connect(null, 5000, 0);
             if (endpoint.getKey() != null)
                 conn.authenticateWithPublicKey(endpoint.getLogin(), endpoint.getKey().toCharArray(), null);
@@ -36,11 +34,9 @@ public class Scp {
         } catch (IOException e) {
             return Result.error(e.getMessage());
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ignore) {
-                }
+            try {
+                conn.close();
+            } catch (Exception ignore) {
             }
         }
     }

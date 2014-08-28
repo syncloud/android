@@ -9,6 +9,7 @@ dependencies {
     compile 'dnsjava:dnsjava:2.1.6'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.10'
+    testCompile 'org.mockito:mockito-all:1.9.5'
 }
 
 test {
