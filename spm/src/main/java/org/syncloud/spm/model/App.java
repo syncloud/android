@@ -1,12 +1,5 @@
 package org.syncloud.spm.model;
 
-import com.google.common.collect.Sets;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 public class App {
 
     private String id;

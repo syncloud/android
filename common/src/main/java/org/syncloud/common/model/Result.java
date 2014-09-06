@@ -26,10 +26,6 @@ public class Result<T> {
         return error.isPresent();
     }
 
-    public String getErrorOrEmpty() {
-        return hasError() ? getError() : "";
-    }
-
     public String getError() {
         return error.get();
     }

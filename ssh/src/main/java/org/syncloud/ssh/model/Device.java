@@ -2,9 +2,6 @@ package org.syncloud.ssh.model;
 
 import java.io.Serializable;
 
-import static com.google.common.collect.Iterables.filter;
-import static org.apache.commons.lang3.StringUtils.join;
-
 public class Device implements Serializable {
     private Integer id;
     private String  userDomain;

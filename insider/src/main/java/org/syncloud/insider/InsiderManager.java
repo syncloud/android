@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.syncloud.common.model.Result;
 import org.syncloud.insider.model.StringResult;
 import org.syncloud.ssh.model.DeviceReply;
-import org.syncloud.insider.model.Endpoint;
-import org.syncloud.insider.model.EndpointResult;
 import org.syncloud.ssh.model.Device;
 
 import static java.lang.String.format;
@@ -18,33 +16,6 @@ public class InsiderManager {
     private static final String INSIDER_BIN = "insider";
     public static final ObjectMapper JSON = new ObjectMapper();
 
-    public static Result<String> addService(
-            final Device device, String name, String protocol, String type, int port, String url) {
-
-        return execute(
-                device,
-                asList(format(
-                        "%s add_service %s %s %s %s %s",
-                        INSIDER_BIN, name, protocol, type, port, url)))
-                .flatMap(new Result.Function<String, Result<String>>() {
-            @Override
-            public Result<String> apply(String input) throws Exception {
-                return enableCron(device);
-            }
-        });
-
-    }
-
-    public static Result<Endpoint> serviceInfo(Device device, String name) {
-        return execute(device, asList(format("%s service_info %s", INSIDER_BIN, name)))
-                .map(new Result.Function<String, Endpoint>() {
-                    @Override
-                    public Endpoint apply(String input) throws Exception {
-                        return JSON.readValue(input, EndpointResult.class).getData();
-                    }
-                });
-    }
-
     public static Result<String> userDomain(Device device) {
         return execute(device, asList(format("%s user_domain", INSIDER_BIN)))
                 .map(new Result.Function<String,String>() {
@@ -55,22 +26,8 @@ public class InsiderManager {
                 });
     }
 
-    private static Result<String> enableCron(Device device) {
-        return execute(device, asList(INSIDER_BIN + " cron_on "));
-    }
-
-    public static Result<String> acquireDomain(
-            final Device device, String email, String pass, String domain) {
-
-        return execute(
-                device,
-                asList(format("%s acquire_domain %s %s %s", INSIDER_BIN, email, pass, domain)))
-                .flatMap(new Result.Function<String, Result<String>>() {
-                    @Override
-                    public Result<String> apply(String input) throws Exception {
-                        return enableCron(device);
-                    }
-                });
+    public static Result<String> acquireDomain(final Device device, String email, String pass, String domain) {
+        return execute(device, asList(format("%s acquire_domain %s %s %s", INSIDER_BIN, email, pass, domain)));
     }
 
     public static Result<String> setRedirectInfo(Device device, String domain, String apiUl) {
@@ -94,9 +51,5 @@ public class InsiderManager {
                     }
                 });
 
-    }
-
-    public static Result<String> removeService(Device device, int port) {
-        return execute(device, asList(INSIDER_BIN + " remove_service " + port));
     }
 }

@@ -22,7 +22,7 @@ public class UserServiceTest {
         Rest.start(Rest.ExistingUser.class);
         Result<Boolean> result = getUser("test", "test", Rest.URL);
 
-        assertFalse(result.getErrorOrEmpty(), result.hasError());
+        assertFalse(getErrorOrEmpty(result), result.hasError());
         assertEquals(true, result.getValue());
     }
 
@@ -31,7 +31,7 @@ public class UserServiceTest {
         Rest.start(Rest.MissingUser.class);
         Result<Boolean> result = getUser("test", "test", Rest.URL);
 
-        assertTrue(result.getErrorOrEmpty(), result.hasError());
+        assertTrue(getErrorOrEmpty(result), result.hasError());
     }
 
     @Test
@@ -39,7 +39,7 @@ public class UserServiceTest {
         Rest.start(Rest.MissingUser.class);
         Result<String> result = createUser("test", "test", "user_domain", Rest.URL);
 
-        assertFalse(result.getErrorOrEmpty(), result.hasError());
+        assertFalse(getErrorOrEmpty(result), result.hasError());
     }
 
     @Test
@@ -47,6 +47,10 @@ public class UserServiceTest {
         Rest.start(Rest.ExistingUser.class);
         Result<String> result = createUser("test", "test", "user_domain", Rest.URL);
 
-        assertTrue(result.getErrorOrEmpty(), result.hasError());
+        assertTrue(getErrorOrEmpty(result), result.hasError());
+    }
+
+    private String getErrorOrEmpty(Result result) {
+        return result.hasError() ? result.getError() : "";
     }
 }

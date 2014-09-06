@@ -2,12 +2,9 @@ package org.syncloud.android.fragment;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 
 import org.syncloud.android.R;
-import org.syncloud.android.activity.SettingsActivity;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 

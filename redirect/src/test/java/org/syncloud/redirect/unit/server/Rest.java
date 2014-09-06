@@ -5,7 +5,6 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import java.io.IOException;
-import java.net.URI;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
