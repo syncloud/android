@@ -1,52 +1,50 @@
 package org.syncloud.remote;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.syncloud.common.model.Result;
-import org.syncloud.insider.model.Endpoint;
+import org.syncloud.insider.model.EndpointResult;
 import org.syncloud.ssh.Scp;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.DirectEndpoint;
-import org.syncloud.ssh.model.ProxyEndpoint;
+import org.syncloud.ssh.model.RemoteReply;
 
 import static java.util.Arrays.asList;
 import static org.syncloud.insider.InsiderManager.addService;
 import static org.syncloud.insider.InsiderManager.removeService;
-import static org.syncloud.insider.InsiderManager.serviceInfo;
 import static org.syncloud.insider.InsiderManager.userDomain;
 import static org.syncloud.ssh.Ssh.execute;
 
 public class RemoteAccessManager {
+    public static final ObjectMapper JSON = new ObjectMapper();
 
     public static final int REMOTE_ACCESS_PORT = 1022;
-    private static final String KEY_FILE = "/root/.ssh/id_dsa_syncloud_master";
-    public static final String SERVICE_NAME = "ssh";
+    private static final String REMOTE_BIN = "remote";
 
     public static Result<String> disable(Device device) {
-        return removeService(device, REMOTE_ACCESS_PORT);
+        return execute(device, asList(REMOTE_BIN + " disable"));
     }
 
-    public static Result<String> enable(final Device device) {
+//    This is enable method implemented in usual way it is only 4 lines
+//    This example is 5 lines instead of 15 lines (9 lines in IDEA) with Result
+//    This example clearly shows that using Result is just a masochism without proper language syntax support
+//    Once again: even altogether with such a long comment procedural code is shorter then Result-based
+//
+//    public static Device enableProcedural(final Device device, final String domain) {
+//        final DirectEndpoint directEndpoint = device.getLocalEndpoint();
+//        String data = execute(device, asList(REMOTE_BIN + " enable"));
+//        final String key = JSON.readValue(data, RemoteReply.class).data;
+//        String userDomain = userDomain(device);
+//        return convert(userDomain + "." + domain, directEndpoint, key);
+//    }
 
-        Result<String> result = execute(device, asList(
-                "mkdir -p /root/.ssh",
-                String.format("rm -rf %s*", KEY_FILE),
-                String.format("ssh-keygen -b 1024 -t dsa -f %s -N ''", KEY_FILE),
-                String.format("cat %s.pub > /root/.ssh/authorized_keys", KEY_FILE)));
-
-        return result.flatMap(new Result.Function<String, Result<String>>() {
-            @Override
-            public Result<String> apply(String input) throws Exception {
-                return addService(device, SERVICE_NAME, "ssh", "_ssh._tcp", REMOTE_ACCESS_PORT, "ssh");
-            }
-        });
-    }
-
-    public static Result<Device> getRemoteDevice(final Device device, final String domain) {
-
+    public static Result<Device> enable(final Device device, final String domain) {
         final DirectEndpoint directEndpoint = device.getLocalEndpoint();
-        return Scp.getFile(directEndpoint, KEY_FILE)
+        return execute(device, asList(REMOTE_BIN + " enable"))
                 .flatMap(new Result.Function<String, Result<Device>>() {
                     @Override
-                    public Result<Device> apply(final String key) throws Exception {
+                    public Result<Device> apply(final String data) throws Exception {
+                        final String key = JSON.readValue(data, RemoteReply.class).data;
                         return userDomain(device)
                                 .map(new Result.Function<String, Device>() {
                                     @Override
@@ -56,7 +54,6 @@ public class RemoteAccessManager {
                                 });
                     }
                 });
-
     }
 
     private static Device convert(String userDomain, DirectEndpoint directEndpoint, String key) {
@@ -64,10 +61,7 @@ public class RemoteAccessManager {
                 null,
                 null,
                 userDomain,
-                new DirectEndpoint(
-                        directEndpoint.getHost(),
-                        REMOTE_ACCESS_PORT,
-                        "root", "syncloud", key)
+                new DirectEndpoint(directEndpoint.getHost(), REMOTE_ACCESS_PORT, "root", "syncloud", key)
         );
     }
 }

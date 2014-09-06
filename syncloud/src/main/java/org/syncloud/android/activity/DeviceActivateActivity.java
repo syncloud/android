@@ -268,20 +268,13 @@ public class DeviceActivateActivity extends Activity {
                 }
 
                 showProgress("Activating remote access");
-                final Result<String> enabled = RemoteAccessManager.enable(discoveredDevice);
-                if (enabled.hasError()) {
-                    showError(enabled.getError());
-                    return;
-                }
-
-                showProgress("Collecting device info");
-                Result<Device> remote = RemoteAccessManager.getRemoteDevice(discoveredDevice, preferences.getDomain());
+                final Result<Device> remote = RemoteAccessManager.enable(discoveredDevice, preferences.getDomain());
                 if (remote.hasError()) {
                     showError(remote.getError());
                     return;
                 }
-                showProgress("Saving device");
 
+                showProgress("Saving device");
                 Db db = ((SyncloudApplication) getApplication()).getDb();
                 db.insert(remote.getValue());
 

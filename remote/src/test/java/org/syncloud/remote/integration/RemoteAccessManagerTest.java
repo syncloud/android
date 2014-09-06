@@ -21,7 +21,7 @@ public class RemoteAccessManagerTest {
     }
 
     public void testRemoteAccess() {
-        Result<Device> remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice, SYNCLOUD_INFO);
+        Result<Device> remoteDevice = RemoteAccessManager.enable(testDevice, SYNCLOUD_INFO);
         Boolean wasEnabled = !remoteDevice.hasError();
         if (wasEnabled) {
             System.out.println(remoteDevice.getValue().getDisplayName());
@@ -31,17 +31,11 @@ public class RemoteAccessManagerTest {
                 Assert.fail(disabled.getError());
             }
 
-            remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice, SYNCLOUD_INFO);
+            remoteDevice = RemoteAccessManager.enable(testDevice, SYNCLOUD_INFO);
             Assert.assertTrue(remoteDevice.hasError());
         }
 
-        System.out.println("enabling");
-        Result<String> enabled = RemoteAccessManager.enable(testDevice);
-        if (enabled.hasError()) {
-            Assert.fail(enabled.getError());
-        }
-
-        remoteDevice = RemoteAccessManager.getRemoteDevice(testDevice, SYNCLOUD_INFO);
+        remoteDevice = RemoteAccessManager.enable(testDevice, SYNCLOUD_INFO);
         if (remoteDevice.hasError()) {
             Assert.fail(remoteDevice.getError());
         }
