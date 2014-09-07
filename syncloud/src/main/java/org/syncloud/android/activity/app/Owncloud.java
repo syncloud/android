@@ -19,7 +19,7 @@ import android.widget.TextView;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.common.model.Result;
-import org.syncloud.owncloud.OwncloudManager;
+import org.syncloud.apps.owncloud.OwncloudManager;
 import org.syncloud.ssh.model.Device;
 
 

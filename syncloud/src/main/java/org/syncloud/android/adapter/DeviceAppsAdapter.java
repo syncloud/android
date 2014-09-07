@@ -9,9 +9,9 @@ import android.widget.TextView;
 
 import org.syncloud.android.R;
 import org.syncloud.android.activity.DeviceAppsActivity;
-import org.syncloud.spm.model.App;
+import org.syncloud.apps.spm.App;
 
-import static org.syncloud.spm.Spm.Command.*;
+import static org.syncloud.apps.spm.Spm.Command.*;
 
 public class DeviceAppsAdapter extends ArrayAdapter<App> {
     private DeviceAppsActivity activity;

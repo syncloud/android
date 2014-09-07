@@ -80,10 +80,7 @@ android {
 
 dependencies {
     compile project(':discovery')
-    compile project(':spm')
-    compile project(':insider')
-    compile project(':remote')
-    compile project(':owncloud')
+    compile project(':apps')
     compile project(':redirect')
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:19.+'

@@ -21,8 +21,8 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
 import org.syncloud.common.model.Result;
-import org.syncloud.spm.Spm;
-import org.syncloud.spm.model.App;
+import org.syncloud.apps.spm.Spm;
+import org.syncloud.apps.spm.App;
 import org.syncloud.ssh.model.Device;
 
 import java.util.List;

@@ -1,7 +1,0 @@
-apply plugin: 'java'
-
-dependencies {
-    compile project(':ssh')
-    compile 'com.google.guava:guava:16.0.1'
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-}
