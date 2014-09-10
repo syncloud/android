@@ -20,7 +20,7 @@ import static java.util.Arrays.asList;
 public class Spm {
     public static final ObjectMapper JSON = new ObjectMapper();
 
-    public static final String REPO_URL = "https://raw.githubusercontent.com/syncloud/apps/SYNCLOUD-1.0";
+    public static final String REPO_URL = "https://raw.githubusercontent.com/syncloud/apps/release";
     public static final String INSTALL_SPM = "wget -qO- " + REPO_URL + "/spm | bash -s install";
     public static final String REPO_DIR = "/opt/syncloud/repo";
     public static final String SPM_BIN = REPO_DIR + "/system/spm";
