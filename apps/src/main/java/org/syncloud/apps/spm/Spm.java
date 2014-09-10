@@ -1,6 +1,7 @@
 package org.syncloud.apps.spm;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -9,6 +10,7 @@ import com.google.common.collect.Lists;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.common.model.Result;
+import org.syncloud.ssh.model.RemoteReply;
 import org.syncloud.ssh.parser.JsonParser;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 public class Spm {
+    public static final ObjectMapper JSON = new ObjectMapper();
 
     public static final String REPO_URL = "https://raw.githubusercontent.com/syncloud/apps/SYNCLOUD-1.0";
     public static final String INSTALL_SPM = "wget -qO- " + REPO_URL + "/spm | bash -s install";
@@ -86,12 +89,10 @@ public class Spm {
         return Ssh.execute(device, asList(SPM_BIN + " list"))
                 .flatMap(new Result.Function<String, Result<List<App>>>() {
                     @Override
-                    public Result<List<App>> apply(String input) throws Exception {return JsonParser.parse(input, App.class);
-                    }
-                })
-                .map(new Result.Function<List<App>, List<App>>() {
-                    @Override
-                    public List<App> apply(List<App> input) throws Exception {return filterNot(input, App.Type.system);
+                    public Result<List<App>> apply(String input) throws Exception {
+                        List<App> apps = JSON.readValue(input, AppListReply.class).data;
+                        apps = filterNot(apps, App.Type.system);
+                        return Result.value(apps);
                     }
                 });
 
