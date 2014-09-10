@@ -44,11 +44,11 @@ public class Spm {
     }
 
     public static Result<String> ensureSpmInstalled(final Device device) {
-        return spmInstalled(device).flatMap(new Result.Function<String, Result<String>>() {
-            @Override
-            public Result<String> apply(String input) throws Exception {return installSpm(device);
-            }
-        });
+        Result<String> installed = spmInstalled(device);
+        if (installed.hasError()) {
+            return installSpm(device);
+        }
+        return installed;
     }
 
     public static Result<Boolean> ensureAdminToolsInstalled(Device device, Function<String, String> progress) {
