@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.DirectEndpoint;
-import org.syncloud.ssh.model.RemoteReply;
+import org.syncloud.ssh.model.StringResult;
 
 import static java.util.Arrays.asList;
 import static org.syncloud.apps.insider.InsiderManager.userDomain;
@@ -40,7 +40,7 @@ public class RemoteAccessManager {
                 .flatMap(new Result.Function<String, Result<Device>>() {
                     @Override
                     public Result<Device> apply(final String data) throws Exception {
-                        final String key = JSON.readValue(data, RemoteReply.class).data;
+                        final String key = JSON.readValue(data, StringResult.class).data;
                         return userDomain(device)
                                 .map(new Result.Function<String, Device>() {
                                     @Override

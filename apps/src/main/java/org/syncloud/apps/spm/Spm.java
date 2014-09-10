@@ -10,8 +10,6 @@ import com.google.common.collect.Lists;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.common.model.Result;
-import org.syncloud.ssh.model.RemoteReply;
-import org.syncloud.ssh.parser.JsonParser;
 
 import java.util.List;
 

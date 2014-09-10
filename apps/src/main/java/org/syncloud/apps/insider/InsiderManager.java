@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.DeviceReply;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.StringResult;
 
@@ -21,7 +20,7 @@ public class InsiderManager {
                 .map(new Result.Function<String, String>() {
                     @Override
                     public String apply(String input) throws Exception {
-                        return JSON.readValue(input, StringResult.class).getData();
+                        return JSON.readValue(input, StringResult.class).data;
                     }
                 });
     }
@@ -47,7 +46,7 @@ public class InsiderManager {
                 .map(new Result.Function<String, String>() {
                     @Override
                     public String apply(String input) throws Exception {
-                        return JSON.readValue(input, DeviceReply.class).getData();
+                        return JSON.readValue(input, StringResult.class).data;
                     }
                 });
 
