@@ -17,10 +17,16 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
+import static java.util.Arrays.asList;
+
 public class Ssh {
 
     public static final int SSH_SERVER_PORT = 22;
     public static final String SSH_TYPE = "_ssh._tcp";
+
+    public static Result<String> execute(Device device, String command) {
+        return execute(device, asList(command));
+    }
 
     public static Result<String> execute(Device device, List<String> commands) {
         try {

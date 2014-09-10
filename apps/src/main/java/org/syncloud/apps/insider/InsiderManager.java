@@ -16,7 +16,7 @@ public class InsiderManager {
     public static final ObjectMapper JSON = new ObjectMapper();
 
     public static Result<String> userDomain(Device device) {
-        return Ssh.execute(device, asList(format("%s user_domain", INSIDER_BIN)))
+        return Ssh.execute(device, format("%s user_domain", INSIDER_BIN))
                 .map(new Result.Function<String, String>() {
                     @Override
                     public String apply(String input) throws Exception {
@@ -26,23 +26,21 @@ public class InsiderManager {
     }
 
     public static Result<String> acquireDomain(final Device device, String email, String pass, String domain) {
-        return Ssh.execute(device, asList(format("%s acquire_domain %s %s %s", INSIDER_BIN, email, pass, domain)));
+        return Ssh.execute(device, format("%s acquire_domain %s %s %s", INSIDER_BIN, email, pass, domain));
     }
 
     public static Result<String> setRedirectInfo(Device device, String domain, String apiUl) {
 
-        return Ssh.execute(
-                device,
-                asList(format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl)));
+        return Ssh.execute(device, format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl));
 
     }
 
     public static Result<String> dropDomain(Device device) {
-        return Ssh.execute(device, asList(format("%s drop_domain", INSIDER_BIN)));
+        return Ssh.execute(device, format("%s drop_domain", INSIDER_BIN));
     }
 
     public static Result<String> fullName(Device device) {
-        return Ssh.execute(device, asList(INSIDER_BIN + " full_name"))
+        return Ssh.execute(device, INSIDER_BIN + " full_name")
                 .map(new Result.Function<String, String>() {
                     @Override
                     public String apply(String input) throws Exception {

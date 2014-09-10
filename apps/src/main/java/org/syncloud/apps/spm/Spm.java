@@ -26,15 +26,15 @@ public class Spm {
     public enum Command {Install, Verify, Upgrade, Remove, Status}
 
     public static Result<String> run(Command command, Device device, String app) {
-        return Ssh.execute(device, asList(SPM_BIN + " " + command.name().toLowerCase() + " " + app));
+        return Ssh.execute(device, SPM_BIN + " " + command.name().toLowerCase() + " " + app);
     }
 
     private static Result<String> installSpm(Device device) {
-        return  Ssh.execute(device, asList(INSTALL_SPM));
+        return  Ssh.execute(device, INSTALL_SPM);
     }
 
     private static Result<String> spmInstalled(Device device) {
-        return Ssh.execute(device, asList("[ -d " + REPO_DIR + " ]"));
+        return Ssh.execute(device, "[ -d " + REPO_DIR + " ]");
     }
 
     public static Result<String> updateSpm(Device device) {
@@ -84,7 +84,7 @@ public class Spm {
 
     public static Result<List<App>> list(Device device) {
 
-        return Ssh.execute(device, asList(SPM_BIN + " list"))
+        return Ssh.execute(device, SPM_BIN + " list")
                 .flatMap(new Result.Function<String, Result<List<App>>>() {
                     @Override
                     public Result<List<App>> apply(String input) throws Exception {
