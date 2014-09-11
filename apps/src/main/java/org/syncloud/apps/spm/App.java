@@ -8,7 +8,7 @@ public class App {
 
     public String version;
     public String script;
-    public String installedVersion;
+    public String installed_version;
 
     @Override
     public String toString() {
@@ -16,7 +16,7 @@ public class App {
     }
 
     public Boolean installed() {
-        return installedVersion != null;
+        return installed_version != null;
     }
 
     public Type appType() {

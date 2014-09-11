@@ -56,7 +56,7 @@ public class DeviceAppsAdapter extends ArrayAdapter<App> {
         }
 
         if (app.installed()) {
-            if (!app.installedVersion.equals(app.version)) {
+            if (!app.installed_version.equals(app.version)) {
                 upgrade.setVisibility(View.VISIBLE);
             }
             remove.setVisibility(View.VISIBLE);

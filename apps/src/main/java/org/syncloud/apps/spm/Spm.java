@@ -65,7 +65,7 @@ public class Spm {
             if(!app.installed()) {
                 command = Command.Install;
             } else {
-                if (!app.version.equals(app.installedVersion))
+                if (!app.version.equals(app.installed_version))
                     command = Command.Upgrade;
                 else
                     continue;
