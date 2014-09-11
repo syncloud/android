@@ -21,7 +21,7 @@ public class Spm {
     public static final String REPO_DIR = "/opt/syncloud/repo";
     public static final String SPM_BIN = REPO_DIR + "/system/spm";
 
-    public enum Command {Install, Verify, Upgrade, Remove, Status}
+    public enum Command {Install, Verify, Upgrade, Remove}
 
     public static Result<String> run(Command command, Device device, String app) {
         return Ssh.execute(device, SPM_BIN + " " + command.name().toLowerCase() + " " + app);
