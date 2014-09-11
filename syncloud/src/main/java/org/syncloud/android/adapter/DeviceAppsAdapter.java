@@ -29,11 +29,11 @@ public class DeviceAppsAdapter extends ArrayAdapter<App> {
         View rowView = inflater.inflate(R.layout.layout_app, null);
         TextView textView = (TextView) rowView.findViewById(R.id.app_name);
         final App app = getItem(position);
-        textView.setText(app.getName() + " " + app.getVersion());
+        textView.setText(app.name + " " + app.version);
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.openApp(app.getId());
+                activity.openApp(app.id);
             }
         });
 
@@ -47,7 +47,7 @@ public class DeviceAppsAdapter extends ArrayAdapter<App> {
         ImageButton appTypeUser = (ImageButton) rowView.findViewById(R.id.app_icon_user);
         ImageButton appTypeUtil = (ImageButton) rowView.findViewById(R.id.app_icon_util);
 
-        if (app.getAppType() == App.Type.user) {
+        if (app.appType() == App.Type.user) {
             appTypeUser.setVisibility(View.VISIBLE);
             appTypeUtil.setVisibility(View.GONE);
         } else {
@@ -55,8 +55,8 @@ public class DeviceAppsAdapter extends ArrayAdapter<App> {
             appTypeUser.setVisibility(View.GONE);
         }
 
-        if (app.getInstalled()) {
-            if (!app.getInstalledVersion().equals(app.getVersion())) {
+        if (app.installed()) {
+            if (!app.installedVersion.equals(app.version)) {
                 upgrade.setVisibility(View.VISIBLE);
             }
             remove.setVisibility(View.VISIBLE);
@@ -66,17 +66,17 @@ public class DeviceAppsAdapter extends ArrayAdapter<App> {
 
         install.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Install, app.getId());
+            public void onClick(View view) {activity.run(Install, app.id);
             }
         });
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Remove, app.getId());
+            public void onClick(View view) {activity.run(Remove, app.id);
             }
         });
         upgrade.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Upgrade, app.getId());
+            public void onClick(View view) {activity.run(Upgrade, app.id);
             }
         });
 

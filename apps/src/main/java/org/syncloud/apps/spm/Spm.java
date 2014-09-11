@@ -13,8 +13,6 @@ import org.syncloud.common.model.Result;
 
 import java.util.List;
 
-import static java.util.Arrays.asList;
-
 public class Spm {
     public static final ObjectMapper JSON = new ObjectMapper();
 
@@ -64,17 +62,17 @@ public class Spm {
         for (App app : filter(list.getValue(), App.Type.admin)) {
 
             Command command;
-            if(!app.getInstalled()) {
+            if(!app.installed()) {
                 command = Command.Install;
             } else {
-                if (!app.getVersion().equals(app.getInstalledVersion()))
+                if (!app.version.equals(app.installedVersion))
                     command = Command.Upgrade;
                 else
                     continue;
             }
 
-            progress.apply("installing " + app.getName());
-            Result<String> install = run(command, device, app.getId());
+            progress.apply("installing " + app.name);
+            Result<String> install = run(command, device, app.id);
             if (install.hasError())
                 return Result.error(install.getError());
         }
@@ -100,7 +98,7 @@ public class Spm {
         return  Lists.newArrayList(Iterables.filter(apps, new Predicate<App>() {
             @Override
             public boolean apply(App input) {
-                return input.getAppType() != type;
+                return input.appType() != type;
             }
         }));
     }
@@ -109,7 +107,7 @@ public class Spm {
         return  Lists.newArrayList(Iterables.filter(apps, new Predicate<App>() {
             @Override
             public boolean apply(App input) {
-                return input.getAppType() == type;
+                return input.appType() == type;
             }
         }));
     }

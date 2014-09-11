@@ -137,7 +137,7 @@ public class DeviceAppsActivity extends Activity {
                                 public void run() {
                                     deviceAppsAdapter.clear();
                                     for (App app : appsResult.getValue()) {
-                                        if (showAdminApps || app.getAppType() == App.Type.user)
+                                        if (showAdminApps || app.appType() == App.Type.user)
                                             deviceAppsAdapter.add(app);
                                     }
                                 }
