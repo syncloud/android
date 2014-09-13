@@ -20,6 +20,7 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
+import org.syncloud.apps.spm.AppVersions;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.spm.Spm;
 import org.syncloud.apps.spm.App;
@@ -130,14 +131,14 @@ public class DeviceAppsActivity extends Activity {
                     @Override
                     public void run() {
                         progressUpdate("Refreshing app list");
-                        final Result<List<App>> appsResult = Spm.list(device);
+                        final Result<List<AppVersions>> appsResult = Spm.list(device);
                         if (!appsResult.hasError()) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     deviceAppsAdapter.clear();
-                                    for (App app : appsResult.getValue()) {
-                                        if (showAdminApps || app.appType() == App.Type.user)
+                                    for (AppVersions app : appsResult.getValue()) {
+                                        if (showAdminApps || app.app.appType() == App.Type.user)
                                             deviceAppsAdapter.add(app);
                                     }
                                 }

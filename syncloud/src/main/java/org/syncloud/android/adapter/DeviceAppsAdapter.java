@@ -10,10 +10,11 @@ import android.widget.TextView;
 import org.syncloud.android.R;
 import org.syncloud.android.activity.DeviceAppsActivity;
 import org.syncloud.apps.spm.App;
+import org.syncloud.apps.spm.AppVersions;
 
 import static org.syncloud.apps.spm.Spm.Command.*;
 
-public class DeviceAppsAdapter extends ArrayAdapter<App> {
+public class DeviceAppsAdapter extends ArrayAdapter<AppVersions> {
     private DeviceAppsActivity activity;
 
     public DeviceAppsAdapter(DeviceAppsActivity activity) {
@@ -28,12 +29,12 @@ public class DeviceAppsAdapter extends ArrayAdapter<App> {
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_app, null);
         TextView textView = (TextView) rowView.findViewById(R.id.app_name);
-        final App app = getItem(position);
-        textView.setText(app.name + " " + app.version);
+        final AppVersions appVersions = getItem(position);
+        textView.setText(appVersions.app.name + " " + appVersions.current_version);
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.openApp(app.id);
+                activity.openApp(appVersions.app.id);
             }
         });
 
@@ -47,7 +48,7 @@ public class DeviceAppsAdapter extends ArrayAdapter<App> {
         ImageButton appTypeUser = (ImageButton) rowView.findViewById(R.id.app_icon_user);
         ImageButton appTypeUtil = (ImageButton) rowView.findViewById(R.id.app_icon_util);
 
-        if (app.appType() == App.Type.user) {
+        if (appVersions.app.appType() == App.Type.user) {
             appTypeUser.setVisibility(View.VISIBLE);
             appTypeUtil.setVisibility(View.GONE);
         } else {
@@ -55,8 +56,8 @@ public class DeviceAppsAdapter extends ArrayAdapter<App> {
             appTypeUser.setVisibility(View.GONE);
         }
 
-        if (app.installed()) {
-            if (!app.installed_version.equals(app.version)) {
+        if (appVersions.installed()) {
+            if (!appVersions.installed_version.equals(appVersions.current_version)) {
                 upgrade.setVisibility(View.VISIBLE);
             }
             remove.setVisibility(View.VISIBLE);
@@ -66,17 +67,17 @@ public class DeviceAppsAdapter extends ArrayAdapter<App> {
 
         install.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Install, app.id);
+            public void onClick(View view) {activity.run(Install, appVersions.app.id);
             }
         });
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Remove, app.id);
+            public void onClick(View view) {activity.run(Remove, appVersions.app.id);
             }
         });
         upgrade.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Upgrade, app.id);
+            public void onClick(View view) {activity.run(Upgrade, appVersions.app.id);
             }
         });
 

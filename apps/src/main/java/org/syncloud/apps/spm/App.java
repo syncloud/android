@@ -6,19 +6,6 @@ public class App {
     public String name;
     public String type;
 
-    public String version;
-    public String script;
-    public String installed_version;
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    public Boolean installed() {
-        return installed_version != null;
-    }
-
     public Type appType() {
         try {
             return Type.valueOf(type);

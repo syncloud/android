@@ -55,24 +55,24 @@ public class Spm {
             return Result.error(result.getError());
 
         progress.apply("getting list of apps");
-        Result<List<App>> list = list(device);
+        Result<List<AppVersions>> list = list(device);
         if (list.hasError())
             return Result.error(list.getError());
 
-        for (App app : filter(list.getValue(), App.Type.admin)) {
+        for (AppVersions appVersions : filter(list.getValue(), App.Type.admin)) {
 
             Command command;
-            if(!app.installed()) {
+            if(!appVersions.installed()) {
                 command = Command.Install;
             } else {
-                if (!app.version.equals(app.installed_version))
+                if (!appVersions.current_version.equals(appVersions.installed_version))
                     command = Command.Upgrade;
                 else
                     continue;
             }
 
-            progress.apply("installing " + app.name);
-            Result<String> install = run(command, device, app.id);
+            progress.apply("installing " + appVersions.app.name);
+            Result<String> install = run(command, device, appVersions.app.id);
             if (install.hasError())
                 return Result.error(install.getError());
         }
@@ -80,13 +80,13 @@ public class Spm {
         return Result.value(true);
     }
 
-    public static Result<List<App>> list(Device device) {
+    public static Result<List<AppVersions>> list(Device device) {
 
         return Ssh.execute(device, SPM_BIN + " list")
-                .flatMap(new Result.Function<String, Result<List<App>>>() {
+                .flatMap(new Result.Function<String, Result<List<AppVersions>>>() {
                     @Override
-                    public Result<List<App>> apply(String input) throws Exception {
-                        List<App> apps = JSON.readValue(input, AppListReply.class).data;
+                    public Result<List<AppVersions>> apply(String input) throws Exception {
+                        List<AppVersions> apps = JSON.readValue(input, AppListReply.class).data;
                         apps = filterNot(apps, App.Type.system);
                         return Result.value(apps);
                     }
@@ -94,20 +94,20 @@ public class Spm {
 
     }
 
-    private static List<App> filterNot(List<App> apps, final App.Type type) {
-        return  Lists.newArrayList(Iterables.filter(apps, new Predicate<App>() {
+    private static List<AppVersions> filterNot(List<AppVersions> apps, final App.Type type) {
+        return  Lists.newArrayList(Iterables.filter(apps, new Predicate<AppVersions>() {
             @Override
-            public boolean apply(App input) {
-                return input.appType() != type;
+            public boolean apply(AppVersions input) {
+                return input.app.appType() != type;
             }
         }));
     }
 
-    private static List<App> filter(List<App> apps, final App.Type type) {
-        return  Lists.newArrayList(Iterables.filter(apps, new Predicate<App>() {
+    private static List<AppVersions> filter(List<AppVersions> apps, final App.Type type) {
+        return  Lists.newArrayList(Iterables.filter(apps, new Predicate<AppVersions>() {
             @Override
-            public boolean apply(App input) {
-                return input.appType() == type;
+            public boolean apply(AppVersions input) {
+                return input.app.appType() == type;
             }
         }));
     }
