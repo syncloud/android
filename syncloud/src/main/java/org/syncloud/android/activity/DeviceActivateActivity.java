@@ -163,13 +163,6 @@ public class DeviceActivateActivity extends Activity {
             @Override
             public void run() {
 
-                showProgress("Checking system tools");
-                Result<Boolean> systemTools = Spm.ensureAdminToolsInstalled(discoveredDevice, progressFunction);
-                if (systemTools.hasError()) {
-                    showError(systemTools.getError());
-                    return;
-                }
-
                 showProgress("Deactivating device");
                 final Result<String> redirectResult = InsiderManager.dropDomain(discoveredDevice);
                 if (redirectResult.hasError()) {

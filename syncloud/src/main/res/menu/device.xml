@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="org.syncloud.android.activity.DeviceAppsActivity" >
 
-    <item android:id="@+id/action_reinstall_spm"
+    <item android:id="@+id/action_update_apps"
         android:title="@string/update_spm"
         android:orderInCategory="100"
         app:showAsAction="never" />

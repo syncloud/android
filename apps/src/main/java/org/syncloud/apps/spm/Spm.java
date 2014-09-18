@@ -31,29 +31,11 @@ public class Spm {
         return  Ssh.execute(device, INSTALL_SPM);
     }
 
-    private static Result<String> spmInstalled(Device device) {
-        return Ssh.execute(device, "[ -d " + REPO_DIR + " ]");
-    }
-
     public static Result<String> updateSpm(Device device) {
         return installSpm(device);
     }
 
-    public static Result<String> ensureSpmInstalled(final Device device) {
-        Result<String> installed = spmInstalled(device);
-        if (installed.hasError()) {
-            return installSpm(device);
-        }
-        return installed;
-    }
-
     public static Result<Boolean> ensureAdminToolsInstalled(Device device, Function<String, String> progress) {
-
-        progress.apply("installing spm");
-        Result<String> result = ensureSpmInstalled(device);
-        if (result.hasError())
-            return Result.error(result.getError());
-
         progress.apply("getting list of apps");
         Result<List<AppVersions>> list = list(device);
         if (list.hasError())

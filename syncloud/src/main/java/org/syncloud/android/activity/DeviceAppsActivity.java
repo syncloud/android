@@ -105,13 +105,6 @@ public class DeviceAppsActivity extends Activity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        final Result<String> result = Spm.ensureSpmInstalled(device);
-                        if (result.hasError()) {
-                            String message = "Initial name setup may take up to 10 minutes, " +
-                                    "try in several minutes\n\n";
-                            progressError(message + result.getError());
-                            return;
-                        }
                         connected = true;
                         listApps();
                     }
@@ -193,7 +186,7 @@ public class DeviceAppsActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_reinstall_spm) {
+        if (id == R.id.action_update_apps) {
             updateSpm();
         } else if (id == R.id.action_show_admin_apps) {
             startProgress("Changing apps filter");
@@ -206,8 +199,7 @@ public class DeviceAppsActivity extends Activity {
 
     private void updateSpm() {
         startProgress("Updating app list");
-        execute(
-                new Runnable() {
+        execute(new Runnable() {
                     @Override
                     public void run() {
                         final Result<String> result = Spm.updateSpm(device);
