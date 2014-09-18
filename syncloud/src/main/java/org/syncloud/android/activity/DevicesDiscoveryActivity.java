@@ -16,7 +16,7 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.adapter.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.AsyncDiscovery;
-import org.syncloud.discovery.DeviceEndpointListener;
+//import org.syncloud.discovery.DeviceEndpointListener;
 import org.syncloud.ssh.model.DirectEndpoint;
 
 import java.util.concurrent.Executors;
@@ -42,7 +42,7 @@ public class DevicesDiscoveryActivity extends Activity {
         listAdapter = new DevicesDiscoveredAdapter(this);
         listview.setAdapter(listAdapter);
 
-        DeviceEndpointListener deviceEndpointListener = new DeviceEndpointListener() {
+        /*DeviceEndpointListener deviceEndpointListener = new DeviceEndpointListener() {
             @Override
             public void added(final DirectEndpoint endpoint) {
                 runOnUiThread(new Runnable() {
@@ -62,11 +62,11 @@ public class DevicesDiscoveryActivity extends Activity {
                     }
                 });
             }
-        };
+        };*/
 
-        asyncDiscovery = new AsyncDiscovery(
+        /*asyncDiscovery = new AsyncDiscovery(
                 (WifiManager) getSystemService(Context.WIFI_SERVICE),
-                deviceEndpointListener);
+                deviceEndpointListener);*/
 
         discoveryStart();
     }
@@ -75,7 +75,7 @@ public class DevicesDiscoveryActivity extends Activity {
         listAdapter.clear();
         refreshBtn.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
-        asyncDiscovery.start();
+//        asyncDiscovery.start();
         scheduler.schedule(new Runnable() {
             @Override
             public void run() {
@@ -90,7 +90,7 @@ public class DevicesDiscoveryActivity extends Activity {
     }
 
     private void discoveryStop() {
-        asyncDiscovery.stop();
+//        asyncDiscovery.stop();
         progressBar.setVisibility(View.GONE);
         refreshBtn.setVisibility(View.VISIBLE);
     }
@@ -127,7 +127,7 @@ public class DevicesDiscoveryActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        asyncDiscovery.stop();
+//        asyncDiscovery.stop();
     }
 
     public void refresh(View view) {

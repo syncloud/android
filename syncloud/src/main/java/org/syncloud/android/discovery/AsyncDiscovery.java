@@ -3,12 +3,12 @@ package org.syncloud.android.discovery;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
-import org.syncloud.discovery.DeviceEndpointListener;
-import org.syncloud.discovery.Discovery;
+//import org.syncloud.discovery.DeviceEndpointListener;
+//import org.syncloud.discovery.Discovery;
 
 public class AsyncDiscovery {
 
-    private WifiManager wifi;
+    /*private WifiManager wifi;
     private WifiManager.MulticastLock lock;
     public final static String MULTICAST_LOCK_TAG = AsyncDiscovery.class.toString();
     private Discovery discovery;
@@ -52,6 +52,6 @@ public class AsyncDiscovery {
                 }
             }
         });
-    }
+    }*/
 
 }

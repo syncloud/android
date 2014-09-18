@@ -79,7 +79,7 @@ android {
 }
 
 dependencies {
-    compile project(':discovery')
+//    compile project(':discovery')
     compile project(':apps')
     compile project(':redirect')
     compile fileTree(dir: 'libs', include: ['*.jar'])
