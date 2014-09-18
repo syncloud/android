@@ -13,6 +13,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.syncloud.redirect.model.RestMessage;
 import org.syncloud.common.model.Result;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,10 @@ public class UserService {
         }
     }
 
+    public static Result<String> createUser(String email, String password, String apiUrl1) {
+        return createUser(email, password, null, apiUrl1);
+    }
+
     public static Result<String> createUser(String email, String password, String domain, String apiUrl1) {
 
         CloseableHttpClient http = HttpClients.createDefault();
@@ -50,12 +55,14 @@ public class UserService {
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("email", email));
         nvps.add(new BasicNameValuePair("password", password));
-        nvps.add(new BasicNameValuePair("user_domain", domain));
+        if (domain != null)
+            nvps.add(new BasicNameValuePair("user_domain", domain));
         try {
             post.setEntity(new UrlEncodedFormEntity(nvps));
             CloseableHttpResponse response = http.execute(post);
             ObjectMapper mapper = new ObjectMapper();
-            RestMessage reply = mapper.readValue(response.getEntity().getContent(), RestMessage.class);
+            InputStream jsonResponse = response.getEntity().getContent();
+            RestMessage reply = mapper.readValue(jsonResponse, RestMessage.class);
             int statusCode = response.getStatusLine().getStatusCode();
             response.close();
             if (statusCode == 200) {

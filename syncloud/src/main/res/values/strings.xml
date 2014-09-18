@@ -42,5 +42,9 @@
     <string name="device_activation_email"/>
     <string name="device_activation_password"/>
     <string name="device_activation_domain"/>
+    <string name="auth_learn_more">Build your own server. <a href="http://syncloud.org">Learn more!</a></string>
+    <string name="sign_in_exclamation"><u>Sign in!</u></string>
+    <string name="check_credentials">Check credentials</string>
+    <string name="sign_in_failed">Sign in with these credentials failed. Please check and correct credentials.</string>
 
 </resources>

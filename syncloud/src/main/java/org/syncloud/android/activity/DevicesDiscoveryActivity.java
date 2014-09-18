@@ -76,6 +76,8 @@ public class DevicesDiscoveryActivity extends Activity {
         refreshBtn.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         asyncDiscovery.start();
+//        use for testing without wi-fi
+//        listAdapter.add(new DirectEndpoint("localhost", 22, "vsapronov", "somepassword", null));
         scheduler.schedule(new Runnable() {
             @Override
             public void run() {

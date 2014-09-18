@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,7 +20,6 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.insider.InsiderManager;
-import org.syncloud.redirect.UserService;
 import org.syncloud.apps.remote.RemoteAccessManager;
 import org.syncloud.apps.spm.Spm;
 import org.syncloud.ssh.model.Device;
@@ -32,23 +30,26 @@ public class DeviceActivateActivity extends Activity {
 
     private Function<String, String> progressFunction;
     private DirectEndpoint endpoint;
+    private boolean dnsReady = false;
+    private Preferences preferences;
+    private Device discoveredDevice;
+
     private ProgressDialog progress;
     private TextView url;
-    private boolean dnsReady = false;
-    private LinearLayout dnsControl;
-    private Preferences preferences;
+    private LinearLayout domainSettings;
     private Button deactivateButton;
-    private Device discoveredDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_activate);
 
+        endpoint = (DirectEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
+        discoveredDevice = new Device(null, null, null, endpoint);
+
         preferences = ((SyncloudApplication) getApplication()).getPreferences();
 
         progress = new ProgressDialog(this);
-//        progress.setF
         progressFunction = new Function<String, String>() {
             @Override
             public String apply(String input) {
@@ -57,20 +58,18 @@ public class DeviceActivateActivity extends Activity {
             }
 
         };
+
         url = (TextView) findViewById(R.id.device_url);
         deactivateButton = (Button) findViewById(R.id.name_deactivate);
-        deactivateButton.setVisibility(View.GONE);
+        domainSettings = (LinearLayout) findViewById(R.id.domain_settings);
 
-        dnsControl = (LinearLayout) findViewById(R.id.dns_control);
-        endpoint = (DirectEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
-        discoveredDevice = new Device(null, null, null, endpoint);
         status();
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+//        Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.dns, menu);
         return true;
     }
@@ -131,7 +130,7 @@ public class DeviceActivateActivity extends Activity {
                         public void run() {
                             dnsReady = false;
                             progress.hide();
-                            dnsControl.setVisibility(View.VISIBLE);
+                            domainSettings.setVisibility(View.VISIBLE);
                             deactivateButton.setVisibility(View.GONE);
                         }
                     });
@@ -140,7 +139,7 @@ public class DeviceActivateActivity extends Activity {
                         @Override
                         public void run() {
                             dnsReady = true;
-                            dnsControl.setVisibility(View.GONE);
+                            domainSettings.setVisibility(View.GONE);
                             deactivateButton.setVisibility(View.VISIBLE);
                             url.setText(fullName.getValue());
                             progress.hide();
@@ -210,27 +209,14 @@ public class DeviceActivateActivity extends Activity {
 
                 if (!dnsReady) {
 
-                    EditText emailText = (EditText) findViewById(R.id.name_email);
-                    EditText passText = (EditText) findViewById(R.id.name_pass);
                     EditText userDomainText = (EditText) findViewById(R.id.user_domain);
-                    CheckBox existingUserCheck = (CheckBox) findViewById(R.id.existing_user_check);
 
-                    final String email = emailText.getText().toString();
-                    final String pass = passText.getText().toString();
+                    final String email = preferences.getEmail();
+                    final String pass = preferences.getPassword();
                     final String domain = userDomainText.getText().toString();
 
                     TextView status = (TextView) findViewById(R.id.dns_status);
                     boolean valid = true;
-
-                    if (email.matches("")) {
-                        status.setText("enter email");
-                        valid = false;
-                    }
-
-                    if (pass.matches("")) {
-                        status.setText("enter password");
-                        valid = false;
-                    }
 
                     if (domain.matches("")) {
                         status.setText("enter domain");
@@ -243,20 +229,10 @@ public class DeviceActivateActivity extends Activity {
                     }
 
                     showProgress("Setting redirect info");
-
                     final Result<String> redirectResult = InsiderManager.setRedirectInfo(discoveredDevice, preferences.getDomain(), preferences.getApiUrl());
                     if (redirectResult.hasError()) {
                         showError(redirectResult.getError());
                         return;
-                    }
-
-                    showProgress("Activating public name");
-                    if (!existingUserCheck.isChecked()) {
-                        Result<Boolean> user = UserService.getOrCreate(email, pass, domain, preferences.getApiUrl());
-                        if (user.hasError()) {
-                            showError(user.getError());
-                            return;
-                        }
                     }
 
                     showProgress("Acquiring domain");
