@@ -1,4 +1,4 @@
-package org.syncloud.android.activity.app;
+package org.syncloud.android.ui.apps;
 
 import android.app.Activity;
 import android.app.ProgressDialog;

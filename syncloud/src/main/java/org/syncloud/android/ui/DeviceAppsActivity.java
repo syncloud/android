@@ -1,4 +1,4 @@
-package org.syncloud.android.activity;
+package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -18,7 +18,7 @@ import android.widget.TextView;
 import org.apache.commons.lang3.StringUtils;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.adapter.DeviceAppsAdapter;
+import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
 import org.syncloud.apps.spm.AppVersions;
 import org.syncloud.common.model.Result;

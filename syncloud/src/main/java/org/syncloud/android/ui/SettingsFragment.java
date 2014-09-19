@@ -1,4 +1,4 @@
-package org.syncloud.android.fragment;
+package org.syncloud.android.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,7 +8,6 @@ import android.preference.PreferenceFragment;
 
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
-import org.syncloud.android.activity.AuthActivity;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 

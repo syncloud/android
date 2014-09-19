@@ -1,9 +1,7 @@
-package org.syncloud.android.activity;
+package org.syncloud.android.ui;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-
-import org.syncloud.android.fragment.SettingsFragment;
 
 public class SettingsActivity extends PreferenceActivity {
 

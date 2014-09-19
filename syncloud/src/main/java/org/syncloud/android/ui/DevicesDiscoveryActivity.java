@@ -1,4 +1,4 @@
-package org.syncloud.android.activity;
+package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,7 +14,7 @@ import android.widget.ProgressBar;
 
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.adapter.DevicesDiscoveredAdapter;
+import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.AsyncDiscovery;
 import org.syncloud.discovery.DeviceEndpointListener;
 import org.syncloud.ssh.model.DirectEndpoint;

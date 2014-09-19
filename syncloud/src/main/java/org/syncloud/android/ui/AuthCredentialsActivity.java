@@ -1,4 +1,4 @@
-package org.syncloud.android.activity;
+package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;

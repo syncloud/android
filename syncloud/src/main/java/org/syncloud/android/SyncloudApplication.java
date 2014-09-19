@@ -3,8 +3,8 @@ package org.syncloud.android;
 import android.app.Application;
 import android.preference.PreferenceManager;
 
-import org.syncloud.android.activity.DeviceActivateActivity;
-import org.syncloud.android.activity.app.Owncloud;
+import org.syncloud.android.ui.DeviceActivateActivity;
+import org.syncloud.android.ui.apps.Owncloud;
 import org.syncloud.android.db.Db;
 
 import java.util.HashMap;

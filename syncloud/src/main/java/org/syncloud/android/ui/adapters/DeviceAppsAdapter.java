@@ -1,4 +1,4 @@
-package org.syncloud.android.adapter;
+package org.syncloud.android.ui.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +8,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.syncloud.android.R;
-import org.syncloud.android.activity.DeviceAppsActivity;
+import org.syncloud.android.ui.DeviceAppsActivity;
 import org.syncloud.apps.spm.App;
 import org.syncloud.apps.spm.AppVersions;
 

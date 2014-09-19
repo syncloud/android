@@ -1,4 +1,4 @@
-package org.syncloud.android.adapter;
+package org.syncloud.android.ui.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +11,7 @@ import android.widget.TextView;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.activity.DevicesSavedActivity;
+import org.syncloud.android.ui.DevicesSavedActivity;
 import org.syncloud.android.db.Db;
 import org.syncloud.ssh.model.Device;
 

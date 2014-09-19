@@ -1,4 +1,4 @@
-package org.syncloud.android.activity;
+package org.syncloud.android.ui;
 
 import android.content.Context;
 import android.preference.DialogPreference;
