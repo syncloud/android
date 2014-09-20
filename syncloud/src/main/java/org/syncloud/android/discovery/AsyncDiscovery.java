@@ -28,7 +28,7 @@ public class AsyncDiscovery {
             @Override
             public void run() {
                 try {
-                    events.add(new Event("lock"));
+                    events.add(new Event("locked"));
                     lock = wifi.createMulticastLock(MULTICAST_LOCK_TAG);
                     lock.setReferenceCounted(false);
                     lock.acquire();
@@ -50,13 +50,15 @@ public class AsyncDiscovery {
             public void run() {
                 try {
                     discovery.stop();
+                    events.add(new Event("stopped"));
                 } catch (Exception e) {
                     e.printStackTrace();
                     events.add(new Event("stop error"));
                 } finally {
                     if (lock != null) {
                         lock.release();
-                        events.add(new Event("release"));
+                        events.add(new Event("released"));
+                        events.add(new Event(lock.isHeld() ? "held" : "not held"));
                     }
                     lock = null;
                 }
