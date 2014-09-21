@@ -67,7 +67,7 @@ public class DevicesDiscoveryActivity extends Activity {
         asyncDiscovery = new AsyncDiscovery(
                 (WifiManager) getSystemService(Context.WIFI_SERVICE),
                 deviceEndpointListener,
-                ((SyncloudApplication) getApplication()).discoveryEvents);
+                ((SyncloudApplication) getApplication()).eventbus);
 
         discoveryStart();
     }

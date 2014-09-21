@@ -3,11 +3,11 @@ package org.syncloud.android.discovery;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+
+import com.google.common.eventbus.EventBus;
+
 import org.syncloud.discovery.DeviceEndpointListener;
 import org.syncloud.discovery.Discovery;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AsyncDiscovery {
 
@@ -15,11 +15,11 @@ public class AsyncDiscovery {
     private WifiManager.MulticastLock lock;
     public final static String MULTICAST_LOCK_TAG = AsyncDiscovery.class.toString();
     private Discovery discovery;
-    public List<Event> events;
+    public EventBus eventBus;
 
-    public AsyncDiscovery(WifiManager wifi, DeviceEndpointListener deviceEndpointListener, List<Event> events) {
+    public AsyncDiscovery(WifiManager wifi, DeviceEndpointListener deviceEndpointListener, EventBus eventBus) {
         this.wifi = wifi;
-        this.events = events;
+        this.eventBus = eventBus;
         discovery = new Discovery(deviceEndpointListener, "syncloud");
     }
 
@@ -28,16 +28,16 @@ public class AsyncDiscovery {
             @Override
             public void run() {
                 try {
-                    events.add(new Event("locked"));
+                    eventBus.post(new Event("locked"));
                     lock = wifi.createMulticastLock(MULTICAST_LOCK_TAG);
                     lock.setReferenceCounted(false);
                     lock.acquire();
                     WifiInfo connInfo = wifi.getConnectionInfo();
                     discovery.start(connInfo.getIpAddress());
-                    events.add(new Event("started"));
+                    eventBus.post(new Event("started"));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    events.add(new Event("start error"));
+                    eventBus.post(new Event("start error"));
                 }
 
             }
@@ -50,15 +50,15 @@ public class AsyncDiscovery {
             public void run() {
                 try {
                     discovery.stop();
-                    events.add(new Event("stopped"));
+                    eventBus.post(new Event("stopped"));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    events.add(new Event("stop error"));
+                    eventBus.post(new Event("stop error"));
                 } finally {
                     if (lock != null) {
                         lock.release();
-                        events.add(new Event("released"));
-                        events.add(new Event(lock.isHeld() ? "held" : "not held"));
+                        eventBus.post(new Event("released"));
+                        eventBus.post(new Event(lock.isHeld() ? "held" : "not held"));
                     }
                     lock = null;
                 }
