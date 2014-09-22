@@ -66,7 +66,8 @@ public class DevicesDiscoveryActivity extends Activity {
 
         asyncDiscovery = new AsyncDiscovery(
                 (WifiManager) getSystemService(Context.WIFI_SERVICE),
-                deviceEndpointListener);
+                deviceEndpointListener,
+                ((SyncloudApplication) getApplication()).eventbus);
 
         discoveryStart();
     }
@@ -100,7 +101,7 @@ public class DevicesDiscoveryActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.discovery, menu);
+        getMenuInflater().inflate(R.menu.discovery, menu);
         return true;
     }
 
@@ -110,8 +111,10 @@ public class DevicesDiscoveryActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_discovery_audit) {
+            Intent intent = new Intent(this, DevicesDiscoveryAuditActivity.class);
+            startActivity(intent);
+
         }
         return super.onOptionsItemSelected(item);
     }
