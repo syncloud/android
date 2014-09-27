@@ -20,15 +20,16 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
-import org.syncloud.apps.spm.AppVersions;
+import org.syncloud.apps.sam.AppVersions;
+import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
-import org.syncloud.apps.spm.Spm;
-import org.syncloud.apps.spm.App;
+import org.syncloud.apps.sam.App;
 import org.syncloud.ssh.model.Device;
 
 import java.util.List;
 
 import static android.os.AsyncTask.execute;
+import static java.util.Arrays.asList;
 import static org.syncloud.android.SyncloudApplication.appRegistry;
 
 public class DeviceAppsActivity extends Activity {
@@ -124,7 +125,7 @@ public class DeviceAppsActivity extends Activity {
                     @Override
                     public void run() {
                         progressUpdate("Refreshing app list");
-                        final Result<List<AppVersions>> appsResult = Spm.list(device);
+                        final Result<List<AppVersions>> appsResult = Sam.list(device);
                         if (!appsResult.hasError()) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -202,7 +203,7 @@ public class DeviceAppsActivity extends Activity {
         execute(new Runnable() {
                     @Override
                     public void run() {
-                        final Result<String> result = Spm.updateSpm(device);
+                        final Result<String> result = Sam.updateSpm(device);
                         if (result.hasError()) {
                             progressError(result.getError());
                             return;
@@ -214,12 +215,12 @@ public class DeviceAppsActivity extends Activity {
         );
     }
 
-    public void run(final Spm.Command action, final String app) {
-        startProgress("Running " + action.name().toLowerCase() + " for " + app);
+    public void run(final String action, final String app) {
+        startProgress("Running " + action + " for " + app);
         execute(new Runnable() {
             @Override
             public void run() {
-                final Result<String> result = Spm.run(action, device, app);
+                final Result<String> result = Sam.run(device, asList(action, app));
                 if (result.hasError()) {
                     progressError(result.getError());
                     return;

@@ -1,4 +1,4 @@
-package org.syncloud.apps.spm;
+package org.syncloud.apps.sam;
 
 public class AppVersions {
     public App app;

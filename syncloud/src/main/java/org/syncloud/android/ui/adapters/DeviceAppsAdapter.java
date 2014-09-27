@@ -9,10 +9,9 @@ import android.widget.TextView;
 
 import org.syncloud.android.R;
 import org.syncloud.android.ui.DeviceAppsActivity;
-import org.syncloud.apps.spm.App;
-import org.syncloud.apps.spm.AppVersions;
-
-import static org.syncloud.apps.spm.Spm.Command.*;
+import org.syncloud.apps.sam.App;
+import org.syncloud.apps.sam.AppVersions;
+import org.syncloud.apps.sam.Commands;
 
 public class DeviceAppsAdapter extends ArrayAdapter<AppVersions> {
     private DeviceAppsActivity activity;
@@ -67,17 +66,17 @@ public class DeviceAppsAdapter extends ArrayAdapter<AppVersions> {
 
         install.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Install, appVersions.app.id);
+            public void onClick(View view) {activity.run(Commands.Install, appVersions.app.id);
             }
         });
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Remove, appVersions.app.id);
+            public void onClick(View view) {activity.run(Commands.Remove, appVersions.app.id);
             }
         });
         upgrade.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Upgrade, appVersions.app.id);
+            public void onClick(View view) {activity.run(Commands.Upgrade, appVersions.app.id);
             }
         });
 

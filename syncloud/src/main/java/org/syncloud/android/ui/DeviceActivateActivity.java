@@ -18,10 +18,10 @@ import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
+import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.remote.RemoteAccessManager;
-import org.syncloud.apps.spm.Spm;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.DirectEndpoint;
 
@@ -194,7 +194,7 @@ public class DeviceActivateActivity extends Activity {
 
                 showProgress("Checking system tools");
 
-                Result<Boolean> systemTools = Spm.ensureAdminToolsInstalled(discoveredDevice, progressFunction);
+                Result<Boolean> systemTools = Sam.ensureAdminToolsInstalled(discoveredDevice, progressFunction);
                 if (systemTools.hasError()) {
                     showError(systemTools.getError());
                     return;

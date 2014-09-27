@@ -1,4 +1,4 @@
-package org.syncloud.apps.spm;
+package org.syncloud.apps.sam;
 
 import java.util.List;
 
