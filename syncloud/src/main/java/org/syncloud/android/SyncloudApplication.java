@@ -1,6 +1,7 @@
 package org.syncloud.android;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import org.syncloud.android.ui.DeviceActivateActivity;
@@ -27,7 +28,9 @@ public class SyncloudApplication extends Application {
     public void onCreate() {
         super.onCreate();
         db = new Db(getApplicationContext());
-        preferences = new Preferences(PreferenceManager.getDefaultSharedPreferences(this));
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        preferences = new Preferences(sharedPreferences);
     }
 
     public Db getDb() {
