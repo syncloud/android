@@ -18,18 +18,46 @@ import static java.util.Arrays.asList;
 
 public class Sam {
     public static final ObjectMapper JSON = new ObjectMapper();
+    private static final String SAM_BOOTSTRAP_COMMAND =
+            "wget -qO- https://raw.githubusercontent.com/syncloud/apps/0.7/sam | bash -s install";
+    private static final String SAM_EXIST_COMMAND = "type sam";
 
     public static Result<String> run(Device device, List<String> arguments) {
+        Result<String> installResult = ensureSamInstalled(device);
+        if (installResult .hasError())
+            return installResult;
+
         String command = StringUtils.join(arguments, " ");
         command = "sam" + " " + command;
         return Ssh.execute(device, command);
     }
 
+    private static Result<String> ensureSamInstalled(Device device) {
+        Result<String> exists = Ssh.execute(device, SAM_EXIST_COMMAND);
+        if (exists.hasError())
+            return Ssh.execute(device, SAM_BOOTSTRAP_COMMAND);
+        return exists;
+    }
+
     public static Result<String> updateSpm(Device device) {
+        Result<String> installResult = ensureSamInstalled(device);
+        if (installResult .hasError())
+            return installResult;
+
         return run(device, asList(Commands.Install, "sam"));
     }
 
     public static Result<Boolean> ensureAdminToolsInstalled(Device device, Function<String, String> progress) {
+
+        Result<String> installResult = ensureSamInstalled(device);
+        if (installResult .hasError())
+            return installResult.map(new Result.Function<String, Boolean>() {
+                @Override
+                public Boolean apply(String input) throws Exception {
+                    return true;
+                }
+            });
+
         progress.apply("getting list of apps");
         Result<List<AppVersions>> list = list(device);
         if (list.hasError())
