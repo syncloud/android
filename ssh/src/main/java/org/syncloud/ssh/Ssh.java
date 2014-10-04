@@ -29,24 +29,35 @@ public class Ssh {
     }
 
     public static Result<String> execute(Device device, List<String> commands) {
+
+        String error = "";
+
         try {
-            return run(device, commands);
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
+            return run(device.getLocalEndpoint(), commands);
+        } catch (Exception localException) {
+            error += localException.getMessage();
         }
+
+        EndpointResolver resolver = new EndpointResolver(new Dns());
+        Result<DirectEndpoint> remote = resolver.dnsService(device.getUserDomain(), SSH_TYPE, device.getLocalEndpoint().getKey());
+        if (remote.hasError())
+            return Result.error(remote.getError());
+
+        try {
+            return run(remote.getValue(), commands);
+        } catch (Exception remoteException) {
+            error += remoteException.getMessage();
+        }
+
+        return Result.error(error);
     }
 
-    private static Result<String> run(Device device, List<String> commands) throws JSchException, IOException {
+    private static Result<String> run(DirectEndpoint endpoint, List<String> commands) throws JSchException, IOException {
 
         JSch jsch = new JSch();
 
-        EndpointResolver resolver = new EndpointResolver(new Dns(), new EndpointVisibility());
-        Result<DirectEndpoint> reachableEndpoint = resolver.findDirectEndpoint(device, SSH_TYPE);
-        if (reachableEndpoint.hasError())
-            return Result.error(reachableEndpoint.getError());
-
-        DirectEndpoint endpoint = reachableEndpoint.getValue();
         Session session = jsch.getSession(endpoint.getLogin(), endpoint.getHost(), endpoint.getPort());
+        session.setTimeout(3000);
         if (endpoint.getKey() == null) {
             session.setPassword(endpoint.getPassword());
         } else {

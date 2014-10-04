@@ -71,7 +71,16 @@ public class DeviceAppsActivity extends Activity {
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
 
-        checkSystem();
+        startProgress("Connecting to the device");
+        execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        listApps();
+                    }
+                }
+
+        );
+
     }
 
     private void showNameChange() {
@@ -99,20 +108,6 @@ public class DeviceAppsActivity extends Activity {
         }).show();
     }
 
-    private void checkSystem() {
-        String message = "Checking system";
-        startProgress(message);
-        execute(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        connected = true;
-                        listApps();
-                    }
-                }
-        );
-    }
-
     private void startProgress(String message) {
         progress.setMessage(message);
         progress.setCancelable(false);
@@ -120,8 +115,7 @@ public class DeviceAppsActivity extends Activity {
     }
 
     private void listApps() {
-        execute(
-                new Runnable() {
+        execute( new Runnable() {
                     @Override
                     public void run() {
                         progressUpdate("Refreshing app list");
@@ -138,6 +132,7 @@ public class DeviceAppsActivity extends Activity {
                                 }
                             });
                             progressDone();
+                            connected = true;
                         } else {
                             progressError(appsResult.getError());
                         }
