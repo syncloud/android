@@ -1,7 +1,6 @@
 package org.syncloud.android.ui;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,6 +17,7 @@ import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
+import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.insider.InsiderManager;
@@ -35,7 +35,7 @@ public class DeviceActivateActivity extends Activity {
     private Preferences preferences;
     private Device discoveredDevice;
 
-    private ProgressDialog progress;
+    private CommunicationDialog progress;
     private TextView url;
     private LinearLayout domainSettings;
     private Button deactivateButton;
@@ -51,7 +51,7 @@ public class DeviceActivateActivity extends Activity {
 
         preferences = ((SyncloudApplication) getApplication()).getPreferences();
 
-        progress = new ProgressDialog(this);
+        progress = new CommunicationDialog(this);
         progressFunction = new Function<String, String>() {
             @Override
             public String apply(String input) {
@@ -101,18 +101,14 @@ public class DeviceActivateActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                progress.setMessage(message);
-                progress.setCancelable(true);
+                progress.setError(message);
             }
         });
     }
 
     private void status() {
 
-        progress.setTitle("Checking device status ...");
-        progress.setMessage("");
-        progress.setCancelable(false);
-        progress.show();
+        progress.show("Checking device status ...");
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -156,10 +152,7 @@ public class DeviceActivateActivity extends Activity {
 
     public void deactivate(View view) {
 
-        progress.setTitle("Connecting to the device");
-        progress.setMessage("");
-        progress.setCancelable(false);
-        progress.show();
+        progress.show("Connecting to the device");
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -185,10 +178,7 @@ public class DeviceActivateActivity extends Activity {
 
     public void activate(View view) {
 
-        progress.setTitle("Connecting to the device");
-        progress.setMessage("");
-        progress.setCancelable(false);
-        progress.show();
+        progress.show("Connecting to the device");
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -260,6 +250,12 @@ public class DeviceActivateActivity extends Activity {
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progress.dismiss();
     }
 
 }

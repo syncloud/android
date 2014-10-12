@@ -2,7 +2,6 @@ package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,11 +14,11 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.apache.commons.lang3.StringUtils;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
+import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Command;
 import org.syncloud.apps.sam.Sam;
@@ -35,7 +34,6 @@ import static org.syncloud.android.SyncloudApplication.appRegistry;
 
 public class DeviceAppsActivity extends Activity {
 
-    private ProgressDialog progress;
     private DeviceAppsAdapter deviceAppsAdapter;
     private Device device;
     private Db db;
@@ -43,13 +41,14 @@ public class DeviceAppsActivity extends Activity {
     private boolean connected = false;
     private boolean showAdminApps = false;
     private Sam sam;
+    private CommunicationDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_apps);
 
-        progress = new ProgressDialog(this);
+        progress = new CommunicationDialog(this);
         progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
@@ -73,7 +72,7 @@ public class DeviceAppsActivity extends Activity {
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
         sam = new Sam(new Ssh());
-        startProgress("Connecting to the device");
+        progress.show("Connecting to the device");
         execute(new Runnable() {
                     @Override
                     public void run() {
@@ -108,12 +107,6 @@ public class DeviceAppsActivity extends Activity {
             public void onClick(DialogInterface dialog, int whichButton) {
             }
         }).show();
-    }
-
-    private void startProgress(String message) {
-        progress.setMessage(message);
-        progress.setCancelable(false);
-        progress.show();
     }
 
     private void listApps() {
@@ -165,8 +158,7 @@ public class DeviceAppsActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                progress.setMessage(StringUtils.right(message, 500));
-                progress.setCancelable(true);
+                progress.setError(message);
             }
         });
     }
@@ -187,7 +179,7 @@ public class DeviceAppsActivity extends Activity {
         if (id == R.id.action_update_apps) {
             updateSpm();
         } else if (id == R.id.action_show_admin_apps) {
-            startProgress("Changing apps filter");
+            progress.show("Changing apps filter");
             item.setChecked(!item.isChecked());
             showAdminApps = item.isChecked();
             listApps();
@@ -196,7 +188,7 @@ public class DeviceAppsActivity extends Activity {
     }
 
     private void updateSpm() {
-        startProgress("Updating app list");
+        progress.show("Updating app list");
         execute(new Runnable() {
                     @Override
                     public void run() {
@@ -213,7 +205,7 @@ public class DeviceAppsActivity extends Activity {
     }
 
     public void run(final Command command, final String app) {
-        startProgress("Running " + command + " for " + app);
+        progress.show("Running " + command + " for " + app);
         execute(new Runnable() {
             @Override
             public void run() {
@@ -235,6 +227,12 @@ public class DeviceAppsActivity extends Activity {
             intent.putExtra(SyncloudApplication.DEVICE, device);
             startActivity(intent);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progress.dismiss();
     }
 
 

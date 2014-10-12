@@ -1,7 +1,6 @@
 package org.syncloud.android.ui.apps;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
@@ -18,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.owncloud.OwncloudManager;
 import org.syncloud.ssh.model.Device;
@@ -27,7 +27,7 @@ public class Owncloud extends Activity {
 
     public static final String COM_OWNCLOUD_ANDROID = "com.owncloud.android";
     private Device device;
-    private ProgressDialog progress;
+    private CommunicationDialog progress;
     private TextView url;
     private LinearLayout loginRow;
     private LinearLayout passRow;
@@ -42,7 +42,7 @@ public class Owncloud extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_owncloud);
 
-        progress = new ProgressDialog(this);
+        progress = new CommunicationDialog(this);
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
         activatedControls = (LinearLayout) findViewById(R.id.owncloud_activated_controls);
@@ -57,9 +57,7 @@ public class Owncloud extends Activity {
 
         setVisibility(View.GONE, View.GONE);
 
-        progress.setTitle("Checking ownCloud status ...");
-        progress.setCancelable(false);
-        progress.show();
+        progress.show("Checking ownCloud status ...");
 
         status();
     }
@@ -94,8 +92,7 @@ public class Owncloud extends Activity {
         final String pass = passText.getText().toString();
 
 
-        progress.setTitle("Activating ...");
-        progress.show();
+        progress.show("Activating ...");
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -121,8 +118,7 @@ public class Owncloud extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                progress.setMessage(error);
-                progress.setCancelable(true);
+                progress.setError(error);
             }
         });
     }
@@ -210,5 +206,11 @@ public class Owncloud extends Activity {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("url", url.getText());
         clipboard.setPrimaryClip(clip);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progress.dismiss();
     }
 }

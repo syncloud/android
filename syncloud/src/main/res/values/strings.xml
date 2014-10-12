@@ -46,5 +46,6 @@
     <string name="sign_in_exclamation"><u>Sign in!</u></string>
     <string name="check_credentials">Check credentials</string>
     <string name="sign_in_failed">Sign in with these credentials failed. Please check and correct credentials.</string>
+    <string name="btn_report_error">Send error report</string>
 
 </resources>
