@@ -31,7 +31,6 @@ import org.syncloud.ssh.model.Device;
 import java.util.List;
 
 import static android.os.AsyncTask.execute;
-import static java.util.Arrays.asList;
 import static org.syncloud.android.SyncloudApplication.appRegistry;
 
 public class DeviceAppsActivity extends Activity {
@@ -201,7 +200,7 @@ public class DeviceAppsActivity extends Activity {
         execute(new Runnable() {
                     @Override
                     public void run() {
-                        final Result<String> result = sam.updateSpm(device);
+                        final Result<String> result = sam.update(device);
                         if (result.hasError()) {
                             progressError(result.getError());
                             return;
