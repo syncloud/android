@@ -24,11 +24,16 @@ public class Ssh {
     public static final int SSH_SERVER_PORT = 22;
     public static final String SSH_TYPE = "_ssh._tcp";
 
-    public static Result<String> execute(Device device, String command) {
+    public Result<String> execute(Device device, String command) {
         return execute(device, asList(command));
     }
 
-    public static Result<String> execute(Device device, List<String> commands) {
+    //TODO: replace with instance method
+    public static Result<String> staticExecute(Device device, String command) {
+        return execute(device, asList(command));
+    }
+
+    private static Result<String> execute(Device device, List<String> commands) {
 
         String error = "";
 

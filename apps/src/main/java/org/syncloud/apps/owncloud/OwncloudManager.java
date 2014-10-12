@@ -13,12 +13,12 @@ public class OwncloudManager {
     public static final ObjectMapper JSON = new ObjectMapper();
 
     public static Result<String> finishSetup(Device device, String login, String password) {
-        return Ssh.execute(device, String.format("%s finish %s %s", OWNCLOUD_CTL_BIN, login, password));
+        return Ssh.staticExecute(device, String.format("%s finish %s %s", OWNCLOUD_CTL_BIN, login, password));
     }
 
     public static Result<String> owncloudUrl(Device device) {
 
-        Result<String> execute = Ssh.execute(device, String.format("%s url", OWNCLOUD_CTL_BIN));
+        Result<String> execute = Ssh.staticExecute(device, String.format("%s url", OWNCLOUD_CTL_BIN));
         return execute.map(new Result.Function<String, String>() {
             @Override
             public String  apply(String input) throws Exception {

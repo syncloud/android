@@ -17,7 +17,7 @@ public class RemoteAccessManager {
     private static final String REMOTE_BIN = "remote";
 
     public static Result<String> disable(Device device) {
-        return Ssh.execute(device, REMOTE_BIN + " disable");
+        return Ssh.staticExecute(device, REMOTE_BIN + " disable");
     }
 
 //    This is enable method implemented in usual way it is only 4 lines
@@ -27,7 +27,7 @@ public class RemoteAccessManager {
 //
 //    public static Device enableProcedural(final Device device, final String domain) {
 //        final DirectEndpoint directEndpoint = device.getLocalEndpoint();
-//        String data = execute(device, REMOTE_BIN + " enable");
+//        String data = staticExecute(device, REMOTE_BIN + " enable");
 //        final String key = JSON.readValue(data, RemoteReply.class).data;
 //        String userDomain = userDomain(device);
 //        return convert(userDomain + "." + domain, directEndpoint, key);
@@ -35,7 +35,7 @@ public class RemoteAccessManager {
 
     public static Result<Device> enable(final Device device, final String domain) {
         final DirectEndpoint directEndpoint = device.getLocalEndpoint();
-        return Ssh.execute(device, REMOTE_BIN + " enable")
+        return Ssh.staticExecute(device, REMOTE_BIN + " enable")
                 .flatMap(new Result.Function<String, Result<Device>>() {
                     @Override
                     public Result<Device> apply(final String data) throws Exception {

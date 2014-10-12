@@ -1,0 +1,97 @@
+{
+   "message" : null,
+   "data" :
+      [
+         {
+            "current_version" : "0.55-9",
+            "app" :
+               {
+                  "type" : "admin",
+                  "id" : "insider",
+                  "name" : "Insider: Public address and name"
+               },
+            "installed_version" : "0.55-9"
+         },
+         {
+            "current_version" : "0.13-1",
+            "app" :
+               {
+                  "type" : "admin",
+                  "id" : "image-base",
+                  "name" : "Base image tweaks"
+               },
+            "installed_version" : "0.13-1"
+         },
+         {
+            "current_version" : "0.2-1",
+            "app" :
+               {
+                  "type" : "admin",
+                  "id" : "image-boot",
+                  "name" : "Boot image tweaks"
+               },
+            "installed_version" : "0.2-1"
+         },
+         {
+            "current_version" : "0.4-3",
+            "app" :
+               {
+                  "type" : "system",
+                  "id" : "sam",
+                  "name" : "Syncloud Application Manager"
+               },
+            "installed_version" : "0.4-2"
+         },
+         {
+            "current_version" : "0.4-3",
+            "app" :
+               {
+                  "type" : "admin",
+                  "id" : "remote-access",
+                  "name" : "Remote Management"
+               },
+            "installed_version" : "0.4-3"
+         },
+         {
+            "current_version" : "v0.1-6",
+            "app" :
+               {
+                  "type" : "dev",
+                  "id" : "syncloud-ci",
+                  "name" : "Syncloud Continuous Integration"
+               },
+            "installed_version" : "v0.1-6"
+         },
+         {
+            "current_version" : "v7.0.1-5",
+            "app" :
+               {
+                  "type" : "user",
+                  "id" : "owncloud",
+                  "name" : "ownCloud"
+               },
+            "installed_version" : "v7.0.1-4"
+         },
+         {
+            "current_version" : "0.32-3",
+            "app" :
+               {
+                  "type" : "admin",
+                  "id" : "owncloud-ctl",
+                  "name" : "ownCloud control tool"
+               },
+            "installed_version" : "0.32-3"
+         },
+         {
+            "current_version" : "v0.2",
+            "app" :
+               {
+                  "type" : "admin",
+                  "id" : "discovery",
+                  "name" : "Discovery"
+               },
+            "installed_version" : "v0.2"
+         }
+      ],
+   "success" : true
+}

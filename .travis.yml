@@ -5,7 +5,7 @@ android:
   licenses:
     - android-sdk-license-5be876d5
 
-script: ./gradlew clean test assembleBetaDebug
+script: ./gradlew clean test jacocoTestReport printCoverage assembleBetaDebug
 
 deploy:
   provider: releases

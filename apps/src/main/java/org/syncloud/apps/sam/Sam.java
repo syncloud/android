@@ -7,47 +7,57 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import org.apache.commons.lang3.StringUtils;
+import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.common.model.Result;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.syncloud.apps.sam.App.Type.system;
+import static org.syncloud.apps.sam.Command.Install;
+import static org.syncloud.apps.sam.Command.List;
+import static org.syncloud.apps.sam.Command.Update;
+import static org.syncloud.apps.sam.Command.Upgrade;
+import static org.syncloud.common.model.Result.value;
 
 public class Sam {
     public static final ObjectMapper JSON = new ObjectMapper();
     private static final String SAM_BOOTSTRAP_COMMAND =
             "wget -qO- https://raw.githubusercontent.com/syncloud/apps/0.7/sam | bash -s install";
-    private static final String SAM_EXIST_COMMAND = "type sam";
+    public static final String SAM_EXIST_COMMAND = "type sam";
+    private Ssh ssh;
 
-    public static Result<String> run(Device device, List<String> arguments) {
-        Result<String> installResult = ensureSamInstalled(device);
-        if (installResult .hasError())
-            return installResult;
-
-        String command = StringUtils.join(arguments, " ");
-        command = "sam" + " " + command;
-        return Ssh.execute(device, command);
+    public Sam(Ssh ssh) {
+        this.ssh = ssh;
     }
 
-    private static Result<String> ensureSamInstalled(Device device) {
-        Result<String> exists = Ssh.execute(device, SAM_EXIST_COMMAND);
+    public Result<String> run(Device device, Command command, String... arguments) {
+        Result<String> installResult = ensureSamInstalled(device);
+        if (installResult.hasError())
+            return installResult;
+
+        return ssh.execute(device, command.cmd(arguments));
+    }
+
+    private Result<String> ensureSamInstalled(Device device) {
+        Result<String> exists = ssh.execute(device, SAM_EXIST_COMMAND);
         if (exists.hasError())
-            return Ssh.execute(device, SAM_BOOTSTRAP_COMMAND);
+            return ssh.execute(device, SAM_BOOTSTRAP_COMMAND);
         return exists;
     }
 
-    public static Result<String> updateSpm(Device device) {
+    public Result<String> updateSpm(Device device) {
         Result<String> installResult = ensureSamInstalled(device);
         if (installResult .hasError())
             return installResult;
 
-        return run(device, asList(Commands.Install, "sam"));
+        return run(device, Update, "sam");
     }
 
-    public static Result<Boolean> ensureAdminToolsInstalled(Device device, Function<String, String> progress) {
+    public Result<Boolean> ensureAdminToolsInstalled(Device device, Function<String, String> progress) {
 
         Result<String> installResult = ensureSamInstalled(device);
         if (installResult .hasError())
@@ -65,34 +75,32 @@ public class Sam {
 
         for (AppVersions appVersions : filter(list.getValue(), App.Type.admin)) {
 
-            String command;
+            Command command;
             if(!appVersions.installed()) {
-                command = Commands.Install;
+                command = Install;
             } else {
                 if (!appVersions.current_version.equals(appVersions.installed_version))
-                    command = Commands.Upgrade;
+                    command = Upgrade;
                 else
                     continue;
             }
 
             progress.apply("installing " + appVersions.app.name);
-            Result<String> install = run(device, asList(command, appVersions.app.id));
+            Result<String> install = run(device, command, appVersions.app.id);
             if (install.hasError())
                 return Result.error(install.getError());
         }
 
-        return Result.value(true);
+        return value(true);
     }
 
-    public static Result<List<AppVersions>> list(Device device) {
+    public Result<List<AppVersions>> list(Device device) {
 
-        return run(device, asList("list"))
+        return run(device, List)
                 .flatMap(new Result.Function<String, Result<List<AppVersions>>>() {
                     @Override
-                    public Result<List<AppVersions>> apply(String input) throws Exception {
-                        List<AppVersions> apps = JSON.readValue(input, AppListReply.class).data;
-                        apps = filterNot(apps, App.Type.system);
-                        return Result.value(apps);
+                    public Result<List<AppVersions>> apply(String v) throws Exception {
+                        return value(filterNot(JSON.readValue(v, AppListReply.class).data, system));
                     }
                 });
 

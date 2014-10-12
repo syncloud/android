@@ -22,6 +22,7 @@ import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.remote.RemoteAccessManager;
+import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.DirectEndpoint;
 
@@ -38,6 +39,7 @@ public class DeviceActivateActivity extends Activity {
     private TextView url;
     private LinearLayout domainSettings;
     private Button deactivateButton;
+    private Sam sam;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +60,7 @@ public class DeviceActivateActivity extends Activity {
             }
 
         };
-
+        sam = new Sam(new Ssh());
         url = (TextView) findViewById(R.id.device_url);
         deactivateButton = (Button) findViewById(R.id.name_deactivate);
         domainSettings = (LinearLayout) findViewById(R.id.domain_settings);
@@ -194,7 +196,7 @@ public class DeviceActivateActivity extends Activity {
 
                 showProgress("Checking system tools");
 
-                Result<Boolean> systemTools = Sam.ensureAdminToolsInstalled(discoveredDevice, progressFunction);
+                Result<Boolean> systemTools = sam.ensureAdminToolsInstalled(discoveredDevice, progressFunction);
                 if (systemTools.hasError()) {
                     showError(systemTools.getError());
                     return;

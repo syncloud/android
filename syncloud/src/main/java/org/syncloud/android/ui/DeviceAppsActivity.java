@@ -21,9 +21,11 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
 import org.syncloud.apps.sam.AppVersions;
+import org.syncloud.apps.sam.Command;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.sam.App;
+import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 
 import java.util.List;
@@ -41,6 +43,7 @@ public class DeviceAppsActivity extends Activity {
     private TextView deviceName;
     private boolean connected = false;
     private boolean showAdminApps = false;
+    private Sam sam;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +73,7 @@ public class DeviceAppsActivity extends Activity {
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
-
+        sam = new Sam(new Ssh());
         startProgress("Connecting to the device");
         execute(new Runnable() {
                     @Override
@@ -119,7 +122,7 @@ public class DeviceAppsActivity extends Activity {
                     @Override
                     public void run() {
                         progressUpdate("Refreshing app list");
-                        final Result<List<AppVersions>> appsResult = Sam.list(device);
+                        final Result<List<AppVersions>> appsResult = sam.list(device);
                         if (!appsResult.hasError()) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -198,7 +201,7 @@ public class DeviceAppsActivity extends Activity {
         execute(new Runnable() {
                     @Override
                     public void run() {
-                        final Result<String> result = Sam.updateSpm(device);
+                        final Result<String> result = sam.updateSpm(device);
                         if (result.hasError()) {
                             progressError(result.getError());
                             return;
@@ -210,12 +213,12 @@ public class DeviceAppsActivity extends Activity {
         );
     }
 
-    public void run(final String action, final String app) {
-        startProgress("Running " + action + " for " + app);
+    public void run(final Command command, final String app) {
+        startProgress("Running " + command + " for " + app);
         execute(new Runnable() {
             @Override
             public void run() {
-                final Result<String> result = Sam.run(device, asList(action, app));
+                final Result<String> result = sam.run(device, command, app);
                 if (result.hasError()) {
                     progressError(result.getError());
                     return;
