@@ -184,14 +184,6 @@ public class DeviceActivateActivity extends Activity {
             @Override
             public void run() {
 
-                showProgress("Checking system tools");
-
-                Result<Boolean> systemTools = sam.ensureAdminToolsInstalled(discoveredDevice, progressFunction);
-                if (systemTools.hasError()) {
-                    showError(systemTools.getError());
-                    return;
-                }
-
                 if (!dnsReady) {
 
                     EditText userDomainText = (EditText) findViewById(R.id.user_domain);
