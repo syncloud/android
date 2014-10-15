@@ -1,7 +1,7 @@
 package org.syncloud.android.ui.dialog;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,17 +11,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.syncloud.android.R;
+import org.syncloud.common.progress.Progress;
 
-public class CommunicationDialog extends AlertDialog {
+public class CommunicationDialog extends AlertDialog implements Progress {
     private ProgressBar progress;
-    private Context context;
+    private Activity context;
     private TextView messageView;
     private CharSequence message;
     private Button reportBtn;
     private CharSequence title;
     private String emailErrorBoundary = "========= ERROR =========";
 
-    public CommunicationDialog(Context context) {
+    public CommunicationDialog(Activity context) {
         super(context);
         this.context = context;
     }
@@ -78,17 +79,56 @@ public class CommunicationDialog extends AlertDialog {
     }
 
 
-    public void setError(String error) {
+    private void setError(String error) {
         setMessage(error);
         enableErrorButton();
         setCancelable(true);
         progress.setVisibility(View.INVISIBLE);
     }
 
-    public void show(String message) {
-        setTitle(message);
+    public void start() {
+        setTitle("Connecting to the device");
         setMessage("");
         setCancelable(false);
         show();
+    }
+
+    public void stop() {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                hide();
+            }
+        });
+    }
+
+    @Override
+    public void error(final String error) {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                setError(error);
+            }
+        });
+    }
+
+    @Override
+    public void title(final String message) {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                setTitle(message);
+            }
+        });
+    }
+
+    @Override
+    public void progress(final String progress) {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                setMessage(message + "\n" + progress);
+            }
+        });
     }
 }

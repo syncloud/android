@@ -11,8 +11,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.common.base.Function;
-
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
@@ -29,7 +27,7 @@ import org.syncloud.ssh.model.DirectEndpoint;
 
 public class DeviceActivateActivity extends Activity {
 
-    private Function<String, String> progressFunction;
+    //    private Function<String, String> progressFunction;
     private DirectEndpoint endpoint;
     private boolean dnsReady = false;
     private Preferences preferences;
@@ -52,14 +50,6 @@ public class DeviceActivateActivity extends Activity {
         preferences = ((SyncloudApplication) getApplication()).getPreferences();
 
         progress = new CommunicationDialog(this);
-        progressFunction = new Function<String, String>() {
-            @Override
-            public String apply(String input) {
-                showProgress(input);
-                return null;
-            }
-
-        };
         sam = new Sam(new Ssh());
         url = (TextView) findViewById(R.id.device_url);
         deactivateButton = (Button) findViewById(R.id.name_deactivate);
@@ -88,27 +78,9 @@ public class DeviceActivateActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void showProgress(final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progress.setTitle(message);
-            }
-        });
-    }
-
-    private void showError(final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progress.setError(message);
-            }
-        });
-    }
-
     private void status() {
 
-        progress.show("Checking device status ...");
+        progress.start();
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -152,16 +124,16 @@ public class DeviceActivateActivity extends Activity {
 
     public void deactivate(View view) {
 
-        progress.show("Connecting to the device");
+        progress.start();
 
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
 
-                showProgress("Deactivating device");
+                progress.title("Deactivating device");
                 final Result<String> redirectResult = InsiderManager.dropDomain(discoveredDevice);
                 if (redirectResult.hasError()) {
-                    showError(redirectResult.getError());
+                    progress.error(redirectResult.getError());
                 }
 
                 runOnUiThread(new Runnable() {
@@ -178,11 +150,15 @@ public class DeviceActivateActivity extends Activity {
 
     public void activate(View view) {
 
-        progress.show("Connecting to the device");
+        progress.start();
 
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
+
+                if (!sam.update(discoveredDevice, progress)) {
+                    return;
+                }
 
                 if (!dnsReady) {
 
@@ -201,33 +177,33 @@ public class DeviceActivateActivity extends Activity {
                     }
 
                     if (!valid) {
-                        showError("fix errors");
+                        progress.error("fix errors");
                         return;
                     }
 
-                    showProgress("Setting redirect info");
+                    progress.title("Setting redirect info");
                     final Result<String> redirectResult = InsiderManager.setRedirectInfo(discoveredDevice, preferences.getDomain(), preferences.getApiUrl());
                     if (redirectResult.hasError()) {
-                        showError(redirectResult.getError());
+                        progress.error(redirectResult.getError());
                         return;
                     }
 
-                    showProgress("Acquiring domain");
+                    progress.title("Acquiring domain");
                     final Result<String> result = InsiderManager.acquireDomain(discoveredDevice, email, pass, domain);
                     if (result.hasError()) {
-                        showError(result.getError());
+                        progress.error(result.getError());
                         return;
                     }
                 }
 
-                showProgress("Activating remote access");
+                progress.title("Activating remote access");
                 final Result<Device> remote = RemoteAccessManager.enable(discoveredDevice, preferences.getDomain());
                 if (remote.hasError()) {
-                    showError(remote.getError());
+                    progress.error(remote.getError());
                     return;
                 }
 
-                showProgress("Saving device");
+                progress.title("Saving device");
                 Db db = ((SyncloudApplication) getApplication()).getDb();
                 db.insert(remote.getValue());
 

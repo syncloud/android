@@ -6,7 +6,10 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+import org.apache.commons.exec.LogOutputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.syncloud.common.progress.NullProgress;
+import org.syncloud.common.progress.Progress;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.DirectEndpoint;
 import org.syncloud.common.model.Result;
@@ -14,6 +17,7 @@ import org.syncloud.common.model.Result;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Properties;
 
@@ -25,20 +29,24 @@ public class Ssh {
     public static final String SSH_TYPE = "_ssh._tcp";
 
     public Result<String> execute(Device device, String command) {
-        return execute(device, asList(command));
+        return execute(device, asList(command), new NullProgress());
+    }
+
+    public Result<String> execute(Device device, String command, Progress progress) {
+        return execute(device, asList(command), progress);
     }
 
     //TODO: replace with instance method
     public static Result<String> staticExecute(Device device, String command) {
-        return execute(device, asList(command));
+        return execute(device, asList(command), new NullProgress());
     }
 
-    private static Result<String> execute(Device device, List<String> commands) {
+    private static Result<String> execute(Device device, List<String> commands, Progress progress) {
 
         String error = "";
 
         try {
-            return run(device.getLocalEndpoint(), commands);
+            return run(device.getLocalEndpoint(), commands, progress);
         } catch (Exception localException) {
             error += localException.getMessage();
         }
@@ -49,7 +57,7 @@ public class Ssh {
             return Result.error(remote.getError());
 
         try {
-            return run(remote.getValue(), commands);
+            return run(remote.getValue(), commands, progress);
         } catch (Exception remoteException) {
             error += remoteException.getMessage();
         }
@@ -57,7 +65,7 @@ public class Ssh {
         return Result.error(error);
     }
 
-    private static Result<String> run(DirectEndpoint endpoint, List<String> commands) throws JSchException, IOException {
+    private static Result<String> run(DirectEndpoint endpoint, List<String> commands, final Progress progress) throws JSchException, IOException {
 
         JSch jsch = new JSch();
 
@@ -79,11 +87,19 @@ public class Ssh {
 
             ChannelExec channel = (ChannelExec) session.openChannel("exec");
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            channel.setOutputStream(baos);
+            channel.setOutputStream(new LogOutputStream() {
+                @Override
+                protected void processLine(String line, int level) {
+                    progress.progress(line);
+                }
+            });
 
-            ByteArrayOutputStream err = new ByteArrayOutputStream();
-            channel.setErrStream(err);
+            channel.setErrStream(new LogOutputStream() {
+                @Override
+                protected void processLine(String line, int level) {
+                    progress.progress("ERROR: " + line);
+                }
+            });
 
             channel.setCommand(StringUtils.join(commands, "; "));
             InputStream inputStream = channel.getInputStream();
@@ -98,11 +114,10 @@ public class Ssh {
                     }
                 }
                 //TODO: export output stream for progress monitor
-                String message = baos.toString() + otput + err.toString();
                 if (channel.getExitStatus() == 0)
-                    return Result.value(message);
+                    return Result.value(otput);
                 else
-                    return Result.error(message);
+                    return Result.error(otput);
             } finally {
                 if (channel.isConnected())
                     channel.disconnect();
