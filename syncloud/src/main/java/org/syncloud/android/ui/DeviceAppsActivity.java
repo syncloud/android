@@ -72,7 +72,7 @@ public class DeviceAppsActivity extends Activity {
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
         sam = new Sam(new Ssh());
-        progress.show("Connecting to the device");
+        progress.start();
         execute(new Runnable() {
                     @Override
                     public void run() {
@@ -110,11 +110,10 @@ public class DeviceAppsActivity extends Activity {
     }
 
     private void listApps() {
-        execute( new Runnable() {
+        execute(new Runnable() {
                     @Override
                     public void run() {
-                        progressUpdate("Refreshing app list");
-                        final Result<List<AppVersions>> appsResult = sam.list(device);
+                        final Result<List<AppVersions>> appsResult = sam.list(device, progress);
                         if (!appsResult.hasError()) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -126,42 +125,14 @@ public class DeviceAppsActivity extends Activity {
                                     }
                                 }
                             });
-                            progressDone();
+                            progress.stop();
                             connected = true;
-                        } else {
-                            progressError(appsResult.getError());
                         }
                     }
                 }
         );
     }
 
-    private void progressDone() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progress.hide();
-            }
-        });
-    }
-
-    private void progressUpdate(final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progress.setMessage(message);
-            }
-        });
-    }
-
-    private void progressError(final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progress.setError(message);
-            }
-        });
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -179,7 +150,8 @@ public class DeviceAppsActivity extends Activity {
         if (id == R.id.action_update_apps) {
             updateSpm();
         } else if (id == R.id.action_show_admin_apps) {
-            progress.show("Changing apps filter");
+            progress.start();
+            progress.title("Changing apps filter");
             item.setChecked(!item.isChecked());
             showAdminApps = item.isChecked();
             listApps();
@@ -188,30 +160,28 @@ public class DeviceAppsActivity extends Activity {
     }
 
     private void updateSpm() {
-        progress.show("Updating app list");
+        progress.start();
         execute(new Runnable() {
                     @Override
                     public void run() {
-                        final Result<String> result = sam.update(device);
-                        if (result.hasError()) {
-                            progressError(result.getError());
+                        if (!sam.update(device, progress)) {
                             return;
                         }
-
                         listApps();
+                        progress.stop();
                     }
                 }
         );
     }
 
     public void run(final Command command, final String app) {
-        progress.show("Running " + command + " for " + app);
+        progress.start();
         execute(new Runnable() {
             @Override
             public void run() {
-                final Result<String> result = sam.run(device, command, app);
+                final Result<String> result = sam.run(device, progress, command, app);
                 if (result.hasError()) {
-                    progressError(result.getError());
+                    progress.error(result.getError());
                     return;
                 }
 

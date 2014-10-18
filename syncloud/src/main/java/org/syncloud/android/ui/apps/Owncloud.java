@@ -57,7 +57,8 @@ public class Owncloud extends Activity {
 
         setVisibility(View.GONE, View.GONE);
 
-        progress.show("Checking ownCloud status ...");
+        progress.start();
+        progress.title("Checking ownCloud status ...");
 
         status();
     }
@@ -92,14 +93,15 @@ public class Owncloud extends Activity {
         final String pass = passText.getText().toString();
 
 
-        progress.show("Activating ...");
+        progress.start();
+        progress.title("Activating ...");
 
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 Result<String> result = OwncloudManager.finishSetup(device, login, pass);
                 if (result.hasError()) {
-                    showError(result.getError());
+                    progress.error(result.getError());
                     return;
                 }
                 runOnUiThread(new Runnable() {
@@ -112,15 +114,6 @@ public class Owncloud extends Activity {
             }
         });
 
-    }
-
-    private void showError(final String error) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progress.setError(error);
-            }
-        });
     }
 
     private void status() {

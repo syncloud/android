@@ -3,6 +3,7 @@ package org.syncloud.apps.sam;
 import com.google.common.io.Resources;
 
 import org.junit.Test;
+import org.syncloud.common.progress.Progress;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
@@ -32,7 +33,7 @@ public class SamTest {
         when(ssh.execute(device, Sam.SAM_EXIST_COMMAND)).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
-        sam.run(device, Command.Update);
+        sam.run(device, new FailOnErrorProgress(), Command.Update);
 
         verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
         verify(ssh).execute(device, "sam update");
@@ -46,7 +47,7 @@ public class SamTest {
         when(ssh.execute(device, Sam.SAM_EXIST_COMMAND)).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
-        sam.run(device, Command.Update, "--release 0.1");
+        sam.run(device, new FailOnErrorProgress(), Command.Update, "--release 0.1");
 
         verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
         verify(ssh).execute(device, "sam update --release 0.1");
@@ -63,8 +64,7 @@ public class SamTest {
 
         Sam sam = new Sam(ssh);
 
-        Result<java.util.List<AppVersions>> result = sam.list(device);
-        assertFalse(result.hasError());
+        Result<java.util.List<AppVersions>> result = sam.list(device, new FailOnErrorProgress());
         assertEquals(8, result.getValue().size());
 
         verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
@@ -83,9 +83,7 @@ public class SamTest {
 
         Sam sam = new Sam(ssh);
 
-        Result<java.util.List<AppVersions>> result = sam.list(device);
-        if (result.hasError())
-            fail(result.getError());
+        Result<java.util.List<AppVersions>> result = sam.list(device, new FailOnErrorProgress());
         assertFalse(result.hasError());
         assertEquals(0, result.getValue().size());
 
@@ -103,7 +101,7 @@ public class SamTest {
 
         Sam sam = new Sam(ssh);
 
-        assertTrue(sam.list(device).hasError());
+        assertTrue(sam.list(device, new FailOnErrorProgress()).hasError());
 
         verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
         verify(ssh).execute(device, List.cmd());
@@ -120,7 +118,7 @@ public class SamTest {
 
         Sam sam = new Sam(ssh);
 
-        assertTrue(sam.list(device).hasError());
+        assertTrue(sam.list(device, new FailOnErrorProgress()).hasError());
 
         verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
         verify(ssh).execute(device, List.cmd());
@@ -138,10 +136,25 @@ public class SamTest {
 
         Sam sam = new Sam(ssh);
 
-        Result<String> update = sam.update(device);
-        assertFalse(update.hasError());
+        assertTrue(sam.update(device, new FailOnErrorProgress()));
 
         verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
         verify(ssh).execute(device, command);
+    }
+
+    private static class FailOnErrorProgress implements Progress {
+        @Override
+        public void error(String error) {
+            fail(error);
+        }
+
+        @Override
+        public void title(String message) {
+
+        }
+
+        @Override
+        public void progress(String message) {
+        }
     }
 }
