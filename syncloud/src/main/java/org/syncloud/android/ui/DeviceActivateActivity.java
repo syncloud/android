@@ -121,8 +121,8 @@ public class DeviceActivateActivity extends Activity {
                     }
                 });
 
-                final Result<String> fullName = InsiderManager.fullName(discoveredDevice);
-                if (fullName.hasError()) {
+                final Result<String> domain_name = InsiderManager.userDomain(discoveredDevice);
+                if (domain_name.hasError()) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -139,7 +139,7 @@ public class DeviceActivateActivity extends Activity {
                             dnsReady = true;
                             domainSettings.setVisibility(View.GONE);
                             deactivateButton.setVisibility(View.VISIBLE);
-                            url.setText(fullName.getValue());
+                            url.setText(domain_name.getValue()+"."+preferences.getDomain());
                             progress.hide();
                         }
                     });

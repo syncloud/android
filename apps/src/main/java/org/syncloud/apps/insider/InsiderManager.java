@@ -29,23 +29,10 @@ public class InsiderManager {
     }
 
     public static Result<String> setRedirectInfo(Device device, String domain, String apiUl) {
-
         return Ssh.staticExecute(device, format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl));
-
     }
 
     public static Result<String> dropDomain(Device device) {
         return Ssh.staticExecute(device, format("%s drop_domain", INSIDER_BIN));
-    }
-
-    public static Result<String> fullName(Device device) {
-        return Ssh.staticExecute(device, INSIDER_BIN + " full_name")
-                .map(new Result.Function<String, String>() {
-                    @Override
-                    public String apply(String input) throws Exception {
-                        return JSON.readValue(input, StringResult.class).data;
-                    }
-                });
-
     }
 }
