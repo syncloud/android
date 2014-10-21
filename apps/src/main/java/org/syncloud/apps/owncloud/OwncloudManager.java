@@ -12,8 +12,8 @@ public class OwncloudManager {
     private static String OWNCLOUD_CTL_BIN = "owncloud-ctl";
     public static final ObjectMapper JSON = new ObjectMapper();
 
-    public static Result<String> finishSetup(Device device, String login, String password) {
-        return Ssh.staticExecute(device, String.format("%s finish %s %s", OWNCLOUD_CTL_BIN, login, password));
+    public static Result<String> finishSetup(Device device, String login, String password, String protocol) {
+        return Ssh.staticExecute(device, String.format("%s finish %s %s %s", OWNCLOUD_CTL_BIN, login, password, protocol));
     }
 
     public static Result<String> owncloudUrl(Device device) {

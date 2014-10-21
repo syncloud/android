@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/owncloud_url_copy_btn"
-                android:text="url" />
+                android:text="url"/>
 
             <ImageButton
                 android:id="@+id/owncloud_url_copy_btn"
@@ -35,8 +35,8 @@
                 android:layout_alignParentRight="true"
                 android:background="@drawable/ic_action_copy"
                 android:padding="25dp"
-                android:onClick="copyUrl"
-                />
+                android:onClick="copyUrl"/>
+
         </RelativeLayout>
 
         <LinearLayout
@@ -69,64 +69,39 @@
         android:id="@+id/owncloud_not_activated_controls"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/owncloud_login_row"
+        <EditText
+            android:id="@+id/txtLogin"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="20dp">
+            android:hint="@string/admin_login"
+            android:inputType="text"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-            <TextView
-                android:id="@+id/login_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/owncloud_login_label"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <EditText
-                android:id="@+id/login"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:text=""
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/owncloud_pass_row"
+        <EditText
+            android:id="@+id/txtPassword"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:hint="@string/admin_password"
+            android:inputType="textPassword"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-            <TextView
-                android:id="@+id/pass_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/owncloud_password_label"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <EditText
-                android:id="@+id/pass"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:text=""
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        </LinearLayout>
+        <CheckBox
+            android:id="@+id/chkHttps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/use_https"/>
 
         <Button
             android:id="@+id/owncloud_activate"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:onClick="activate"
-            android:text="@string/activate_button"
+            android:text="@string/activate_button"/>
 
-            />
     </LinearLayout>
 
 </LinearLayout>

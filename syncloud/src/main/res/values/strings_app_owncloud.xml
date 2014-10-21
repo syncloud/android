@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="admin_login">Admin  Login</string>
+    <string name="admin_password">Admin Password</string>
+    <string name="use_https">Use HTTPS</string>
+</resources>

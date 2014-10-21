@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -29,13 +30,14 @@ public class Owncloud extends Activity {
     private Device device;
     private CommunicationDialog progress;
     private TextView url;
-    private LinearLayout loginRow;
-    private LinearLayout passRow;
     private Button activateBtn;
     private Button webBtn;
     private Button mobileBtn;
     private LinearLayout activatedControls;
     private LinearLayout notActivatedControls;
+    private EditText loginText;
+    private EditText passText;
+    private CheckBox chkHttps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +50,14 @@ public class Owncloud extends Activity {
         activatedControls = (LinearLayout) findViewById(R.id.owncloud_activated_controls);
         notActivatedControls = (LinearLayout) findViewById(R.id.owncloud_not_activated_controls);
         url = (TextView) findViewById(R.id.owncloud_url);
-        loginRow = (LinearLayout) findViewById(R.id.owncloud_login_row);
-        passRow = (LinearLayout) findViewById(R.id.owncloud_pass_row);
         activateBtn = (Button) findViewById(R.id.owncloud_activate);
 
         webBtn = (Button) findViewById(R.id.owncloud_web_btn);
         mobileBtn = (Button) findViewById(R.id.owncloud_mobile_btn);
+
+        loginText = (EditText) findViewById(R.id.txtLogin);
+        passText = (EditText) findViewById(R.id.txtPassword);
+        chkHttps = (CheckBox) findViewById(R.id.chkHttps);
 
         setVisibility(View.GONE, View.GONE);
 
@@ -84,14 +88,11 @@ public class Owncloud extends Activity {
     }
 
     public void activate(View view) {
-
-        EditText loginText = (EditText) findViewById(R.id.login);
-        EditText passText = (EditText) findViewById(R.id.pass);
         //TODO: Some validation
 
         final String login = loginText.getText().toString();
         final String pass = passText.getText().toString();
-
+        final String protocol = chkHttps.isChecked() ? "https" : "http";
 
         progress.start();
         progress.title("Activating ...");
@@ -99,7 +100,7 @@ public class Owncloud extends Activity {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                Result<String> result = OwncloudManager.finishSetup(device, login, pass);
+                Result<String> result = OwncloudManager.finishSetup(device, login, pass, protocol);
                 if (result.hasError()) {
                     progress.error(result.getError());
                     return;
