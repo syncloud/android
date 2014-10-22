@@ -19,7 +19,7 @@ public class SyncloudApplication extends Application {
     public static Map<String, Class> appRegistry = new HashMap<String, Class>() {{
 //        put("remote", Remote_Access.class);
         put("insider", DeviceActivateActivity.class);
-        put("owncloud", Owncloud.class);
+        put("owncloud-ctl", Owncloud.class);
     }};
     private Db db;
     private Preferences preferences;
