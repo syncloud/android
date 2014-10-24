@@ -37,4 +37,14 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Feedback">
+
+        <Preference
+            android:key="pref_feedback_send"
+            android:title="Send debug information"
+            android:summary="Sends developers application logs"
+            />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

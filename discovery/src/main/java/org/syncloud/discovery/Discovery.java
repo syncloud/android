@@ -34,7 +34,7 @@ public class Discovery {
         try {
             myAddress = InetAddress.getByAddress(ip);
         } catch (UnknownHostException e) {
-            logger.debug("Failed to get address: " + e.toString());
+            logger.error("Failed to get address: " + e.toString());
             return;
         }
 
@@ -44,8 +44,7 @@ public class Discovery {
             jmdns.addServiceListener(TYPE, listener);
             started = true;
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -63,8 +62,7 @@ public class Discovery {
             logger.info("closing jmdns: done");
             started = false;
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
 }

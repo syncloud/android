@@ -5,13 +5,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.util.Log;
 
+import org.acra.ACRA;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private Preference removeAccountPref;
+    private Preference feedbackPref;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
 
+                return true;
+            }
+        });
+
+        feedbackPref = findPreference(Preferences.KEY_PREF_FEEDBACK_SEND);
+        feedbackPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
+                ACRA.getErrorReporter().handleException(null);
                 return true;
             }
         });

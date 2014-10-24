@@ -12,6 +12,7 @@ public class Preferences {
     public static final String KEY_PREF_ACCOUNT_REMOVE = "pref_account_remove";
     public static final String KEY_PREF_EMAIL = "pref_email";
     public static final String KEY_PREF_PASSWORD = "pref_password";
+    public static final String KEY_PREF_FEEDBACK_SEND= "pref_feedback_send";
 
     private SharedPreferences preferences;
 

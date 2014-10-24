@@ -50,7 +50,7 @@ public class EventToDeviceConverter implements ServiceListener {
                 logger.debug("waiting for ipv4");
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("interrupted", e);
             }
             retry++;
         }
@@ -58,6 +58,8 @@ public class EventToDeviceConverter implements ServiceListener {
 
 
     private DirectEndpoint extractDevice(ServiceInfo info) {
+        logger.debug("extracting device: " + info);
+
         String address = "unknown";
         if (info.getInet4Addresses().length > 0) {
             address = info.getInet4Addresses()[0].getHostAddress();
@@ -84,6 +86,7 @@ public class EventToDeviceConverter implements ServiceListener {
 
     @Override
     public void serviceResolved(ServiceEvent event) {
+        logger.debug("not used event: " + event);
         //TODO: Not using this as sometime it is not even called
     }
 

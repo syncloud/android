@@ -100,7 +100,7 @@ public class DevicesDiscoveryActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.discovery, menu);
+        getMenuInflater().inflate(R.menu.discovery, menu);
         return true;
     }
 
@@ -111,7 +111,7 @@ public class DevicesDiscoveryActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            return true;
+            startActivityForResult(new Intent(this, SettingsActivity.class), 1);
         }
         return super.onOptionsItemSelected(item);
     }
