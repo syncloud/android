@@ -52,17 +52,6 @@ android {
     allprojects {
         afterEvaluate { project ->
 
-            /*
-            Generate using:
-            keytool -genkey -v -keystore syncloud.keystore -alias syncloud -keyalg RSA -keysize 2048 -validity 10000
-
-            keystore.properties contents:
-            storePassword=
-            keyPassword=
-            keyAlias=syncloud
-            storeFile=/path/to/syncloud.keystore
-            */
-
             def props = new Properties()
             def keystoreProperies = 'keystore.properties'
             def keyProps = rootProject.file(keystoreProperies)
