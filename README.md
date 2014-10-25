@@ -3,7 +3,7 @@
 ### Publish to Google Play
 
 1. Have keystore.properties pointing at the key
-2. gradle clean assemble
+2. gradle clean assemble (or Gradle tab -> All tasks -> :syncloud -> assemble inside ~~Visual~~ Android Studio)
 2. Apk: syncloud/build/outputs/apk/
 3. Use syncloud-[beta|prod]-release.apk
 4. Go to: [Google Play Console: Syncloud](https://play.google.com/apps/publish/?dev_acc=00379821603627617580#AppListPlace)
