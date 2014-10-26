@@ -33,6 +33,7 @@ public class Discovery {
         InetAddress myAddress;
         try {
             myAddress = InetAddress.getByAddress(ip);
+            logger.debug("address: " + myAddress);
         } catch (UnknownHostException e) {
             logger.error("Failed to get address: " + e.toString());
             return;

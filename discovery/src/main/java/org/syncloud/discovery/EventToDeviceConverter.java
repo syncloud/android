@@ -29,6 +29,8 @@ public class EventToDeviceConverter implements ServiceListener {
     public void serviceAdded(final ServiceEvent event) {
 
         String eventName = event.getName();
+        logger.debug("service added: " + event);
+
         if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
             logger.debug("service added name: " + event.getName()+ ", ip4 addresses: " + event.getInfo().getInet4Addresses().length);
             ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), eventName);
