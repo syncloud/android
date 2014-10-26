@@ -21,6 +21,7 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.owncloud.OwncloudManager;
+import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 
 
@@ -38,6 +39,7 @@ public class Owncloud extends Activity {
     private EditText loginText;
     private EditText passText;
     private CheckBox chkHttps;
+    private OwncloudManager owncloudManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class Owncloud extends Activity {
         setContentView(R.layout.activity_app_owncloud);
 
         progress = new CommunicationDialog(this);
+        owncloudManager = new OwncloudManager(new Ssh());
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
         activatedControls = (LinearLayout) findViewById(R.id.owncloud_activated_controls);
@@ -100,7 +103,7 @@ public class Owncloud extends Activity {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                Result<String> result = OwncloudManager.finishSetup(device, login, pass, protocol);
+                Result<String> result = owncloudManager.finishSetup(device, login, pass, protocol);
                 if (result.hasError()) {
                     progress.error(result.getError());
                     return;
@@ -124,7 +127,7 @@ public class Owncloud extends Activity {
                     @Override
                     public void run() {
 
-                        final Result<String> result = OwncloudManager.owncloudUrl(device);
+                        final Result<String> result = owncloudManager.owncloudUrl(device);
 
                         if (!result.hasError()) {
                             runOnUiThread(new Runnable() {

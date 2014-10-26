@@ -36,7 +36,7 @@
             "current_version" : "0.4-3",
             "app" :
                {
-                  "type" : "system",
+                  "type" : "admin",
                   "id" : "sam",
                   "name" : "Syncloud Application Manager"
                },
@@ -56,7 +56,7 @@
             "current_version" : "v0.1-6",
             "app" :
                {
-                  "type" : "dev",
+                  "type" : "admin",
                   "id" : "syncloud-ci",
                   "name" : "Syncloud Continuous Integration"
                },

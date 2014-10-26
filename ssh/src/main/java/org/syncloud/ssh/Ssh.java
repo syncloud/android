@@ -36,12 +36,7 @@ public class Ssh {
         return execute(device, asList(command), progress);
     }
 
-    //TODO: replace with instance method
-    public static Result<String> staticExecute(Device device, String command) {
-        return execute(device, asList(command), new NullProgress());
-    }
-
-    private static Result<String> execute(Device device, List<String> commands, Progress progress) {
+    private Result<String> execute(Device device, List<String> commands, Progress progress) {
 
         String error = "";
 
@@ -97,7 +92,7 @@ public class Ssh {
             channel.setErrStream(new LogOutputStream() {
                 @Override
                 protected void processLine(String line, int level) {
-                    progress.progress("ERROR: " + line);
+                    progress.error(line);
                 }
             });
 
@@ -106,7 +101,7 @@ public class Ssh {
 
             try {
                 channel.connect();
-                String otput = new String(ByteStreams.toByteArray(inputStream));
+                String output = new String(ByteStreams.toByteArray(inputStream));
                 while (channel.getExitStatus() == -1) {
                     try {
                         Thread.sleep(1000);
@@ -115,9 +110,11 @@ public class Ssh {
                 }
                 //TODO: export output stream for progress monitor
                 if (channel.getExitStatus() == 0)
-                    return Result.value(otput);
-                else
-                    return Result.error(otput);
+                    return Result.value(output);
+                else {
+                    progress.error(output);
+                    return Result.error(output);
+                }
             } finally {
                 if (channel.isConnected())
                     channel.disconnect();

@@ -15,5 +15,5 @@ public class App {
         }
     }
 
-    public static enum Type {unknown, system, admin, user, dev}
+    public static enum Type {unknown, system, admin, user}
 }

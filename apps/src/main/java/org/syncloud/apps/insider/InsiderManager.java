@@ -13,9 +13,14 @@ public class InsiderManager {
 
     private static final String INSIDER_BIN = "insider";
     public static final ObjectMapper JSON = new ObjectMapper();
+    private Ssh ssh;
 
-    public static Result<String> userDomain(Device device) {
-        return Ssh.staticExecute(device, format("%s user_domain", INSIDER_BIN))
+    public InsiderManager(Ssh ssh) {
+        this.ssh = ssh;
+    }
+
+    public Result<String> userDomain(Device device) {
+        return ssh.execute(device, format("%s user_domain", INSIDER_BIN))
                 .map(new Result.Function<String, String>() {
                     @Override
                     public String apply(String input) throws Exception {
@@ -24,15 +29,15 @@ public class InsiderManager {
                 });
     }
 
-    public static Result<String> acquireDomain(final Device device, String email, String pass, String domain) {
-        return Ssh.staticExecute(device, format("%s acquire_domain %s %s %s", INSIDER_BIN, email, pass, domain));
+    public Result<String> acquireDomain(final Device device, String email, String pass, String domain) {
+        return ssh.execute(device, format("%s acquire_domain %s %s %s", INSIDER_BIN, email, pass, domain));
     }
 
-    public static Result<String> setRedirectInfo(Device device, String domain, String apiUl) {
-        return Ssh.staticExecute(device, format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl));
+    public Result<String> setRedirectInfo(Device device, String domain, String apiUl) {
+        return ssh.execute(device, format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl));
     }
 
-    public static Result<String> dropDomain(Device device) {
-        return Ssh.staticExecute(device, format("%s drop_domain", INSIDER_BIN));
+    public Result<String> dropDomain(Device device) {
+        return ssh.execute(device, format("%s drop_domain", INSIDER_BIN));
     }
 }

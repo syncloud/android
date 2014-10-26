@@ -1,0 +1,24 @@
+{
+   "message" : null,
+   "data" : [{
+                  "current_version" : "0.55-9",
+                  "app" :
+                     {
+                        "type" : "admin",
+                        "id" : "insider",
+                        "name" : "Insider: Public address and name"
+                     },
+                  "installed_version" : "0.55-9"
+               },
+               {
+                  "current_version" : "0.13-1",
+                  "app" :
+                     {
+                        "type" : "admin",
+                        "id" : "image-base",
+                        "name" : "Base image tweaks"
+                     },
+                  "installed_version" : "0.13-1"
+               }],
+   "success" : true
+}

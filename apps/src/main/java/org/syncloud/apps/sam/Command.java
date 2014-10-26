@@ -7,7 +7,7 @@ import static org.apache.commons.lang3.StringUtils.join;
 
 public enum Command {
 
-    Install, Verify, Upgrade, Update, Remove, List;
+    Install, Verify, Upgrade, Update, Remove, List, Upgrade_All;
 
     public String cmd(String... arguments) {
         java.util.List<String> cmd = new ArrayList<String>(asList("sam", name().toLowerCase()));

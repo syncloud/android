@@ -133,6 +133,29 @@ public class DeviceAppsActivity extends Activity {
         );
     }
 
+    private void showUpgradeQuestion() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(DeviceAppsActivity.this)
+                        .setTitle("Updates available")
+                        .setPositiveButton("Update all apps", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (!sam.run(device, progress, Command.Upgrade_All).hasError()) {
+                                            listApps();
+                                        }
+                                    }
+                                });
+                            }
+                        }).setCancelable(true)
+                        .show();
+            }
+        });
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -164,11 +187,15 @@ public class DeviceAppsActivity extends Activity {
         execute(new Runnable() {
                     @Override
                     public void run() {
-                        if (!sam.update(device, progress)) {
+                        Result<List<AppVersions>> updatesResult = sam.update(device, progress);
+                        if (updatesResult.hasError()) {
                             return;
                         }
-                        listApps();
-                        progress.stop();
+                        if (!updatesResult.getValue().isEmpty()) {
+                            showUpgradeQuestion();
+                        } else {
+                            listApps();
+                        }
                     }
                 }
         );

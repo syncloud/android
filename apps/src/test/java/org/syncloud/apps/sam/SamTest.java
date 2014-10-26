@@ -30,13 +30,14 @@ public class SamTest {
 
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
-        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND)).thenReturn(value("exist"));
+        FailOnErrorProgress progress = new FailOnErrorProgress();
+        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND, progress)).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
-        sam.run(device, new FailOnErrorProgress(), Command.Update);
+        sam.run(device, progress, Command.Update);
 
-        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
-        verify(ssh).execute(device, "sam update");
+        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND, progress);
+        verify(ssh).execute(device, "sam update", progress);
     }
 
     @Test
@@ -44,13 +45,14 @@ public class SamTest {
 
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
-        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND)).thenReturn(value("exist"));
+        FailOnErrorProgress progress = new FailOnErrorProgress();
+        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND, progress)).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
-        sam.run(device, new FailOnErrorProgress(), Command.Update, "--release 0.1");
+        sam.run(device, progress, Command.Update, "--release 0.1");
 
-        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
-        verify(ssh).execute(device, "sam update --release 0.1");
+        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND, progress);
+        verify(ssh).execute(device, "sam update --release 0.1", progress);
     }
 
     @Test
@@ -59,16 +61,17 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.json"), UTF_8);
-        when(ssh.execute(device, List.cmd())).thenReturn(value(json));
-        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND)).thenReturn(value("exist"));
+        FailOnErrorProgress progress = new FailOnErrorProgress();
+        when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
+        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND, progress)).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
 
-        Result<java.util.List<AppVersions>> result = sam.list(device, new FailOnErrorProgress());
-        assertEquals(8, result.getValue().size());
+        Result<java.util.List<AppVersions>> result = sam.list(device, progress);
+        assertEquals(9, result.getValue().size());
 
-        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
-        verify(ssh).execute(device, List.cmd());
+        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND, progress);
+        verify(ssh).execute(device, List.cmd(), progress);
 
     }
 
@@ -78,17 +81,18 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.empty.json"), UTF_8);
-        when(ssh.execute(device, List.cmd())).thenReturn(value(json));
-        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND)).thenReturn(value("exist"));
+        FailOnErrorProgress progress = new FailOnErrorProgress();
+        when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
+        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND, progress)).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
 
-        Result<java.util.List<AppVersions>> result = sam.list(device, new FailOnErrorProgress());
+        Result<java.util.List<AppVersions>> result = sam.list(device, progress);
         assertFalse(result.hasError());
         assertEquals(0, result.getValue().size());
 
-        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
-        verify(ssh).execute(device, List.cmd());
+        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND, progress);
+        verify(ssh).execute(device, List.cmd(), progress);
     }
 
     @Test
@@ -96,15 +100,18 @@ public class SamTest {
 
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
-        when(ssh.execute(device, List.cmd())).thenReturn(value(""));
-        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND)).thenReturn(value("exist"));
+        String json = "";
+        FailOnErrorProgress progress = new FailOnErrorProgress();
+
+        when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
+        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND, progress)).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
 
-        assertTrue(sam.list(device, new FailOnErrorProgress()).hasError());
+        assertTrue(sam.list(device, progress).hasError());
 
-        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
-        verify(ssh).execute(device, List.cmd());
+        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND, progress);
+        verify(ssh).execute(device, List.cmd(), progress);
     }
 
     @Test
@@ -113,33 +120,44 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.error.json"), UTF_8);
-        when(ssh.execute(device, List.cmd())).thenReturn(value(json));
-        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND)).thenReturn(value("exist"));
+        FailOnErrorProgress progress = new FailOnErrorProgress();
+
+        when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
+        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND, progress)).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
 
-        assertTrue(sam.list(device, new FailOnErrorProgress()).hasError());
+        assertTrue(sam.list(device, progress).hasError());
 
-        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
-        verify(ssh).execute(device, List.cmd());
+        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND, progress);
+        verify(ssh).execute(device, List.cmd(), progress);
     }
 
     @Test
-    public void testUpdate() throws IOException {
+    public void testUpdateNoUpdates() throws IOException {
+        assertUpdate("ok.no.updates.json", 0);
+    }
 
+    @Test
+    public void testUpdateSomeUpdates() throws IOException {
+        assertUpdate("ok.some.updates.json", 2);
+    }
+
+    private void assertUpdate(String response, int expectedUpdates) throws IOException {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
-        String json = Resources.toString(getResource("ok.json"), UTF_8);
+        String json = Resources.toString(getResource(response), UTF_8);
         String command = Update.cmd("--release", Sam.RELEASE);
-        when(ssh.execute(device, command)).thenReturn(value(json));
-        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND)).thenReturn(value("exist"));
+        FailOnErrorProgress progress = new FailOnErrorProgress();
+        when(ssh.execute(device, command, progress)).thenReturn(value(json));
+        when(ssh.execute(device, Sam.SAM_EXIST_COMMAND, progress)).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
 
-        assertTrue(sam.update(device, new FailOnErrorProgress()));
+        assertEquals(sam.update(device, progress).getValue().size(), expectedUpdates);
 
-        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND);
-        verify(ssh).execute(device, command);
+        verify(ssh).execute(device, Sam.SAM_EXIST_COMMAND, progress);
+        verify(ssh).execute(device, command, progress);
     }
 
     private static class FailOnErrorProgress implements Progress {
@@ -149,12 +167,9 @@ public class SamTest {
         }
 
         @Override
-        public void title(String message) {
-
-        }
+        public void title(String message) {}
 
         @Override
-        public void progress(String message) {
-        }
+        public void progress(String message) {}
     }
 }

@@ -38,54 +38,39 @@ public class Sam {
             return installResult;
 
         String cmd = command.cmd(arguments);
-        progress.title("Running " + cmd);
-        return ssh.execute(device, cmd);
+        progress.progress("Running " + cmd);
+        return ssh.execute(device, cmd, progress);
     }
 
     private Result<String> ensureSamInstalled(Device device, Progress progress) {
         progress.title("Checking app manager");
-        Result<String> exists = ssh.execute(device, SAM_EXIST_COMMAND);
+        Result<String> exists = ssh.execute(device, SAM_EXIST_COMMAND, progress);
         if (exists.hasError())
             return ssh.execute(device, SAM_BOOTSTRAP_COMMAND);
         return exists;
     }
 
-    public Boolean update(Device device, Progress progress) {
+    public Result<java.util.List<AppVersions>> update(Device device, Progress progress) {
 
         progress.title("Checking for updates");
-
-        Result<String> result = run(device, progress, Update, "--release", RELEASE);
-        if (result.hasError()) {
-            progress.error(result.getError());
-            return false;
-        }
-        return true;
+        return list1(device, progress, Update, "--release", RELEASE);
     }
 
     public Result<List<AppVersions>> list(Device device, Progress progress) {
 
         progress.title("Refreshing app list");
 
-        Result<String> run = run(device, progress, List);
-        if (run.hasError())
-            progress.error(run.getError());
-
-        return run.flatMap(new Result.Function<String, Result<List<AppVersions>>>() {
-            @Override
-            public Result<List<AppVersions>> apply(String v) throws Exception {
-                return value(filterNot(JSON.readValue(v, AppListReply.class).data, system));
-            }
-        });
+        return list1(device, progress, List);
 
     }
 
-    private static List<AppVersions> filterNot(List<AppVersions> apps, final App.Type type) {
-        return  Lists.newArrayList(Iterables.filter(apps, new Predicate<AppVersions>() {
+    private Result<List<AppVersions>> list1(Device device, Progress progress, Command command, String... arguments) {
+        return run(device, progress, command, arguments).flatMap(new Result.Function<String, Result<List<AppVersions>>>() {
             @Override
-            public boolean apply(AppVersions input) {
-                return input.app.appType() != type;
+            public Result<List<AppVersions>> apply(String v) throws Exception {
+                return value(JSON.readValue(v, AppListReply.class).data);
             }
-        }));
+        });
     }
 
 }

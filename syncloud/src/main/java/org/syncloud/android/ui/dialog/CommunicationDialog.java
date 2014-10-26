@@ -80,7 +80,7 @@ public class CommunicationDialog extends AlertDialog implements Progress {
 
 
     private void setError(String error) {
-        setMessage(error);
+        progress(error);
         enableErrorButton();
         setCancelable(true);
         progress.setVisibility(View.INVISIBLE);

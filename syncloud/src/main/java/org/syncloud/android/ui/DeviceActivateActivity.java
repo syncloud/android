@@ -16,6 +16,8 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
+import org.syncloud.apps.sam.AppVersions;
+import org.syncloud.apps.sam.Command;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.insider.InsiderManager;
@@ -24,6 +26,8 @@ import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.DirectEndpoint;
 
+import java.util.List;
+
 
 public class DeviceActivateActivity extends Activity {
 
@@ -31,13 +35,15 @@ public class DeviceActivateActivity extends Activity {
     private DirectEndpoint endpoint;
     private boolean dnsReady = false;
     private Preferences preferences;
-    private Device discoveredDevice;
+    private Device device;
 
     private CommunicationDialog progress;
     private TextView url;
     private LinearLayout domainSettings;
     private Button deactivateButton;
     private Sam sam;
+    private InsiderManager insider;
+    private RemoteAccessManager accessManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +51,15 @@ public class DeviceActivateActivity extends Activity {
         setContentView(R.layout.activity_device_activate);
 
         endpoint = (DirectEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
-        discoveredDevice = new Device(null, null, null, endpoint);
+        device = new Device(null, null, null, endpoint);
 
         preferences = ((SyncloudApplication) getApplication()).getPreferences();
 
         progress = new CommunicationDialog(this);
-        sam = new Sam(new Ssh());
+        Ssh ssh = new Ssh();
+        sam = new Sam(ssh);
+        insider = new InsiderManager(ssh);
+        accessManager = new RemoteAccessManager(insider, ssh);
         url = (TextView) findViewById(R.id.device_url);
         deactivateButton = (Button) findViewById(R.id.name_deactivate);
         domainSettings = (LinearLayout) findViewById(R.id.domain_settings);
@@ -93,7 +102,7 @@ public class DeviceActivateActivity extends Activity {
                     }
                 });
 
-                final Result<String> domain_name = InsiderManager.userDomain(discoveredDevice);
+                final Result<String> domain_name = insider.userDomain(device);
                 if (domain_name.hasError()) {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -131,7 +140,7 @@ public class DeviceActivateActivity extends Activity {
             public void run() {
 
                 progress.title("Deactivating device");
-                final Result<String> redirectResult = InsiderManager.dropDomain(discoveredDevice);
+                final Result<String> redirectResult = insider.dropDomain(device);
                 if (redirectResult.hasError()) {
                     progress.error(redirectResult.getError());
                 }
@@ -156,8 +165,15 @@ public class DeviceActivateActivity extends Activity {
             @Override
             public void run() {
 
-                if (!sam.update(discoveredDevice, progress)) {
+                Result<List<AppVersions>> updateResult = sam.update(device, progress);
+                if (updateResult.hasError()) {
                     return;
+                }
+
+                if (!updateResult.getValue().isEmpty()) {
+                    if (sam.run(device, progress, Command.Upgrade_All).hasError()) {
+                        return;
+                    }
                 }
 
                 if (!dnsReady) {
@@ -182,14 +198,14 @@ public class DeviceActivateActivity extends Activity {
                     }
 
                     progress.title("Setting redirect info");
-                    final Result<String> redirectResult = InsiderManager.setRedirectInfo(discoveredDevice, preferences.getDomain(), preferences.getApiUrl());
+                    final Result<String> redirectResult = insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
                     if (redirectResult.hasError()) {
                         progress.error(redirectResult.getError());
                         return;
                     }
 
                     progress.title("Acquiring domain");
-                    final Result<String> result = InsiderManager.acquireDomain(discoveredDevice, email, pass, domain);
+                    final Result<String> result = insider.acquireDomain(device, email, pass, domain);
                     if (result.hasError()) {
                         progress.error(result.getError());
                         return;
@@ -197,7 +213,7 @@ public class DeviceActivateActivity extends Activity {
                 }
 
                 progress.title("Activating remote access");
-                final Result<Device> remote = RemoteAccessManager.enable(discoveredDevice, preferences.getDomain());
+                final Result<Device> remote = accessManager.enable(device, preferences.getDomain());
                 if (remote.hasError()) {
                     progress.error(remote.getError());
                     return;

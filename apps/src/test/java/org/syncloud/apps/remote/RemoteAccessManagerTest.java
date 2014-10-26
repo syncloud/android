@@ -2,6 +2,8 @@ package org.syncloud.apps.remote;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.syncloud.apps.insider.InsiderManager;
+import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.model.DirectEndpoint;
@@ -20,28 +22,30 @@ public class RemoteAccessManagerTest {
     }
 
     public void testRemoteAccess() {
-        Result<Device> remoteDevice = RemoteAccessManager.enable(testDevice, SYNCLOUD_INFO);
+        Ssh ssh = new Ssh();
+        RemoteAccessManager accessManager = new RemoteAccessManager(new InsiderManager(ssh), ssh);
+        Result<Device> remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO);
         Boolean wasEnabled = !remoteDevice.hasError();
         if (wasEnabled) {
             System.out.println(remoteDevice.getValue().getDisplayName());
             System.out.println("was enabled, disabling");
-            Result<String> disabled = RemoteAccessManager.disable(testDevice);
+            Result<String> disabled = accessManager.disable(testDevice);
             if (disabled.hasError()) {
                 Assert.fail(disabled.getError());
             }
 
-            remoteDevice = RemoteAccessManager.enable(testDevice, SYNCLOUD_INFO);
+            remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO);
             Assert.assertTrue(remoteDevice.hasError());
         }
 
-        remoteDevice = RemoteAccessManager.enable(testDevice, SYNCLOUD_INFO);
+        remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO);
         if (remoteDevice.hasError()) {
             Assert.fail(remoteDevice.getError());
         }
         System.out.println(remoteDevice.getValue().getDisplayName());
 
         System.out.println("disabling");
-        Result<String> disabled = RemoteAccessManager.disable(testDevice);
+        Result<String> disabled = accessManager.disable(testDevice);
         if (disabled.hasError()) {
             Assert.fail(disabled.getError());
         }
