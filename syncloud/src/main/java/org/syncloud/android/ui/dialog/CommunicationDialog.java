@@ -62,10 +62,6 @@ public class CommunicationDialog extends AlertDialog implements Progress {
         super.setTitle(title);
     }
 
-    public void enableErrorButton() {
-        reportBtn.setVisibility(View.VISIBLE);
-    }
-
 
     public void reportError(View view) {
         Intent intent = new Intent();
@@ -81,7 +77,7 @@ public class CommunicationDialog extends AlertDialog implements Progress {
 
     private void setError(String error) {
         progress(error);
-        enableErrorButton();
+        reportBtn.setVisibility(View.VISIBLE);
         setCancelable(true);
         progress.setVisibility(View.INVISIBLE);
     }
@@ -91,6 +87,8 @@ public class CommunicationDialog extends AlertDialog implements Progress {
         setMessage("");
         setCancelable(false);
         show();
+        reportBtn.setVisibility(View.INVISIBLE);
+        progress.setVisibility(View.VISIBLE);
     }
 
     public void stop() {

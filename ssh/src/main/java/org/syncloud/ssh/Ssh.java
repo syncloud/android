@@ -33,11 +33,11 @@ public class Ssh {
     }
 
     public Result<String> execute(Device device, String command, Progress progress) {
+        progress.progress("ssh: " + command);
         return execute(device, asList(command), progress);
     }
 
     private Result<String> execute(Device device, List<String> commands, Progress progress) {
-
         String error = "";
 
         try {
