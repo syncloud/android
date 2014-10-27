@@ -10,7 +10,7 @@ public class NoErrorsProgress implements Progress {
 
     @Override
     public void error(String error) {
-        //no error
+        progress.progress(error);
     }
 
     @Override

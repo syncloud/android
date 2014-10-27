@@ -38,26 +38,27 @@ public class Ssh {
     }
 
     private Result<String> execute(Device device, List<String> commands, Progress progress) {
-        String error = "";
 
         try {
             return run(device.getLocalEndpoint(), commands, progress);
-        } catch (Exception localException) {
-            error += localException.getMessage();
+        } catch (Exception e) {
+            progress.progress("Local endpoint is not available: " + e.getMessage());
         }
 
         EndpointResolver resolver = new EndpointResolver(new Dns());
         Result<DirectEndpoint> remote = resolver.dnsService(device.getUserDomain(), SSH_TYPE, device.getLocalEndpoint().getKey());
-        if (remote.hasError())
+        if (remote.hasError()) {
+            progress.progress("Unable to resolve dns: " + remote.getError());
             return Result.error(remote.getError());
+        }
 
         try {
             return run(remote.getValue(), commands, progress);
-        } catch (Exception remoteException) {
-            error += remoteException.getMessage();
+        } catch (Exception e) {
+            progress.progress("Remote endpoint is not available: " + e.getMessage());
         }
 
-        return Result.error(error);
+        return Result.error("unable to connect");
     }
 
     private static Result<String> run(DirectEndpoint endpoint, List<String> commands, final Progress progress) throws JSchException, IOException {

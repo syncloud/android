@@ -81,7 +81,7 @@ public class SamTest {
         verify(ssh).execute(device, "sam update", progress);
 
         verify(progress, never()).error("no sam");
-        verify(progress, never()).progress("no sam");
+//        verify(progress, never()).progress("no sam");
     }
 
     @Test
