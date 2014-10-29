@@ -37,12 +37,10 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         FailOnErrorProgress progress = new FailOnErrorProgress();
-        when(ssh.execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class))).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
         sam.run(device, progress, Command.Update);
 
-        verify(ssh).execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class));
         verify(ssh).execute(device, "sam update", progress);
     }
 
@@ -51,37 +49,12 @@ public class SamTest {
 
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
-        when(ssh.execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class))).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
         FailOnErrorProgress progress = new FailOnErrorProgress();
         sam.run(device, progress, Command.Update, "--release 0.1");
 
-        verify(ssh).execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class));
         verify(ssh).execute(device, "sam update --release 0.1", progress);
-    }
-
-    @Test
-    public void test_NoSam_Error_Should_Not_Propagate() {
-
-        Ssh ssh = mock(Ssh.class);
-        Device device = mock(Device.class);
-        Progress progress = mock(Progress.class);
-        when(ssh.execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class))).thenReturn(Result.<String>error("not found"));
-        when(ssh.execute(eq(device), eq(Sam.SAM_BOOTSTRAP_COMMAND), any(Progress.class))).thenReturn(value("installed"));
-
-        Sam sam = new Sam(ssh);
-        sam.run(device, progress, Command.Update);
-
-        ArgumentCaptor<Progress> existsProgress = ArgumentCaptor.forClass(Progress.class);
-        verify(ssh).execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), existsProgress.capture());
-        existsProgress.getValue().error("no sam");
-
-        verify(ssh).execute(device, Sam.SAM_BOOTSTRAP_COMMAND, progress);
-        verify(ssh).execute(device, "sam update", progress);
-
-        verify(progress, never()).error("no sam");
-//        verify(progress, never()).progress("no sam");
     }
 
     @Test
@@ -92,14 +65,12 @@ public class SamTest {
         String json = Resources.toString(getResource("app.list.json"), UTF_8);
         FailOnErrorProgress progress = new FailOnErrorProgress();
         when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
-        when(ssh.execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class))).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
 
         Result<java.util.List<AppVersions>> result = sam.list(device, progress);
         assertEquals(9, result.getValue().size());
 
-        verify(ssh).execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class));
         verify(ssh).execute(device, List.cmd(), progress);
 
     }
@@ -112,7 +83,6 @@ public class SamTest {
         String json = Resources.toString(getResource("app.list.empty.json"), UTF_8);
         FailOnErrorProgress progress = new FailOnErrorProgress();
         when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
-        when(ssh.execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class))).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
 
@@ -120,7 +90,6 @@ public class SamTest {
         assertFalse(result.hasError());
         assertEquals(0, result.getValue().size());
 
-        verify(ssh).execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class));
         verify(ssh).execute(device, List.cmd(), progress);
     }
 
@@ -133,13 +102,11 @@ public class SamTest {
         FailOnErrorProgress progress = new FailOnErrorProgress();
 
         when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
-        when(ssh.execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class))).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
 
         assertTrue(sam.list(device, progress).hasError());
 
-        verify(ssh).execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class));
         verify(ssh).execute(device, List.cmd(), progress);
     }
 
@@ -152,13 +119,11 @@ public class SamTest {
         FailOnErrorProgress progress = new FailOnErrorProgress();
 
         when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
-        when(ssh.execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class))).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
 
         assertTrue(sam.list(device, progress).hasError());
 
-        verify(ssh).execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class));
         verify(ssh).execute(device, List.cmd(), progress);
     }
 
@@ -179,13 +144,11 @@ public class SamTest {
         String command = Update.cmd("--release", Sam.RELEASE);
         FailOnErrorProgress progress = new FailOnErrorProgress();
         when(ssh.execute(device, command, progress)).thenReturn(value(json));
-        when(ssh.execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class))).thenReturn(value("exist"));
 
         Sam sam = new Sam(ssh);
 
         assertEquals(sam.update(device, progress).getValue().size(), expectedUpdates);
 
-        verify(ssh).execute(eq(device), eq(Sam.SAM_EXIST_COMMAND), any(Progress.class));
         verify(ssh).execute(device, command, progress);
     }
 

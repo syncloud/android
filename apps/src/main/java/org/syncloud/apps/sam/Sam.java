@@ -18,9 +18,6 @@ import static org.syncloud.common.model.Result.value;
 public class Sam {
     public static final ObjectMapper JSON = new ObjectMapper();
     public static final String RELEASE = "0.7";
-    public static final String SAM_BOOTSTRAP_COMMAND =
-            "wget -qO- https://raw.githubusercontent.com/syncloud/apps/"+ RELEASE + "/sam | bash -s bootstrap >> /tmp/sam.log 2>&1";
-    public static final String SAM_EXIST_COMMAND = "sam -h";
     private Ssh ssh;
 
     public Sam(Ssh ssh) {
@@ -29,19 +26,7 @@ public class Sam {
 
     public Result<String> run(Device device, Progress progress, Command command, String... arguments) {
 
-        Result<String> installResult = ensureSamInstalled(device, progress);
-        if (installResult.hasError())
-            return installResult;
-
         return ssh.execute(device, command.cmd(arguments), progress);
-    }
-
-    private Result<String> ensureSamInstalled(Device device, Progress progress) {
-        progress.title("Checking app manager");
-        Result<String> exists = ssh.execute(device, SAM_EXIST_COMMAND, new NoErrorsProgress(progress));
-        if (exists.hasError())
-            return ssh.execute(device, SAM_BOOTSTRAP_COMMAND, progress);
-        return exists;
     }
 
     public Result<List<AppVersions>> update(Device device, Progress progress) {
