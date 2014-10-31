@@ -57,8 +57,8 @@ public class DiscoveryTest {
     public void testDiscovery() throws IOException {
 
         BlockingDeviceEndpointListener blockingDeviceListener = new BlockingDeviceEndpointListener();
-        JmdnsDiscovery discovery = new JmdnsDiscovery(blockingDeviceListener, TEST_SERVICE_NAME);
-        discovery.start(ByteBuffer.wrap(localHost.getAddress()).getInt());
+        JmdnsDiscovery discovery = new JmdnsDiscovery(ByteBuffer.wrap(localHost.getAddress()).getInt(), blockingDeviceListener, TEST_SERVICE_NAME);
+        discovery.start();
         List<DirectEndpoint> devices = blockingDeviceListener.await(10, TimeUnit.SECONDS);
         discovery.stop();
 
