@@ -3,6 +3,7 @@ package org.syncloud.android.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
@@ -24,6 +26,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class DevicesDiscoveryActivity extends Activity {
+    private Preferences preferences;
 
     private AsyncDiscovery asyncDiscovery;
     private final ScheduledExecutorService scheduler =
@@ -35,6 +38,9 @@ public class DevicesDiscoveryActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        preferences = ((SyncloudApplication)getApplication()).getPreferences();
+
         setContentView(R.layout.activity_devices_discovery);
         final ListView listview = (ListView) findViewById(R.id.devices_discovered);
         progressBar = (ProgressBar) findViewById(R.id.discovery_progress);
@@ -66,6 +72,7 @@ public class DevicesDiscoveryActivity extends Activity {
 
         asyncDiscovery = new AsyncDiscovery(
                 (WifiManager) getSystemService(Context.WIFI_SERVICE),
+                (NsdManager) getSystemService(Context.NSD_SERVICE),
                 deviceEndpointListener);
 
         discoveryStart();
@@ -75,7 +82,7 @@ public class DevicesDiscoveryActivity extends Activity {
         listAdapter.clear();
         refreshBtn.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
-        asyncDiscovery.start();
+        asyncDiscovery.start(preferences.getDiscoveryLibrary());
 //        use for testing without wi-fi
 //        listAdapter.add(new DirectEndpoint("localhost", 22, "vsapronov", "somepassword", null));
         scheduler.schedule(new Runnable() {
@@ -88,7 +95,7 @@ public class DevicesDiscoveryActivity extends Activity {
                     }
                 });
             }
-        }, 10, TimeUnit.SECONDS );
+        }, 20, TimeUnit.SECONDS );
     }
 
     private void discoveryStop() {

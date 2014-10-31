@@ -52,6 +52,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         preferences.registerOnSharedPreferenceChangeListener(this);
         updateSummary(preferences, Preferences.KEY_PREF_API_URL);
         updateSummary(preferences, Preferences.KEY_PREF_EMAIL);
+        updateSummary(preferences, Preferences.KEY_PREF_DISCOVERY_LIBRARY);
         updateRemoveAccountPref(preferences);
     }
 
@@ -67,6 +68,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
 
         if (key.equals(Preferences.KEY_PREF_API_URL)) {
+            updateSummary(sharedPreferences, key);
+        }
+
+        if (key.equals(Preferences.KEY_PREF_DISCOVERY_LIBRARY)) {
             updateSummary(sharedPreferences, key);
         }
     }

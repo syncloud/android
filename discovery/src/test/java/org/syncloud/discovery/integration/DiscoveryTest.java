@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.syncloud.discovery.BlockingDeviceEndpointListener;
-import org.syncloud.discovery.Discovery;
+import org.syncloud.discovery.JmdnsDiscovery;
 import org.syncloud.ssh.model.DirectEndpoint;
 
 import java.io.IOException;
@@ -41,12 +41,12 @@ public class DiscoveryTest {
 
         jmdns = JmDNS.create(localHost);
         jmdns.registerService(ServiceInfo.create(
-                Discovery.TYPE, TEST_SERVICE_NAME, 8080, 0, 0,
+                JmdnsDiscovery.TYPE, TEST_SERVICE_NAME, 8080, 0, 0,
                 new HashMap<String, String>()
         ));
 
         jmdns.registerService(ServiceInfo.create(
-                Discovery.TYPE, TEST_SERVICE_NAME, 8081, 0, 0,
+                JmdnsDiscovery.TYPE, TEST_SERVICE_NAME, 8081, 0, 0,
                 new HashMap<String, String>()
         ));
 
@@ -57,7 +57,7 @@ public class DiscoveryTest {
     public void testDiscovery() throws IOException {
 
         BlockingDeviceEndpointListener blockingDeviceListener = new BlockingDeviceEndpointListener();
-        Discovery discovery = new Discovery(blockingDeviceListener, TEST_SERVICE_NAME);
+        JmdnsDiscovery discovery = new JmdnsDiscovery(blockingDeviceListener, TEST_SERVICE_NAME);
         discovery.start(ByteBuffer.wrap(localHost.getAddress()).getInt());
         List<DirectEndpoint> devices = blockingDeviceListener.await(10, TimeUnit.SECONDS);
         discovery.stop();
