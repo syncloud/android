@@ -31,16 +31,18 @@ public class EventToDeviceConverter implements ServiceListener {
         String eventName = event.getName();
         logger.debug("service added: " + event);
 
-        if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
-            logger.debug("service added name: " + event.getName()+ ", ip4 addresses: " + event.getInfo().getInet4Addresses().length);
-            ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), eventName);
-            waitForIpv4(info);
+        if (!serviceToUrl.containsKey(eventName)) {
+            if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
+                logger.debug("service added name: " + event.getName() + ", ip4 addresses: " + event.getInfo().getInet4Addresses().length);
+                ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), eventName);
+                waitForIpv4(info);
 
-            DirectEndpoint device = extractDevice(info);
-            serviceToUrl.put(eventName, device);
-            if (deviceEndpointListener != null)
-                deviceEndpointListener.added(device);
+                DirectEndpoint device = extractDevice(info);
+                serviceToUrl.put(eventName, device);
+                if (deviceEndpointListener != null)
+                    deviceEndpointListener.added(device);
 
+            }
         }
     }
 

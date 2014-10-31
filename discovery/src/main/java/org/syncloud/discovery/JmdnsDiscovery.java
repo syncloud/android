@@ -10,7 +10,7 @@ import javax.jmdns.JmDNS;
 
 public class JmdnsDiscovery implements Discovery {
 
-    private static Logger logger = LogManager.getLogger(Discovery.class.getName());
+    private static Logger logger = LogManager.getLogger(JmdnsDiscovery.class.getName());
 
     public static final String TYPE = "_ssh._tcp.local.";
     private JmDNS jmdns;

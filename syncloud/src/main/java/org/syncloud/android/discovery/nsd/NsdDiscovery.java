@@ -10,7 +10,7 @@ import org.syncloud.discovery.JmdnsDiscovery;
 
 public class NsdDiscovery implements Discovery {
 
-    private static Logger logger = LogManager.getLogger(JmdnsDiscovery.class.getName());
+    private static Logger logger = LogManager.getLogger(NsdDiscovery.class.getName());
 
     public static final String TYPE = "_ssh._tcp.";
 

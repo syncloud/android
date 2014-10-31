@@ -45,10 +45,10 @@ public class AsyncDiscovery {
                             int ipAddress = connInfo.getIpAddress();
                             discovery = new JmdnsDiscovery(ipAddress, deviceEndpointListener, "syncloud");
                         }
+                        discovery.start();
                     } catch (Exception e) {
                         logger.error("failed to acquire multicast lock", e);
                     }
-
                 }
             });
         }

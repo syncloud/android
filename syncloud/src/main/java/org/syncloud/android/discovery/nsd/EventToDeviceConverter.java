@@ -58,10 +58,12 @@ public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
     public void onServiceFound(NsdServiceInfo serviceInfo) {
         String text = "service found "+serviceInfo.getServiceName();
         logger.info(text);
-        if (serviceInfo.getServiceName().toLowerCase().contains(serviceName.toLowerCase())) {
-            text = "starting resolving service "+serviceInfo.getServiceName();
-            logger.info(text);
-            manager.resolveService(serviceInfo, this.resolveListener);
+        if (!serviceToUrl.containsKey(serviceInfo.getServiceName())) {
+            if (serviceInfo.getServiceName().toLowerCase().contains(serviceName.toLowerCase())) {
+                text = "starting resolving service " + serviceInfo.getServiceName();
+                logger.info(text);
+                manager.resolveService(serviceInfo, this.resolveListener);
+            }
         }
     }
 
