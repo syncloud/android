@@ -24,7 +24,7 @@ public class UserServiceTest {
         Result<Response> result = getUser("test", "test", Rest.URL);
 
         assertFalse(getErrorOrEmpty(result), result.hasError());
-        assertEquals(true, result.getValue());
+        assertEquals(200, result.getValue().statusCode);
     }
 
     @Test
@@ -32,7 +32,8 @@ public class UserServiceTest {
         Rest.start(Rest.MissingUser.class);
         Result<Response> result = getUser("test", "test", Rest.URL);
 
-        assertTrue(getErrorOrEmpty(result), result.hasError());
+        assertFalse(getErrorOrEmpty(result), result.hasError());
+        assertEquals(403, result.getValue().statusCode);
     }
 
     @Test
@@ -48,7 +49,8 @@ public class UserServiceTest {
         Rest.start(Rest.ExistingUser.class);
         Result<Response> result = createUser("test", "test", "user_domain", Rest.URL);
 
-        assertTrue(getErrorOrEmpty(result), result.hasError());
+        assertFalse(getErrorOrEmpty(result), result.hasError());
+        assertEquals(409, result.getValue().statusCode);
     }
 
     private String getErrorOrEmpty(Result result) {
