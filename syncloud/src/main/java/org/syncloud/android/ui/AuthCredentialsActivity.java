@@ -23,6 +23,11 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.common.model.Result;
 import org.syncloud.redirect.UserService;
+import org.syncloud.redirect.model.ParameterMessages;
+import org.syncloud.redirect.model.Response;
+import org.syncloud.redirect.model.RestMessage;
+
+import static org.apache.commons.lang3.StringUtils.join;
 
 public class AuthCredentialsActivity extends Activity {
 
@@ -106,6 +111,14 @@ public class AuthCredentialsActivity extends Activity {
         }
     }
 
+    private EditText getControl(String parameter) {
+        if (parameter.equals("email"))
+            return emailView;
+        if (parameter.equals("password"))
+            return passwordView;
+        return null;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -165,7 +178,8 @@ public class AuthCredentialsActivity extends Activity {
             focusView.requestFocus();
         } else {
             showProgress(true);
-            authTask = new UserTask(preferences, purpose.equals(PURPOSE_REGISTER), email, password);
+            boolean register = purpose.equals(PURPOSE_REGISTER);
+            authTask = new UserTask(register, preferences, email, password);
             authTask.execute((Void) null);
         }
     }
@@ -190,57 +204,79 @@ public class AuthCredentialsActivity extends Activity {
         }
     }
 
-    public class UserTask extends AsyncTask<Void, Void, String> {
+    private void showErrorDialog(String message) {
+        new AlertDialog.Builder(AuthCredentialsActivity.this)
+                .setTitle("Failed")
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
 
+    private void showMessage(RestMessage data) {
+        if (data.parameters_messages == null) {
+            showErrorDialog(data.message);
+        } else {
+            for (ParameterMessages pm: data.parameters_messages) {
+                EditText control = getControl(pm.parameter);
+                if (control != null) {
+                    String message = join(pm.messages, '\n');
+                    control.setError(message);
+                    control.requestFocus();
+                }
+            }
+        }
+    }
+
+    private void finishSuccess() {
+        Intent intent = new Intent(this, DevicesSavedActivity.class);
+        startActivity(intent);
+        setResult(Activity.RESULT_OK, new Intent(AuthCredentialsActivity.this, AuthActivity.class));
+        finish();
+    }
+
+    public class UserTask extends AsyncTask<Void, Void, Result<Response>> {
+
+        private final boolean register;
         private final Preferences preferences;
-        boolean register = false;
         private final String email;
         private final String password;
 
 
-        UserTask(Preferences preferences, boolean register, String email, String password) {
-            this.preferences = preferences;
+        UserTask(boolean register, Preferences preferences, String email, String password) {
             this.register = register;
+            this.preferences = preferences;
             this.email = email;
             this.password = password;
         }
 
         @Override
-        protected String doInBackground(Void... params) {
+        protected Result<Response> doInBackground(Void... params) {
 
             if (register) {
-                Result<String> user = UserService.createUser(email, password, preferences.getApiUrl());
-                if (user.hasError())
-                    return user.getError();
+                Result<Response> response = UserService.createUser(email, password, preferences.getApiUrl());
+                return response;
             } else {
-                Result<Boolean> user = UserService.getUser(email, password, preferences.getApiUrl());
-                if (user.hasError())
-                    return getString(R.string.sign_in_failed);
+                Result<Response> response = UserService.getUser(email, password, preferences.getApiUrl());
+                return response;
             }
-
-            preferences.setCredentials(email, password);
-
-            return null;
         }
 
         @Override
-        protected void onPostExecute(final String error) {
+        protected void onPostExecute(final Result<Response> result) {
             authTask = null;
             showProgress(false);
 
-            if (error == null) {
-                Intent intent = new Intent(AuthCredentialsActivity.this, DevicesSavedActivity.class);
-                startActivity(intent);
-                setResult(Activity.RESULT_OK, new Intent(AuthCredentialsActivity.this, AuthActivity.class));
-                finish();
+            if (!result.hasError() && result.getValue().statusCode == 200) {
+                if (register) {
+                    preferences.setCredentials(email, password);
+                }
+                finishSuccess();
             } else {
-                new AlertDialog.Builder(AuthCredentialsActivity.this)
-                        .setTitle("Failed")
-                        .setMessage(error)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show();
-//                passwordView.setError(getString(R.string.error_incorrect_password));
-//                passwordView.requestFocus();
+                if (result.hasError()) {
+                    showErrorDialog(result.getError());
+                } else {
+                    showMessage(result.getValue().data);
+                }
             }
         }
 
@@ -250,6 +286,7 @@ public class AuthCredentialsActivity extends Activity {
             showProgress(false);
         }
     }
+
 }
 
 

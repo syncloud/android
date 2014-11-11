@@ -1,9 +1,8 @@
 package org.syncloud.redirect.model;
 
-public class RestMessage {
-    private String message;
+import java.util.List;
 
-    public String getMessage() {
-        return message;
-    }
+public class RestMessage {
+    public String message;
+    public List<ParameterMessages> parameters_messages;
 }
