@@ -15,9 +15,8 @@ import android.widget.TextView;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.common.model.Result;
 import org.syncloud.redirect.UserService;
-import org.syncloud.redirect.model.Response;
+import org.syncloud.redirect.model.RestResult;
 
 public class AuthActivity extends Activity {
 
@@ -47,13 +46,13 @@ public class AuthActivity extends Activity {
                 public void run() {
                     String email = preferences.getEmail();
                     String password = preferences.getPassword();
-                    final Result<Response> user = UserService.getUser(email, password, preferences.getApiUrl());
+                    final RestResult<String> result = UserService.getUser(email, password, preferences.getApiUrl());
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             progressBar.setVisibility(View.INVISIBLE);
-                            if (user.hasError() || user.getValue().statusCode != 200) {
+                            if (result.hasError()) {
                                 signInOrOut.setVisibility(View.VISIBLE);
 
                                 Intent intent = new Intent(AuthActivity.this, AuthCredentialsActivity.class);

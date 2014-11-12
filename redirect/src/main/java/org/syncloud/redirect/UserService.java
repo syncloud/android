@@ -10,9 +10,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.syncloud.redirect.model.Response;
-import org.syncloud.redirect.model.RestMessage;
-import org.syncloud.common.model.Result;
+import org.syncloud.redirect.model.RestError;
+import org.syncloud.redirect.model.RestResult;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,9 +20,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.syncloud.redirect.model.RestResult.error;
+import static org.syncloud.redirect.model.RestResult.value;
+
 public class UserService {
 
-    public static Result<Response> getUser(String email, String password, String apiUrl1) {
+    public static RestResult<String> getUser(String email, String password, String apiUrl1) {
 
         CloseableHttpClient http = HttpClients.createDefault();
         HttpGet get = new HttpGet(apiUrl1 +
@@ -33,26 +35,25 @@ public class UserService {
         try {
             CloseableHttpResponse response = http.execute(get);
             int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode == 200) {
-                return Result.value(new Response(200, null));
-            }
+            if (statusCode == 200)
+                return value("User exists");
             ObjectMapper mapper = new ObjectMapper();
             InputStream jsonResponse = response.getEntity().getContent();
 // Uncomment to see json in debug
-            String textJsonResponse = readText(jsonResponse);
-            RestMessage reply = mapper.readValue(textJsonResponse, RestMessage.class);
+//            String textJsonResponse = readText(jsonResponse);
+            RestError restError = mapper.readValue(jsonResponse, RestError.class);
             response.close();
-            return Result.value(new Response(statusCode, reply));
+            return error(restError);
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            return error(new RestError(e.getMessage()));
         }
     }
 
-    public static Result<Response> createUser(String email, String password, String apiUrl1) {
+    public static RestResult<String> createUser(String email, String password, String apiUrl1) {
         return createUser(email, password, null, apiUrl1);
     }
 
-    public static Result<Response> createUser(String email, String password, String domain, String apiUrl1) {
+    public static RestResult<String> createUser(String email, String password, String domain, String apiUrl1) {
 
         CloseableHttpClient http = HttpClients.createDefault();
         HttpPost post = new HttpPost(apiUrl1 + "/user/create");
@@ -66,15 +67,18 @@ public class UserService {
             post.setEntity(new UrlEncodedFormEntity(nvps));
             CloseableHttpResponse response = http.execute(post);
             int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == 200)
+                return value("User registered");
+
             ObjectMapper mapper = new ObjectMapper();
             InputStream jsonResponse = response.getEntity().getContent();
 // Uncomment to see json in debug
 //            String textJsonResponse = readText(jsonResponse);
-            RestMessage reply = mapper.readValue(jsonResponse, RestMessage.class);
+            RestError restError = mapper.readValue(jsonResponse, RestError.class);
             response.close();
-            return Result.value(new Response(statusCode, reply));
+            return error(restError);
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            return error(new RestError(e.getMessage()));
         }
     }
 

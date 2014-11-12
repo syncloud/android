@@ -2,11 +2,10 @@ package org.syncloud.redirect.unit;
 
 import org.junit.After;
 import org.junit.Test;
-import org.syncloud.common.model.Result;
-import org.syncloud.redirect.model.Response;
+import org.syncloud.redirect.model.RestResult;
 import org.syncloud.redirect.unit.server.Rest;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.syncloud.redirect.UserService.createUser;
 import static org.syncloud.redirect.UserService.getUser;
@@ -21,39 +20,38 @@ public class UserServiceTest {
     @Test
     public void testGetUserExisting() {
         Rest.start(Rest.ExistingUser.class);
-        Result<Response> result = getUser("test", "test", Rest.URL);
+        RestResult<String> result = getUser("test", "test", Rest.URL);
 
         assertFalse(getErrorOrEmpty(result), result.hasError());
-        assertEquals(200, result.getValue().statusCode);
+        assertNotNull(result.getValue());
     }
 
     @Test
     public void testGetUserMissing() {
         Rest.start(Rest.MissingUser.class);
-        Result<Response> result = getUser("test", "test", Rest.URL);
+        RestResult<String> result = getUser("test", "test", Rest.URL);
 
-        assertFalse(getErrorOrEmpty(result), result.hasError());
-        assertEquals(403, result.getValue().statusCode);
+        assertTrue(getErrorOrEmpty(result), result.hasError());
     }
 
     @Test
     public void testCreateUserNew() {
         Rest.start(Rest.MissingUser.class);
-        Result<Response> result = createUser("test", "test", "user_domain", Rest.URL);
+        RestResult<String> result = createUser("test", "test", "user_domain", Rest.URL);
 
         assertFalse(getErrorOrEmpty(result), result.hasError());
+        assertNotNull(result.getValue());
     }
 
     @Test
     public void testCreateUserExisting() {
         Rest.start(Rest.ExistingUser.class);
-        Result<Response> result = createUser("test", "test", "user_domain", Rest.URL);
+        RestResult<String> result = createUser("test", "test", "user_domain", Rest.URL);
 
-        assertFalse(getErrorOrEmpty(result), result.hasError());
-        assertEquals(409, result.getValue().statusCode);
+        assertTrue(getErrorOrEmpty(result), result.hasError());
     }
 
-    private String getErrorOrEmpty(Result result) {
-        return result.hasError() ? result.getError() : "";
+    private String getErrorOrEmpty(RestResult result) {
+        return result.hasError() ? result.getError().message : "";
     }
 }

@@ -21,11 +21,10 @@ import android.widget.TextView;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.common.model.Result;
 import org.syncloud.redirect.UserService;
 import org.syncloud.redirect.model.ParameterMessages;
-import org.syncloud.redirect.model.Response;
-import org.syncloud.redirect.model.RestMessage;
+import org.syncloud.redirect.model.RestError;
+import org.syncloud.redirect.model.RestResult;
 
 import static org.apache.commons.lang3.StringUtils.join;
 
@@ -212,11 +211,11 @@ public class AuthCredentialsActivity extends Activity {
                 .show();
     }
 
-    private void showMessage(RestMessage data) {
-        if (data.parameters_messages == null) {
-            showErrorDialog(data.message);
+    private void showError(RestError error) {
+        if (error.parameters_messages == null) {
+            showErrorDialog(error.message);
         } else {
-            for (ParameterMessages pm: data.parameters_messages) {
+            for (ParameterMessages pm: error.parameters_messages) {
                 EditText control = getControl(pm.parameter);
                 if (control != null) {
                     String message = join(pm.messages, '\n');
@@ -234,7 +233,7 @@ public class AuthCredentialsActivity extends Activity {
         finish();
     }
 
-    public class UserTask extends AsyncTask<Void, Void, Result<Response>> {
+    public class UserTask extends AsyncTask<Void, Void, RestResult<String>> {
 
         private final boolean register;
         private final Preferences preferences;
@@ -250,34 +249,27 @@ public class AuthCredentialsActivity extends Activity {
         }
 
         @Override
-        protected Result<Response> doInBackground(Void... params) {
-
+        protected RestResult<String> doInBackground(Void... params) {
+            RestResult<String> result;
             if (register) {
-                Result<Response> response = UserService.createUser(email, password, preferences.getApiUrl());
-                return response;
+                result = UserService.createUser(email, password, preferences.getApiUrl());
+                if (!result.hasError())
+                    preferences.setCredentials(email, password);
             } else {
-                Result<Response> response = UserService.getUser(email, password, preferences.getApiUrl());
-                return response;
+                result = UserService.getUser(email, password, preferences.getApiUrl());
             }
+            return result;
         }
 
         @Override
-        protected void onPostExecute(final Result<Response> result) {
+        protected void onPostExecute(final RestResult<String> result) {
             authTask = null;
             showProgress(false);
 
-            if (!result.hasError() && result.getValue().statusCode == 200) {
-                if (register) {
-                    preferences.setCredentials(email, password);
-                }
+            if (result.hasError())
+                showError(result.getError());
+            else
                 finishSuccess();
-            } else {
-                if (result.hasError()) {
-                    showErrorDialog(result.getError());
-                } else {
-                    showMessage(result.getValue().data);
-                }
-            }
         }
 
         @Override
