@@ -1,0 +1,71 @@
+package org.syncloud.discovery;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+
+import javax.jmdns.JmDNS;
+
+public class JmdnsDiscovery implements Discovery {
+
+    private static Logger logger = LogManager.getLogger(JmdnsDiscovery.class.getName());
+
+    public static final String TYPE = "_ssh._tcp.local.";
+    private JmDNS jmdns;
+    private EventToDeviceConverter listener;
+    private boolean started = false;
+    private int ipAddress;
+
+    public JmdnsDiscovery(int ipAddress, DeviceEndpointListener deviceEndpointListener, String serviceName) {
+        this.ipAddress = ipAddress;
+        listener = new EventToDeviceConverter(serviceName, deviceEndpointListener);
+    }
+
+    public void start() {
+
+        if (started){
+            logger.error("already started, stop first");
+            return;
+        }
+
+
+        byte[] ip = ByteBuffer.allocate(4).putInt(ipAddress).array();
+        InetAddress myAddress;
+        try {
+            myAddress = InetAddress.getByAddress(ip);
+            logger.debug("address: " + myAddress);
+        } catch (UnknownHostException e) {
+            logger.error("Failed to get address: " + e.toString());
+            return;
+        }
+
+        try {
+            logger.info("creating jmdns");
+            jmdns = JmDNS.create(myAddress);
+            jmdns.addServiceListener(TYPE, listener);
+            started = true;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    public void stop() {
+
+        if (!started) {
+            logger.error("not started, start first");
+            return;
+        }
+
+        try {
+            jmdns.removeServiceListener(TYPE, listener);
+            logger.info("closing jmdns");
+            jmdns.close();
+            logger.info("closing jmdns: done");
+            started = false;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+}

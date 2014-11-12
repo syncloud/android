@@ -84,4 +84,7 @@ dependencies {
     compile 'com.google.guava:guava:17.0'
     compile 'com.android.support:support-v4:20.0.0'
     compile 'com.google.android.gms:play-services:4.2.42'
+    compile 'ch.acra:acra:4.5.0'
+    compile 'de.mindpipe.android:android-logging-log4j:1.0.3'
+
 }

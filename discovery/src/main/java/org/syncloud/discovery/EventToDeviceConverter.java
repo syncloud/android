@@ -29,16 +29,20 @@ public class EventToDeviceConverter implements ServiceListener {
     public void serviceAdded(final ServiceEvent event) {
 
         String eventName = event.getName();
-        if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
-            logger.debug("service added name: " + event.getName()+ ", ip4 addresses: " + event.getInfo().getInet4Addresses().length);
-            ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), eventName);
-            waitForIpv4(info);
+        logger.debug("service added: " + event);
 
-            DirectEndpoint device = extractDevice(info);
-            serviceToUrl.put(eventName, device);
-            if (deviceEndpointListener != null)
-                deviceEndpointListener.added(device);
+        if (!serviceToUrl.containsKey(eventName)) {
+            if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
+                logger.debug("service added name: " + event.getName() + ", ip4 addresses: " + event.getInfo().getInet4Addresses().length);
+                ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), eventName);
+                waitForIpv4(info);
 
+                DirectEndpoint device = extractDevice(info);
+                serviceToUrl.put(eventName, device);
+                if (deviceEndpointListener != null)
+                    deviceEndpointListener.added(device);
+
+            }
         }
     }
 
@@ -50,7 +54,7 @@ public class EventToDeviceConverter implements ServiceListener {
                 logger.debug("waiting for ipv4");
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("interrupted", e);
             }
             retry++;
         }
@@ -58,6 +62,8 @@ public class EventToDeviceConverter implements ServiceListener {
 
 
     private DirectEndpoint extractDevice(ServiceInfo info) {
+        logger.debug("extracting device: " + info);
+
         String address = "unknown";
         if (info.getInet4Addresses().length > 0) {
             address = info.getInet4Addresses()[0].getHostAddress();
@@ -84,6 +90,7 @@ public class EventToDeviceConverter implements ServiceListener {
 
     @Override
     public void serviceResolved(ServiceEvent event) {
+        logger.debug("not used event: " + event);
         //TODO: Not using this as sometime it is not even called
     }
 

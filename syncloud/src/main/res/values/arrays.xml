@@ -1,6 +1,5 @@
 <resources>
 
-    <string name="pref_title_api_url">DNS</string>
     <string-array name="pref_api_url_titles">
         <item>Main: api.syncloud.it</item>
         <item>Test: api.syncloud.info:81</item>
@@ -9,4 +8,14 @@
         <item>http://api.syncloud.it</item>
         <item>http://api.syncloud.info:81</item>
     </string-array>
+
+    <string-array name="pref_discovery_titles">
+        <item>JmDNS</item>
+        <item>Android NSD</item>
+    </string-array>
+    <string-array name="pref_discovery_values">
+        <item>JmDNS</item>
+        <item>Android NSD</item>
+    </string-array>
+
 </resources>

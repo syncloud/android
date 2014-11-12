@@ -46,6 +46,13 @@
     <string name="sign_in_exclamation"><u>Sign in!</u></string>
     <string name="check_credentials">Check credentials</string>
     <string name="sign_in_failed">Sign in with these credentials failed. Please check and correct credentials.</string>
+    <string name="crash_toast_text">Wait for report dialog!</string>
+    <string name="crash_dialog_title">Bug report</string>
+    <string name="crash_dialog_text">An unexpected error occurred forcing the
+    application to stop. Please help us fix this by sending us error data,
+    all you have to do is click OK.</string>
+    <string name="crash_dialog_comment_prompt">You might add your comments about the problem below:</string>
+    <string name="crash_dialog_ok_toast">Thank you !</string>
     <string name="btn_report_error">Send error report</string>
 
 </resources>

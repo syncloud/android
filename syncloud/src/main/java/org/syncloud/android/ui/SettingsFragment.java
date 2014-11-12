@@ -5,13 +5,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.util.Log;
 
+import org.acra.ACRA;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private Preference removeAccountPref;
+    private Preference feedbackPref;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,10 +40,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
+        feedbackPref = findPreference(Preferences.KEY_PREF_FEEDBACK_SEND);
+        feedbackPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
+                ACRA.getErrorReporter().handleException(null);
+                return true;
+            }
+        });
+
         SharedPreferences preferences = getPreferenceScreen().getSharedPreferences();
         preferences.registerOnSharedPreferenceChangeListener(this);
         updateSummary(preferences, Preferences.KEY_PREF_API_URL);
         updateSummary(preferences, Preferences.KEY_PREF_EMAIL);
+        updateSummary(preferences, Preferences.KEY_PREF_DISCOVERY_LIBRARY);
         updateRemoveAccountPref(preferences);
     }
 
@@ -56,6 +68,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
 
         if (key.equals(Preferences.KEY_PREF_API_URL)) {
+            updateSummary(sharedPreferences, key);
+        }
+
+        if (key.equals(Preferences.KEY_PREF_DISCOVERY_LIBRARY)) {
             updateSummary(sharedPreferences, key);
         }
     }

@@ -18,6 +18,14 @@
             android:defaultValue="false"
             />
 
+        <ListPreference
+            android:key="pref_discovery_library"
+            android:title="Discovery Library"
+            android:dialogTitle="Discovery Library"
+            android:entries="@array/pref_discovery_titles"
+            android:entryValues="@array/pref_discovery_values"
+            android:defaultValue="JmDNS" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Account">
@@ -34,6 +42,16 @@
             android:summary="Removes Syncloud account information"
             />
 
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Feedback">
+
+        <Preference
+            android:key="pref_feedback_send"
+            android:title="Send debug information"
+            android:summary="Sends developers application logs"
+            />
 
     </PreferenceCategory>
 
