@@ -1,4 +1,4 @@
-package org.syncloud.discovery;
+package org.syncloud.android.discovery;
 
 import org.syncloud.ssh.model.DirectEndpoint;
 

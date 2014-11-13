@@ -4,9 +4,8 @@ import android.net.nsd.NsdManager;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.syncloud.discovery.DeviceEndpointListener;
-import org.syncloud.discovery.Discovery;
-import org.syncloud.discovery.JmdnsDiscovery;
+import org.syncloud.android.discovery.DeviceEndpointListener;
+import org.syncloud.android.discovery.Discovery;
 
 public class NsdDiscovery implements Discovery {
 

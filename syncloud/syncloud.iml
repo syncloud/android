@@ -106,8 +106,8 @@
     <orderEntry type="library" exported="" name="httpclient-android-4.3.3" level="project" />
     <orderEntry type="library" exported="" name="jackson-annotations-2.3.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-20.0.0" level="project" />
-    <orderEntry type="library" exported="" name="acra-4.5.0" level="project" />
     <orderEntry type="library" exported="" name="log4j-1.2.17" level="project" />
+    <orderEntry type="library" exported="" name="acra-4.5.0" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.3.2" level="project" />
     <orderEntry type="library" exported="" name="jsch-0.1.51" level="project" />
     <orderEntry type="library" exported="" name="play-services-4.2.42" level="project" />
@@ -120,7 +120,6 @@
     <orderEntry type="library" exported="" name="support-annotations-20.0.0" level="project" />
     <orderEntry type="module" module-name="redirect" exported="" />
     <orderEntry type="module" module-name="common" exported="" />
-    <orderEntry type="module" module-name="discovery" exported="" />
     <orderEntry type="module" module-name="apps" exported="" />
     <orderEntry type="module" module-name="ssh" exported="" />
   </component>

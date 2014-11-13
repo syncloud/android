@@ -18,7 +18,7 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.AsyncDiscovery;
-import org.syncloud.discovery.DeviceEndpointListener;
+import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.ssh.model.DirectEndpoint;
 
 import java.util.concurrent.Executors;

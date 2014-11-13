@@ -1,7 +1,10 @@
-package org.syncloud.discovery;
+package org.syncloud.android.discovery.jmdns;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.syncloud.android.discovery.DeviceEndpointListener;
+import org.syncloud.android.discovery.Discovery;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -16,10 +19,8 @@ public class JmdnsDiscovery implements Discovery {
     private JmDNS jmdns;
     private EventToDeviceConverter listener;
     private boolean started = false;
-    private int ipAddress;
 
-    public JmdnsDiscovery(int ipAddress, DeviceEndpointListener deviceEndpointListener, String serviceName) {
-        this.ipAddress = ipAddress;
+    public JmdnsDiscovery(DeviceEndpointListener deviceEndpointListener, String serviceName) {
         listener = new EventToDeviceConverter(serviceName, deviceEndpointListener);
     }
 
@@ -30,20 +31,9 @@ public class JmdnsDiscovery implements Discovery {
             return;
         }
 
-
-        byte[] ip = ByteBuffer.allocate(4).putInt(ipAddress).array();
-        InetAddress myAddress;
-        try {
-            myAddress = InetAddress.getByAddress(ip);
-            logger.debug("address: " + myAddress);
-        } catch (UnknownHostException e) {
-            logger.error("Failed to get address: " + e.toString());
-            return;
-        }
-
         try {
             logger.info("creating jmdns");
-            jmdns = JmDNS.create(myAddress);
+            jmdns = JmDNS.create();
             jmdns.addServiceListener(TYPE, listener);
             started = true;
         } catch (Exception e) {

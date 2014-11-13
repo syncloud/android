@@ -1,7 +1,8 @@
-package org.syncloud.discovery;
+package org.syncloud.android.discovery.jmdns;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.ssh.model.DirectEndpoint;
 import org.syncloud.ssh.Ssh;
 
