@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -31,7 +32,7 @@ public class DevicesDiscoveryActivity extends Activity {
     private AsyncDiscovery asyncDiscovery;
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
-    private ImageButton refreshBtn;
+    private Button refreshBtn;
     private ProgressBar progressBar;
     private DevicesDiscoveredAdapter listAdapter;
 
@@ -44,7 +45,7 @@ public class DevicesDiscoveryActivity extends Activity {
         setContentView(R.layout.activity_devices_discovery);
         final ListView listview = (ListView) findViewById(R.id.devices_discovered);
         progressBar = (ProgressBar) findViewById(R.id.discovery_progress);
-        refreshBtn = (ImageButton) findViewById(R.id.discovery_refresh_btn);
+        refreshBtn = (Button) findViewById(R.id.discovery_refresh_btn);
         listAdapter = new DevicesDiscoveredAdapter(this);
         listview.setAdapter(listAdapter);
 
@@ -80,7 +81,7 @@ public class DevicesDiscoveryActivity extends Activity {
 
     private void discoveryStart() {
         listAdapter.clear();
-        refreshBtn.setVisibility(View.GONE);
+        refreshBtn.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
         asyncDiscovery.start(preferences.getDiscoveryLibrary());
 //        use for testing without wi-fi
@@ -101,7 +102,7 @@ public class DevicesDiscoveryActivity extends Activity {
     private void discoveryStop() {
         asyncDiscovery.stop();
         progressBar.setVisibility(View.GONE);
-        refreshBtn.setVisibility(View.VISIBLE);
+        refreshBtn.setEnabled(true);
     }
 
     @Override
