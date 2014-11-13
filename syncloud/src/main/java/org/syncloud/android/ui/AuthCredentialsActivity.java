@@ -253,11 +253,11 @@ public class AuthCredentialsActivity extends Activity {
             RestResult<String> result;
             if (register) {
                 result = UserService.createUser(email, password, preferences.getApiUrl());
-                if (!result.hasError())
-                    preferences.setCredentials(email, password);
             } else {
                 result = UserService.getUser(email, password, preferences.getApiUrl());
             }
+            if (!result.hasError())
+                preferences.setCredentials(email, password);
             return result;
         }
 
