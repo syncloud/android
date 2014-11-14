@@ -1,5 +1,7 @@
 package org.syncloud.android.discovery.jmdns;
 
+import com.google.common.base.Optional;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.DeviceEndpointListener;
@@ -19,8 +21,10 @@ public class JmdnsDiscovery implements Discovery {
     private JmDNS jmdns;
     private EventToDeviceConverter listener;
     private boolean started = false;
+    private InetAddress ip;
 
-    public JmdnsDiscovery(DeviceEndpointListener deviceEndpointListener, String serviceName) {
+    public JmdnsDiscovery(InetAddress ip, DeviceEndpointListener deviceEndpointListener, String serviceName) {
+        this.ip = ip;
         listener = new EventToDeviceConverter(serviceName, deviceEndpointListener);
     }
 
@@ -33,7 +37,7 @@ public class JmdnsDiscovery implements Discovery {
 
         try {
             logger.info("creating jmdns");
-            jmdns = JmDNS.create();
+            jmdns = JmDNS.create(ip);
             jmdns.addServiceListener(TYPE, listener);
             started = true;
         } catch (Exception e) {

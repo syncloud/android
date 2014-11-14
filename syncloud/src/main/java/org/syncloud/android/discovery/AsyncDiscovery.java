@@ -33,7 +33,12 @@ public class AsyncDiscovery {
                     if ("Android NSD".equals(discoveryLibrary)) {
                         discovery = new NsdDiscovery(manager, deviceEndpointListener, "syncloud");
                     } else {
-                        discovery = new JmdnsDiscovery(deviceEndpointListener, "syncloud");
+                        if (lock.ip().isPresent()) {
+                            discovery = new JmdnsDiscovery(lock.ip().get(), deviceEndpointListener, "syncloud");
+                        } else {
+                            logger.error("unable to get local ip");
+                            return;
+                        }
                     }
                     discovery.start();
                 }
@@ -50,7 +55,7 @@ public class AsyncDiscovery {
                         discovery.stop();
                         discovery = null;
                     } catch (Exception e) {
-                        logger.error("failed to stop discovery");
+                        logger.error("failed to stop discovery", e);
                     }
                     lock.release();
                 }
