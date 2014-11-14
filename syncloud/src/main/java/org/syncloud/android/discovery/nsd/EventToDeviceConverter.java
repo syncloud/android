@@ -56,11 +56,13 @@ public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
 
     @Override
     public void onServiceFound(NsdServiceInfo serviceInfo) {
-        String text = "service found "+serviceInfo.getServiceName();
+        String serviceName = serviceInfo.getServiceName();
+        String text = "service found "+serviceName;
         logger.info(text);
-        if (!serviceToUrl.containsKey(serviceInfo.getServiceName())) {
-            if (serviceInfo.getServiceName().toLowerCase().contains(serviceName.toLowerCase())) {
-                text = "starting resolving service " + serviceInfo.getServiceName();
+        if (!serviceToUrl.containsKey(serviceName)) {
+            if (serviceName.toLowerCase().contains(serviceName.toLowerCase())) {
+                serviceToUrl.put(serviceName, null);
+                text = "starting resolving service " + serviceName;
                 logger.info(text);
                 manager.resolveService(serviceInfo, this.resolveListener);
             }
@@ -71,10 +73,10 @@ public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
     public void onServiceLost(NsdServiceInfo serviceInfo) {
         String text = "service lost "+serviceInfo.getServiceName();
         logger.info(text);
-        String eventName = serviceInfo.getServiceName();
-        if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
-            DirectEndpoint device = serviceToUrl.remove(eventName);
-            if (deviceEndpointListener != null)
+        String serviceName = serviceInfo.getServiceName();
+        if (serviceName.toLowerCase().contains(this.serviceName.toLowerCase())) {
+            DirectEndpoint device = serviceToUrl.remove(serviceName);
+            if (deviceEndpointListener != null && device != null)
                 deviceEndpointListener.removed(device);
         }
     }
@@ -89,11 +91,12 @@ public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
 
         @Override
         public void onServiceResolved(NsdServiceInfo serviceInfo) {
-            String text = "service: "+serviceInfo.getServiceName()+" resovled";
+            String serviceName = serviceInfo.getServiceName();
+            String text = "service: "+serviceName+" resovled";
             logger.info(text);
 
             DirectEndpoint device = extractDevice(serviceInfo);
-            serviceToUrl.put(serviceInfo.getServiceName(), device);
+            serviceToUrl.put(serviceName, device);
             if (deviceEndpointListener != null)
                 deviceEndpointListener.added(device);
         }

@@ -27,6 +27,7 @@ public class DevicesSavedActivity extends Activity {
 
         setContentView(R.layout.activity_devices_saved);
         final ListView listview = (ListView) findViewById(R.id.devices_saved);
+        listview.setEmptyView(findViewById(android.R.id.empty));
         adapter = new DevicesSavedAdapter(this);
         listview.setAdapter(adapter);
         adapter.refresh();
