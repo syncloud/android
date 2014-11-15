@@ -53,10 +53,10 @@ public class DeviceActivateActivity extends Activity {
         endpoint = (DirectEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
         device = new Device(null, null, null, endpoint);
 
-        preferences = ((SyncloudApplication) getApplication()).getPreferences();
-
+        SyncloudApplication application = (SyncloudApplication) getApplication();
+        preferences = application.getPreferences();
         progress = new CommunicationDialog(this);
-        Ssh ssh = new Ssh();
+        Ssh ssh = application.getSsh();
         sam = new Sam(ssh);
         insider = new InsiderManager(ssh);
         accessManager = new RemoteAccessManager(insider, ssh);

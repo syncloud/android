@@ -4,14 +4,18 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.jcraft.jsch.JSch;
+
 import org.acra.ACRA;
-import org.acra.ReportField;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.syncloud.android.log.ConfigureLog4J;
 import org.syncloud.android.ui.DeviceActivateActivity;
 import org.syncloud.android.ui.apps.Owncloud;
 import org.syncloud.android.db.Db;
+import org.syncloud.ssh.Dns;
+import org.syncloud.ssh.EndpointResolver;
+import org.syncloud.ssh.Ssh;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +47,7 @@ public class SyncloudApplication extends Application {
     }};
     private Db db;
     private Preferences preferences;
+    private Ssh ssh;
 
     @Override
     public void onCreate() {
@@ -55,6 +60,7 @@ public class SyncloudApplication extends Application {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         preferences = new Preferences(sharedPreferences);
+        ssh = new Ssh(new JSch(), new EndpointResolver(new Dns()));
     }
 
     public Db getDb() {
@@ -63,5 +69,9 @@ public class SyncloudApplication extends Application {
 
     public Preferences getPreferences() {
         return preferences;
+    }
+
+    public Ssh getSsh() {
+        return ssh;
     }
 }

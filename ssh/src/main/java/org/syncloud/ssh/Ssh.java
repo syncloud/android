@@ -14,10 +14,8 @@ import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.DirectEndpoint;
 import org.syncloud.common.model.Result;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Properties;
 
@@ -27,6 +25,13 @@ public class Ssh {
 
     public static final int SSH_SERVER_PORT = 22;
     public static final String SSH_TYPE = "_ssh._tcp";
+    private JSch jsch;
+    private final EndpointResolver resolver;
+
+    public Ssh(JSch jsch, EndpointResolver resolver1) {
+        this.jsch = jsch;
+        resolver = resolver1;
+    }
 
     public Result<String> execute(Device device, String command) {
         return execute(device, asList(command), new NullProgress());
@@ -39,31 +44,30 @@ public class Ssh {
 
     private Result<String> execute(Device device, List<String> commands, Progress progress) {
 
+        DirectEndpoint local = device.getLocalEndpoint();
         try {
-            return run(device.getLocalEndpoint(), commands, progress);
+            return run(local, commands, progress);
         } catch (Exception e) {
-            progress.progress("Local endpoint is not available: " + e.getMessage());
+            progress.progress("Local endpoint is not available: " + local + ", error: " + e.getMessage());
         }
 
-        EndpointResolver resolver = new EndpointResolver(new Dns());
-        Result<DirectEndpoint> remote = resolver.dnsService(device.getUserDomain(), SSH_TYPE, device.getLocalEndpoint().getKey());
-        if (remote.hasError()) {
-            progress.progress("Unable to resolve dns: " + remote.getError());
-            return Result.error(remote.getError());
+        Result<DirectEndpoint> resolved = resolver.dnsService(device.getUserDomain(), SSH_TYPE, local.getKey());
+        if (resolved.hasError()) {
+            progress.error("Unable to resolve dns: " + resolved.getError());
+            return Result.error(resolved.getError());
         }
 
+        DirectEndpoint remote = resolved.getValue();
         try {
-            return run(remote.getValue(), commands, progress);
+            return run(remote, commands, progress);
         } catch (Exception e) {
-            progress.progress("Remote endpoint is not available: " + e.getMessage());
+            progress.error("Remote endpoint is not available: " + remote + ", error: " + e.getMessage());
         }
 
         return Result.error("unable to connect");
     }
 
-    private static Result<String> run(DirectEndpoint endpoint, List<String> commands, final Progress progress) throws JSchException, IOException {
-
-        JSch jsch = new JSch();
+    private Result<String> run(DirectEndpoint endpoint, List<String> commands, final Progress progress) throws JSchException, IOException {
 
         Session session = jsch.getSession(endpoint.getLogin(), endpoint.getHost(), endpoint.getPort());
         session.setTimeout(3000);

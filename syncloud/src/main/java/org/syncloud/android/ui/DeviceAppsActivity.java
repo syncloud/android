@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
@@ -42,6 +43,8 @@ public class DeviceAppsActivity extends Activity {
     private boolean showAdminApps = false;
     private Sam sam;
     private CommunicationDialog progress;
+    private Ssh ssh;
+    private Preferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +60,23 @@ public class DeviceAppsActivity extends Activity {
             }
         });
 
+        SyncloudApplication application = (SyncloudApplication) getApplication();
+
+        preferences = application.getPreferences();
+
         deviceName = (TextView) findViewById(R.id.device_name);
         ImageButton nameEditBtn = (ImageButton) findViewById(R.id.device_name_edit_btn);
+        ImageButton rebootBtn = (ImageButton) findViewById(R.id.device_reboot_btn);
+        rebootBtn.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
+        rebootBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                reboot();
+            }
+        });
+
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
-        db = ((SyncloudApplication) getApplication()).getDb();
+        db = application.getDb();
         deviceName.setText(device.getDisplayName());
         nameEditBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,7 +87,8 @@ public class DeviceAppsActivity extends Activity {
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
-        sam = new Sam(new Ssh());
+        ssh = application.getSsh();
+        sam = new Sam(ssh);
         progress.start();
         execute(new Runnable() {
                     @Override
@@ -107,6 +124,23 @@ public class DeviceAppsActivity extends Activity {
             public void onClick(DialogInterface dialog, int whichButton) {
             }
         }).show();
+    }
+
+    public void reboot() {
+        new AlertDialog.Builder(this)
+                .setTitle("Reboot")
+                .setMessage("Are you sure?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                ssh.execute(device, "reboot");
+                            }
+                        });
+                    }
+                })
+                .show();
     }
 
     private void listApps() {
@@ -150,7 +184,17 @@ public class DeviceAppsActivity extends Activity {
                                     }
                                 });
                             }
-                        }).setCancelable(true)
+                        })
+                        .setNegativeButton("Not now", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        progress.stop();
+                                    }
+                                });
+                            }
+                        })
                         .show();
             }
         });

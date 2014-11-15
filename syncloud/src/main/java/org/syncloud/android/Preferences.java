@@ -1,8 +1,6 @@
 package org.syncloud.android;
 
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 

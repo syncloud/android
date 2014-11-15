@@ -1,8 +1,12 @@
 package org.syncloud.apps.remote;
 
+import com.jcraft.jsch.JSch;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.syncloud.apps.insider.InsiderManager;
+import org.syncloud.ssh.Dns;
+import org.syncloud.ssh.EndpointResolver;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.common.model.Result;
@@ -22,7 +26,7 @@ public class RemoteAccessManagerTest {
     }
 
     public void testRemoteAccess() {
-        Ssh ssh = new Ssh();
+        Ssh ssh = new Ssh(new JSch(), new EndpointResolver(new Dns()));
         RemoteAccessManager accessManager = new RemoteAccessManager(new InsiderManager(ssh), ssh);
         Result<Device> remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO);
         Boolean wasEnabled = !remoteDevice.hasError();

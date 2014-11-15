@@ -27,11 +27,11 @@ public class EndpointResolverTest {
     private final String domain = "syncloud.it";
     private final String remoteHost = "device." + domain;
 
-    private DirectEndpoint localEndpoint = new DirectEndpoint("localEndpoint", 0, "", "", "");
+//    private DirectEndpoint localEndpoint = new DirectEndpoint("localEndpoint", 0, "", "", "");
     private DirectEndpoint remoteEndpoint = new DirectEndpoint(remoteHost, remotePort, "", "", "");
 
     private final String userDomain = "testdomain1.syncloud.info";
-    private final Device device = new Device(0, "", userDomain, localEndpoint);
+//    private final Device device = new Device(0, "", userDomain, localEndpoint);
 
 
     @Test

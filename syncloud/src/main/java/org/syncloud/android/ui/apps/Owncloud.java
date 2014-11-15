@@ -46,8 +46,11 @@ public class Owncloud extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_owncloud);
 
+        SyncloudApplication application = (SyncloudApplication) getApplication();
+
         progress = new CommunicationDialog(this);
-        owncloudManager = new OwncloudManager(new Ssh());
+
+        owncloudManager = new OwncloudManager(application.getSsh());
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
         activatedControls = (LinearLayout) findViewById(R.id.owncloud_activated_controls);
