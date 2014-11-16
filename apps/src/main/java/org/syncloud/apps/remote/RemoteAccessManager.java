@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.common.model.Result;
+import org.syncloud.common.progress.Progress;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.DirectEndpoint;
@@ -39,14 +40,14 @@ public class RemoteAccessManager {
 //        return convert(userDomain + "." + domain, directEndpoint, key);
 //    }
 
-    public Result<Device> enable(final Device device, final String domain) {
+    public Result<Device> enable(final Device device, final String domain, final Progress progress) {
         final DirectEndpoint directEndpoint = device.getLocalEndpoint();
-        return ssh.execute(device, REMOTE_BIN + " enable")
+        return ssh.execute(device, REMOTE_BIN + " enable", progress)
                 .flatMap(new Result.Function<String, Result<Device>>() {
                     @Override
                     public Result<Device> apply(final String data) throws Exception {
                         final String key = JSON.readValue(data, StringResult.class).data;
-                        return insider.userDomain(device)
+                        return insider.userDomain(device, progress)
                                 .map(new Result.Function<String, Device>() {
                                     @Override
                                     public Device apply(String userDomain) throws Exception {

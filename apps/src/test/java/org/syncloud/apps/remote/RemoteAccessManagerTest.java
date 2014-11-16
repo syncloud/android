@@ -4,6 +4,7 @@ import com.jcraft.jsch.JSch;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.syncloud.apps.FailOnErrorProgress;
 import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.ssh.Dns;
 import org.syncloud.ssh.EndpointResolver;
@@ -28,7 +29,7 @@ public class RemoteAccessManagerTest {
     public void testRemoteAccess() {
         Ssh ssh = new Ssh(new JSch(), new EndpointResolver(new Dns()));
         RemoteAccessManager accessManager = new RemoteAccessManager(new InsiderManager(ssh), ssh);
-        Result<Device> remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO);
+        Result<Device> remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO, new FailOnErrorProgress());
         Boolean wasEnabled = !remoteDevice.hasError();
         if (wasEnabled) {
             System.out.println(remoteDevice.getValue().getDisplayName());
@@ -38,11 +39,11 @@ public class RemoteAccessManagerTest {
                 Assert.fail(disabled.getError());
             }
 
-            remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO);
+            remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO, new FailOnErrorProgress());
             Assert.assertTrue(remoteDevice.hasError());
         }
 
-        remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO);
+        remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO, new FailOnErrorProgress());
         if (remoteDevice.hasError()) {
             Assert.fail(remoteDevice.getError());
         }

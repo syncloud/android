@@ -102,7 +102,7 @@ public class DeviceActivateActivity extends Activity {
                     }
                 });
 
-                final Result<String> domain_name = insider.userDomain(device);
+                final Result<String> domain_name = insider.userDomain(device, progress);
                 if (domain_name.hasError()) {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -213,7 +213,7 @@ public class DeviceActivateActivity extends Activity {
                 }
 
                 progress.title("Activating remote access");
-                final Result<Device> remote = accessManager.enable(device, preferences.getDomain());
+                final Result<Device> remote = accessManager.enable(device, preferences.getDomain(), progress);
                 if (remote.hasError()) {
                     progress.error(remote.getError());
                     return;

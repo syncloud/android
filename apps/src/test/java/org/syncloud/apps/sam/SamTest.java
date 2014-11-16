@@ -3,8 +3,7 @@ package org.syncloud.apps.sam;
 import com.google.common.io.Resources;
 
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.syncloud.common.progress.Progress;
+import org.syncloud.apps.FailOnErrorProgress;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
@@ -18,15 +17,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.syncloud.apps.sam.Command.List;
 import static org.syncloud.apps.sam.Command.Update;
-import static org.syncloud.common.model.Result.error;
 import static org.syncloud.common.model.Result.value;
 
 public class SamTest {
@@ -152,16 +148,4 @@ public class SamTest {
         verify(ssh).execute(device, command, progress);
     }
 
-    private static class FailOnErrorProgress implements Progress {
-        @Override
-        public void error(String error) {
-            fail(error);
-        }
-
-        @Override
-        public void title(String message) {}
-
-        @Override
-        public void progress(String message) {}
-    }
 }
