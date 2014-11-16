@@ -25,11 +25,11 @@ public class Ssh {
 
     public static final int SSH_SERVER_PORT = 22;
     public static final String SSH_TYPE = "_ssh._tcp";
-    private JSch jsch;
+    private JSchFactory jSchFactory;
     private final EndpointResolver resolver;
 
-    public Ssh(JSch jsch, EndpointResolver resolver1) {
-        this.jsch = jsch;
+    public Ssh(JSchFactory jsch, EndpointResolver resolver1) {
+        this.jSchFactory = jsch;
         resolver = resolver1;
     }
 
@@ -69,12 +69,13 @@ public class Ssh {
 
     private Result<String> run(DirectEndpoint endpoint, List<String> commands, final Progress progress) throws JSchException, IOException {
 
-        Session session = jsch.getSession(endpoint.getLogin(), endpoint.getHost(), endpoint.getPort());
+        JSch jSch = jSchFactory.create();
+        Session session = jSch.getSession(endpoint.getLogin(), endpoint.getHost(), endpoint.getPort());
         session.setTimeout(3000);
         if (endpoint.getKey() == null) {
             session.setPassword(endpoint.getPassword());
         } else {
-            jsch.addIdentity(endpoint.getLogin(), endpoint.getKey().getBytes(), null, new byte[0]);
+            jSch.addIdentity(endpoint.getLogin(), endpoint.getKey().getBytes(), null, new byte[0]);
             session.setUserInfo(new EmptyUserInfo());
         }
 

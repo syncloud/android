@@ -7,8 +7,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.syncloud.common.model.Result;
 import org.syncloud.common.progress.Progress;
-import org.syncloud.ssh.Dns;
 import org.syncloud.ssh.EndpointResolver;
+import org.syncloud.ssh.JSchFactory;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.DirectEndpoint;
@@ -41,7 +41,7 @@ public class SshTest {
         EndpointResolver resolver = mock(EndpointResolver.class);
         when(resolver.dnsService(anyString(), anyString(), anyString())).thenReturn(Result.value(remoteEndpoint));
 
-        Ssh ssh = new Ssh(jsch, resolver);
+        Ssh ssh = new Ssh(getjSchFactory(jsch), resolver);
         Progress progress = mock(Progress.class);
 
         Result<String> result = ssh.execute(device, "command", progress);
@@ -60,7 +60,7 @@ public class SshTest {
         EndpointResolver resolver = mock(EndpointResolver.class);
         when(resolver.dnsService(anyString(), anyString(), anyString())).thenReturn(Result.<DirectEndpoint>error("not available"));
 
-        Ssh ssh = new Ssh(jsch, resolver);
+        Ssh ssh = new Ssh(getjSchFactory(jsch), resolver);
         Progress progress = mock(Progress.class);
 
         Result<String> result = ssh.execute(device, "command", progress);
@@ -68,5 +68,11 @@ public class SshTest {
         Assert.assertTrue(result.hasError());
         verify(progress, atLeastOnce()).error(anyString());
 
+    }
+
+    private JSchFactory getjSchFactory(JSch jsch) {
+        JSchFactory jSchFactory = mock(JSchFactory.class);
+        when(jSchFactory.create()).thenReturn(jsch);
+        return jSchFactory;
     }
 }
