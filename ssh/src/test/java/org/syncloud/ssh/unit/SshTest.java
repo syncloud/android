@@ -10,8 +10,9 @@ import org.syncloud.common.progress.Progress;
 import org.syncloud.ssh.EndpointResolver;
 import org.syncloud.ssh.JSchFactory;
 import org.syncloud.ssh.Ssh;
+import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.Endpoint;
 
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -26,11 +27,11 @@ public class SshTest {
     private final String domain = "syncloud.it";
     private final String remoteHost = "device." + domain;
 
-    private DirectEndpoint localEndpoint = new DirectEndpoint("localEndpoint", 0, "", "", "");
-    private DirectEndpoint remoteEndpoint = new DirectEndpoint(remoteHost, remotePort, "", "", "");
+    private Endpoint localEndpoint = new Endpoint("localhost", 0);
+    private Endpoint remoteEndpoint = new Endpoint(remoteHost, remotePort);
 
     private final String userDomain = "testdomain1.syncloud.info";
-    private final Device device = new Device(0, "", userDomain, localEndpoint);
+    private final Device device = new Device(0, userDomain, localEndpoint, new Credentials("login", "password", "key"));
 
     @Test
     public void testExecute_UnableToConnect() throws JSchException {
@@ -39,12 +40,12 @@ public class SshTest {
         when(jsch.getSession(anyString(), anyString(), anyInt())).thenThrow(new JSchException("unable to connect"));
 
         EndpointResolver resolver = mock(EndpointResolver.class);
-        when(resolver.dnsService(anyString(), anyString(), anyString())).thenReturn(Result.value(remoteEndpoint));
+        when(resolver.dnsService(anyString(), anyString())).thenReturn(Result.value(remoteEndpoint));
 
         Ssh ssh = new Ssh(getjSchFactory(jsch), resolver);
         Progress progress = mock(Progress.class);
 
-        Result<String> result = ssh.execute(device, "command", progress);
+        Result<String> result = ssh.execute(device, "command");
 
         Assert.assertTrue(result.hasError());
         verify(progress, atLeastOnce()).error(anyString());
@@ -58,12 +59,12 @@ public class SshTest {
         when(jsch.getSession(anyString(), anyString(), anyInt())).thenThrow(new JSchException("unable to connect"));
 
         EndpointResolver resolver = mock(EndpointResolver.class);
-        when(resolver.dnsService(anyString(), anyString(), anyString())).thenReturn(Result.<DirectEndpoint>error("not available"));
+        when(resolver.dnsService(anyString(), anyString())).thenReturn(Result.<Endpoint>error("not available"));
 
         Ssh ssh = new Ssh(getjSchFactory(jsch), resolver);
         Progress progress = mock(Progress.class);
 
-        Result<String> result = ssh.execute(device, "command", progress);
+        Result<String> result = ssh.execute(device, "command");
 
         Assert.assertTrue(result.hasError());
         verify(progress, atLeastOnce()).error(anyString());

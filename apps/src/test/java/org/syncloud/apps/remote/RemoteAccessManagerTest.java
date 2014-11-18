@@ -31,8 +31,9 @@ public class RemoteAccessManagerTest {
 
     public void testRemoteAccess() {
         Ssh ssh = new Ssh(new JSchFactory(), new EndpointResolver(new Dns()));
-        RemoteAccessManager accessManager = new RemoteAccessManager(new InsiderManager(ssh), ssh);
-        Result<Device> remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO, new FailOnErrorProgress());
+        FailOnErrorProgress progress = new FailOnErrorProgress();
+        RemoteAccessManager accessManager = new RemoteAccessManager(new InsiderManager(ssh, progress), ssh, progress);
+        Result<Device> remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO);
         Boolean wasEnabled = !remoteDevice.hasError();
         if (wasEnabled) {
             System.out.println(remoteDevice.getValue().userDomain());
@@ -42,11 +43,11 @@ public class RemoteAccessManagerTest {
                 Assert.fail(disabled.getError());
             }
 
-            remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO, new FailOnErrorProgress());
+            remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO);
             Assert.assertTrue(remoteDevice.hasError());
         }
 
-        remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO, new FailOnErrorProgress());
+        remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO);
         if (remoteDevice.hasError()) {
             Assert.fail(remoteDevice.getError());
         }

@@ -18,9 +18,9 @@ public class RemoteAccessManager {
     private static final String REMOTE_BIN = "remote";
     private InsiderManager insider;
     private Ssh ssh;
-    private Progress progress
+    private Progress progress;
 
-    public RemoteAccessManager(InsiderManager insider, Ssh ssh, Progress progress ) {
+    public RemoteAccessManager(InsiderManager insider, Ssh ssh, Progress progress) {
         this.insider = insider;
         this.ssh = ssh;
         this.progress = progress;
@@ -37,7 +37,7 @@ public class RemoteAccessManager {
                     @Override
                     public Result<Device> apply(final String data) throws Exception {
                         final String key = JSON.readValue(data, StringResult.class).data;
-                        return insider.userDomain(device, progress)
+                        return insider.userDomain(device)
                                 .map(new Result.Function<String, Device>() {
                                     @Override
                                     public Device apply(String userDomain) throws Exception {

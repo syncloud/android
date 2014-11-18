@@ -14,4 +14,10 @@
         app:showAsAction="never"
         android:checkable="true"
         />
+
+    <item android:id="@+id/action_reboot_device"
+        android:title="@string/revoot_device"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        />
 </menu>

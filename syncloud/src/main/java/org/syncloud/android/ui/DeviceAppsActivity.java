@@ -64,15 +64,6 @@ public class DeviceAppsActivity extends Activity {
         preferences = application.getPreferences();
 
         deviceName = (TextView) findViewById(R.id.device_name);
-        ImageButton rebootBtn = (ImageButton) findViewById(R.id.device_reboot_btn);
-        rebootBtn.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
-        rebootBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                reboot();
-            }
-        });
-
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
         db = application.getDb();
         deviceName.setText(device.userDomain());
@@ -80,16 +71,15 @@ public class DeviceAppsActivity extends Activity {
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
-        sam = new Sam(application.getSsh(), progress);
+        ssh = application.createSsh(progress);
+        sam = new Sam(ssh, progress);
         progress.start();
         execute(new Runnable() {
                     @Override
                     public void run() {
                         listApps();
                     }
-                }
-
-        );
+                });
 
     }
 
@@ -189,7 +179,10 @@ public class DeviceAppsActivity extends Activity {
             item.setChecked(!item.isChecked());
             showAdminApps = item.isChecked();
             listApps();
+        } else if (id == R.id.action_reboot_device) {
+          reboot();
         }
+
         return super.onOptionsItemSelected(item);
     }
 

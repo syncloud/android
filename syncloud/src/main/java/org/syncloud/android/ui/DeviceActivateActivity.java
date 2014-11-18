@@ -24,7 +24,6 @@ import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.remote.RemoteAccessManager;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.model.IdentifiedEndpoint;
 
 import java.util.List;
@@ -61,9 +60,9 @@ public class DeviceActivateActivity extends Activity {
         preferences = application.getPreferences();
 
         progress = new CommunicationDialog(this);
-        Ssh ssh = application.getSsh();
+        Ssh ssh = application.createSsh(progress);
         sam = new Sam(ssh, progress);
-        insider = new InsiderManager(ssh);
+        insider = new InsiderManager(ssh, progress);
         accessManager = new RemoteAccessManager(insider, ssh, progress);
         url = (TextView) findViewById(R.id.device_url);
         deactivateButton = (Button) findViewById(R.id.name_deactivate);

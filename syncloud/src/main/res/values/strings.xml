@@ -55,5 +55,6 @@
     <string name="crash_dialog_ok_toast">Thank you !</string>
     <string name="btn_report_error">Send error report</string>
     <string name="title_devices">Devices</string>
+    <string name="revoot_device">Reboot device</string>
 
 </resources>

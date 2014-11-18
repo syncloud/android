@@ -20,6 +20,8 @@ import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.AsyncDiscovery;
 import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.common.model.Result;
+import org.syncloud.common.progress.NullProgress;
+import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.Tools;
 import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.model.Identification;
@@ -44,13 +46,16 @@ public class DevicesDiscoveryActivity extends Activity {
     private DevicesDiscoveredAdapter listAdapter;
 
     private Map<Endpoint, IdentifiedEndpoint> map;
+    private Tools tools;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        preferences = ((SyncloudApplication)getApplication()).getPreferences();
-
+        SyncloudApplication application = (SyncloudApplication) getApplication();
+        preferences = application.getPreferences();
+        Ssh ssh = application.createSsh(new NullProgress());
+        tools = new Tools(ssh);
         setContentView(R.layout.activity_devices_discovery);
         final ListView listview = (ListView) findViewById(R.id.devices_discovered);
         progressBar = (ProgressBar) findViewById(R.id.discovery_progress);
@@ -63,7 +68,7 @@ public class DevicesDiscoveryActivity extends Activity {
         DeviceEndpointListener deviceEndpointListener = new DeviceEndpointListener() {
             @Override
             public void added(final Endpoint endpoint) {
-                Result<Identification> idResult = Tools.getId(endpoint, getStandardCredentials());
+                Result<Identification> idResult = tools.getId(endpoint, getStandardCredentials());
                 Identification id = null;
                 if (!idResult.hasError())
                     id = idResult.getValue();

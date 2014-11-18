@@ -27,14 +27,11 @@ public class Ssh {
 
     private Progress progress;
     
-    public Ssh(JSchFactory jsch, EndpointResolver resolver1) {
+    public Ssh(JSchFactory jsch, EndpointResolver resolver, Progress progress) {
         this.jSchFactory = jsch;
-        resolver = resolver1;
+        this.resolver = resolver;
+        this.progress = progress;
     }
-
-//    public Ssh() {
-//        this(new NullProgress());
-//    }
 
     public Result<String> execute(Device device, String command) {
 

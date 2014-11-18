@@ -21,7 +21,6 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.owncloud.OwncloudManager;
-import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 
 
@@ -50,7 +49,7 @@ public class Owncloud extends Activity {
 
         progress = new CommunicationDialog(this);
 
-        owncloudManager = new OwncloudManager(application.getSsh());
+        owncloudManager = new OwncloudManager(application.createSsh(progress));
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
         activatedControls = (LinearLayout) findViewById(R.id.owncloud_activated_controls);

@@ -13,6 +13,7 @@ import org.syncloud.android.log.ConfigureLog4J;
 import org.syncloud.android.ui.DeviceActivateActivity;
 import org.syncloud.android.ui.apps.Owncloud;
 import org.syncloud.android.db.Db;
+import org.syncloud.common.progress.Progress;
 import org.syncloud.ssh.Dns;
 import org.syncloud.ssh.EndpointResolver;
 import org.syncloud.ssh.JSchFactory;
@@ -48,7 +49,6 @@ public class SyncloudApplication extends Application {
     }};
     private Db db;
     private Preferences preferences;
-    private Ssh ssh;
 
     @Override
     public void onCreate() {
@@ -61,7 +61,6 @@ public class SyncloudApplication extends Application {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         preferences = new Preferences(sharedPreferences);
-        ssh = new Ssh(new JSchFactory(), new EndpointResolver(new Dns()));
     }
 
     public Db getDb() {
@@ -72,7 +71,7 @@ public class SyncloudApplication extends Application {
         return preferences;
     }
 
-    public Ssh getSsh() {
-        return ssh;
+    public Ssh createSsh(Progress progress) {
+        return new Ssh(new JSchFactory(), new EndpointResolver(new Dns()), progress);
     }
 }

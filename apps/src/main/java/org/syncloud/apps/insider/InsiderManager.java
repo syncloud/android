@@ -15,13 +15,15 @@ public class InsiderManager {
     private static final String INSIDER_BIN = "insider";
     public static final ObjectMapper JSON = new ObjectMapper();
     private Ssh ssh;
+    private Progress progress;
 
-    public InsiderManager(Ssh ssh) {
+    public InsiderManager(Ssh ssh, Progress progress) {
         this.ssh = ssh;
+        this.progress = progress;
     }
 
-    public Result<String> userDomain(Device device, Progress progress) {
-        return ssh.execute(device, format("%s user_domain", INSIDER_BIN), progress)
+    public Result<String> userDomain(Device device) {
+        return ssh.execute(device, format("%s user_domain", INSIDER_BIN))
                 .map(new Result.Function<String, String>() {
                     @Override
                     public String apply(String input) throws Exception {

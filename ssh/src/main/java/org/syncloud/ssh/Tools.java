@@ -12,11 +12,18 @@ import org.syncloud.ssh.model.SshResult;
 import static org.syncloud.common.model.Result.error;
 
 public class Tools {
+
     public static final ObjectMapper JSON = new ObjectMapper();
 
-    public static Result<Identification> getId(Endpoint endpoint, Credentials credentials) {
+    private Ssh ssh;
+
+    public Tools(Ssh ssh) {
+        this.ssh = ssh;
+    }
+
+    public Result<Identification> getId(Endpoint endpoint, Credentials credentials) {
         try {
-            Result<String> result = (new Ssh()).run(endpoint, credentials, "syncloud-id id");
+            Result<String> result = ssh.run(endpoint, credentials, "syncloud-id id");
             return result.map(new Result.Function<String, Identification>() {
                 @Override
                 public Identification apply(String data) throws Exception {
