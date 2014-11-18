@@ -5,38 +5,30 @@ import java.io.Serializable;
 public class Device implements Serializable {
     private Integer id;
     private String  userDomain;
-    private DirectEndpoint localEndpoint;
-    private String name;
+    private Endpoint localEndpoint;
+    private Credentials credentials;
 
-    public Device(Integer id, String name, String userDomain, DirectEndpoint localEndpoint) {
+    public Device(Integer id, String userDomain, Endpoint localEndpoint, Credentials credentials) {
         this.userDomain = userDomain;
         this.localEndpoint = localEndpoint;
         this.id = id;
-        this.name = name;
+        this.credentials = credentials;
     }
 
-    public Integer getId() {
+    public Integer id() {
         return id;
     }
 
-    public String getDisplayName() {
-        return name != null ? name : userDomain;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUserDomain() {
+    public String userDomain() {
         return userDomain;
     }
 
-    public DirectEndpoint getLocalEndpoint() {
+    public Endpoint localEndpoint() {
         return localEndpoint;
+    }
+
+    public Credentials credentials() {
+        return credentials;
     }
 
     @Override

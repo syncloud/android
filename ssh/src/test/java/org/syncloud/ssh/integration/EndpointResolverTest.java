@@ -5,8 +5,9 @@ import org.junit.Test;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Dns;
 import org.syncloud.ssh.EndpointResolver;
+import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.Endpoint;
 
 public class EndpointResolverTest {
 
@@ -14,10 +15,12 @@ public class EndpointResolverTest {
     public void testDnsSrv() {
 
         EndpointResolver resolver = new EndpointResolver(new Dns());
-        Device device = new Device(0, "",
+        Device device = new Device(
+                0,
                 "testdomain1.syncloud.info",
-                new DirectEndpoint("localhost", 0, "", "", ""));
-        Result<DirectEndpoint> endpoint = resolver.dnsService(device.getDisplayName(), "_ssh._tcp", device.getLocalEndpoint().getKey());
+                new Endpoint("localhost", 0),
+                new Credentials("", "", ""));
+        Result<Endpoint> endpoint = resolver.dnsService(device.userDomain(), "_ssh._tcp");
 
         Assert.assertFalse(endpoint.hasError());
 

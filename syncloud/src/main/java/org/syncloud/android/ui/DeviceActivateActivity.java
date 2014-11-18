@@ -24,15 +24,18 @@ import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.remote.RemoteAccessManager;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.Endpoint;
+import org.syncloud.ssh.model.IdentifiedEndpoint;
 
 import java.util.List;
+
+import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 
 public class DeviceActivateActivity extends Activity {
 
     //    private Function<String, String> progressFunction;
-    private DirectEndpoint endpoint;
+    private IdentifiedEndpoint endpoint;
     private boolean dnsReady = false;
     private Preferences preferences;
     private Device device;
@@ -50,16 +53,18 @@ public class DeviceActivateActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_activate);
 
-        endpoint = (DirectEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
-        device = new Device(null, null, null, endpoint);
-
         SyncloudApplication application = (SyncloudApplication) getApplication();
+
+        endpoint = (IdentifiedEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
+        device = new Device(null, null, endpoint.endpoint(), getStandardCredentials());
+
         preferences = application.getPreferences();
+
         progress = new CommunicationDialog(this);
         Ssh ssh = application.getSsh();
-        sam = new Sam(ssh);
+        sam = new Sam(ssh, progress);
         insider = new InsiderManager(ssh);
-        accessManager = new RemoteAccessManager(insider, ssh);
+        accessManager = new RemoteAccessManager(insider, ssh, progress);
         url = (TextView) findViewById(R.id.device_url);
         deactivateButton = (Button) findViewById(R.id.name_deactivate);
         domainSettings = (LinearLayout) findViewById(R.id.domain_settings);
@@ -102,7 +107,7 @@ public class DeviceActivateActivity extends Activity {
                     }
                 });
 
-                final Result<String> domain_name = insider.userDomain(device, progress);
+                final Result<String> domain_name = insider.userDomain(device);
                 if (domain_name.hasError()) {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -165,13 +170,13 @@ public class DeviceActivateActivity extends Activity {
             @Override
             public void run() {
 
-                Result<List<AppVersions>> updateResult = sam.update(device, progress);
+                Result<List<AppVersions>> updateResult = sam.update(device);
                 if (updateResult.hasError()) {
                     return;
                 }
 
                 if (!updateResult.getValue().isEmpty()) {
-                    if (sam.run(device, progress, Command.Upgrade_All).hasError()) {
+                    if (sam.run(device, Command.Upgrade_All).hasError()) {
                         return;
                     }
                 }
@@ -213,7 +218,7 @@ public class DeviceActivateActivity extends Activity {
                 }
 
                 progress.title("Activating remote access");
-                final Result<Device> remote = accessManager.enable(device, preferences.getDomain(), progress);
+                final Result<Device> remote = accessManager.enable(device, preferences.getDomain());
                 if (remote.hasError()) {
                     progress.error(remote.getError());
                     return;

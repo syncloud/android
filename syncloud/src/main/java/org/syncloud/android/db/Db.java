@@ -7,8 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 
+import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.Endpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,6 @@ public class Db extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "syncloud";
     public static final String DEVICE_TABLE = "device";
-    public static final String NAME_COLUMN = "name";
     public static final String USER_DOMAIN = "user_domain";
     public static final String LOCAL_HOST_COLUMN = "local_host";
     public static final String LOCAL_PORT_COLUMN = "local_port";
@@ -30,7 +30,6 @@ public class Db extends SQLiteOpenHelper {
     private static final String DEVICE_TABLE_CREATE =
             "CREATE TABLE " + DEVICE_TABLE + " (" +
                     DEVICE_ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    NAME_COLUMN + " TEXT, " +
                     USER_DOMAIN + " TEXT, " +
                     LOCAL_HOST_COLUMN + " TEXT, " +
                     LOCAL_PORT_COLUMN + " INTEGER," +
@@ -66,18 +65,22 @@ public class Db extends SQLiteOpenHelper {
         Cursor cursor = qb.query(db, null, null, null, null, null, null);
         try {
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                devices.add(
-                        new Device(
-                                cursor.getInt(cursor.getColumnIndex(DEVICE_ID_COLUMN)),
-                                cursor.getString(cursor.getColumnIndex(NAME_COLUMN)),
-                                cursor.getString(cursor.getColumnIndex(USER_DOMAIN)),
-                                new DirectEndpoint(
-                                        cursor.getString(cursor.getColumnIndex(LOCAL_HOST_COLUMN)),
-                                        cursor.getInt(cursor.getColumnIndex(LOCAL_PORT_COLUMN)),
-                                        cursor.getString(cursor.getColumnIndex(LOGIN_COLUMN)),
-                                        cursor.getString(cursor.getColumnIndex(PASSWORD_COLUMN)),
-                                        cursor.getString(cursor.getColumnIndex(SSHKEY_COLUMN))))
-                );
+                Credentials credentials = new Credentials(
+                        cursor.getString(cursor.getColumnIndex(LOGIN_COLUMN)),
+                        cursor.getString(cursor.getColumnIndex(PASSWORD_COLUMN)),
+                        cursor.getString(cursor.getColumnIndex(SSHKEY_COLUMN)));
+
+                Endpoint endpoint = new Endpoint(
+                        cursor.getString(cursor.getColumnIndex(LOCAL_HOST_COLUMN)),
+                        cursor.getInt(cursor.getColumnIndex(LOCAL_PORT_COLUMN)));
+
+                Device device = new Device(
+                        cursor.getInt(cursor.getColumnIndex(DEVICE_ID_COLUMN)),
+                        cursor.getString(cursor.getColumnIndex(USER_DOMAIN)),
+                        endpoint,
+                        credentials);
+
+                devices.add(device);
             }
         } finally {
             cursor.close();
@@ -91,7 +94,7 @@ public class Db extends SQLiteOpenHelper {
         getWritableDatabase().delete(
                 DEVICE_TABLE,
                 DEVICE_ID_COLUMN + "=?",
-                new String[] { device.getId().toString() });
+                new String[] { device.id().toString() });
 
     }
 
@@ -102,24 +105,23 @@ public class Db extends SQLiteOpenHelper {
 
     public void update(Device device) {
         ContentValues values = toFields(device);
-        values.put(NAME_COLUMN, device.getName());
 
         int update = getWritableDatabase().update(
                 DEVICE_TABLE,
                 values,
                 DEVICE_ID_COLUMN + "=?",
-                new String[]{device.getId().toString()});
+                new String[]{device.id().toString()});
         System.out.println(update);
     }
 
     private ContentValues toFields(Device device) {
         ContentValues values = new ContentValues();
-        values.put(USER_DOMAIN, device.getUserDomain());
-        values.put(LOCAL_HOST_COLUMN, device.getLocalEndpoint().getHost());
-        values.put(LOCAL_PORT_COLUMN, device.getLocalEndpoint().getPort());
-        values.put(LOGIN_COLUMN, device.getLocalEndpoint().getLogin());
-        values.put(PASSWORD_COLUMN, device.getLocalEndpoint().getPassword());
-        values.put(SSHKEY_COLUMN, device.getLocalEndpoint().getKey());
+        values.put(USER_DOMAIN, device.userDomain());
+        values.put(LOCAL_HOST_COLUMN, device.localEndpoint().host());
+        values.put(LOCAL_PORT_COLUMN, device.localEndpoint().port());
+        values.put(LOGIN_COLUMN, device.credentials().login());
+        values.put(PASSWORD_COLUMN, device.credentials().password());
+        values.put(SSHKEY_COLUMN, device.credentials().key());
         return values;
     }
 }

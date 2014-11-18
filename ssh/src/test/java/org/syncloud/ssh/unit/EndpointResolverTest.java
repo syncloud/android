@@ -4,8 +4,9 @@ import org.junit.Test;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Dns;
 import org.syncloud.ssh.EndpointResolver;
+import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.Endpoint;
 import org.xbill.DNS.Record;
 import org.xbill.DNS.SRVRecord;
 import org.xbill.DNS.TextParseException;
@@ -27,11 +28,11 @@ public class EndpointResolverTest {
     private final String domain = "syncloud.it";
     private final String remoteHost = "device." + domain;
 
-//    private DirectEndpoint localEndpoint = new DirectEndpoint("localEndpoint", 0, "", "", "");
-    private DirectEndpoint remoteEndpoint = new DirectEndpoint(remoteHost, remotePort, "", "", "");
+//    private Endpoint localEndpoint = new Endpoint("localEndpoint", 0);
+    private Endpoint remoteEndpoint = new Endpoint(remoteHost, remotePort);
 
     private final String userDomain = "testdomain1.syncloud.info";
-//    private final Device device = new Device(0, "", userDomain, localEndpoint);
+//    private final Device device = new Device(0, userDomain, localEndpoint, new Credentials("", "", ""));
 
 
     @Test
@@ -39,7 +40,7 @@ public class EndpointResolverTest {
 
         EndpointResolver resolver = new EndpointResolver(mock(Dns.class));
 
-        Result<DirectEndpoint> endpoint = resolver.dnsService(userDomain, type, "");
+        Result<Endpoint> endpoint = resolver.dnsService(userDomain, type);
 
         assertTrue(endpoint.hasError());
     }
@@ -53,7 +54,7 @@ public class EndpointResolverTest {
 
         EndpointResolver resolver = new EndpointResolver(dns);
 
-        Result<DirectEndpoint> endpoint = resolver.dnsService(userDomain, type, "");
+        Result<Endpoint> endpoint = resolver.dnsService(userDomain, type);
 
         assertFalse(endpoint.hasError() ? endpoint.getError() : "", endpoint.hasError());
         assertEquals(remoteEndpoint, endpoint.getValue());
@@ -67,7 +68,7 @@ public class EndpointResolverTest {
 
         EndpointResolver resolver = new EndpointResolver(dns);
 
-        Result<DirectEndpoint> endpoint = resolver.dnsService(userDomain, type, "");
+        Result<Endpoint> endpoint = resolver.dnsService(userDomain, type);
 
         assertTrue(endpoint.hasError());
     }

@@ -3,6 +3,7 @@ package org.syncloud.apps.sam;
 import com.google.common.io.Resources;
 
 import org.junit.Test;
+import org.syncloud.common.progress.Progress;
 import org.syncloud.apps.FailOnErrorProgress;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
@@ -32,12 +33,12 @@ public class SamTest {
 
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
+
         FailOnErrorProgress progress = new FailOnErrorProgress();
+        Sam sam = new Sam(ssh, progress);
+        sam.run(device, Command.Update);
 
-        Sam sam = new Sam(ssh);
-        sam.run(device, progress, Command.Update);
-
-        verify(ssh).execute(device, "sam update", progress);
+        verify(ssh).execute(device, "sam update");
     }
 
     @Test
@@ -46,11 +47,11 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
 
-        Sam sam = new Sam(ssh);
         FailOnErrorProgress progress = new FailOnErrorProgress();
-        sam.run(device, progress, Command.Update, "--release 0.1");
+        Sam sam = new Sam(ssh, progress);
+        sam.run(device, Command.Update, "--release 0.1");
 
-        verify(ssh).execute(device, "sam update --release 0.1", progress);
+        verify(ssh).execute(device, "sam update --release 0.1");
     }
 
     @Test
@@ -60,15 +61,14 @@ public class SamTest {
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.json"), UTF_8);
         FailOnErrorProgress progress = new FailOnErrorProgress();
-        when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
+        when(ssh.execute(device, List.cmd())).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, progress);
 
-        Result<java.util.List<AppVersions>> result = sam.list(device, progress);
+        Result<java.util.List<AppVersions>> result = sam.list(device);
         assertEquals(9, result.getValue().size());
 
-        verify(ssh).execute(device, List.cmd(), progress);
-
+        verify(ssh).execute(device, List.cmd());
     }
 
     @Test
@@ -78,15 +78,15 @@ public class SamTest {
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.empty.json"), UTF_8);
         FailOnErrorProgress progress = new FailOnErrorProgress();
-        when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
+        when(ssh.execute(device, List.cmd())).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, progress);
 
-        Result<java.util.List<AppVersions>> result = sam.list(device, progress);
+        Result<java.util.List<AppVersions>> result = sam.list(device);
         assertFalse(result.hasError());
         assertEquals(0, result.getValue().size());
 
-        verify(ssh).execute(device, List.cmd(), progress);
+        verify(ssh).execute(device, List.cmd());
     }
 
     @Test
@@ -97,13 +97,13 @@ public class SamTest {
         String json = "";
         FailOnErrorProgress progress = new FailOnErrorProgress();
 
-        when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
+        when(ssh.execute(device, List.cmd())).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, progress);
 
-        assertTrue(sam.list(device, progress).hasError());
+        assertTrue(sam.list(device).hasError());
 
-        verify(ssh).execute(device, List.cmd(), progress);
+        verify(ssh).execute(device, List.cmd());
     }
 
     @Test
@@ -114,13 +114,13 @@ public class SamTest {
         String json = Resources.toString(getResource("app.list.error.json"), UTF_8);
         FailOnErrorProgress progress = new FailOnErrorProgress();
 
-        when(ssh.execute(device, List.cmd(), progress)).thenReturn(value(json));
+        when(ssh.execute(device, List.cmd())).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, progress);
 
-        assertTrue(sam.list(device, progress).hasError());
+        assertTrue(sam.list(device).hasError());
 
-        verify(ssh).execute(device, List.cmd(), progress);
+        verify(ssh).execute(device, List.cmd());
     }
 
     @Test
@@ -139,13 +139,13 @@ public class SamTest {
         String json = Resources.toString(getResource(response), UTF_8);
         String command = Update.cmd("--release", Sam.RELEASE);
         FailOnErrorProgress progress = new FailOnErrorProgress();
-        when(ssh.execute(device, command, progress)).thenReturn(value(json));
+        when(ssh.execute(device, command)).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, progress);
 
-        assertEquals(sam.update(device, progress).getValue().size(), expectedUpdates);
+        assertEquals(sam.update(device).getValue().size(), expectedUpdates);
 
-        verify(ssh).execute(device, command, progress);
+        verify(ssh).execute(device, command);
     }
 
 }

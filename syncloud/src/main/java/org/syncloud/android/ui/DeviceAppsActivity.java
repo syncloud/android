@@ -5,14 +5,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.ImageButton;
+import android.view.View;
+
 
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
@@ -65,7 +64,6 @@ public class DeviceAppsActivity extends Activity {
         preferences = application.getPreferences();
 
         deviceName = (TextView) findViewById(R.id.device_name);
-        ImageButton nameEditBtn = (ImageButton) findViewById(R.id.device_name_edit_btn);
         ImageButton rebootBtn = (ImageButton) findViewById(R.id.device_reboot_btn);
         rebootBtn.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
         rebootBtn.setOnClickListener(new View.OnClickListener() {
@@ -77,18 +75,12 @@ public class DeviceAppsActivity extends Activity {
 
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
         db = application.getDb();
-        deviceName.setText(device.getDisplayName());
-        nameEditBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showNameChange();
-            }
-        });
+        deviceName.setText(device.userDomain());
+
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
-        ssh = application.getSsh();
-        sam = new Sam(ssh);
+        sam = new Sam(application.getSsh(), progress);
         progress.start();
         execute(new Runnable() {
                     @Override
@@ -99,31 +91,6 @@ public class DeviceAppsActivity extends Activity {
 
         );
 
-    }
-
-    private void showNameChange() {
-        final EditText input = new EditText(this);
-        input.setText(device.getDisplayName());
-        new AlertDialog.Builder(this)
-                .setTitle("Name change")
-                .setMessage("Enter name for the device")
-                .setView(input)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        final Editable name = input.getText();
-                        device.setName(name.toString());
-                        deviceName.setText(device.getDisplayName());
-                        execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                db.update(device);
-                            }
-                        });
-                    }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-            }
-        }).show();
     }
 
     public void reboot() {
@@ -142,12 +109,12 @@ public class DeviceAppsActivity extends Activity {
                 })
                 .show();
     }
-
+    
     private void listApps() {
         execute(new Runnable() {
                     @Override
                     public void run() {
-                        final Result<List<AppVersions>> appsResult = sam.list(device, progress);
+                        final Result<List<AppVersions>> appsResult = sam.list(device);
                         if (!appsResult.hasError()) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -178,7 +145,7 @@ public class DeviceAppsActivity extends Activity {
                                 execute(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (!sam.run(device, progress, Command.Upgrade_All).hasError()) {
+                                        if (!sam.run(device, Command.Upgrade_All).hasError()) {
                                             listApps();
                                         }
                                     }
@@ -231,7 +198,7 @@ public class DeviceAppsActivity extends Activity {
         execute(new Runnable() {
                     @Override
                     public void run() {
-                        Result<List<AppVersions>> updatesResult = sam.update(device, progress);
+                        Result<List<AppVersions>> updatesResult = sam.update(device);
                         if (updatesResult.hasError()) {
                             return;
                         }
@@ -250,7 +217,7 @@ public class DeviceAppsActivity extends Activity {
         execute(new Runnable() {
             @Override
             public void run() {
-                final Result<String> result = sam.run(device, progress, command, app);
+                final Result<String> result = sam.run(device, command, app);
                 if (result.hasError()) {
                     progress.error(result.getError());
                     return;

@@ -10,55 +10,18 @@
     android:orientation="vertical"
     >
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/device_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="20dp"
-        >
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        />
 
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            >
-
-            <TextView
-                android:id="@+id/device_name"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="device name"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/device_name_edit_btn"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                />
-
-            <ImageButton
-                android:id="@+id/device_reboot_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/device_name_edit_btn"
-                android:padding="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/ic_action_refresh"
-                />
-
-            <ImageButton
-                android:id="@+id/device_name_edit_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:padding="20dp"
-                android:background="@drawable/ic_action_edit"
-                />
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/app_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/app_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
 
 </LinearLayout>

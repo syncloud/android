@@ -7,19 +7,16 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 import org.apache.commons.exec.LogOutputStream;
-import org.apache.commons.lang3.StringUtils;
 import org.syncloud.common.progress.NullProgress;
 import org.syncloud.common.progress.Progress;
+import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.common.model.Result;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
-
-import static java.util.Arrays.asList;
 
 public class Ssh {
 
@@ -28,38 +25,35 @@ public class Ssh {
     private JSchFactory jSchFactory;
     private final EndpointResolver resolver;
 
+    private Progress progress;
+    
     public Ssh(JSchFactory jsch, EndpointResolver resolver1) {
         this.jSchFactory = jsch;
         resolver = resolver1;
     }
 
+//    public Ssh() {
+//        this(new NullProgress());
+//    }
+
     public Result<String> execute(Device device, String command) {
-        return execute(device, asList(command), new NullProgress());
-    }
 
-    public Result<String> execute(Device device, String command, Progress progress) {
         progress.progress("ssh: " + command);
-        return execute(device, asList(command), progress);
-    }
-
-    private Result<String> execute(Device device, List<String> commands, Progress progress) {
-
-        DirectEndpoint local = device.getLocalEndpoint();
         try {
-            return run(local, commands, progress);
+            return run(device.localEndpoint(), device.credentials(), command);
         } catch (Exception e) {
-            progress.progress("Local endpoint is not available: " + local + ", error: " + e.getMessage());
+            progress.progress("Local endpoint is not available: " + e.getMessage());
         }
 
-        Result<DirectEndpoint> resolved = resolver.dnsService(device.getUserDomain(), SSH_TYPE, local.getKey());
-        if (resolved.hasError()) {
-            progress.error("Unable to resolve dns: " + resolved.getError());
-            return Result.error(resolved.getError());
+        Result<Endpoint> remote = resolver.dnsService(device.userDomain(), SSH_TYPE);
+        if (remote.hasError()) {
+            progress.error("Unable to resolve dns: " + remote.getError());
+            return Result.error(remote.getError());
         }
 
-        DirectEndpoint remote = resolved.getValue();
+        Endpoint remote1 = remote.getValue();
         try {
-            return run(remote, commands, progress);
+            return run(remote1, device.credentials(), command);
         } catch (Exception e) {
             progress.error("Remote endpoint is not available: " + remote + ", error: " + e.getMessage());
         }
@@ -67,15 +61,16 @@ public class Ssh {
         return Result.error("unable to connect");
     }
 
-    private Result<String> run(DirectEndpoint endpoint, List<String> commands, final Progress progress) throws JSchException, IOException {
+    public Result<String> run(Endpoint endpoint, Credentials credentials, String command) throws JSchException, IOException {
 
-        JSch jSch = jSchFactory.create();
-        Session session = jSch.getSession(endpoint.getLogin(), endpoint.getHost(), endpoint.getPort());
+        JSch jsch = jSchFactory.create();
+
+        Session session = jsch.getSession(credentials.login(), endpoint.host(), endpoint.port());
         session.setTimeout(3000);
-        if (endpoint.getKey() == null) {
-            session.setPassword(endpoint.getPassword());
+        if (credentials.key() == null) {
+            session.setPassword(credentials.password());
         } else {
-            jSch.addIdentity(endpoint.getLogin(), endpoint.getKey().getBytes(), null, new byte[0]);
+            jsch.addIdentity(credentials.login(), credentials.key().getBytes(), null, new byte[0]);
             session.setUserInfo(new EmptyUserInfo());
         }
 
@@ -102,7 +97,7 @@ public class Ssh {
                 }
             });
 
-            channel.setCommand(StringUtils.join(commands, "; "));
+            channel.setCommand(command);
             InputStream inputStream = channel.getInputStream();
 
             try {
