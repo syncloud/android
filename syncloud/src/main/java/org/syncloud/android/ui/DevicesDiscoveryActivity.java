@@ -10,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -20,11 +19,16 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.AsyncDiscovery;
 import org.syncloud.android.discovery.DeviceEndpointListener;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.common.model.Result;
+import org.syncloud.ssh.Tools;
+import org.syncloud.ssh.model.Endpoint;
+import org.syncloud.ssh.model.Id;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 public class DevicesDiscoveryActivity extends Activity {
     private Preferences preferences;
@@ -51,7 +55,8 @@ public class DevicesDiscoveryActivity extends Activity {
 
         DeviceEndpointListener deviceEndpointListener = new DeviceEndpointListener() {
             @Override
-            public void added(final DirectEndpoint endpoint) {
+            public void added(final Endpoint endpoint) {
+                Result<Id> id = Tools.getId(endpoint, getStandardCredentials());
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -61,7 +66,7 @@ public class DevicesDiscoveryActivity extends Activity {
             }
 
             @Override
-            public void removed(final DirectEndpoint endpoint) {
+            public void removed(final Endpoint endpoint) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -124,7 +129,7 @@ public class DevicesDiscoveryActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void open(final DirectEndpoint endpoint) {
+    public void open(final Endpoint endpoint) {
         Intent intent = new Intent(this, DeviceActivateActivity.class);
         intent.putExtra(SyncloudApplication.DEVICE_ENDPOINT, endpoint);
         startActivity(intent);

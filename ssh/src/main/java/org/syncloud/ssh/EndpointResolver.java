@@ -1,8 +1,7 @@
 package org.syncloud.ssh;
 
 import org.syncloud.common.model.Result;
-import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.Endpoint;
 import org.xbill.DNS.Record;
 import org.xbill.DNS.SRVRecord;
 import org.xbill.DNS.TextParseException;
@@ -16,10 +15,10 @@ public class EndpointResolver {
         this.dns = dns;
     }
 
-    public Result<DirectEndpoint> dnsService(String domain, String type, String key) {
+    public Result<Endpoint> dnsService(String domain, String type) {
 
         String name = type + "." + domain;
-        Result<DirectEndpoint> notFound = Result.error("Public address is not available yet for " + name);
+        Result<Endpoint> notFound = Result.error("Public address is not available yet for " + name);
 
         try {
             Record[] records = dns.lookup(name, Type.SRV);
@@ -29,10 +28,7 @@ public class EndpointResolver {
                 SRVRecord srvRecord = (SRVRecord) records[0];
                 String target = srvRecord.getTarget().toString();
                 String host = target.substring(0, target.length() - 1);
-                DirectEndpoint endpoint = new DirectEndpoint(
-                        host,
-                        srvRecord.getPort(),
-                        null, null, key);
+                Endpoint endpoint = new Endpoint(host, srvRecord.getPort());
                 return Result.value(endpoint);
             }
         } catch (TextParseException e) {

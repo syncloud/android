@@ -5,14 +5,14 @@ import java.io.Serializable;
 public class Device implements Serializable {
     private Integer id;
     private String  userDomain;
-    private DirectEndpoint localEndpoint;
-    private String name;
+    private Endpoint localEndpoint;
+    private Credentials credentials;
 
-    public Device(Integer id, String name, String userDomain, DirectEndpoint localEndpoint) {
+    public Device(Integer id, String userDomain, Endpoint localEndpoint, Credentials credentials) {
         this.userDomain = userDomain;
         this.localEndpoint = localEndpoint;
         this.id = id;
-        this.name = name;
+        this.credentials = credentials;
     }
 
     public Integer getId() {
@@ -20,23 +20,19 @@ public class Device implements Serializable {
     }
 
     public String getDisplayName() {
-        return name != null ? name : userDomain;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return userDomain;
     }
 
     public String getUserDomain() {
         return userDomain;
     }
 
-    public DirectEndpoint getLocalEndpoint() {
+    public Endpoint getLocalEndpoint() {
         return localEndpoint;
+    }
+
+    public Credentials credentials() {
+        return credentials;
     }
 
     @Override

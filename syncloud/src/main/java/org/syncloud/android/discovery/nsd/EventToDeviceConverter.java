@@ -7,7 +7,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.Endpoint;
 
 import java.net.InetAddress;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
     private NsdManager manager;
     private String serviceName;
     private DeviceEndpointListener deviceEndpointListener;
-    private Map<String, DirectEndpoint> serviceToUrl = new HashMap<String, DirectEndpoint>();
+    private Map<String, Endpoint> serviceToUrl = new HashMap<String, Endpoint>();
 
     public EventToDeviceConverter(NsdManager manager, String serviceName, DeviceEndpointListener deviceEndpointListener) {
         this.manager = manager;
@@ -75,7 +75,7 @@ public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
         logger.info(text);
         String serviceName = serviceInfo.getServiceName();
         if (serviceName.toLowerCase().contains(this.serviceName.toLowerCase())) {
-            DirectEndpoint device = serviceToUrl.remove(serviceName);
+            Endpoint device = serviceToUrl.remove(serviceName);
             if (deviceEndpointListener != null && device != null)
                 deviceEndpointListener.removed(device);
         }
@@ -95,14 +95,14 @@ public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
             String text = "service: "+serviceName+" resovled";
             logger.info(text);
 
-            DirectEndpoint device = extractDevice(serviceInfo);
+            Endpoint device = extractDevice(serviceInfo);
             serviceToUrl.put(serviceName, device);
             if (deviceEndpointListener != null)
                 deviceEndpointListener.added(device);
         }
     };
 
-    private DirectEndpoint extractDevice(NsdServiceInfo serviceInfo) {
+    private Endpoint extractDevice(NsdServiceInfo serviceInfo) {
         String address = "unknown";
         InetAddress host = serviceInfo.getHost();
         if (host != null) {
@@ -110,6 +110,6 @@ public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
         }
         int port = serviceInfo.getPort();
 
-        return new DirectEndpoint(address, Ssh.SSH_SERVER_PORT, "root", "syncloud", null);
+        return new Endpoint(address, Ssh.SSH_SERVER_PORT);
     }
 }

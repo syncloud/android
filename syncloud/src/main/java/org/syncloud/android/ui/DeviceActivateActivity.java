@@ -24,15 +24,17 @@ import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.remote.RemoteAccessManager;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.Endpoint;
 
 import java.util.List;
+
+import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 
 public class DeviceActivateActivity extends Activity {
 
     //    private Function<String, String> progressFunction;
-    private DirectEndpoint endpoint;
+    private Endpoint endpoint;
     private boolean dnsReady = false;
     private Preferences preferences;
     private Device device;
@@ -50,14 +52,14 @@ public class DeviceActivateActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_activate);
 
-        endpoint = (DirectEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
-        device = new Device(null, null, null, endpoint);
+        endpoint = (Endpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
+        device = new Device(null, null, endpoint, getStandardCredentials());
 
         preferences = ((SyncloudApplication) getApplication()).getPreferences();
 
         progress = new CommunicationDialog(this);
-        Ssh ssh = new Ssh();
-        sam = new Sam(ssh);
+        Ssh ssh = new Ssh(progress);
+        sam = new Sam(ssh, progress);
         insider = new InsiderManager(ssh);
         accessManager = new RemoteAccessManager(insider, ssh);
         url = (TextView) findViewById(R.id.device_url);
@@ -165,13 +167,13 @@ public class DeviceActivateActivity extends Activity {
             @Override
             public void run() {
 
-                Result<List<AppVersions>> updateResult = sam.update(device, progress);
+                Result<List<AppVersions>> updateResult = sam.update(device);
                 if (updateResult.hasError()) {
                     return;
                 }
 
                 if (!updateResult.getValue().isEmpty()) {
-                    if (sam.run(device, progress, Command.Upgrade_All).hasError()) {
+                    if (sam.run(device, Command.Upgrade_All).hasError()) {
                         return;
                     }
                 }

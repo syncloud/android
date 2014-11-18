@@ -58,20 +58,13 @@ public class DeviceAppsActivity extends Activity {
         });
 
         deviceName = (TextView) findViewById(R.id.device_name);
-        ImageButton nameEditBtn = (ImageButton) findViewById(R.id.device_name_edit_btn);
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
         db = ((SyncloudApplication) getApplication()).getDb();
         deviceName.setText(device.getDisplayName());
-        nameEditBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showNameChange();
-            }
-        });
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
-        sam = new Sam(new Ssh());
+        sam = new Sam(new Ssh(progress), progress);
         progress.start();
         execute(new Runnable() {
                     @Override
@@ -84,36 +77,11 @@ public class DeviceAppsActivity extends Activity {
 
     }
 
-    private void showNameChange() {
-        final EditText input = new EditText(this);
-        input.setText(device.getDisplayName());
-        new AlertDialog.Builder(this)
-                .setTitle("Name change")
-                .setMessage("Enter name for the device")
-                .setView(input)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        final Editable name = input.getText();
-                        device.setName(name.toString());
-                        deviceName.setText(device.getDisplayName());
-                        execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                db.update(device);
-                            }
-                        });
-                    }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-            }
-        }).show();
-    }
-
     private void listApps() {
         execute(new Runnable() {
                     @Override
                     public void run() {
-                        final Result<List<AppVersions>> appsResult = sam.list(device, progress);
+                        final Result<List<AppVersions>> appsResult = sam.list(device);
                         if (!appsResult.hasError()) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -144,7 +112,7 @@ public class DeviceAppsActivity extends Activity {
                                 execute(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (!sam.run(device, progress, Command.Upgrade_All).hasError()) {
+                                        if (!sam.run(device, Command.Upgrade_All).hasError()) {
                                             listApps();
                                         }
                                     }
@@ -187,7 +155,7 @@ public class DeviceAppsActivity extends Activity {
         execute(new Runnable() {
                     @Override
                     public void run() {
-                        Result<List<AppVersions>> updatesResult = sam.update(device, progress);
+                        Result<List<AppVersions>> updatesResult = sam.update(device);
                         if (updatesResult.hasError()) {
                             return;
                         }
@@ -206,7 +174,7 @@ public class DeviceAppsActivity extends Activity {
         execute(new Runnable() {
             @Override
             public void run() {
-                final Result<String> result = sam.run(device, progress, command, app);
+                final Result<String> result = sam.run(device, command, app);
                 if (result.hasError()) {
                     progress.error(result.getError());
                     return;

@@ -3,7 +3,7 @@ package org.syncloud.android.discovery.jmdns;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.DeviceEndpointListener;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.Ssh;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class EventToDeviceConverter implements ServiceListener {
 
     private String serviceName;
     private DeviceEndpointListener deviceEndpointListener;
-    private Map<String, DirectEndpoint> serviceToUrl = new HashMap<String, DirectEndpoint>();
+    private Map<String, Endpoint> serviceToUrl = new HashMap<String, Endpoint>();
 
     public EventToDeviceConverter(String serviceName, DeviceEndpointListener deviceEndpointListener) {
         this.serviceName = serviceName;
@@ -38,7 +38,7 @@ public class EventToDeviceConverter implements ServiceListener {
                 ServiceInfo info = event.getDNS().getServiceInfo(event.getType(), eventName);
                 waitForIpv4(info);
 
-                DirectEndpoint device = extractDevice(info);
+                Endpoint device = extractDevice(info);
                 serviceToUrl.put(eventName, device);
                 if (deviceEndpointListener != null)
                     deviceEndpointListener.added(device);
@@ -62,7 +62,7 @@ public class EventToDeviceConverter implements ServiceListener {
     }
 
 
-    private DirectEndpoint extractDevice(ServiceInfo info) {
+    private Endpoint extractDevice(ServiceInfo info) {
         logger.debug("extracting device: " + info);
 
         String address = "unknown";
@@ -75,7 +75,7 @@ public class EventToDeviceConverter implements ServiceListener {
                 address = server.substring(0, server.length() - local.length());
         }
 
-        return new DirectEndpoint(address, Ssh.SSH_SERVER_PORT, "root", "syncloud", null);
+        return new Endpoint(address, Ssh.SSH_SERVER_PORT);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class EventToDeviceConverter implements ServiceListener {
         logger.debug("service removed name: " + event.getName() + ", ip4 addresses: " + event.getInfo().getInet4Addresses().length);
         String eventName = event.getName();
         if (eventName.toLowerCase().contains(serviceName.toLowerCase())) {
-            DirectEndpoint device = serviceToUrl.remove(eventName);
+            Endpoint device = serviceToUrl.remove(eventName);
             if (deviceEndpointListener != null)
                 deviceEndpointListener.removed(device);
         }

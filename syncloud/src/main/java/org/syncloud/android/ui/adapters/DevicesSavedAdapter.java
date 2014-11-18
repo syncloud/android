@@ -67,7 +67,7 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
                 activity.open(device);
             }
         });
-        deviceLocalEndpoint.setText(device.getLocalEndpoint().getHost() + ":" + device.getLocalEndpoint().getPort());
+        deviceLocalEndpoint.setText(device.getLocalEndpoint().host() + ":" + device.getLocalEndpoint().port());
         deviceRemoteEndpoint.setText(device.getUserDomain());
 
         deviceLocalEndpoint.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);

@@ -6,11 +6,13 @@ import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.common.model.Result;
-import org.syncloud.ssh.model.DirectEndpoint;
+import org.syncloud.ssh.model.Endpoint;
+
+import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 public class RemoteAccessManagerTest {
 
-    public static final Device testDevice = new Device(null, null, null, new DirectEndpoint("192.168.1.70", 22, "root", "syncloud", null));
+    public static final Device testDevice = new Device(null, null, new Endpoint("192.168.1.70", 22), getStandardCredentials());
     public static final String SYNCLOUD_INFO = "syncloud.info";
 
     @Test
@@ -58,7 +60,7 @@ public class RemoteAccessManagerTest {
             if (device.hasError()) {
                 Assert.fail(device.getError());
             }
-            Assert.assertNotNull(device.getValue().getLocalEndpoint().getKey());
+            Assert.assertNotNull(device.getValue().getLocalEndpoint().key());
             System.out.println(device.getValue());
         }*/
 
