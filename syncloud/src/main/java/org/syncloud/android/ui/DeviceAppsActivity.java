@@ -5,12 +5,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -60,7 +56,7 @@ public class DeviceAppsActivity extends Activity {
         deviceName = (TextView) findViewById(R.id.device_name);
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
         db = ((SyncloudApplication) getApplication()).getDb();
-        deviceName.setText(device.getDisplayName());
+        deviceName.setText(device.userDomain());
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);

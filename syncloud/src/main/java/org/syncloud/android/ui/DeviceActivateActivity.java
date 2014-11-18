@@ -25,6 +25,7 @@ import org.syncloud.apps.remote.RemoteAccessManager;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.Endpoint;
+import org.syncloud.ssh.model.IdentifiedEndpoint;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 public class DeviceActivateActivity extends Activity {
 
     //    private Function<String, String> progressFunction;
-    private Endpoint endpoint;
+    private IdentifiedEndpoint endpoint;
     private boolean dnsReady = false;
     private Preferences preferences;
     private Device device;
@@ -52,8 +53,8 @@ public class DeviceActivateActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_activate);
 
-        endpoint = (Endpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
-        device = new Device(null, null, endpoint, getStandardCredentials());
+        endpoint = (IdentifiedEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
+        device = new Device(null, null, endpoint.endpoint(), getStandardCredentials());
 
         preferences = ((SyncloudApplication) getApplication()).getPreferences();
 

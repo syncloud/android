@@ -1,6 +1,8 @@
 package org.syncloud.ssh.model;
 
-public class Id {
+import java.io.Serializable;
+
+public class Identification implements Serializable {
     public String name;
     public String title;
     public String mac_address;

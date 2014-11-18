@@ -94,7 +94,7 @@ public class Db extends SQLiteOpenHelper {
         getWritableDatabase().delete(
                 DEVICE_TABLE,
                 DEVICE_ID_COLUMN + "=?",
-                new String[] { device.getId().toString() });
+                new String[] { device.id().toString() });
 
     }
 
@@ -110,15 +110,15 @@ public class Db extends SQLiteOpenHelper {
                 DEVICE_TABLE,
                 values,
                 DEVICE_ID_COLUMN + "=?",
-                new String[]{device.getId().toString()});
+                new String[]{device.id().toString()});
         System.out.println(update);
     }
 
     private ContentValues toFields(Device device) {
         ContentValues values = new ContentValues();
-        values.put(USER_DOMAIN, device.getUserDomain());
-        values.put(LOCAL_HOST_COLUMN, device.getLocalEndpoint().host());
-        values.put(LOCAL_PORT_COLUMN, device.getLocalEndpoint().port());
+        values.put(USER_DOMAIN, device.userDomain());
+        values.put(LOCAL_HOST_COLUMN, device.localEndpoint().host());
+        values.put(LOCAL_PORT_COLUMN, device.localEndpoint().port());
         values.put(LOGIN_COLUMN, device.credentials().login());
         values.put(PASSWORD_COLUMN, device.credentials().password());
         values.put(SSHKEY_COLUMN, device.credentials().key());

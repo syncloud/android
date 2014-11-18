@@ -36,13 +36,13 @@ public class Ssh {
 
         progress.progress("ssh: " + command);
         try {
-            return run(device.getLocalEndpoint(), device.credentials(), command);
+            return run(device.localEndpoint(), device.credentials(), command);
         } catch (Exception e) {
             progress.progress("Local endpoint is not available: " + e.getMessage());
         }
 
         EndpointResolver resolver = new EndpointResolver(new Dns());
-        Result<Endpoint> remote = resolver.dnsService(device.getUserDomain(), SSH_TYPE);
+        Result<Endpoint> remote = resolver.dnsService(device.userDomain(), SSH_TYPE);
         if (remote.hasError()) {
             progress.progress("Unable to resolve dns: " + remote.getError());
             return Result.error(remote.getError());

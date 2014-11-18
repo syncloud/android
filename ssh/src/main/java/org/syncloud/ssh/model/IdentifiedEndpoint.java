@@ -1,10 +1,12 @@
 package org.syncloud.ssh.model;
 
-public class IdentifiedEndpoint {
-    private Endpoint enpoint;
-    private Id id;
+import java.io.Serializable;
 
-    public IdentifiedEndpoint(Endpoint endpoint, Id id) {
+public class IdentifiedEndpoint implements Serializable {
+    private Endpoint enpoint;
+    private Identification id;
+
+    public IdentifiedEndpoint(Endpoint endpoint, Identification id) {
         this.enpoint = endpoint;
         this.id = id;
     }
@@ -13,7 +15,7 @@ public class IdentifiedEndpoint {
         return enpoint;
     }
 
-    public Id id() {
+    public Identification id() {
         return id;
     }
 }

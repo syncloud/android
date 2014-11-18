@@ -60,15 +60,15 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
                 removeSaved(device);
             }
         });
-        deviceName.setText(device.getDisplayName());
+        deviceName.setText(device.userDomain());
         deviceInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 activity.open(device);
             }
         });
-        deviceLocalEndpoint.setText(device.getLocalEndpoint().host() + ":" + device.getLocalEndpoint().port());
-        deviceRemoteEndpoint.setText(device.getUserDomain());
+        deviceLocalEndpoint.setText(device.localEndpoint().host() + ":" + device.localEndpoint().port());
+        deviceRemoteEndpoint.setText(device.userDomain());
 
         deviceLocalEndpoint.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
         deviceRemoteEndpoint.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);

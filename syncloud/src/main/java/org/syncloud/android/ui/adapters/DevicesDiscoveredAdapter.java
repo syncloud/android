@@ -5,13 +5,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.syncloud.android.R;
 import org.syncloud.android.ui.DevicesDiscoveryActivity;
-import org.syncloud.ssh.model.Endpoint;
+import org.syncloud.ssh.model.IdentifiedEndpoint;
 
-public class DevicesDiscoveredAdapter extends ArrayAdapter<Endpoint> {
+public class DevicesDiscoveredAdapter extends ArrayAdapter<IdentifiedEndpoint> {
     private DevicesDiscoveryActivity activity;
 
     public DevicesDiscoveredAdapter(DevicesDiscoveryActivity activity) {
@@ -25,18 +26,42 @@ public class DevicesDiscoveredAdapter extends ArrayAdapter<Endpoint> {
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_device_discovered, null);
 
-        final Endpoint endpoint = getItem(position);
+        final IdentifiedEndpoint ie = getItem(position);
 
         ImageButton deviceAdd = (ImageButton) rowView.findViewById(R.id.device_add);
         deviceAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.open(endpoint);
+                activity.open(ie);
             }
         });
 
-        TextView deviceHost = (TextView) rowView.findViewById(R.id.device_discovered_host);
-        deviceHost.setText(endpoint.host());
+        TextView txtMain = (TextView) rowView.findViewById(R.id.txt_main_name);
+        TextView txtHost = (TextView) rowView.findViewById(R.id.txt_host);
+        TextView txtMacAddress = (TextView) rowView.findViewById(R.id.txt_mac_address);
+
+        LinearLayout layoutHost = (LinearLayout) rowView.findViewById(R.id.layout_host);
+        LinearLayout layoutMacAddress = (LinearLayout) rowView.findViewById(R.id.layout_mac_address);
+        TextView txtNoIdentification = (TextView) rowView.findViewById(R.id.txt_no_identification);
+
+        txtHost.setText(ie.endpoint().host());
+
+        if (ie.id() != null) {
+            txtMain.setText(ie.id().title);
+
+            txtNoIdentification.setVisibility(View.GONE);
+            layoutHost.setVisibility(View.VISIBLE);
+            layoutMacAddress.setVisibility(View.VISIBLE);
+
+            txtHost.setText(ie.endpoint().host());
+            txtMacAddress.setText(ie.id().mac_address);
+        } else {
+            txtMain.setText(ie.endpoint().host());
+
+            txtNoIdentification.setVisibility(View.VISIBLE);
+            layoutHost.setVisibility(View.GONE);
+            layoutMacAddress.setVisibility(View.INVISIBLE);
+        }
 
         return rowView;
 

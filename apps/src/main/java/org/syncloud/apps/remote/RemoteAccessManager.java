@@ -28,7 +28,7 @@ public class RemoteAccessManager {
     }
 
     public Result<Device> enable(final Device device, final String domain) {
-        final Endpoint endpoint = device.getLocalEndpoint();
+        final Endpoint endpoint = device.localEndpoint();
         return ssh.execute(device, REMOTE_BIN + " enable")
                 .flatMap(new Result.Function<String, Result<Device>>() {
                     @Override

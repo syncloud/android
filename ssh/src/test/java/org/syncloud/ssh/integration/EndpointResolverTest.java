@@ -20,7 +20,7 @@ public class EndpointResolverTest {
                 "testdomain1.syncloud.info",
                 new Endpoint("localhost", 0),
                 new Credentials("", "", ""));
-        Result<Endpoint> endpoint = resolver.dnsService(device.getDisplayName(), "_ssh._tcp");
+        Result<Endpoint> endpoint = resolver.dnsService(device.userDomain(), "_ssh._tcp");
 
         Assert.assertFalse(endpoint.hasError());
 

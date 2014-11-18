@@ -15,19 +15,15 @@ public class Device implements Serializable {
         this.credentials = credentials;
     }
 
-    public Integer getId() {
+    public Integer id() {
         return id;
     }
 
-    public String getDisplayName() {
+    public String userDomain() {
         return userDomain;
     }
 
-    public String getUserDomain() {
-        return userDomain;
-    }
-
-    public Endpoint getLocalEndpoint() {
+    public Endpoint localEndpoint() {
         return localEndpoint;
     }
 
