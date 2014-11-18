@@ -42,8 +42,8 @@ public class SshTest {
         EndpointResolver resolver = mock(EndpointResolver.class);
         when(resolver.dnsService(anyString(), anyString())).thenReturn(Result.value(remoteEndpoint));
 
-        Ssh ssh = new Ssh(getjSchFactory(jsch), resolver);
         Progress progress = mock(Progress.class);
+        Ssh ssh = new Ssh(getjSchFactory(jsch), resolver, progress);
 
         Result<String> result = ssh.execute(device, "command");
 
@@ -61,8 +61,8 @@ public class SshTest {
         EndpointResolver resolver = mock(EndpointResolver.class);
         when(resolver.dnsService(anyString(), anyString())).thenReturn(Result.<Endpoint>error("not available"));
 
-        Ssh ssh = new Ssh(getjSchFactory(jsch), resolver);
         Progress progress = mock(Progress.class);
+        Ssh ssh = new Ssh(getjSchFactory(jsch), resolver, progress);
 
         Result<String> result = ssh.execute(device, "command");
 

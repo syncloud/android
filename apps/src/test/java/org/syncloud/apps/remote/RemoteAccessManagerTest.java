@@ -30,8 +30,8 @@ public class RemoteAccessManagerTest {
     }
 
     public void testRemoteAccess() {
-        Ssh ssh = new Ssh(new JSchFactory(), new EndpointResolver(new Dns()));
         FailOnErrorProgress progress = new FailOnErrorProgress();
+        Ssh ssh = new Ssh(new JSchFactory(), new EndpointResolver(new Dns()), progress);
         RemoteAccessManager accessManager = new RemoteAccessManager(new InsiderManager(ssh, progress), ssh, progress);
         Result<Device> remoteDevice = accessManager.enable(testDevice, SYNCLOUD_INFO);
         Boolean wasEnabled = !remoteDevice.hasError();
