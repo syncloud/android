@@ -1,10 +1,13 @@
 package org.syncloud.android;
 
 import android.content.SharedPreferences;
+
+import org.syncloud.ssh.EndpointPreference;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Preferences {
+public class Preferences implements EndpointPreference {
     public static final String KEY_PREF_API_URL = "pref_api_url";
     public static final String KEY_PREF_DEBUG_MODE = "pref_debug_mode";
     public static final String KEY_PREF_ACCOUNT_REMOVE = "pref_account_remove";
@@ -14,6 +17,8 @@ public class Preferences {
     public static final String KEY_PREF_DISCOVERY_LIBRARY = "pref_discovery_library";
 
     private SharedPreferences preferences;
+
+    private boolean remoteEndpointPreferred = false;
 
     public Preferences(SharedPreferences preferences) {
         this.preferences = preferences;
@@ -58,4 +63,13 @@ public class Preferences {
         return preferences.getString(KEY_PREF_DISCOVERY_LIBRARY, "JmDNS");
     }
 
+    @Override
+    public boolean isRemote() {
+        return remoteEndpointPreferred;
+    }
+
+    @Override
+    public void swap() {
+        remoteEndpointPreferred = !remoteEndpointPreferred;
+    }
 }

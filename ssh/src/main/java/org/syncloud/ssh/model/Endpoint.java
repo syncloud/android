@@ -22,10 +22,7 @@ public class Endpoint implements Serializable {
 
     @Override
     public String toString() {
-        return "DeviceEndpoint{" +
-                "host='" + host +
-                ", port=" + port +
-                '}';
+        return "{ host=" + host + ", port=" + port + '}';
     }
 
     @Override

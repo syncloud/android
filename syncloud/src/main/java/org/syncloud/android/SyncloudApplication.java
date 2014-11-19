@@ -4,8 +4,6 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.jcraft.jsch.JSch;
-
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -16,7 +14,8 @@ import org.syncloud.android.db.Db;
 import org.syncloud.common.progress.Progress;
 import org.syncloud.ssh.Dns;
 import org.syncloud.ssh.EndpointResolver;
-import org.syncloud.ssh.JSchFactory;
+import org.syncloud.ssh.EndpointSelector;
+import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.Ssh;
 
 import java.util.HashMap;
@@ -49,6 +48,7 @@ public class SyncloudApplication extends Application {
     }};
     private Db db;
     private Preferences preferences;
+    private SshRunner sshRunner;
 
     @Override
     public void onCreate() {
@@ -72,6 +72,8 @@ public class SyncloudApplication extends Application {
     }
 
     public Ssh createSsh(Progress progress) {
-        return new Ssh(new JSchFactory(), new EndpointResolver(new Dns()), progress);
+        sshRunner = new SshRunner(progress);
+        EndpointSelector endpointSelector = new EndpointSelector(new EndpointResolver(new Dns()), preferences);
+        return new Ssh(sshRunner, endpointSelector, progress, preferences);
     }
 }

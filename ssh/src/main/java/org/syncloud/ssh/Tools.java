@@ -15,9 +15,9 @@ public class Tools {
 
     public static final ObjectMapper JSON = new ObjectMapper();
 
-    private Ssh ssh;
+    private SshRunner ssh;
 
-    public Tools(Ssh ssh) {
+    public Tools(SshRunner ssh) {
         this.ssh = ssh;
     }
 

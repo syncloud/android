@@ -22,6 +22,7 @@ import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.common.model.Result;
 import org.syncloud.common.progress.NullProgress;
 import org.syncloud.ssh.Ssh;
+import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.Tools;
 import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.model.Identification;
@@ -54,8 +55,7 @@ public class DevicesDiscoveryActivity extends Activity {
 
         SyncloudApplication application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
-        Ssh ssh = application.createSsh(new NullProgress());
-        tools = new Tools(ssh);
+        tools = new Tools(new SshRunner(new NullProgress()));
         setContentView(R.layout.activity_devices_discovery);
         final ListView listview = (ListView) findViewById(R.id.devices_discovered);
         progressBar = (ProgressBar) findViewById(R.id.discovery_progress);
