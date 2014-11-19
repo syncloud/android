@@ -39,6 +39,12 @@
             android:label="@string/title_activity_device" >
         </activity>
         <activity
+            android:name=".ui.DeviceAppStoreActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_app_store" >
+        </activity>
+        <activity
             android:name=".ui.apps.Owncloud"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"

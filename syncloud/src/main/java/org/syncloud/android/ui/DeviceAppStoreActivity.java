@@ -9,21 +9,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.ImageButton;
-import android.view.View;
-
 
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
+import org.syncloud.android.ui.adapters.DeviceAppStoreAppsAdapter;
+import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
+import org.syncloud.apps.sam.App;
 import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Command;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
-import org.syncloud.apps.sam.App;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 
@@ -32,9 +30,9 @@ import java.util.List;
 import static android.os.AsyncTask.execute;
 import static org.syncloud.android.SyncloudApplication.appRegistry;
 
-public class DeviceAppsActivity extends Activity {
+public class DeviceAppStoreActivity extends Activity {
 
-    private DeviceAppsAdapter deviceAppsAdapter;
+    private DeviceAppStoreAppsAdapter deviceAppsAdapter;
     private Device device;
     private Db db;
     private TextView deviceName;
@@ -48,7 +46,7 @@ public class DeviceAppsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_device_apps);
+        setContentView(R.layout.activity_device_app_store);
 
         progress = new CommunicationDialog(this);
         progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -69,7 +67,7 @@ public class DeviceAppsActivity extends Activity {
         deviceName.setText(device.userDomain());
 
         final ListView listview = (ListView) findViewById(R.id.app_list);
-        deviceAppsAdapter = new DeviceAppsAdapter(this);
+        deviceAppsAdapter = new DeviceAppStoreAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
         ssh = application.createSsh(progress);
         sam = new Sam(ssh, progress);
@@ -124,10 +122,44 @@ public class DeviceAppsActivity extends Activity {
         );
     }
 
+    private void showUpgradeQuestion() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(DeviceAppStoreActivity.this)
+                        .setTitle("Updates available")
+                        .setPositiveButton("Update all apps", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (!sam.run(device, Command.Upgrade_All).hasError()) {
+                                            listApps();
+                                        }
+                                    }
+                                });
+                            }
+                        })
+                        .setNegativeButton("Not now", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        progress.stop();
+                                    }
+                                });
+                            }
+                        })
+                        .show();
+            }
+        });
+
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.device, menu);
+        getMenuInflater().inflate(R.menu.app_store, menu);
         return true;
     }
 
@@ -137,23 +169,55 @@ public class DeviceAppsActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_reboot_device) {
+        if (id == R.id.action_update_apps) {
+            updateSpm();
+        } else if (id == R.id.action_show_admin_apps) {
+            progress.start();
+            progress.title("Changing apps filter");
+            item.setChecked(!item.isChecked());
+            showAdminApps = item.isChecked();
+            listApps();
+        } else if (id == R.id.action_reboot_device) {
           reboot();
-        } else if (id == R.id.action_manage_apps) {
-            Intent intent = new Intent(this, DeviceAppStoreActivity.class);
-            intent.putExtra(SyncloudApplication.DEVICE, device);
-            startActivityForResult(intent, 1);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void openApp(String appId) {
-        if (appRegistry.containsKey(appId)) {
-            Intent intent = new Intent(this, appRegistry.get(appId));
-            intent.putExtra(SyncloudApplication.DEVICE, device);
-            startActivity(intent);
-        }
+    private void updateSpm() {
+        progress.start();
+        execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        Result<List<AppVersions>> updatesResult = sam.update(device);
+                        if (updatesResult.hasError()) {
+                            return;
+                        }
+                        if (!updatesResult.getValue().isEmpty()) {
+                            showUpgradeQuestion();
+                        } else {
+                            listApps();
+                        }
+                    }
+                }
+        );
+    }
+
+    public void run(final Command command, final String app) {
+        progress.start();
+        execute(new Runnable() {
+            @Override
+            public void run() {
+                final Result<String> result = sam.run(device, command, app);
+                if (result.hasError()) {
+                    progress.error(result.getError());
+                    return;
+                }
+
+                listApps();
+
+            }
+        });
     }
 
     @Override

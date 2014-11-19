@@ -27,8 +27,6 @@ public class DeviceAppsAdapter extends ArrayAdapter<AppVersions> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-//        return super.getView(position, convertView, parent);
-
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_app, null);
         TextView textView = (TextView) rowView.findViewById(R.id.app_name);
@@ -41,13 +39,6 @@ public class DeviceAppsAdapter extends ArrayAdapter<AppVersions> {
             }
         });
 
-        ImageButton install = (ImageButton) rowView.findViewById(R.id.install_app);
-        install.setVisibility(View.GONE);
-        ImageButton remove = (ImageButton) rowView.findViewById(R.id.remove_app);
-        remove.setVisibility(View.GONE);
-        ImageButton upgrade = (ImageButton) rowView.findViewById(R.id.upgrade_app);
-        upgrade.setVisibility(View.GONE);
-
         ImageButton appTypeUser = (ImageButton) rowView.findViewById(R.id.app_icon_user);
         ImageButton appTypeUtil = (ImageButton) rowView.findViewById(R.id.app_icon_util);
 
@@ -58,31 +49,6 @@ public class DeviceAppsAdapter extends ArrayAdapter<AppVersions> {
             appTypeUtil.setVisibility(View.VISIBLE);
             appTypeUser.setVisibility(View.GONE);
         }
-
-        if (appVersions.installed()) {
-            if (!appVersions.installed_version.equals(appVersions.current_version)) {
-                upgrade.setVisibility(View.VISIBLE);
-            }
-            remove.setVisibility(View.VISIBLE);
-        } else {
-            install.setVisibility(View.VISIBLE);
-        }
-
-        install.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {activity.run(Install, appVersions.app.id);
-            }
-        });
-        remove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {activity.run(Remove, appVersions.app.id);
-            }
-        });
-        upgrade.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {activity.run(Upgrade, appVersions.app.id);
-            }
-        });
 
         return rowView;
 
