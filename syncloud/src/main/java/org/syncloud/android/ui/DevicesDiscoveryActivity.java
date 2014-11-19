@@ -3,13 +3,17 @@ package org.syncloud.android.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -21,7 +25,6 @@ import org.syncloud.android.discovery.AsyncDiscovery;
 import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.common.model.Result;
 import org.syncloud.common.progress.NullProgress;
-import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.Tools;
 import org.syncloud.ssh.model.Endpoint;
@@ -46,6 +49,11 @@ public class DevicesDiscoveryActivity extends Activity {
     private ProgressBar progressBar;
     private DevicesDiscoveredAdapter listAdapter;
 
+    private LinearLayout layoutResults;
+    private LinearLayout layoutNoWifi;
+
+    private ListView resultsList;
+
     private Map<Endpoint, IdentifiedEndpoint> map;
     private Tools tools;
 
@@ -57,11 +65,14 @@ public class DevicesDiscoveryActivity extends Activity {
         preferences = application.getPreferences();
         tools = new Tools(new SshRunner(new NullProgress()));
         setContentView(R.layout.activity_devices_discovery);
-        final ListView listview = (ListView) findViewById(R.id.devices_discovered);
+
+        layoutResults = (LinearLayout) findViewById(R.id.layout_results);
+        layoutNoWifi = (LinearLayout) findViewById(R.id.layout_no_wifi);
+        resultsList = (ListView) findViewById(R.id.devices_discovered);
         progressBar = (ProgressBar) findViewById(R.id.discovery_progress);
         refreshBtn = (Button) findViewById(R.id.discovery_refresh_btn);
         listAdapter = new DevicesDiscoveredAdapter(this);
-        listview.setAdapter(listAdapter);
+        resultsList.setAdapter(listAdapter);
 
         map = newHashMap();
 
@@ -102,29 +113,43 @@ public class DevicesDiscoveryActivity extends Activity {
         discoveryStart();
     }
 
+    private boolean isWifiConnected() {
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+        return mWifi.isConnected();
+    }
+
     private void discoveryStart() {
         listAdapter.clear();
-        refreshBtn.setEnabled(false);
-        progressBar.setVisibility(View.VISIBLE);
-        asyncDiscovery.start(preferences.getDiscoveryLibrary());
-//        use for testing without wi-fi
-//        listAdapter.add(new DirectEndpoint("localhost", 22, "vsapronov", "somepassword", null));
-        scheduler.schedule(new Runnable() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        discoveryStop();
-                    }
-                });
-            }
-        }, 20, TimeUnit.SECONDS );
+        if (isWifiConnected()) {
+            layoutResults.setVisibility(View.VISIBLE);
+            layoutNoWifi.setVisibility(View.GONE);
+            refreshBtn.setEnabled(false);
+            progressBar.setVisibility(View.VISIBLE);
+            asyncDiscovery.start(preferences.getDiscoveryLibrary());
+            //        use for testing without wi-fi
+            //        listAdapter.add(new DirectEndpoint("localhost", 22, "vsapronov", "somepassword", null));
+            scheduler.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            discoveryStop();
+                        }
+                    });
+                }
+            }, 20, TimeUnit.SECONDS);
+        } else {
+            layoutResults.setVisibility(View.GONE);
+            layoutNoWifi.setVisibility(View.VISIBLE);
+        }
     }
 
     private void discoveryStop() {
         asyncDiscovery.stop();
-        progressBar.setVisibility(View.GONE);
+        progressBar.setVisibility(View.INVISIBLE);
         refreshBtn.setEnabled(true);
     }
 

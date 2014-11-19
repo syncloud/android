@@ -19,12 +19,69 @@
         style="@android:style/Widget.Holo.ProgressBar.Horizontal"
         />
 
-    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/devices_discovered"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/layout_results"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_weight="1"
-        />
+        android:visibility="gone">
+
+        <ListView
+            android:id="@+id/devices_discovered"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"/>
+
+        <TextView android:id="@android:id/empty"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
+                  android:paddingLeft="30dp"
+                  android:paddingRight="30dp"
+                  android:gravity="center"
+                  android:textSize="18sp"
+                  android:text="No devices found.\nCheck that your syncloud device is on and connected to the router."
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_no_wifi"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_network_wifi"
+                android:minHeight="100dp"
+                android:minWidth="100dp"
+                android:padding="10dp"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:text="Connect to Wi-Fi network and try to discover again."
+                android:layout_weight="1"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
 
     <Button
         android:id="@+id/discovery_refresh_btn"
