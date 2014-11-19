@@ -33,14 +33,15 @@
             android:layout_height="match_parent"
             android:visibility="visible"/>
 
-        <TextView android:id="@android:id/empty"
-                  android:layout_width="fill_parent"
-                  android:layout_height="fill_parent"
-                  android:paddingLeft="30dp"
-                  android:paddingRight="30dp"
-                  android:gravity="center"
-                  android:textSize="18sp"
-                  android:text="No devices found.\nCheck that your syncloud device is on and connected to the router."
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:text="No devices found.\nCheck that your syncloud device is on and connected to the router."
             />
 
     </LinearLayout>
@@ -62,22 +63,36 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:src="@drawable/ic_action_network_wifi"
+                android:padding="10dp"
                 android:minHeight="100dp"
                 android:minWidth="100dp"
-                android:padding="10dp"
-                android:layout_gravity="center"/>
+                />
 
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="30dp"
-                android:paddingRight="30dp"
                 android:gravity="center"
+                android:padding="10dp"
                 android:textSize="18sp"
                 android:text="Connect to Wi-Fi network and try to discover again."
                 android:layout_weight="1"
                 />
+
+            <TextView
+                android:text="Open Wi-Fi settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="10dp"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:clickable="true"
+                android:onClick="openWiFiSettings"
+                android:textColor="#ff33b5e5"
+                />
+
         </LinearLayout>
 
     </LinearLayout>

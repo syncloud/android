@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -180,7 +181,10 @@ public class DevicesDiscoveryActivity extends Activity {
         finish();
     }
 
-
+    public void openWiFiSettings(View view) {
+        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+        startActivityForResult(intent, 0);
+    }
 
     @Override
     protected void onDestroy() {
