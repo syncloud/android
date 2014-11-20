@@ -17,8 +17,7 @@
     <uses-permission
         android:name="android.permission.INTERNET"
         android:required="true" />
-
-    <uses-permission android:name="android.permission.READ_LOGS"/>
+    <uses-permission android:name="android.permission.READ_LOGS" />
 
     <application
         android:name=".SyncloudApplication"
@@ -29,14 +28,14 @@
         <activity
             android:name=".ui.DevicesSavedActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"
-            android:label="@string/title_devices" >
+            android:label="@string/title_devices"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.DeviceAppsActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_device" >
+            android:label="@string/title_activity_device"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.DeviceAppStoreActivity"
@@ -47,20 +46,20 @@
         <activity
             android:name=".ui.apps.Owncloud"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_owncloud" >
+            android:label="@string/title_activity_owncloud"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.DeviceActivateActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_insider" >
+            android:label="@string/title_activity_insider"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.DevicesDiscoveryActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_discovery" >
+            android:label="@string/title_activity_discovery"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.AuthActivity"
@@ -69,25 +68,31 @@
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.SettingsActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_settings" >
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.AuthCredentialsActivity"
-            android:windowSoftInputMode="adjustResize|stateVisible"
+            android:label="@string/title_activity_auth_credentials"
             android:screenOrientation="portrait"
-            android:label="@string/title_activity_auth_credentials" >
+            android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
-        <activity android:name="org.acra.CrashReportDialog"
-            android:theme="@android:style/Theme.Dialog"
-            android:launchMode="singleInstance"
+        <activity
+            android:name="org.acra.CrashReportDialog"
             android:excludeFromRecents="true"
-            android:finishOnTaskLaunch="true" />
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".ui.LogsActivity"
+            android:label="@string/title_activity_logs" >
+        </activity>
     </application>
 
 </manifest>

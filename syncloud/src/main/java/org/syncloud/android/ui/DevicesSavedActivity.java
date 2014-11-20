@@ -61,6 +61,8 @@ public class DevicesSavedActivity extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             startActivityForResult(new Intent(this, SettingsActivity.class), 2);
+        } else if (id == R.id.logs_activity) {
+            startActivityForResult(new Intent(this, LogsActivity.class), 3);
         }
         return super.onOptionsItemSelected(item);
     }
