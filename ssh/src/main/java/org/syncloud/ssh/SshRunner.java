@@ -7,8 +7,8 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 import org.apache.commons.exec.LogOutputStream;
+import org.apache.log4j.Logger;
 import org.syncloud.common.model.Result;
-import org.syncloud.common.progress.Progress;
 import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Endpoint;
 
@@ -18,11 +18,7 @@ import java.util.Properties;
 
 public class SshRunner {
 
-    private Progress progress;
-
-    public SshRunner(Progress progress) {
-        this.progress = progress;
-    }
+    private static Logger logger = Logger.getLogger(SshRunner.class);
 
     public Result<String> run(Endpoint endpoint, Credentials credentials, String command) throws JSchException, IOException {
 
@@ -30,12 +26,12 @@ public class SshRunner {
 
         Session session = jsch.getSession(credentials.login(), endpoint.host(), endpoint.port());
         session.setTimeout(10000);
-        progress.progress("Endpoint: " + endpoint);
+        logger.info("Endpoint: " + endpoint);
         if (credentials.key() == null) {
-            progress.progress("Password authentication");
+            logger.info("Password authentication");
             session.setPassword(credentials.password());
         } else {
-            progress.progress("Public key authentication");
+            logger.info("Public key authentication");
             jsch.addIdentity(credentials.login(), credentials.key().getBytes(), null, new byte[0]);
             session.setUserInfo(new EmptyUserInfo());
         }
@@ -52,14 +48,14 @@ public class SshRunner {
             channel.setOutputStream(new LogOutputStream() {
                 @Override
                 protected void processLine(String line, int level) {
-                    progress.progress(line);
+                    logger.info(line);
                 }
             });
 
             channel.setErrStream(new LogOutputStream() {
                 @Override
                 protected void processLine(String line, int level) {
-                    progress.error(line);
+                    logger.error(line);
                 }
             });
 
@@ -79,7 +75,7 @@ public class SshRunner {
                 if (channel.getExitStatus() == 0)
                     return Result.value(output);
                 else {
-                    progress.error(output);
+                    logger.info(output);
                     return Result.error(output);
                 }
             } finally {

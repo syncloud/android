@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import org.acra.ACRA;
 import org.syncloud.android.R;
 import org.syncloud.android.log.Logcat;
 import org.syncloud.android.ui.adapters.LogsAdapter;
@@ -48,5 +49,9 @@ public class LogsActivity extends Activity {
 
     public void refresh(View view) {
         logcat.readLog();
+    }
+
+    public void send(View view) {
+        ACRA.getErrorReporter().handleException(null);
     }
 }

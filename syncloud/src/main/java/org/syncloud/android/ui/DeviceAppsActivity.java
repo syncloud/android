@@ -71,8 +71,8 @@ public class DeviceAppsActivity extends Activity {
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
-        ssh = application.createSsh(progress);
-        sam = new Sam(ssh, progress);
+        ssh = application.createSsh();
+        sam = new Sam(ssh);
         progress.start();
         execute(new Runnable() {
                     @Override
@@ -104,6 +104,7 @@ public class DeviceAppsActivity extends Activity {
         execute(new Runnable() {
                     @Override
                     public void run() {
+                        progress.title("Refreshing app list");
                         final Result<List<AppVersions>> appsResult = sam.list(device);
                         if (!appsResult.hasError()) {
                             runOnUiThread(new Runnable() {
@@ -118,6 +119,8 @@ public class DeviceAppsActivity extends Activity {
                             });
                             progress.stop();
                             connected = true;
+                        } else {
+                            progress.error(appsResult.getError());
                         }
                     }
                 }

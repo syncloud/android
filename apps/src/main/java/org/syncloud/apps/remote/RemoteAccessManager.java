@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.common.model.Result;
-import org.syncloud.common.progress.Progress;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Device;
@@ -18,12 +17,10 @@ public class RemoteAccessManager {
     private static final String REMOTE_BIN = "remote";
     private InsiderManager insider;
     private Ssh ssh;
-    private Progress progress;
 
-    public RemoteAccessManager(InsiderManager insider, Ssh ssh, Progress progress) {
+    public RemoteAccessManager(InsiderManager insider, Ssh ssh) {
         this.insider = insider;
         this.ssh = ssh;
-        this.progress = progress;
     }
 
     public Result<String> disable(Device device) {

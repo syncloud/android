@@ -60,10 +60,10 @@ public class DeviceActivateActivity extends Activity {
         preferences = application.getPreferences();
 
         progress = new CommunicationDialog(this);
-        Ssh ssh = application.createSsh(progress);
-        sam = new Sam(ssh, progress);
-        insider = new InsiderManager(ssh, progress);
-        accessManager = new RemoteAccessManager(insider, ssh, progress);
+        Ssh ssh = application.createSsh();
+        sam = new Sam(ssh);
+        insider = new InsiderManager(ssh);
+        accessManager = new RemoteAccessManager(insider, ssh);
         url = (TextView) findViewById(R.id.device_url);
         deactivateButton = (Button) findViewById(R.id.name_deactivate);
         domainSettings = (LinearLayout) findViewById(R.id.domain_settings);
@@ -168,7 +168,7 @@ public class DeviceActivateActivity extends Activity {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-
+                progress.title("Checking for updates");
                 Result<List<AppVersions>> updateResult = sam.update(device);
                 if (updateResult.hasError()) {
                     return;

@@ -3,7 +3,6 @@ package org.syncloud.apps.insider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.syncloud.common.model.Result;
-import org.syncloud.common.progress.Progress;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.StringResult;
@@ -15,11 +14,9 @@ public class InsiderManager {
     private static final String INSIDER_BIN = "insider";
     public static final ObjectMapper JSON = new ObjectMapper();
     private Ssh ssh;
-    private Progress progress;
 
-    public InsiderManager(Ssh ssh, Progress progress) {
+    public InsiderManager(Ssh ssh) {
         this.ssh = ssh;
-        this.progress = progress;
     }
 
     public Result<String> userDomain(Device device) {

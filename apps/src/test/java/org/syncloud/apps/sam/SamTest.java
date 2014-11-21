@@ -3,8 +3,6 @@ package org.syncloud.apps.sam;
 import com.google.common.io.Resources;
 
 import org.junit.Test;
-import org.syncloud.common.progress.Progress;
-import org.syncloud.apps.FailOnErrorProgress;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
@@ -34,8 +32,7 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
 
-        FailOnErrorProgress progress = new FailOnErrorProgress();
-        Sam sam = new Sam(ssh, progress);
+        Sam sam = new Sam(ssh);
         sam.run(device, Command.Update);
 
         verify(ssh).execute(device, "sam update");
@@ -47,8 +44,7 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
 
-        FailOnErrorProgress progress = new FailOnErrorProgress();
-        Sam sam = new Sam(ssh, progress);
+        Sam sam = new Sam(ssh);
         sam.run(device, Command.Update, "--release 0.1");
 
         verify(ssh).execute(device, "sam update --release 0.1");
@@ -60,10 +56,9 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.json"), UTF_8);
-        FailOnErrorProgress progress = new FailOnErrorProgress();
         when(ssh.execute(device, List.cmd())).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh, progress);
+        Sam sam = new Sam(ssh);
 
         Result<java.util.List<AppVersions>> result = sam.list(device);
         assertEquals(9, result.getValue().size());
@@ -77,10 +72,9 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.empty.json"), UTF_8);
-        FailOnErrorProgress progress = new FailOnErrorProgress();
         when(ssh.execute(device, List.cmd())).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh, progress);
+        Sam sam = new Sam(ssh);
 
         Result<java.util.List<AppVersions>> result = sam.list(device);
         assertFalse(result.hasError());
@@ -95,11 +89,9 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = "";
-        FailOnErrorProgress progress = new FailOnErrorProgress();
-
         when(ssh.execute(device, List.cmd())).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh, progress);
+        Sam sam = new Sam(ssh);
 
         assertTrue(sam.list(device).hasError());
 
@@ -112,11 +104,10 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.error.json"), UTF_8);
-        FailOnErrorProgress progress = new FailOnErrorProgress();
 
         when(ssh.execute(device, List.cmd())).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh, progress);
+        Sam sam = new Sam(ssh);
 
         assertTrue(sam.list(device).hasError());
 
@@ -138,10 +129,9 @@ public class SamTest {
         Device device = mock(Device.class);
         String json = Resources.toString(getResource(response), UTF_8);
         String command = Update.cmd("--release", Sam.RELEASE);
-        FailOnErrorProgress progress = new FailOnErrorProgress();
         when(ssh.execute(device, command)).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh, progress);
+        Sam sam = new Sam(ssh);
 
         assertEquals(sam.update(device).getValue().size(), expectedUpdates);
 

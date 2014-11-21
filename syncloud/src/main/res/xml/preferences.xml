@@ -26,6 +26,12 @@
             android:entryValues="@array/pref_discovery_values"
             android:defaultValue="JmDNS" />
 
+        <Preference
+            android:key="pref_logs"
+            android:title="Logs"
+            android:summary="Shows application logs"
+            />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Account">

@@ -8,8 +8,4 @@
         android:orderInCategory="100"
         app:showAsAction="never" />
 
-    <item android:id="@+id/logs_activity"
-        android:title="Logs"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
 </menu>

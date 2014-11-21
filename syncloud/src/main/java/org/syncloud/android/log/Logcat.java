@@ -57,7 +57,7 @@ public class Logcat {
     private BufferedReader execute() throws IOException {
         final List<String> commandLine = commandLine();
         String[] args = commandLine.toArray(new String[commandLine.size()]);
-        Log.d(TAG, "running logcat: " + Joiner.on(" ").join(commandLine));
+        Log.d(TAG, Joiner.on(" ").join(commandLine));
         final Process process = Runtime.getRuntime().exec(args);
         return new BufferedReader(new InputStreamReader(process.getInputStream()));
     }

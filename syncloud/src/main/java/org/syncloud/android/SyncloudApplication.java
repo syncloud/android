@@ -3,15 +3,18 @@ package org.syncloud.android;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
+import org.acra.collector.CrashReportData;
+import org.acra.sender.ReportSender;
+import org.acra.sender.ReportSenderException;
 import org.syncloud.android.log.ConfigureLog4J;
 import org.syncloud.android.ui.DeviceActivateActivity;
 import org.syncloud.android.ui.apps.Owncloud;
 import org.syncloud.android.db.Db;
-import org.syncloud.common.progress.Progress;
 import org.syncloud.ssh.Dns;
 import org.syncloud.ssh.EndpointResolver;
 import org.syncloud.ssh.EndpointSelector;
@@ -20,6 +23,7 @@ import org.syncloud.ssh.Ssh;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import static org.acra.ReportField.*;
 
 @ReportsCrashes(
@@ -38,6 +42,8 @@ import static org.acra.ReportField.*;
 )
 public class SyncloudApplication extends Application {
 
+    private String TAG = SyncloudApplication.class.getSimpleName();
+
     public static String DEVICE = "device";
     public static String DEVICE_ENDPOINT = "device_endpoint";
 
@@ -48,12 +54,18 @@ public class SyncloudApplication extends Application {
     }};
     private Db db;
     private Preferences preferences;
-    private SshRunner sshRunner;
 
     @Override
     public void onCreate() {
 
         ACRA.init(this);
+        ACRA.getErrorReporter().addReportSender(new ReportSender() {
+            @Override
+            public void send(CrashReportData errorContent) throws ReportSenderException {
+                Log.e(TAG, errorContent.getProperty(STACK_TRACE));
+            }
+        });
+
         ConfigureLog4J.configure();
 
         super.onCreate();
@@ -71,9 +83,10 @@ public class SyncloudApplication extends Application {
         return preferences;
     }
 
-    public Ssh createSsh(Progress progress) {
-        sshRunner = new SshRunner(progress);
-        EndpointSelector endpointSelector = new EndpointSelector(new EndpointResolver(new Dns()), preferences);
-        return new Ssh(sshRunner, endpointSelector, progress, preferences);
+    public Ssh createSsh() {
+        return new Ssh(
+                new SshRunner(),
+                new EndpointSelector(new EndpointResolver(new Dns()), preferences),
+                preferences);
     }
 }

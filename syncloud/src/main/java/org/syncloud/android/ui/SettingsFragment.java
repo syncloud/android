@@ -48,6 +48,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
+        findPreference(Preferences.KEY_PREF_LOGS).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
+                startActivity(new Intent(SettingsFragment.this.getActivity(), LogsActivity.class));
+                return true;
+            }
+        });
+
         SharedPreferences preferences = getPreferenceScreen().getSharedPreferences();
         preferences.registerOnSharedPreferenceChangeListener(this);
         updateSummary(preferences, Preferences.KEY_PREF_API_URL);

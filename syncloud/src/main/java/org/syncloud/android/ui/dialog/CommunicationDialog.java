@@ -2,7 +2,6 @@ package org.syncloud.android.ui.dialog;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,17 +9,16 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.acra.ACRA;
 import org.syncloud.android.R;
-import org.syncloud.common.progress.Progress;
 
-public class CommunicationDialog extends AlertDialog implements Progress {
+public class CommunicationDialog extends AlertDialog {
     private ProgressBar progress;
     private Activity context;
     private TextView messageView;
     private CharSequence message;
     private Button reportBtn;
     private CharSequence title;
-    private String emailErrorBoundary = "========= ERROR =========";
 
     public CommunicationDialog(Activity context) {
         super(context);
@@ -37,7 +35,7 @@ public class CommunicationDialog extends AlertDialog implements Progress {
         reportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reportError(view);
+                reportError();
             }
         });
         setView(view);
@@ -46,6 +44,7 @@ public class CommunicationDialog extends AlertDialog implements Progress {
             setMessage(message);
         setCancelable(false);
         progress.setVisibility(View.VISIBLE);
+        messageView.setVisibility(View.INVISIBLE);
         super.onCreate(savedInstanceState);
     }
 
@@ -63,21 +62,15 @@ public class CommunicationDialog extends AlertDialog implements Progress {
     }
 
 
-    public void reportError(View view) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
-        intent.setType("message/rfc822");
-        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"syncloud@syncloud.it"});
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Syncloud error report: " + title);
-        CharSequence body = emailErrorBoundary + '\n' + message + '\n' + emailErrorBoundary + '\n';
-        intent.putExtra(Intent.EXTRA_TEXT, body);
-        context.startActivity(intent);
+    public void reportError() {
+        ACRA.getErrorReporter().handleException(null);
     }
 
 
     private void setError(String error) {
         progress(error);
         reportBtn.setVisibility(View.VISIBLE);
+        messageView.setVisibility(View.VISIBLE);
         setCancelable(true);
         progress.setVisibility(View.INVISIBLE);
     }
@@ -87,6 +80,7 @@ public class CommunicationDialog extends AlertDialog implements Progress {
         setMessage("");
         setCancelable(false);
         show();
+        messageView.setVisibility(View.INVISIBLE);
         reportBtn.setVisibility(View.INVISIBLE);
         progress.setVisibility(View.VISIBLE);
     }
@@ -100,7 +94,6 @@ public class CommunicationDialog extends AlertDialog implements Progress {
         });
     }
 
-    @Override
     public void error(final String error) {
         context.runOnUiThread(new Runnable() {
             @Override
@@ -110,7 +103,6 @@ public class CommunicationDialog extends AlertDialog implements Progress {
         });
     }
 
-    @Override
     public void title(final String message) {
         context.runOnUiThread(new Runnable() {
             @Override
@@ -120,7 +112,6 @@ public class CommunicationDialog extends AlertDialog implements Progress {
         });
     }
 
-    @Override
     public void progress(final String progress) {
         context.runOnUiThread(new Runnable() {
             @Override

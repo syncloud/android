@@ -20,15 +20,35 @@
 
     </LinearLayout>
 
-
-    <Button
-        android:id="@+id/discovery_btn"
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_weight="0"
-        android:onClick="refresh"
-        android:text="Refresh" />
+        android:orientation="horizontal"
+        android:weightSum="2"
+        >
+
+        <Button
+            android:id="@+id/log_send_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:onClick="send"
+            android:text="Send" />
+
+        <Button
+            android:id="@+id/log_refresh_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:onClick="refresh"
+            android:text="Refresh"/>
+
+
+        </LinearLayout>
+
 
 </LinearLayout>

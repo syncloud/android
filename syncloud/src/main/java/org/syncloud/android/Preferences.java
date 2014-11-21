@@ -15,6 +15,7 @@ public class Preferences implements EndpointPreference {
     public static final String KEY_PREF_PASSWORD = "pref_password";
     public static final String KEY_PREF_FEEDBACK_SEND= "pref_feedback_send";
     public static final String KEY_PREF_DISCOVERY_LIBRARY = "pref_discovery_library";
+    public static final String KEY_PREF_LOGS = "pref_logs";
 
     private SharedPreferences preferences;
 
