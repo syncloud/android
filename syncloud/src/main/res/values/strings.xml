@@ -57,6 +57,6 @@
     <string name="btn_report_error">Send error report</string>
     <string name="title_devices">Devices</string>
     <string name="revoot_device">Reboot device</string>
-    <string name="title_activity_logs">LogsActivity</string>
+    <string name="title_activity_logs">Logs</string>
 
 </resources>
