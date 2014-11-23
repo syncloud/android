@@ -3,16 +3,15 @@ package org.syncloud.apps.sam;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.syncloud.common.progress.Progress;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.SshResult;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.join;
-import static org.syncloud.apps.sam.Command.Update;
 import static org.syncloud.common.model.Result.value;
 
 public class Sam {
@@ -26,19 +25,21 @@ public class Sam {
 
     private String cmd(String... arguments) {
         List<String> cmd = asList(arguments);
-        cmd.add(0, "sam");
-
-        return join(cmd, " ");
+        return "sam "+ join(cmd, " ");
     }
 
-    public <TContent> Result<TContent> runTyped(Device device, String... arguments) {
+    public <TContent> Result<TContent> runTyped(final TypeReference type, Device device, String... arguments) {
         return run(device, arguments).flatMap(new Result.Function<String, Result<TContent>>() {
             @Override
             public Result<TContent> apply(String v) throws Exception {
-                TContent content = JSON.readValue(v, new TypeReference<TContent>() {});
-                return value(content);
+                SshResult<TContent> result = JSON.readValue(v, type);
+                return value(result.data);
             }
         });
+    }
+
+    private Result<List<AppVersions>> appsVersions(Device device, String... arguments) {
+        return runTyped(new TypeReference<SshResult<List<AppVersions>>>() {}, device, arguments);
     }
 
     public Result<String> run(Device device, String... arguments) {
@@ -51,23 +52,10 @@ public class Sam {
     }
 
     public Result<List<AppVersions>> update(Device device) {
-        progress.title("Checking for updates");
-        return appList(device, Update, "--release", RELEASE);
+        return appsVersions(device, Commands.update, "--release", RELEASE);
     }
 
     public Result<List<AppVersions>> list(Device device) {
-        return appList(device, List);
-        progress.title("Refreshing app list");
-        return runTyped(device, Commands.list);
+        return appsVersions(device, Commands.list);
     }
-
-    private Result<List<AppVersions>> appList(Device device, Command command, String... arguments) {
-        return run(device, command, arguments).flatMap(new Result.Function<String, Result<List<AppVersions>>>() {
-            @Override
-            public Result<List<AppVersions>> apply(String v) throws Exception {
-                return value(JSON.readValue(v, AppListReply.class).data);
-            }
-        });
-    }
-
 }

@@ -111,7 +111,8 @@ public class DeviceAppsActivity extends Activity {
                                 @Override
                                 public void run() {
                                     deviceAppsAdapter.clear();
-                                    for (AppVersions app : appsResult.getValue()) {
+                                    List<AppVersions> appsVersions = appsResult.getValue();
+                                    for (AppVersions app : appsVersions) {
                                         if (showAdminApps || app.app.appType() == App.Type.user)
                                             deviceAppsAdapter.add(app);
                                     }
