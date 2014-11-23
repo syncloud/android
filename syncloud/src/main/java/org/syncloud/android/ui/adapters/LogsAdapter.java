@@ -16,6 +16,9 @@ import java.text.SimpleDateFormat;
 public class LogsAdapter extends ArrayAdapter<LogEvent> {
     private LogsActivity activity;
 
+    private Boolean showTime = false;
+    private Boolean showLevel = false;
+
     public LogsAdapter(LogsActivity activity) {
         super(activity, R.layout.layout_log);
         this.activity = activity;
@@ -25,17 +28,31 @@ public class LogsAdapter extends ArrayAdapter<LogEvent> {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_log, null);
+
         if (position % 2 == 0)
             rowView.setBackgroundColor(Color.parseColor("#FFE4E4E4"));
+
         final LogEvent event = getItem(position);
-        TextView time = (TextView) rowView.findViewById(R.id.log_date);
-        time.setText(event.getTimestamp());
-        TextView level = (TextView) rowView.findViewById(R.id.log_level);
-        level.setText(event.getLevel());
-        TextView tag = (TextView) rowView.findViewById(R.id.log_tag);
-        tag.setText(event.getTag());
-        TextView message = (TextView) rowView.findViewById(R.id.log_message);
-        message.setText(event.getMessage());
+
+        String message = "";
+        if (showTime)
+            message += event.getTimestamp() + " ";
+        if (showLevel)
+            message += event.getLevel() + " " + event.getTag() + " ";
+
+        message += event.getMessage();
+
+        TextView text = (TextView) rowView.findViewById(R.id.log_message);
+        text.setText(message);
+
         return rowView;
+    }
+
+    public void toggleTime() {
+        showTime = !showTime;
+    }
+
+    public void toggleLevel() {
+        showLevel = !showLevel;
     }
 }
