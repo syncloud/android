@@ -8,55 +8,11 @@
     android:paddingRight="5dp"
     >
 
-    <LinearLayout
-        android:layout_width="fill_parent"
+    <TextView
+        android:id="@+id/log_message"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/log_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="time"
-            android:typeface="monospace"
-            android:textStyle="bold"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/log_level"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="level"
-            android:typeface="monospace"
-            android:paddingLeft="5dp"
-            android:textSize="12sp"/>
-
-        <TextView
-            android:id="@+id/log_tag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="tag"
-            android:typeface="monospace"
-            android:paddingLeft="5dp"
-            android:textSize="12sp"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/log_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="message"
-            android:typeface="monospace"
-            android:textSize="12sp"/>
-
-    </LinearLayout>
-
-
+        android:text="message test test111111 test test1111 test test11111 test test test "
+        android:textSize="12sp"/>
 
 </LinearLayout>

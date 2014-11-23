@@ -27,7 +27,7 @@ public class Logcat {
         this.adapter = adapter;
     }
 
-    public void readLog() {
+    public void refresh() {
         adapter.clear();
         final int pid = android.os.Process.myPid();
         try {

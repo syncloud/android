@@ -25,7 +25,7 @@ public class LogsActivity extends Activity {
         adapter = new LogsAdapter(this);
         listview.setAdapter(adapter);
         logcat = new Logcat(adapter);
-        logcat.readLog();
+        logcat.refresh();
     }
 
     @Override
@@ -48,10 +48,20 @@ public class LogsActivity extends Activity {
     }
 
     public void refresh(View view) {
-        logcat.readLog();
+        logcat.refresh();
     }
 
     public void send(View view) {
         ACRA.getErrorReporter().handleException(null);
+    }
+
+    public void date(View view) {
+        adapter.toggleTime();
+        logcat.refresh();
+    }
+
+    public void level(View view) {
+        adapter.toggleLevel();
+        logcat.refresh();
     }
 }
