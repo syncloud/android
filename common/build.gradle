@@ -4,4 +4,12 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
     compile 'com.google.guava:guava:16.0.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.10'
+}
+
+jacocoTestReport() {
+    reports {
+        xml.enabled false
+        csv.enabled true
+    }
 }

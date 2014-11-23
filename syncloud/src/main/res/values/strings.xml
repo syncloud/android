@@ -40,9 +40,9 @@
     <string name="all_apps">Show admin apps</string>
     <string name="title_activity_auth">AuthActivity</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="device_activation_email"/>
-    <string name="device_activation_password"/>
-    <string name="device_activation_domain"/>
+    <string name="device_activation_email"></string>
+    <string name="device_activation_password"></string>
+    <string name="device_activation_domain"></string>
     <string name="auth_learn_more">Build your own server. <a href="http://syncloud.org">Learn more!</a></string>
     <string name="sign_in_exclamation"><u>Sign in!</u></string>
     <string name="check_credentials">Check credentials</string>
@@ -57,5 +57,6 @@
     <string name="btn_report_error">Send error report</string>
     <string name="title_devices">Devices</string>
     <string name="revoot_device">Reboot device</string>
+    <string name="title_activity_logs">Logs</string>
 
 </resources>

@@ -12,7 +12,6 @@ import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -25,7 +24,6 @@ import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.AsyncDiscovery;
 import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.common.model.Result;
-import org.syncloud.common.progress.NullProgress;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.Tools;
 import org.syncloud.ssh.model.Endpoint;
@@ -64,7 +62,7 @@ public class DevicesDiscoveryActivity extends Activity {
 
         SyncloudApplication application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
-        tools = new Tools(new SshRunner(new NullProgress()));
+        tools = new Tools(new SshRunner());
         setContentView(R.layout.activity_devices_discovery);
 
         layoutResults = (LinearLayout) findViewById(R.id.layout_results);

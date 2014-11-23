@@ -15,7 +15,7 @@ import javax.jmdns.JmDNS;
 
 public class JmdnsDiscovery implements Discovery {
 
-    private static Logger logger = LogManager.getLogger(JmdnsDiscovery.class.getName());
+    private static Logger logger = Logger.getLogger(JmdnsDiscovery.class);
 
     public static final String TYPE = "_ssh._tcp.local.";
     private JmDNS jmdns;

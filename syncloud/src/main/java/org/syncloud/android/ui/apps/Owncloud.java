@@ -49,7 +49,7 @@ public class Owncloud extends Activity {
 
         progress = new CommunicationDialog(this);
 
-        owncloudManager = new OwncloudManager(application.createSsh(progress));
+        owncloudManager = new OwncloudManager(application.createSsh());
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
         activatedControls = (LinearLayout) findViewById(R.id.owncloud_activated_controls);
@@ -167,9 +167,7 @@ public class Owncloud extends Activity {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(text.toString()));
             startActivity(browserIntent);
         } else {
-            progress.setMessage("url is not set");
-            progress.show();
-            progress.setCancelable(true);
+            progress.error("url is not set");
         }
     }
 
@@ -185,9 +183,7 @@ public class Owncloud extends Activity {
                 startActivity(marketIntent);
             }
         } else {
-            progress.setMessage("url is not set");
-            progress.show();
-            progress.setCancelable(true);
+            progress.error("url is not set");
         }
     }
 

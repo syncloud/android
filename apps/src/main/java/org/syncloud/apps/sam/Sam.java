@@ -19,11 +19,9 @@ public class Sam {
     public static final ObjectMapper JSON = new ObjectMapper();
     public static final String RELEASE = "0.7";
     private Ssh ssh;
-    private Progress progress;
 
-    public Sam(Ssh ssh, Progress progress) {
+    public Sam(Ssh ssh) {
         this.ssh = ssh;
-        this.progress = progress;
     }
 
     private String cmd(String... arguments) {
@@ -58,6 +56,7 @@ public class Sam {
     }
 
     public Result<List<AppVersions>> list(Device device) {
+        return appList(device, List);
         progress.title("Refreshing app list");
         return runTyped(device, Commands.list);
     }
