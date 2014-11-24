@@ -14,7 +14,7 @@
         android:id="@+id/device_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text=""
+        android:text="Apps Manager"
         android:textAppearance="?android:attr/textAppearanceLarge"
         />
 

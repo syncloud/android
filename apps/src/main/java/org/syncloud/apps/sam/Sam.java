@@ -23,7 +23,7 @@ public class Sam {
         this.ssh = ssh;
     }
 
-    private String cmd(String... arguments) {
+    public static String cmd(String... arguments) {
         List<String> cmd = asList(arguments);
         return "sam "+ join(cmd, " ");
     }
@@ -45,10 +45,6 @@ public class Sam {
     public Result<String> run(Device device, String... arguments) {
         String command = cmd(arguments);
         return ssh.execute(device, command);
-    }
-
-    public Result<String> run(Device device, Command command, String... arguments) {
-        return ssh.execute(device, command.cmd(arguments));
     }
 
     public Result<List<AppVersions>> update(Device device) {

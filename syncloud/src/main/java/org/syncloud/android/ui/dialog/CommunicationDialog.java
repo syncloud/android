@@ -10,9 +10,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.acra.ACRA;
+import org.syncloud.android.Progress;
 import org.syncloud.android.R;
 
-public class CommunicationDialog extends AlertDialog {
+public class CommunicationDialog extends AlertDialog implements Progress {
     private ProgressBar progress;
     private Activity context;
     private TextView messageView;

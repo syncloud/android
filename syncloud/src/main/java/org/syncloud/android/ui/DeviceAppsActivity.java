@@ -20,7 +20,6 @@ import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.sam.AppVersions;
-import org.syncloud.apps.sam.Command;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.sam.App;

@@ -14,14 +14,10 @@ import static com.google.common.io.Resources.getResource;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.syncloud.apps.sam.Command.List;
-import static org.syncloud.apps.sam.Command.Update;
+import static org.syncloud.apps.sam.Sam.cmd;
 import static org.syncloud.common.model.Result.value;
 
 public class SamTest {
@@ -33,7 +29,7 @@ public class SamTest {
         Device device = mock(Device.class);
 
         Sam sam = new Sam(ssh);
-        sam.run(device, Command.Update);
+        sam.run(device, Commands.update);
 
         verify(ssh).execute(device, "sam update");
     }
@@ -45,7 +41,7 @@ public class SamTest {
         Device device = mock(Device.class);
 
         Sam sam = new Sam(ssh);
-        sam.run(device, Command.Update, "--release 0.1");
+        sam.run(device, Commands.update, "--release", "0.1");
 
         verify(ssh).execute(device, "sam update --release 0.1");
     }
@@ -56,14 +52,15 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.json"), UTF_8);
-        when(ssh.execute(device, List.cmd())).thenReturn(value(json));
+        String command = cmd(Commands.list);
+        when(ssh.execute(device, command)).thenReturn(value(json));
 
         Sam sam = new Sam(ssh);
 
         Result<java.util.List<AppVersions>> result = sam.list(device);
         assertEquals(9, result.getValue().size());
 
-        verify(ssh).execute(device, List.cmd());
+        verify(ssh).execute(device, command);
     }
 
     @Test
@@ -72,7 +69,8 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.empty.json"), UTF_8);
-        when(ssh.execute(device, List.cmd())).thenReturn(value(json));
+        String command = cmd(Commands.list);
+        when(ssh.execute(device, command)).thenReturn(value(json));
 
         Sam sam = new Sam(ssh);
 
@@ -80,7 +78,7 @@ public class SamTest {
         assertFalse(result.hasError());
         assertEquals(0, result.getValue().size());
 
-        verify(ssh).execute(device, List.cmd());
+        verify(ssh).execute(device, command);
     }
 
     @Test
@@ -89,13 +87,14 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = "";
-        when(ssh.execute(device, List.cmd())).thenReturn(value(json));
+        String command = cmd(Commands.list);
+        when(ssh.execute(device, command)).thenReturn(value(json));
 
         Sam sam = new Sam(ssh);
 
         assertTrue(sam.list(device).hasError());
 
-        verify(ssh).execute(device, List.cmd());
+        verify(ssh).execute(device, command);
     }
 
     @Test
@@ -105,13 +104,14 @@ public class SamTest {
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.error.json"), UTF_8);
 
-        when(ssh.execute(device, List.cmd())).thenReturn(value(json));
+        String command = cmd(Commands.list);
+        when(ssh.execute(device, command)).thenReturn(value(json));
 
         Sam sam = new Sam(ssh);
 
         assertTrue(sam.list(device).hasError());
 
-        verify(ssh).execute(device, List.cmd());
+        verify(ssh).execute(device, command);
     }
 
     @Test
@@ -128,7 +128,7 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = Resources.toString(getResource(response), UTF_8);
-        String command = Update.cmd("--release", Sam.RELEASE);
+        String command = cmd(Commands.update, "--release", Sam.RELEASE);
         when(ssh.execute(device, command)).thenReturn(value(json));
 
         Sam sam = new Sam(ssh);

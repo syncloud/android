@@ -11,12 +11,7 @@ import org.syncloud.android.R;
 import org.syncloud.android.ui.DeviceAppStoreActivity;
 import org.syncloud.apps.sam.App;
 import org.syncloud.apps.sam.AppVersions;
-import org.syncloud.apps.sam.Command;
 import org.syncloud.apps.sam.Commands;
-
-import static org.syncloud.apps.sam.Command.Install;
-import static org.syncloud.apps.sam.Command.Remove;
-import static org.syncloud.apps.sam.Command.Upgrade;
 
 public class DeviceAppStoreAppsAdapter extends ArrayAdapter<AppVersions> {
     private DeviceAppStoreActivity activity;

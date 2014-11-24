@@ -17,7 +17,7 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.sam.AppVersions;
-import org.syncloud.apps.sam.Command;
+import org.syncloud.apps.sam.Commands;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.insider.InsiderManager;
@@ -175,7 +175,7 @@ public class DeviceActivateActivity extends Activity {
                 }
 
                 if (!updateResult.getValue().isEmpty()) {
-                    if (sam.run(device, Command.Upgrade_All).hasError()) {
+                    if (sam.run(device, Commands.upgrade_all).hasError()) {
                         return;
                     }
                 }
