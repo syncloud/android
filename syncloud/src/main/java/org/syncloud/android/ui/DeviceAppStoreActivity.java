@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +21,7 @@ import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.sam.App;
 import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Command;
+import org.syncloud.apps.sam.Commands;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
@@ -29,6 +31,7 @@ import java.util.List;
 
 import static android.os.AsyncTask.execute;
 import static org.syncloud.android.SyncloudApplication.appRegistry;
+import static org.syncloud.common.model.Result.error;
 
 public class DeviceAppStoreActivity extends Activity {
 
@@ -42,6 +45,7 @@ public class DeviceAppStoreActivity extends Activity {
     private CommunicationDialog progress;
     private Ssh ssh;
     private Preferences preferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,14 +75,8 @@ public class DeviceAppStoreActivity extends Activity {
         listview.setAdapter(deviceAppsAdapter);
         ssh = application.createSsh();
         sam = new Sam(ssh);
-        progress.start();
-        execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        listApps();
-                    }
-                });
 
+        new ListAppsTask().execute();
     }
 
     public void reboot() {
@@ -97,66 +95,34 @@ public class DeviceAppStoreActivity extends Activity {
                 })
                 .show();
     }
-    
-    private void listApps() {
-        execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        progress.title("Refreshing app list");
-                        final Result<List<AppVersions>> appsResult = sam.list(device);
-                        if (!appsResult.hasError()) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    deviceAppsAdapter.clear();
-                                    for (AppVersions app : appsResult.getValue()) {
-                                        if (showAdminApps || app.app.appType() == App.Type.user)
-                                            deviceAppsAdapter.add(app);
-                                    }
-                                }
-                            });
-                            progress.stop();
-                            connected = true;
-                        } else {
-                            progress.error(appsResult.getError());
-                        }
-                    }
-                }
-        );
+
+    private void onAppsLoaded(List<AppVersions> appsVersions) {
+        connected = true;
+        deviceAppsAdapter.clear();
+        for (AppVersions app : appsVersions) {
+            if (showAdminApps || app.app.appType() == App.Type.user)
+                deviceAppsAdapter.add(app);
+        }
     }
 
-    private void showUpgradeQuestion() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new AlertDialog.Builder(DeviceAppStoreActivity.this)
-                        .setTitle("Updates available")
-                        .setPositiveButton("Update all apps", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (!sam.run(device, Command.Upgrade_All).hasError()) {
-                                            listApps();
-                                        }
-                                    }
-                                });
-                            }
-                        })
-                        .setNegativeButton("Not now", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        progress.stop();
-                                    }
-                                });
-                            }
-                        })
-                        .show();
-            }
-        });
+    private void onSamUpdated(List<AppVersions> appsVersions) {
+        if (appsVersions.isEmpty()) {
+            new ListAppsTask().execute();
+        } else {
+            askUpgradeQuestion();
+        }
+    }
 
+    private void askUpgradeQuestion() {
+        new AlertDialog.Builder(DeviceAppStoreActivity.this)
+                .setTitle("Updates available")
+                .setPositiveButton("Update all apps", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        new UpgradeAllTask().execute();
+                    }
+                })
+                .setNegativeButton("Not now", null)
+                .show();
     }
 
     @Override
@@ -173,13 +139,11 @@ public class DeviceAppStoreActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_update_apps) {
-            updateSpm();
+            new UpdateSamTask().execute();
         } else if (id == R.id.action_show_admin_apps) {
-            progress.start();
-            progress.title("Changing apps filter");
             item.setChecked(!item.isChecked());
             showAdminApps = item.isChecked();
-            listApps();
+            new ListAppsTask().execute();
         } else if (id == R.id.action_reboot_device) {
           reboot();
         }
@@ -187,42 +151,8 @@ public class DeviceAppStoreActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateSpm() {
-        progress.start();
-        execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        progress.title("Checking for updates");
-                        Result<List<AppVersions>> updatesResult = sam.update(device);
-                        if (updatesResult.hasError()) {
-                            progress.error(updatesResult.getError());
-                            return;
-                        }
-                        if (!updatesResult.getValue().isEmpty()) {
-                            showUpgradeQuestion();
-                        } else {
-                            listApps();
-                        }
-                    }
-                }
-        );
-    }
-
-    public void run(final Command command, final String app) {
-        progress.start();
-        execute(new Runnable() {
-            @Override
-            public void run() {
-                final Result<String> result = sam.run(device, command, app);
-                if (result.hasError()) {
-                    progress.error(result.getError());
-                    return;
-                }
-
-                listApps();
-
-            }
-        });
+    public void runSam(String... args) {
+        new SamTask().execute(args);
     }
 
     @Override
@@ -231,5 +161,107 @@ public class DeviceAppStoreActivity extends Activity {
         progress.dismiss();
     }
 
+    class UpdateSamTask extends AsyncTask<Void, Void, Result<List<AppVersions>>> {
+        @Override
+        protected void onPreExecute() {
+            progress.start();
+            progress.title("Checking for updates");
+        }
 
+        @Override
+        protected Result<List<AppVersions>> doInBackground(Void... voids) {
+            Result<List<AppVersions>> updatesResult = sam.update(device);
+            return updatesResult;
+        }
+
+        @Override
+        protected void onPostExecute(final Result<List<AppVersions>> result) {
+            if (result.hasError()) {
+                progress.error(result.getError());
+            } else {
+                progress.stop();
+                onSamUpdated(result.getValue());
+            }
+        }
+    }
+
+    class UpgradeAllTask extends AsyncTask<Void, Void, Result<List<AppVersions>>> {
+        @Override
+        protected void onPreExecute() {
+            progress.start();
+            progress.title("Upgrading all apps");
+        }
+
+        @Override
+        protected Result<List<AppVersions>> doInBackground(Void... voids) {
+            Result<String> upgradeResult = sam.run(device, Command.Upgrade_All);
+            if (upgradeResult.hasError()) {
+                return error(upgradeResult.getError());
+            } else {
+                return sam.list(device);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Result<List<AppVersions>> result) {
+            if (result.hasError()) {
+                progress.error(result.getError());
+                onAppsLoaded(result.getValue());
+            } else {
+                progress.stop();
+                onAppsLoaded(result.getValue());
+            }
+        }
+    }
+
+    class ListAppsTask extends AsyncTask<Void, Void, Result<List<AppVersions>>> {
+        @Override
+        protected void onPreExecute() {
+            progress.start();
+            progress.title("Refreshing app list");
+        }
+
+        @Override
+        protected Result<List<AppVersions>> doInBackground(Void... voids) {
+            return sam.list(device);
+        }
+
+        @Override
+        protected void onPostExecute(final Result<List<AppVersions>> result) {
+            if (result.hasError()) {
+                progress.error(result.getError());
+            } else {
+                progress.stop();
+                onAppsLoaded(result.getValue());
+            }
+        }
+    }
+
+    class SamTask extends AsyncTask<String, Void, Result<List<AppVersions>>> {
+        @Override
+        protected void onPreExecute() {
+            progress.start();
+            progress.title("Executing command");
+        }
+
+        @Override
+        protected Result<List<AppVersions>> doInBackground(String... arguments) {
+            Result<String> commandResult = sam.run(device, arguments);
+            if (commandResult.hasError()) {
+                return error(commandResult.getError());
+            } else {
+                return sam.list(device);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Result<List<AppVersions>> result) {
+            if (result.hasError()) {
+                progress.error(result.getError());
+            } else {
+                progress.stop();
+                onAppsLoaded(result.getValue());
+            }
+        }
+    }
 }

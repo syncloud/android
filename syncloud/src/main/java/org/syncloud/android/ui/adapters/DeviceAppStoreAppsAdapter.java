@@ -11,6 +11,8 @@ import org.syncloud.android.R;
 import org.syncloud.android.ui.DeviceAppStoreActivity;
 import org.syncloud.apps.sam.App;
 import org.syncloud.apps.sam.AppVersions;
+import org.syncloud.apps.sam.Command;
+import org.syncloud.apps.sam.Commands;
 
 import static org.syncloud.apps.sam.Command.Install;
 import static org.syncloud.apps.sam.Command.Remove;
@@ -63,17 +65,17 @@ public class DeviceAppStoreAppsAdapter extends ArrayAdapter<AppVersions> {
 
         install.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Install, appVersions.app.id);
+            public void onClick(View view) {activity.runSam(Commands.install, appVersions.app.id);
             }
         });
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Remove, appVersions.app.id);
+            public void onClick(View view) {activity.runSam(Commands.remove, appVersions.app.id);
             }
         });
         upgrade.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {activity.run(Upgrade, appVersions.app.id);
+            public void onClick(View view) {activity.runSam(Commands.upgrade, appVersions.app.id);
             }
         });
 
