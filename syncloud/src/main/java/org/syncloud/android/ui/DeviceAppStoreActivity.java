@@ -3,8 +3,6 @@ package org.syncloud.android.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,7 +10,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.syncloud.android.Preferences;
-import org.syncloud.android.Progress;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
@@ -67,7 +64,7 @@ public class DeviceAppStoreActivity extends Activity {
         deviceName = (TextView) findViewById(R.id.device_name);
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
         db = application.getDb();
-//        deviceName.setText(device.userDomain());
+        deviceName.setText(device.userDomain());
 
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppStoreAppsAdapter(this);
@@ -82,15 +79,15 @@ public class DeviceAppStoreActivity extends Activity {
         new ProgressAsyncTask<Void, List<AppVersions>>()
                 .setTitle("Refreshing app list")
                 .setProgress(progress)
-                .setWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
+                .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public Result<List<AppVersions>> work(Void... args) {
+                    public Result<List<AppVersions>> run(Void... args) {
                         return sam.list(device);
                     }
                 })
-                .setCompleted(new ProgressAsyncTask.Completed<List<AppVersions>>() {
+                .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
                     @Override
-                    public void onCompleted(List<AppVersions> appsVersions) {
+                    public void run(List<AppVersions> appsVersions) {
                         onAppsLoaded(appsVersions);
                     }
                 })
@@ -101,15 +98,15 @@ public class DeviceAppStoreActivity extends Activity {
         new ProgressAsyncTask<Void, List<AppVersions>>()
                 .setTitle("Checking for updates")
                 .setProgress(progress)
-                .setWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
+                .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public Result<List<AppVersions>> work(Void... args) {
+                    public Result<List<AppVersions>> run(Void... args) {
                         return sam.update(device);
                     }
                 })
-                .setCompleted(new ProgressAsyncTask.Completed<List<AppVersions>>() {
+                .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
                     @Override
-                    public void onCompleted(List<AppVersions> appsVersions) {
+                    public void run(List<AppVersions> appsVersions) {
                         onSamUpdated(appsVersions);
                     }
                 })
@@ -121,9 +118,9 @@ public class DeviceAppStoreActivity extends Activity {
         new ProgressAsyncTask<Void, List<AppVersions>>()
                 .setTitle("Upgrading all apps")
                 .setProgress(progress)
-                .setWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
+                .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public Result<List<AppVersions>> work(Void... args) {
+                    public Result<List<AppVersions>> run(Void... args) {
                         Result<String> upgradeResult = sam.run(device, Commands.upgrade_all);
                         if (upgradeResult.hasError()) {
                             return error(upgradeResult.getError());
@@ -132,22 +129,22 @@ public class DeviceAppStoreActivity extends Activity {
                         }
                     }
                 })
-                .setCompleted(new ProgressAsyncTask.Completed<List<AppVersions>>() {
+                .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
                     @Override
-                    public void onCompleted(List<AppVersions> appsVersions) {
+                    public void run(List<AppVersions> appsVersions) {
                         onAppsLoaded(appsVersions);
                     }
                 })
                 .execute();
     }
 
-    public void runSam(String... args) {
+    public void runSam(String... arguments) {
         new ProgressAsyncTask<String, List<AppVersions>>()
                 .setTitle("Executing command")
                 .setProgress(progress)
-                .setWork(new ProgressAsyncTask.Work<String, List<AppVersions>>() {
+                .doWork(new ProgressAsyncTask.Work<String, List<AppVersions>>() {
                     @Override
-                    public Result work(String... args) {
+                    public Result run(String... args) {
                         Result<String> commandResult = sam.run(device, args);
                         if (commandResult.hasError()) {
                             return error(commandResult.getError());
@@ -156,13 +153,13 @@ public class DeviceAppStoreActivity extends Activity {
                         }
                     }
                 })
-                .setCompleted(new ProgressAsyncTask.Completed<List<AppVersions>>() {
+                .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
                     @Override
-                    public void onCompleted(List<AppVersions> appsVersions) {
+                    public void run(List<AppVersions> appsVersions) {
                         onAppsLoaded(appsVersions);
                     }
                 })
-                .execute();
+                .execute(arguments);
     }
 
     public void reboot() {

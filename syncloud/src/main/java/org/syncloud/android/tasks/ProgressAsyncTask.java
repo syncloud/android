@@ -7,36 +7,46 @@ import org.syncloud.common.model.Result;
 
 public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void, Result<TResult>> {
 
+    public interface Success<TResult> {
+        void run(TResult result);
+    }
+
     public interface Completed<TResult> {
-        void onCompleted(TResult result);
+        void run(Result<TResult> result);
     }
 
     public interface Work<TParams, TResult> {
-        Result<TResult> work(TParams... args);
+        Result<TResult> run(TParams... args);
     }
 
     private String title;
     private Progress progress;
-    private Completed<TResult> completed;
     private Work<TParams, TResult> work;
+    private boolean showError = true;
+    private Success<TResult> success;
+    private Completed<TResult> completed;
 
-    public ProgressAsyncTask(Progress progress, String title, Work<TParams, TResult> work, Completed<TResult> completed) {
+    public ProgressAsyncTask(Progress progress, String title, Work<TParams, TResult> work) {
         this.progress = progress;
         this.title = title;
         this.work = work;
-        this.completed = completed;
     }
 
     public ProgressAsyncTask() {
-        this(null, null, null, null);
+        this(null, null, null);
     }
 
     @Override
     protected Result<TResult> doInBackground(TParams... args) {
         if (work != null)
-            return work.work(args);
+            return work.run(args);
         else
             return null;
+    }
+
+    public ProgressAsyncTask<TParams, TResult> showError(boolean value) {
+        this.showError = value;
+        return this;
     }
 
     public ProgressAsyncTask<TParams, TResult> setTitle(String title) {
@@ -49,12 +59,17 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
         return this;
     }
 
-    public ProgressAsyncTask<TParams, TResult> setCompleted(Completed<TResult> completed) {
+    public ProgressAsyncTask<TParams, TResult> onSuccess(Success<TResult> success) {
+        this.success = success;
+        return this;
+    }
+
+    public ProgressAsyncTask<TParams, TResult> onCompleted(Completed<TResult> completed) {
         this.completed = completed;
         return this;
     }
 
-    public ProgressAsyncTask<TParams, TResult> setWork(Work<TParams, TResult> work) {
+    public ProgressAsyncTask<TParams, TResult> doWork(Work<TParams, TResult> work) {
         this.work = work;
         return this;
     }
@@ -70,14 +85,16 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
 
     @Override
     protected void onPostExecute(Result<TResult> result) {
-        if (result.hasError()) {
-            if (progress != null)
+        if (progress != null) {
+            if (result.hasError() && showError)
                 progress.error(result.getError());
-        } else {
-            if (progress != null)
+            else
                 progress.stop();
-            if (completed != null)
-                completed.onCompleted(result.getValue());
         }
+        if (!result.hasError() && success != null)
+            success.run(result.getValue());
+
+        if (completed != null)
+            completed.run(result);
     }
 }

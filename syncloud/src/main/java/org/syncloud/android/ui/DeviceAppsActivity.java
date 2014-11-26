@@ -9,13 +9,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.ImageButton;
-import android.view.View;
 
 
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
@@ -72,14 +71,8 @@ public class DeviceAppsActivity extends Activity {
         listview.setAdapter(deviceAppsAdapter);
         ssh = application.createSsh();
         sam = new Sam(ssh);
-        progress.start();
-        execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        listApps();
-                    }
-                });
 
+        listApps();
     }
 
     public void reboot() {
@@ -98,33 +91,33 @@ public class DeviceAppsActivity extends Activity {
                 })
                 .show();
     }
-    
+
     private void listApps() {
-        execute(new Runnable() {
+        new ProgressAsyncTask<Void, List<AppVersions>>()
+                .setTitle("Refreshing app list")
+                .setProgress(progress)
+                .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public void run() {
-                        progress.title("Refreshing app list");
-                        final Result<List<AppVersions>> appsResult = sam.list(device);
-                        if (!appsResult.hasError()) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    deviceAppsAdapter.clear();
-                                    List<AppVersions> appsVersions = appsResult.getValue();
-                                    for (AppVersions app : appsVersions) {
-                                        if (showAdminApps || app.app.appType() == App.Type.user)
-                                            deviceAppsAdapter.add(app);
-                                    }
-                                }
-                            });
-                            progress.stop();
-                            connected = true;
-                        } else {
-                            progress.error(appsResult.getError());
-                        }
+                    public Result<List<AppVersions>> run(Void... args) {
+                        return sam.list(device);
                     }
-                }
-        );
+                })
+                .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
+                    @Override
+                    public void run(List<AppVersions> appsVersions) {
+                        onAppsLoaded(appsVersions);
+                    }
+                })
+                .execute();
+    }
+
+    private void onAppsLoaded(List<AppVersions> appsVersions) {
+        connected = true;
+        deviceAppsAdapter.clear();
+        for (AppVersions app : appsVersions) {
+            if (showAdminApps || app.app.appType() == App.Type.user)
+                deviceAppsAdapter.add(app);
+        }
     }
 
     @Override

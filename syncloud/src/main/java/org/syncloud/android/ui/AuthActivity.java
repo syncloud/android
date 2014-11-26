@@ -39,37 +39,7 @@ public class AuthActivity extends Activity {
         learnMoreText.setMovementMethod(LinkMovementMethod.getInstance());
 
         if (preferences.hasCredentials()) {
-            signInOrOut.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    String email = preferences.getEmail();
-                    String password = preferences.getPassword();
-                    final RestResult<String> result = UserService.getUser(email, password, preferences.getApiUrl());
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            if (result.hasError()) {
-                                signInOrOut.setVisibility(View.VISIBLE);
-
-                                Intent intent = new Intent(AuthActivity.this, AuthCredentialsActivity.class);
-                                intent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_SIGN_IN);
-                                intent.putExtra(AuthCredentialsActivity.PARAM_CHECK_EXISTING, true);
-                                startActivityForResult(intent, 1);
-                            } else {
-                                Intent intent = new Intent(AuthActivity.this, DevicesSavedActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                        }
-                    });
-
-
-                }
-            });
+            new CheckCredentialsTask(preferences).execute();
         }
     }
 
@@ -103,6 +73,45 @@ public class AuthActivity extends Activity {
         Intent credentialsIntent = new Intent(this, AuthCredentialsActivity.class);
         credentialsIntent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_REGISTER);
         startActivityForResult(credentialsIntent, 1);
+    }
+
+    public class CheckCredentialsTask extends AsyncTask<Void, Void, RestResult<String>> {
+        private Preferences preferences;
+
+        public CheckCredentialsTask(Preferences preferences) {
+            this.preferences = preferences;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            signInOrOut.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected RestResult<String> doInBackground(Void... voids) {
+            String email = preferences.getEmail();
+            String password = preferences.getPassword();
+            RestResult<String> result = UserService.getUser(email, password, preferences.getApiUrl());
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(RestResult<String> result) {
+            progressBar.setVisibility(View.INVISIBLE);
+            if (result.hasError()) {
+                signInOrOut.setVisibility(View.VISIBLE);
+
+                Intent intent = new Intent(AuthActivity.this, AuthCredentialsActivity.class);
+                intent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_SIGN_IN);
+                intent.putExtra(AuthCredentialsActivity.PARAM_CHECK_EXISTING, true);
+                startActivityForResult(intent, 1);
+            } else {
+                Intent intent = new Intent(AuthActivity.this, DevicesSavedActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }
     }
 
 }

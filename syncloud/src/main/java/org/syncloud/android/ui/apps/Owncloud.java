@@ -16,8 +16,10 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.owncloud.OwncloudManager;
@@ -66,9 +68,6 @@ public class Owncloud extends Activity {
 
         setVisibility(View.GONE, View.GONE);
 
-        progress.start();
-        progress.title("Checking ownCloud status ...");
-
         status();
     }
 
@@ -93,67 +92,55 @@ public class Owncloud extends Activity {
     }
 
     public void activate(View view) {
-        //TODO: Some validation
-
         final String login = loginText.getText().toString();
         final String pass = passText.getText().toString();
         final String protocol = chkHttps.isChecked() ? "https" : "http";
 
-        progress.start();
-        progress.title("Activating ...");
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                Result<String> result = owncloudManager.finishSetup(device, login, pass, protocol);
-                if (result.hasError()) {
-                    progress.error(result.getError());
-                    return;
-                }
-                runOnUiThread(new Runnable() {
+        new ProgressAsyncTask<String, String>()
+                .setTitle("Activating ...")
+                .setProgress(progress)
+                .doWork(new ProgressAsyncTask.Work<String, String>() {
                     @Override
-                    public void run() {
+                    public Result<String> run(String... args) {
+                        Result<String> finishResult = owncloudManager.finishSetup(device, login, pass, protocol);
+                        return finishResult;
+                    }
+                })
+                .onSuccess(new ProgressAsyncTask.Success<String>() {
+                    @Override
+                    public void run(String result) {
                         status();
                     }
-                });
-
-            }
-        });
-
+                })
+                .execute();
     }
 
     private void status() {
-
-        AsyncTask.execute(
-                new Runnable() {
+        new ProgressAsyncTask<Void, String>()
+                .setTitle("Checking status")
+                .setProgress(progress)
+                .showError(false)
+                .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public void run() {
-
-                        final Result<String> result = owncloudManager.owncloudUrl(device);
-
+                    public Result<String> run(Void... args) {
+                        Result<String> result = owncloudManager.owncloudUrl(device);
+                        return result;
+                    }
+                })
+                .onCompleted(new ProgressAsyncTask.Completed<String>() {
+                    @Override
+                    public void run(Result<String> result) {
                         if (!result.hasError()) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    url.setText(result.getValue());
-                                    setVisibility(View.VISIBLE, View.GONE);
-                                    progress.hide();
-                                }
-                            });
-
+                            url.setText(result.getValue());
+                            setVisibility(View.VISIBLE, View.GONE);
+                            progress.hide();
                         } else {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    setVisibility(View.GONE, View.VISIBLE);
-                                    progress.hide();
-                                }
-                            });
+                            setVisibility(View.GONE, View.VISIBLE);
+                            progress.hide();
                         }
                     }
-
-                }
-        );
+                })
+                .execute();
     }
 
     private void setVisibility(int activeControls, int inactiveControls) {
