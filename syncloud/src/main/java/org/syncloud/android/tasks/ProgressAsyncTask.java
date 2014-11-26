@@ -79,7 +79,7 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
         if (progress != null) {
             progress.start();
             if (title != null)
-                progress.title("Executing command");
+                progress.title(title);
         }
     }
 

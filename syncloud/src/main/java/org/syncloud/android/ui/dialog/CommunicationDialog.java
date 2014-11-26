@@ -19,7 +19,6 @@ public class CommunicationDialog extends AlertDialog implements Progress {
     private TextView messageView;
     private CharSequence message;
     private Button reportBtn;
-    private CharSequence title;
 
     public CommunicationDialog(Activity context) {
         super(context);
@@ -58,7 +57,6 @@ public class CommunicationDialog extends AlertDialog implements Progress {
 
     @Override
     public void setTitle(CharSequence title) {
-        this.title = title;
         super.setTitle(title);
     }
 
@@ -87,38 +85,17 @@ public class CommunicationDialog extends AlertDialog implements Progress {
     }
 
     public void stop() {
-        context.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                hide();
-            }
-        });
+        hide();
     }
 
     public void error(final String error) {
-        context.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                setError(error);
-            }
-        });
-    }
+        setError(error);    }
 
     public void title(final String message) {
-        context.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                setTitle(message);
-            }
-        });
+        setTitle(message);
     }
 
     public void progress(final String progress) {
-        context.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                setMessage(message + "\n" + progress);
-            }
-        });
+        setMessage(message + "\n" + progress);
     }
 }

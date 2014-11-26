@@ -133,19 +133,17 @@ public class Owncloud extends Activity {
                         if (!result.hasError()) {
                             url.setText(result.getValue());
                             setVisibility(View.VISIBLE, View.GONE);
-                            progress.hide();
                         } else {
                             setVisibility(View.GONE, View.VISIBLE);
-                            progress.hide();
                         }
                     }
                 })
                 .execute();
     }
 
-    private void setVisibility(int activeControls, int inactiveControls) {
+    private void setVisibility(int activeControls, int nonActiveControls) {
         activatedControls.setVisibility(activeControls);
-        notActivatedControls.setVisibility(inactiveControls);
+        notActivatedControls.setVisibility(nonActiveControls);
     }
 
     public void showWeb(View view) {
@@ -153,8 +151,6 @@ public class Owncloud extends Activity {
         if (text != null && !text.toString().isEmpty()) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(text.toString()));
             startActivity(browserIntent);
-        } else {
-            progress.error("url is not set");
         }
     }
 
@@ -169,8 +165,6 @@ public class Owncloud extends Activity {
                 marketIntent.setData(Uri.parse("market://details?id=" + COM_OWNCLOUD_ANDROID));
                 startActivity(marketIntent);
             }
-        } else {
-            progress.error("url is not set");
         }
     }
 
