@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 
+import org.apache.log4j.Logger;
 import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.Endpoint;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Db extends SQLiteOpenHelper {
+
+    private static Logger logger = Logger.getLogger(Db.class);
 
     private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "syncloud";
@@ -99,6 +102,7 @@ public class Db extends SQLiteOpenHelper {
     }
 
     public void insert(Device device) {
+        logger.info("saving device: " + device);
         ContentValues values = toFields(device);
         getWritableDatabase().insert(DEVICE_TABLE, null, values);
     }

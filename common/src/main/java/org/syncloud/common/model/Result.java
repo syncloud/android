@@ -3,6 +3,11 @@ package org.syncloud.common.model;
 import com.google.common.base.Optional;
 
 public class Result<T> {
+
+    public enum Void { Void }
+
+    public static Result<Void> VOID = new Result<Void>(Void.Void);
+
     private Optional<String> error = Optional.absent();
     private Optional<T> value = Optional.absent();
 

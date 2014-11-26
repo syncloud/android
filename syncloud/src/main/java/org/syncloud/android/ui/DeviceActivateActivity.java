@@ -10,30 +10,33 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
+import org.syncloud.apps.insider.InsiderManager;
+import org.syncloud.apps.remote.RemoteAccessManager;
 import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Commands;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
-import org.syncloud.apps.insider.InsiderManager;
-import org.syncloud.apps.remote.RemoteAccessManager;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.IdentifiedEndpoint;
 
 import java.util.List;
 
-import static org.syncloud.common.model.Result.error;
-import static org.syncloud.common.model.Result.value;
+import static org.syncloud.common.model.Result.VOID;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 
 public class DeviceActivateActivity extends Activity {
+
+    private static Logger logger = Logger.getLogger(DeviceActivateActivity.class);
+
     private IdentifiedEndpoint endpoint;
     private Preferences preferences;
     private Device device;
@@ -111,6 +114,7 @@ public class DeviceActivateActivity extends Activity {
     }
 
     private void status() {
+        logger.info("status");
         new ProgressAsyncTask<Void, String>()
                 .setTitle("Checking status")
                 .setProgress(progress)
@@ -168,49 +172,59 @@ public class DeviceActivateActivity extends Activity {
             return;
         }
 
-        new ProgressAsyncTask<Void, Void>()
+        new ProgressAsyncTask<Void, Result.Void>()
                 .setTitle("Activating device")
                 .setProgress(progress)
-                .doWork(new ProgressAsyncTask.Work<Void, Void>() {
+                .doWork(new ProgressAsyncTask.Work<Void, Result.Void>() {
                     @Override
-                    public Result<Void> run(Void... args) {
+                    public Result<Result.Void> run(Void... args) {
                         return doActivate(email, pass, domain);
                     }
                 })
-                .onSuccess(new ProgressAsyncTask.Success<Void>() {
+                .onSuccess(new ProgressAsyncTask.Success<Result.Void>() {
                     @Override
-                    public void run(Void result) {
-                        status();
+                    public void run(Result.Void result) {
+                        finish();
                     }
                 })
                 .execute();
     }
 
-    private Result<Void> doActivate(String email, String pass, String domain) {
-        Result<List<AppVersions>> updateResult = sam.update(device);
-        if (updateResult.hasError())
-            return error(updateResult.getError());
-
-        Result<String> upgradeAllResult = sam.run(device, Commands.upgrade_all);
-        if (upgradeAllResult.hasError())
-            return error(upgradeAllResult.getError());
-
-        Result<String> redirectResult = insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
-        if (redirectResult.hasError())
-            return error(redirectResult.getError());
-
-        Result<String> acquireDomainResult = insider.acquireDomain(device, email, pass, domain);
-        if (acquireDomainResult.hasError())
-            return error(acquireDomainResult.getError());
-
-        Result<Device> remoteAccessResult = accessManager.enable(device, preferences.getDomain());
-        if (remoteAccessResult.hasError())
-            return error(remoteAccessResult.getError());
-
-        Db db = ((SyncloudApplication) getApplication()).getDb();
-        db.insert(remoteAccessResult.getValue());
-
-        return value(null);
+    private Result<Result.Void> doActivate(final String email, final String pass, final String domain) {
+        logger.info("activate");
+        return sam.update(device).flatMap(new Result.Function<List<AppVersions>, Result<String>>() {
+            @Override
+            public Result<String> apply(List<AppVersions> input) throws Exception {
+                return sam.run(device, Commands.upgrade_all);
+            }
+        }).flatMap(new Result.Function<String, Result<String>>() {
+            @Override
+            public Result<String> apply(String input) throws Exception {
+                return insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
+            }
+        }).flatMap(new Result.Function<String, Result<String>>() {
+            @Override
+            public Result<String> apply(String input) throws Exception {
+                return insider.acquireDomain(device, email, pass, domain);
+            }
+        }).flatMap(new Result.Function<String, Result<String>>() {
+            @Override
+            public Result<String> apply(String input) throws Exception {
+                return insider.acquireDomain(device, email, pass, domain);
+            }
+        }).flatMap(new Result.Function<String, Result<Device>>() {
+            @Override
+            public Result<Device> apply(String input) throws Exception {
+                return accessManager.enable(device, preferences.getDomain());
+            }
+        }).flatMap(new Result.Function<Device, Result<Result.Void>>() {
+            @Override
+            public Result<Result.Void> apply(Device input) throws Exception {
+                Db db = ((SyncloudApplication) getApplication()).getDb();
+                db.insert(input);
+                return VOID;
+            }
+        });
     }
 
     @Override
