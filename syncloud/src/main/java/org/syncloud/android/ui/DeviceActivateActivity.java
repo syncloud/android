@@ -29,6 +29,7 @@ import org.syncloud.ssh.model.IdentifiedEndpoint;
 import java.util.List;
 
 import static org.syncloud.common.model.Result.error;
+import static org.syncloud.common.model.Result.value;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 
@@ -209,7 +210,7 @@ public class DeviceActivateActivity extends Activity {
         Db db = ((SyncloudApplication) getApplication()).getDb();
         db.insert(remoteAccessResult.getValue());
 
-        return null;
+        return value(null);
     }
 
     @Override
