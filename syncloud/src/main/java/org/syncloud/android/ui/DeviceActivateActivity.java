@@ -207,11 +207,6 @@ public class DeviceActivateActivity extends Activity {
             public Result<String> apply(String input) throws Exception {
                 return insider.acquireDomain(device, email, pass, domain);
             }
-        }).flatMap(new Result.Function<String, Result<String>>() {
-            @Override
-            public Result<String> apply(String input) throws Exception {
-                return insider.acquireDomain(device, email, pass, domain);
-            }
         }).flatMap(new Result.Function<String, Result<Device>>() {
             @Override
             public Result<Device> apply(String input) throws Exception {
