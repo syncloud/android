@@ -22,25 +22,63 @@
             >
 
             <TextView
-                android:id="@+id/device_host"
+                android:id="@+id/txt_device_title"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="device addresssd sd d  fds fsd fsd fsd sd sd "
-                android:textSize="20sp" />
+                android:text="Device name"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                />
 
-            <TextView
-                android:id="@+id/device_local_endpoint"
+            <LinearLayout
+                android:id="@+id/layout_domain_name"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="local"
-                android:textSize="10sp"/>
+                android:orientation="horizontal"
+                android:padding="4dp"
+                >
 
-            <TextView
-                android:id="@+id/device_remote_endpoint"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Domain: "
+                    android:textSize="18sp"
+                    />
+
+                <TextView
+                    android:id="@+id/txt_domain_name"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="somedomain.syncloud.it"
+                    android:textSize="18sp"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_mac_address"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="remote"
-                android:textSize="10sp" />
+                android:orientation="horizontal"
+                android:padding="4dp"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MAC Address: "
+                    android:textSize="18sp"
+                    />
+
+                <TextView
+                    android:id="@+id/txt_mac_address"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="00:00:00:00:00"
+                    android:textSize="18sp"
+                    />
+
+            </LinearLayout>
 
         </LinearLayout>
 

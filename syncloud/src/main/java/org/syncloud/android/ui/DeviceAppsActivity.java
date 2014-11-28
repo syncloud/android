@@ -32,10 +32,8 @@ import static org.syncloud.android.SyncloudApplication.appRegistry;
 
 public class DeviceAppsActivity extends Activity {
 
-    private DeviceAppsAdapter deviceAppsAdapter;
     private Device device;
     private Db db;
-    private TextView deviceName;
     private boolean connected = false;
     private boolean showAdminApps = false;
     private Sam sam;
@@ -43,10 +41,28 @@ public class DeviceAppsActivity extends Activity {
     private Ssh ssh;
     private Preferences preferences;
 
+    private TextView txtDeviceTitle;
+    private TextView txtDomainName;
+    private  ListView listApplications;
+
+    private DeviceAppsAdapter deviceAppsAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_apps);
+
+        txtDeviceTitle = (TextView) findViewById(R.id.txt_device_title);
+        txtDomainName = (TextView) findViewById(R.id.txt_domain_name);
+
+        SyncloudApplication application = (SyncloudApplication) getApplication();
+        db = application.getDb();
+        preferences = application.getPreferences();
+
+        ssh = application.createSsh();
+        sam = new Sam(ssh);
+
+        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
         progress = new CommunicationDialog(this);
         progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -57,20 +73,12 @@ public class DeviceAppsActivity extends Activity {
             }
         });
 
-        SyncloudApplication application = (SyncloudApplication) getApplication();
+        txtDeviceTitle.setText(device.id().title);
+        txtDomainName.setText(device.userDomain());
 
-        preferences = application.getPreferences();
-
-        deviceName = (TextView) findViewById(R.id.device_name);
-        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
-        db = application.getDb();
-        deviceName.setText(device.userDomain());
-
-        final ListView listview = (ListView) findViewById(R.id.app_list);
+        listApplications = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
-        listview.setAdapter(deviceAppsAdapter);
-        ssh = application.createSsh();
-        sam = new Sam(ssh);
+        listApplications.setAdapter(deviceAppsAdapter);
 
         listApps();
     }

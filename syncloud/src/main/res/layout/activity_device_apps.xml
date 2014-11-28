@@ -11,11 +11,22 @@
     >
 
     <TextView
-        android:id="@+id/device_name"
+        android:id="@+id/txt_device_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Name of device"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:paddingBottom="10dp"
+        />
+
+    <TextView
+        android:id="@+id/txt_domain_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Full domain name"
+        android:textSize="20dp"
+        android:paddingBottom="10dp"
         />
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"

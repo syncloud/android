@@ -47,10 +47,10 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_device_saved, null);
 
-        TextView deviceName = (TextView) rowView.findViewById(R.id.device_host);
         LinearLayout deviceInfo = (LinearLayout) rowView.findViewById(R.id.device_info);
-        TextView deviceLocalEndpoint = (TextView) rowView.findViewById(R.id.device_local_endpoint);
-        TextView deviceRemoteEndpoint = (TextView) rowView.findViewById(R.id.device_remote_endpoint);
+        TextView txtDeviceTitle = (TextView) rowView.findViewById(R.id.txt_device_title);
+        TextView txtDomainName = (TextView) rowView.findViewById(R.id.txt_domain_name);
+        TextView txtMacAddress = (TextView) rowView.findViewById(R.id.txt_mac_address);
         ImageButton deviceRemove = (ImageButton) rowView.findViewById(R.id.device_remove);
 
         final Device device = getItem(position);
@@ -60,18 +60,20 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
                 removeSaved(device);
             }
         });
-        deviceName.setText(device.userDomain());
         deviceInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 activity.open(device);
             }
         });
-        deviceLocalEndpoint.setText(device.localEndpoint().host() + ":" + device.localEndpoint().port());
-        deviceRemoteEndpoint.setText(device.userDomain());
 
-        deviceLocalEndpoint.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
-        deviceRemoteEndpoint.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
+
+        txtDeviceTitle.setText(device.id().title);
+        txtDomainName.setText(device.userDomain());
+        txtMacAddress.setText(device.macAddress());
+
+//        txtDomainName.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
+//        txtMacAddress.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
 
         return rowView;
 
