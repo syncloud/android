@@ -16,7 +16,7 @@ public class EndpointResolverTest {
 
         EndpointResolver resolver = new EndpointResolver(new Dns());
         Device device = new Device(
-                0,
+                "0",
                 "testdomain1.syncloud.info",
                 new Endpoint("localhost", 0),
                 new Credentials("", "", ""));
