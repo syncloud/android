@@ -1,6 +1,7 @@
 package org.syncloud.android.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -172,11 +173,19 @@ public class DevicesDiscoveryActivity extends Activity {
     }
 
     public void open(final IdentifiedEndpoint endpoint) {
-        Intent intent = new Intent(this, DeviceActivateActivity.class);
-        intent.putExtra(SyncloudApplication.DEVICE_ENDPOINT, endpoint);
-        startActivity(intent);
-        setResult(Activity.RESULT_OK, new Intent(this, DevicesSavedActivity.class));
-        finish();
+        if (endpoint.id() == null) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Can't identify device")
+                    .setMessage("Sorry, there's no identification information for this device. Most probably it is running old release of Syncloud. Please upgrade it to latest release and try to activate again.")
+                    .setPositiveButton("OK", null)
+                    .show();
+        } else {
+            Intent intent = new Intent(this, DeviceActivateActivity.class);
+            intent.putExtra(SyncloudApplication.DEVICE_ENDPOINT, endpoint);
+            startActivity(intent);
+            setResult(Activity.RESULT_OK, new Intent(this, DevicesSavedActivity.class));
+            finish();
+        }
     }
 
     public void openWiFiSettings(View view) {

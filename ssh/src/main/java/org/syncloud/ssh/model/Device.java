@@ -3,20 +3,20 @@ package org.syncloud.ssh.model;
 import java.io.Serializable;
 
 public class Device implements Serializable {
-    private Integer id;
+    private String macAddress;
     private String  userDomain;
     private Endpoint localEndpoint;
     private Credentials credentials;
 
-    public Device(Integer id, String userDomain, Endpoint localEndpoint, Credentials credentials) {
+    public Device(String macAddress, String userDomain, Endpoint localEndpoint, Credentials credentials) {
         this.userDomain = userDomain;
         this.localEndpoint = localEndpoint;
-        this.id = id;
+        this.macAddress = macAddress;
         this.credentials = credentials;
     }
 
-    public Integer id() {
-        return id;
+    public String macAddress() {
+        return macAddress;
     }
 
     public String userDomain() {
@@ -46,13 +46,13 @@ public class Device implements Serializable {
 
         Device device = (Device) o;
 
-        if (id != null ? !id.equals(device.id) : device.id != null) return false;
+        if (macAddress != null ? !macAddress.equals(device.macAddress) : device.macAddress != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return macAddress != null ? macAddress.hashCode() : 0;
     }
 }

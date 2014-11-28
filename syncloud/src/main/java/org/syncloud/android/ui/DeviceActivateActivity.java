@@ -60,7 +60,7 @@ public class DeviceActivateActivity extends Activity {
         SyncloudApplication application = (SyncloudApplication) getApplication();
 
         endpoint = (IdentifiedEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
-        device = new Device(null, null, endpoint.endpoint(), getStandardCredentials());
+        device = new Device(endpoint.id().mac_address, null, endpoint.endpoint(), getStandardCredentials());
 
         preferences = application.getPreferences();
 
@@ -216,7 +216,7 @@ public class DeviceActivateActivity extends Activity {
             @Override
             public Result<Result.Void> apply(Device input) throws Exception {
                 Db db = ((SyncloudApplication) getApplication()).getDb();
-                db.insert(input);
+                db.upsert(input);
                 return VOID;
             }
         });

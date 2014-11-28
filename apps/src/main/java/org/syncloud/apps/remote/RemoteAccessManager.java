@@ -40,12 +40,12 @@ public class RemoteAccessManager {
                                     public Device apply(String userDomain) throws Exception {
                                         Endpoint remoteEndpoint = new Endpoint(endpoint.host(), REMOTE_ACCESS_PORT);
                                         Credentials credentials = new Credentials("root", "syncloud", key);
-                                        Device device = new Device(
-                                                null,
+                                        Device newDevice = new Device(
+                                                device.macAddress(),
                                                 userDomain + "." + domain,
                                                 remoteEndpoint,
                                                 credentials);
-                                        return device;
+                                        return newDevice;
                                     }
                                 });
                     }

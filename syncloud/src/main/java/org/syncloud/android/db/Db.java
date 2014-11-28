@@ -28,11 +28,11 @@ public class Db extends SQLiteOpenHelper {
     public static final String LOGIN_COLUMN = "login";
     public static final String PASSWORD_COLUMN = "password";
     public static final String SSHKEY_COLUMN = "key";
-    public static final String DEVICE_ID_COLUMN = "device_id";
+    public static final String DEVICE_MAC_ADDRESS = "mac_address";
 
     private static final String DEVICE_TABLE_CREATE =
             "CREATE TABLE " + DEVICE_TABLE + " (" +
-                    DEVICE_ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    DEVICE_MAC_ADDRESS + " TEXT PRIMARY KEY, " +
                     USER_DOMAIN + " TEXT, " +
                     LOCAL_HOST_COLUMN + " TEXT, " +
                     LOCAL_PORT_COLUMN + " INTEGER," +
@@ -40,6 +40,7 @@ public class Db extends SQLiteOpenHelper {
                     PASSWORD_COLUMN + " TEXT, " +
                     SSHKEY_COLUMN + " TEXT " +
                     ");";
+
     private Context context;
 
     public Db(Context context) {
@@ -78,7 +79,7 @@ public class Db extends SQLiteOpenHelper {
                         cursor.getInt(cursor.getColumnIndex(LOCAL_PORT_COLUMN)));
 
                 Device device = new Device(
-                        cursor.getInt(cursor.getColumnIndex(DEVICE_ID_COLUMN)),
+                        cursor.getString(cursor.getColumnIndex(DEVICE_MAC_ADDRESS)),
                         cursor.getString(cursor.getColumnIndex(USER_DOMAIN)),
                         endpoint,
                         credentials);
@@ -96,30 +97,54 @@ public class Db extends SQLiteOpenHelper {
 
         getWritableDatabase().delete(
                 DEVICE_TABLE,
-                DEVICE_ID_COLUMN + "=?",
-                new String[] { device.id().toString() });
+                DEVICE_MAC_ADDRESS + "=?",
+                new String[] { device.macAddress() });
 
+    }
+
+    public void upsert(Device device) {
+        logger.info("upserting device: " + device);
+
+        Cursor cursor = getWritableDatabase().query(
+                DEVICE_TABLE,
+                null,
+                DEVICE_MAC_ADDRESS + "=?",
+                new String[] { device.macAddress() },
+                null,
+                null,
+                null);
+
+        if (cursor.getCount() > 0)
+            update(device);
+        else
+            insert(device);
     }
 
     public void insert(Device device) {
-        logger.info("saving device: " + device);
-        ContentValues values = toFields(device);
-        getWritableDatabase().insert(DEVICE_TABLE, null, values);
+        logger.info("inserting device: " + device);
+        ContentValues values = toFields(device, true);
+        getWritableDatabase().insert(
+                DEVICE_TABLE,
+                null,
+                values);
     }
 
     public void update(Device device) {
-        ContentValues values = toFields(device);
+        logger.info("updating device: " + device);
+        ContentValues values = toFields(device, false);
 
         int update = getWritableDatabase().update(
                 DEVICE_TABLE,
                 values,
-                DEVICE_ID_COLUMN + "=?",
-                new String[]{device.id().toString()});
+                DEVICE_MAC_ADDRESS + "=?",
+                new String[]{device.macAddress()});
         System.out.println(update);
     }
 
-    private ContentValues toFields(Device device) {
+    private ContentValues toFields(Device device, boolean addMacAddress) {
         ContentValues values = new ContentValues();
+        if (addMacAddress)
+            values.put(DEVICE_MAC_ADDRESS, device.macAddress());
         values.put(USER_DOMAIN, device.userDomain());
         values.put(LOCAL_HOST_COLUMN, device.localEndpoint().host());
         values.put(LOCAL_PORT_COLUMN, device.localEndpoint().port());
@@ -128,4 +153,5 @@ public class Db extends SQLiteOpenHelper {
         values.put(SSHKEY_COLUMN, device.credentials().key());
         return values;
     }
+
 }
