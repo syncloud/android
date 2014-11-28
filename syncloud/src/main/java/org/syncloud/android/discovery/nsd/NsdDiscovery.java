@@ -19,7 +19,8 @@ public class NsdDiscovery implements Discovery {
 
     public NsdDiscovery(NsdManager manager, DeviceEndpointListener deviceEndpointListener, String serviceName) {
         this.manager = manager;
-        this.listener = new EventToDeviceConverter(manager, serviceName, deviceEndpointListener);
+        Resolver resolver = new Resolver(manager, deviceEndpointListener);
+        this.listener = new EventToDeviceConverter(manager, serviceName, resolver);
     }
 
     public void start() {

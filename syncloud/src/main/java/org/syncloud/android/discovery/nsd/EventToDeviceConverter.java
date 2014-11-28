@@ -5,27 +5,26 @@ import android.net.nsd.NsdServiceInfo;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.syncloud.android.discovery.DeviceEndpointListener;
-import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.Endpoint;
 
-import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
 
     private static Logger logger = LogManager.getLogger(EventToDeviceConverter.class.getName());
 
     private NsdManager manager;
-    private String serviceName;
-    private DeviceEndpointListener deviceEndpointListener;
-    private Map<String, Endpoint> serviceToUrl = new HashMap<String, Endpoint>();
+    private String lookForServiceName;
 
-    public EventToDeviceConverter(NsdManager manager, String serviceName, DeviceEndpointListener deviceEndpointListener) {
+    private Resolver resolver;
+
+    private List<String> discoveredServices = newArrayList();
+
+    public EventToDeviceConverter(NsdManager manager, String lookForServiceName, Resolver resolver) {
         this.manager = manager;
-        this.serviceName = serviceName;
-        this.deviceEndpointListener = deviceEndpointListener;
+        this.lookForServiceName = lookForServiceName.toLowerCase();
+        this.resolver = resolver;
     }
 
     @Override
@@ -56,15 +55,15 @@ public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
 
     @Override
     public void onServiceFound(NsdServiceInfo serviceInfo) {
-        String serviceName = serviceInfo.getServiceName();
+        String serviceName = serviceInfo.getServiceName().toLowerCase();
         String text = "service found "+serviceName;
         logger.info(text);
-        if (!serviceToUrl.containsKey(serviceName)) {
-            if (serviceName.toLowerCase().contains(serviceName.toLowerCase())) {
-                serviceToUrl.put(serviceName, null);
+        if (!discoveredServices.contains(serviceName)) {
+            if (serviceName.contains(lookForServiceName)) {
+                discoveredServices.add(serviceName);
                 text = "starting resolving service " + serviceName;
                 logger.info(text);
-                manager.resolveService(serviceInfo, this.resolveListener);
+                resolver.resolve(serviceInfo);
             }
         }
     }
@@ -73,43 +72,5 @@ public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
     public void onServiceLost(NsdServiceInfo serviceInfo) {
         String text = "service lost "+serviceInfo.getServiceName();
         logger.info(text);
-        String serviceName = serviceInfo.getServiceName();
-        if (serviceName.toLowerCase().contains(this.serviceName.toLowerCase())) {
-            Endpoint device = serviceToUrl.remove(serviceName);
-            if (deviceEndpointListener != null && device != null)
-                deviceEndpointListener.removed(device);
-        }
-    }
-
-    NsdManager.ResolveListener resolveListener = new NsdManager.ResolveListener() {
-
-        @Override
-        public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-            String text = "resolve failed for service: "+serviceInfo.getServiceName()+", error code: "+errorCode;
-            logger.error(text);
-        }
-
-        @Override
-        public void onServiceResolved(NsdServiceInfo serviceInfo) {
-            String serviceName = serviceInfo.getServiceName();
-            String text = "service: "+serviceName+" resovled";
-            logger.info(text);
-
-            Endpoint device = extractDevice(serviceInfo);
-            serviceToUrl.put(serviceName, device);
-            if (deviceEndpointListener != null)
-                deviceEndpointListener.added(device);
-        }
-    };
-
-    private Endpoint extractDevice(NsdServiceInfo serviceInfo) {
-        String address = "unknown";
-        InetAddress host = serviceInfo.getHost();
-        if (host != null) {
-            address = host.getHostAddress();
-        }
-        int port = serviceInfo.getPort();
-
-        return new Endpoint(address, Ssh.SSH_SERVER_PORT);
     }
 }
