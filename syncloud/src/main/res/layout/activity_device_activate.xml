@@ -12,69 +12,132 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="20sp">
+        android:orientation="vertical"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        >
 
         <TextView
-            android:id="@+id/managed_domain_label"
+            android:id="@+id/txt_device_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Device name:"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="15sp" />
+            android:text="Title of device"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            />
 
-        <TextView
-            android:id="@+id/device_url"
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MAC Address: "
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/txt_mac_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00:00:00"
+                android:textSize="18sp"
+                />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Activated: "
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/txt_status_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Activated or not"
+                android:textSize="18sp"
+                />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_deactivate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="domain"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="15sp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
+            android:onClick="deactivate"
+            android:text="Deactivate"
+            android:layout_gravity="right"
+            android:visibility="gone"
             />
 
     </LinearLayout>
 
+
     <LinearLayout
-        android:id="@+id/domain_settings"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="20dp">
+        android:orientation="vertical"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        >
 
         <TextView
-            android:id="@+id/name_login_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/name_login_label"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:text="Activation"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            />
 
-        <EditText
-            android:id="@+id/user_domain"
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:text="@string/device_activation_domain"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:orientation="horizontal"
+            >
 
+            <EditText
+                android:id="@+id/edit_user_domain"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="text"
+                android:hint="domain"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/txt_main_domain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text=".syncloud.it"
+                android:textSize="18sp"
+                />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_activate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="activate"
+            android:text="Activate"
+
+            />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/name_activate"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="activate"
-        android:text="Activate"
-
-        />
-
-    <Button
-        android:id="@+id/name_deactivate"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="deactivate"
-        android:text="Deactivate"
-        android:visibility="gone"
-        />
 
 </LinearLayout>

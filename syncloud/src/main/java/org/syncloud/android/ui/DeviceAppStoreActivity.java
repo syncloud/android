@@ -7,12 +7,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.db.Db;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppStoreAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
@@ -33,8 +31,6 @@ public class DeviceAppStoreActivity extends Activity {
 
     private DeviceAppStoreAppsAdapter deviceAppsAdapter;
     private Device device;
-    private Db db;
-    private TextView deviceName;
     private boolean connected = false;
     private boolean showAdminApps = false;
     private Sam sam;
@@ -61,10 +57,7 @@ public class DeviceAppStoreActivity extends Activity {
 
         preferences = application.getPreferences();
 
-        deviceName = (TextView) findViewById(R.id.device_name);
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
-        db = application.getDb();
-        deviceName.setText(device.userDomain());
 
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppStoreAppsAdapter(this);

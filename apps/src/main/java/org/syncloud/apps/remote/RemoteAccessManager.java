@@ -42,6 +42,7 @@ public class RemoteAccessManager {
                                         Credentials credentials = new Credentials("root", "syncloud", key);
                                         Device newDevice = new Device(
                                                 device.macAddress(),
+                                                device.id(),
                                                 userDomain + "." + domain,
                                                 remoteEndpoint,
                                                 credentials);

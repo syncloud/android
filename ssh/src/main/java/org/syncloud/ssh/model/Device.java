@@ -7,16 +7,22 @@ public class Device implements Serializable {
     private String  userDomain;
     private Endpoint localEndpoint;
     private Credentials credentials;
+    private Identification id;
 
-    public Device(String macAddress, String userDomain, Endpoint localEndpoint, Credentials credentials) {
+    public Device(String macAddress, Identification id, String userDomain, Endpoint localEndpoint, Credentials credentials) {
+        this.macAddress = macAddress;
         this.userDomain = userDomain;
         this.localEndpoint = localEndpoint;
-        this.macAddress = macAddress;
         this.credentials = credentials;
+        this.id = id;
     }
 
     public String macAddress() {
         return macAddress;
+    }
+
+    public Identification id() {
+        return id;
     }
 
     public String userDomain() {

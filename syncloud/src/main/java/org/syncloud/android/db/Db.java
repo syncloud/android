@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.Endpoint;
+import org.syncloud.ssh.model.Identification;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +29,15 @@ public class Db extends SQLiteOpenHelper {
     public static final String LOGIN_COLUMN = "login";
     public static final String PASSWORD_COLUMN = "password";
     public static final String SSHKEY_COLUMN = "key";
-    public static final String DEVICE_MAC_ADDRESS = "mac_address";
+    public static final String MAC_ADDRESS_COLUMN = "mac_address";
+    public static final String TITLE_COLUMN = "title";
+    public static final String NAME_COLUMN = "name";
 
     private static final String DEVICE_TABLE_CREATE =
             "CREATE TABLE " + DEVICE_TABLE + " (" +
-                    DEVICE_MAC_ADDRESS + " TEXT PRIMARY KEY, " +
+                    MAC_ADDRESS_COLUMN + " TEXT PRIMARY KEY, " +
+                    TITLE_COLUMN + " TEXT, " +
+                    NAME_COLUMN + " TEXT, " +
                     USER_DOMAIN + " TEXT, " +
                     LOCAL_HOST_COLUMN + " TEXT, " +
                     LOCAL_PORT_COLUMN + " INTEGER," +
@@ -78,8 +83,15 @@ public class Db extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndex(LOCAL_HOST_COLUMN)),
                         cursor.getInt(cursor.getColumnIndex(LOCAL_PORT_COLUMN)));
 
+                Identification id = new Identification(
+                        cursor.getString(cursor.getColumnIndex(MAC_ADDRESS_COLUMN)),
+                        cursor.getString(cursor.getColumnIndex(NAME_COLUMN)),
+                        cursor.getString(cursor.getColumnIndex(TITLE_COLUMN))
+                );
+
                 Device device = new Device(
-                        cursor.getString(cursor.getColumnIndex(DEVICE_MAC_ADDRESS)),
+                        cursor.getString(cursor.getColumnIndex(MAC_ADDRESS_COLUMN)),
+                        id,
                         cursor.getString(cursor.getColumnIndex(USER_DOMAIN)),
                         endpoint,
                         credentials);
@@ -97,7 +109,7 @@ public class Db extends SQLiteOpenHelper {
 
         getWritableDatabase().delete(
                 DEVICE_TABLE,
-                DEVICE_MAC_ADDRESS + "=?",
+                MAC_ADDRESS_COLUMN + "=?",
                 new String[] { device.macAddress() });
 
     }
@@ -108,7 +120,7 @@ public class Db extends SQLiteOpenHelper {
         Cursor cursor = getWritableDatabase().query(
                 DEVICE_TABLE,
                 null,
-                DEVICE_MAC_ADDRESS + "=?",
+                MAC_ADDRESS_COLUMN + "=?",
                 new String[] { device.macAddress() },
                 null,
                 null,
@@ -136,7 +148,7 @@ public class Db extends SQLiteOpenHelper {
         int update = getWritableDatabase().update(
                 DEVICE_TABLE,
                 values,
-                DEVICE_MAC_ADDRESS + "=?",
+                MAC_ADDRESS_COLUMN + "=?",
                 new String[]{device.macAddress()});
         System.out.println(update);
     }
@@ -144,7 +156,9 @@ public class Db extends SQLiteOpenHelper {
     private ContentValues toFields(Device device, boolean addMacAddress) {
         ContentValues values = new ContentValues();
         if (addMacAddress)
-            values.put(DEVICE_MAC_ADDRESS, device.macAddress());
+            values.put(MAC_ADDRESS_COLUMN, device.macAddress());
+        values.put(NAME_COLUMN, device.id().name);
+        values.put(TITLE_COLUMN, device.id().title);
         values.put(USER_DOMAIN, device.userDomain());
         values.put(LOCAL_HOST_COLUMN, device.localEndpoint().host());
         values.put(LOCAL_PORT_COLUMN, device.localEndpoint().port());

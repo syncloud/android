@@ -42,55 +42,65 @@ public class DeviceActivateActivity extends Activity {
     private Device device;
 
     private CommunicationDialog progress;
-    private TextView url;
-    private LinearLayout domainSettings;
-    private Button deactivateButton;
-    private EditText userDomainText;
+    private TextView txtDeviceTitle;
+    private TextView txtMacAddress;
+    private TextView txtStatusValue;
+
+    private Button btnActivate;
+    private Button btnDeactivate;
+    private EditText editUserDomain;
+    private TextView txtMainDomain;
+
     private Sam sam;
     private InsiderManager insider;
     private RemoteAccessManager accessManager;
-
-    private String domainName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_activate);
 
+        txtDeviceTitle = (TextView) findViewById(R.id.txt_device_title);
+        txtStatusValue = (TextView) findViewById(R.id.txt_status_value);
+        txtMacAddress = (TextView) findViewById(R.id.txt_mac_address);
+
+        btnDeactivate = (Button) findViewById(R.id.btn_deactivate);
+        btnActivate = (Button) findViewById(R.id.btn_activate);
+
+        txtMainDomain = (TextView) findViewById(R.id.txt_main_domain);
+        editUserDomain = (EditText) findViewById(R.id.edit_user_domain);
+
+        progress = new CommunicationDialog(this);
+
         SyncloudApplication application = (SyncloudApplication) getApplication();
 
         endpoint = (IdentifiedEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
-        device = new Device(endpoint.id().mac_address, null, endpoint.endpoint(), getStandardCredentials());
+        device = new Device(
+                endpoint.id().mac_address,
+                endpoint.id(),
+                null,
+                endpoint.endpoint(),
+                getStandardCredentials());
 
         preferences = application.getPreferences();
 
-        progress = new CommunicationDialog(this);
         Ssh ssh = application.createSsh();
         sam = new Sam(ssh);
         insider = new InsiderManager(ssh);
         accessManager = new RemoteAccessManager(insider, ssh);
-        url = (TextView) findViewById(R.id.device_url);
-        deactivateButton = (Button) findViewById(R.id.name_deactivate);
-        domainSettings = (LinearLayout) findViewById(R.id.domain_settings);
 
-        userDomainText = (EditText) findViewById(R.id.user_domain);
+        txtDeviceTitle.setText(device.id().title);
+        txtMacAddress.setText(device.id().mac_address);
+        txtStatusValue.setText("checking...");
 
-        url.setText("[user]." + preferences.getDomain());
+        txtMainDomain.setText("."+preferences.getDomain());
 
         status();
     }
 
     private void showDomainError(String message) {
-        userDomainText.setError(message);
-        userDomainText.requestFocus();
-    }
-
-    private String getDomainName() {
-        String domainFromEdit = userDomainText.getText().toString();
-        if (!domainFromEdit.isEmpty())
-            return domainFromEdit;
-        else
-            return domainName;
+        editUserDomain.setError(message);
+        editUserDomain.requestFocus();
     }
 
 
@@ -129,14 +139,15 @@ public class DeviceActivateActivity extends Activity {
                     @Override
                     public void run(Result<String> result) {
                         if (result.hasError()) {
-                            domainSettings.setVisibility(View.VISIBLE);
-                            deactivateButton.setVisibility(View.GONE);
+                            btnDeactivate.setVisibility(View.GONE);
+                            txtStatusValue.setText("not yet");
                         } else {
-                            domainSettings.setVisibility(View.GONE);
-                            deactivateButton.setVisibility(View.VISIBLE);
-                            domainName = result.getValue();
-                            url.setText(domainName+"."+preferences.getDomain());
-
+                            String domainName = result.getValue();
+                            String fullDomainName = domainName+"."+preferences.getDomain();
+                            txtStatusValue.setText(fullDomainName);
+                            editUserDomain.setText(domainName);
+                            btnActivate.setText("Reactivate");
+                            btnDeactivate.setVisibility(View.VISIBLE);
                         }
                     }
                 })
@@ -165,7 +176,7 @@ public class DeviceActivateActivity extends Activity {
     public void activate(View view) {
         final String email = preferences.getEmail();
         final String pass = preferences.getPassword();
-        final String domain = getDomainName();
+        final String domain = editUserDomain.getText().toString();
 
         if (domain == null || domain.isEmpty()) {
             showDomainError("Enter domain");

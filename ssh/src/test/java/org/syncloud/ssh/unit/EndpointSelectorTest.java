@@ -25,7 +25,7 @@ public class EndpointSelectorTest {
 
     private Endpoint localEndpoint = new Endpoint("localhost", 0);
     private final String userDomain = "testdomain1.syncloud.info";
-    private final Device device = new Device("0", userDomain, localEndpoint, new Credentials("login", "password", "key"));
+    private final Device device = new Device("0", null, userDomain, localEndpoint, new Credentials("login", "password", "key"));
 
     @Test
     public void testPreferred() {
