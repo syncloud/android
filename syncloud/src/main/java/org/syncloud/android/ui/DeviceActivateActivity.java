@@ -2,11 +2,13 @@ package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -47,13 +49,13 @@ public class DeviceActivateActivity extends Activity {
     private TextView txtStatusValue;
 
     private Button btnActivate;
-    private Button btnDeactivate;
     private EditText editUserDomain;
     private TextView txtMainDomain;
 
     private Sam sam;
     private InsiderManager insider;
     private RemoteAccessManager accessManager;
+    private LinearLayout layoutMacAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +65,8 @@ public class DeviceActivateActivity extends Activity {
         txtDeviceTitle = (TextView) findViewById(R.id.txt_device_title);
         txtStatusValue = (TextView) findViewById(R.id.txt_status_value);
         txtMacAddress = (TextView) findViewById(R.id.txt_mac_address);
+        layoutMacAddress = (LinearLayout) findViewById(R.id.layout_activate_mac_address);
 
-        btnDeactivate = (Button) findViewById(R.id.btn_deactivate);
         btnActivate = (Button) findViewById(R.id.btn_activate);
 
         txtMainDomain = (TextView) findViewById(R.id.txt_main_domain);
@@ -91,6 +93,9 @@ public class DeviceActivateActivity extends Activity {
 
         txtDeviceTitle.setText(device.id().title);
         txtMacAddress.setText(device.id().mac_address);
+
+        layoutMacAddress.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
+
         txtStatusValue.setText("checking...");
 
         txtMainDomain.setText("."+preferences.getDomain());
@@ -139,35 +144,13 @@ public class DeviceActivateActivity extends Activity {
                     @Override
                     public void run(Result<String> result) {
                         if (result.hasError()) {
-                            btnDeactivate.setVisibility(View.GONE);
                             txtStatusValue.setText("not yet");
                         } else {
                             String domainName = result.getValue();
                             String fullDomainName = domainName+"."+preferences.getDomain();
                             txtStatusValue.setText(fullDomainName);
                             editUserDomain.setText(domainName);
-                            btnActivate.setText("Reactivate");
-                            btnDeactivate.setVisibility(View.VISIBLE);
                         }
-                    }
-                })
-                .execute();
-    }
-
-    public void deactivate(View view) {
-        new ProgressAsyncTask<Void, String>()
-                .setTitle("Deactivating device")
-                .setProgress(progress)
-                .doWork(new ProgressAsyncTask.Work<Void, String>() {
-                    @Override
-                    public Result<String> run(Void... args) {
-                        return insider.dropDomain(device);
-                    }
-                })
-                .onSuccess(new ProgressAsyncTask.Success<String>() {
-                    @Override
-                    public void run(String result) {
-                        status();
                     }
                 })
                 .execute();
