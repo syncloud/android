@@ -32,6 +32,15 @@
             android:summary="Shows application logs"
             />
 
+        <ListPreference
+            android:key="pref_ssh_mode"
+            android:title="Current connection mode"
+            android:dialogTitle="Connection mode"
+            android:entries="@array/pref_ssh_mode_titles"
+            android:entryValues="@array/pref_ssh_mode_values"
+            android:defaultValue="Local"
+            android:selectable="false"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Account">

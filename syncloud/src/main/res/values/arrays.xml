@@ -18,4 +18,13 @@
         <item>Android NSD</item>
     </string-array>
 
+    <string-array name="pref_ssh_mode_titles">
+        <item>Remote</item>
+        <item>Local</item>
+    </string-array>
+    <string-array name="pref_ssh_mode_values">
+        <item>Remote</item>
+        <item>Local</item>
+    </string-array>
+
 </resources>

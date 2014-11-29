@@ -46,7 +46,7 @@ public class EndpointResolverTest {
     }
 
     @Test
-    public void test_remote_one_found() throws TextParseException {
+    public void test_remote_one_found() throws Exception {
 
         Dns dns = mock(Dns.class);
         SRVRecord record = new SRVRecord(fromString(type + "." + domain + "."), 1, 1,1, 1, remotePort, fromString(remoteHost + "."));
@@ -61,7 +61,7 @@ public class EndpointResolverTest {
     }
 
     @Test
-    public void test_dns_exception() throws TextParseException {
+    public void test_dns_exception() throws Exception {
 
         Dns dns = mock(Dns.class);
         when(dns.lookup(anyString(), anyInt())).thenThrow(new TextParseException());

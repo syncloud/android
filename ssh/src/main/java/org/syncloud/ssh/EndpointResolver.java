@@ -41,7 +41,7 @@ public class EndpointResolver {
 
             logger.warn("got empty dns srv reply");
 
-        } catch (TextParseException e) {
+        } catch (Exception e) {
             logger.error("unable to parse dns srv reply: " + e.getMessage());
         }
 

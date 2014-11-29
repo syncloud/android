@@ -60,6 +60,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateSummary(preferences, Preferences.KEY_PREF_API_URL);
         updateSummary(preferences, Preferences.KEY_PREF_EMAIL);
         updateSummary(preferences, Preferences.KEY_PREF_DISCOVERY_LIBRARY);
+        updateSummary(preferences, Preferences.KEY_PREF_SSH_MODE);
         updateRemoveAccountPref(preferences);
     }
 
@@ -79,6 +80,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
 
         if (key.equals(Preferences.KEY_PREF_DISCOVERY_LIBRARY)) {
+            updateSummary(sharedPreferences, key);
+        }
+
+        if (key.equals(Preferences.KEY_PREF_SSH_MODE)) {
             updateSummary(sharedPreferences, key);
         }
     }

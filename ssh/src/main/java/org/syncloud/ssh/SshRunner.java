@@ -41,7 +41,9 @@ public class SshRunner {
         session.setConfig(prop);
 
         try {
+            logger.info("session connecting");
             session.connect();
+            logger.info("session connected");
 
             ChannelExec channel = (ChannelExec) session.openChannel("exec");
 
@@ -63,16 +65,22 @@ public class SshRunner {
             InputStream inputStream = channel.getInputStream();
 
             try {
+                logger.info("channel connecting");
                 channel.connect();
+                logger.info("reading output");
                 String output = new String(ByteStreams.toByteArray(inputStream));
+                logger.info("waiting for exit code");
                 while (channel.getExitStatus() == -1) {
                     try {
+                        logger.info("sleeping");
                         Thread.sleep(1000);
-                    } catch (Exception ignored) {
+                    } catch (Exception e) {
+                        logger.error("got exception while sleeping", e);
                     }
                 }
-                //TODO: export output stream for progress monitor
-                if (channel.getExitStatus() == 0)
+                int exitCode = channel.getExitStatus();
+                logger.info("got exit code: " + exitCode);
+                if (exitCode == 0)
                     return Result.value(output);
                 else {
                     logger.info(output);
