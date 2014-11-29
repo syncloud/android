@@ -72,8 +72,7 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
         txtDomainName.setText(device.userDomain());
         txtMacAddress.setText(device.macAddress());
 
-//        txtDomainName.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
-//        txtMacAddress.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
+        txtMacAddress.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
 
         return rowView;
 
