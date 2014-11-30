@@ -88,4 +88,8 @@ public class SyncloudApplication extends Application {
                 new EndpointSelector(new EndpointResolver(new Dns()), preferences),
                 preferences);
     }
+
+    public void reportError() {
+        ACRA.getErrorReporter().handleSilentException(null);
+    }
 }

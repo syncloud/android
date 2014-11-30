@@ -5,20 +5,21 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.util.Log;
-
-import org.acra.ACRA;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
+import org.syncloud.android.SyncloudApplication;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private Preference removeAccountPref;
     private Preference feedbackPref;
+    private SyncloudApplication application;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        application = (SyncloudApplication) getActivity().getApplication();
 
         addPreferencesFromResource(R.xml.preferences);
 
@@ -43,7 +44,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         feedbackPref = findPreference(Preferences.KEY_PREF_FEEDBACK_SEND);
         feedbackPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
-                ACRA.getErrorReporter().handleException(null);
+                application.reportError();
                 return true;
             }
         });

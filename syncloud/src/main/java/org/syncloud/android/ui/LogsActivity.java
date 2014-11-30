@@ -6,9 +6,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-
-import org.acra.ACRA;
 import org.syncloud.android.R;
+import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.log.Logcat;
 import org.syncloud.android.ui.adapters.LogsAdapter;
 
@@ -16,11 +15,13 @@ public class LogsActivity extends Activity {
 
     private LogsAdapter adapter;
     private Logcat logcat;
+    private SyncloudApplication application;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logs);
+        application = (SyncloudApplication) getApplication();
         final ListView listview = (ListView) findViewById(R.id.logs_list);
         adapter = new LogsAdapter(this);
         listview.setAdapter(adapter);
@@ -52,7 +53,7 @@ public class LogsActivity extends Activity {
     }
 
     public void send(View view) {
-        ACRA.getErrorReporter().handleException(null);
+        application.reportError();
     }
 
     public void date(View view) {

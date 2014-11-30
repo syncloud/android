@@ -8,12 +8,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import org.acra.ACRA;
 import org.syncloud.android.Progress;
 import org.syncloud.android.R;
+import org.syncloud.android.SyncloudApplication;
 
 public class CommunicationDialog extends AlertDialog implements Progress {
+    private final SyncloudApplication application;
     private ProgressBar progress;
     private Activity context;
     private TextView messageView;
@@ -23,10 +23,12 @@ public class CommunicationDialog extends AlertDialog implements Progress {
     public CommunicationDialog(Activity context) {
         super(context);
         this.context = context;
+        application = (SyncloudApplication) context.getApplication();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.dialog_communication, null);
         progress = (ProgressBar) view.findViewById(R.id.communication_progress);
@@ -44,7 +46,7 @@ public class CommunicationDialog extends AlertDialog implements Progress {
             setMessage(message);
         setCancelable(false);
         progress.setVisibility(View.VISIBLE);
-        messageView.setVisibility(View.INVISIBLE);
+        reportBtn.setVisibility(View.GONE);
         super.onCreate(savedInstanceState);
     }
 
@@ -55,33 +57,24 @@ public class CommunicationDialog extends AlertDialog implements Progress {
             messageView.setText(text);
     }
 
-    @Override
-    public void setTitle(CharSequence title) {
-        super.setTitle(title);
-    }
-
-
     public void reportError() {
-        ACRA.getErrorReporter().handleException(null);
+        application.reportError();
     }
 
 
     private void setError(String error) {
-        progress(error);
-        reportBtn.setVisibility(View.VISIBLE);
-        messageView.setVisibility(View.VISIBLE);
-        setCancelable(true);
+        setMessage(error);
         progress.setVisibility(View.INVISIBLE);
+        reportBtn.setVisibility(View.VISIBLE);
+        setCancelable(true);
     }
 
     public void start() {
-        setTitle("Connecting to the device");
-        setMessage("");
+        setMessage("Connecting to the device");
         setCancelable(false);
         show();
-        messageView.setVisibility(View.INVISIBLE);
-        reportBtn.setVisibility(View.INVISIBLE);
         progress.setVisibility(View.VISIBLE);
+        reportBtn.setVisibility(View.GONE);
     }
 
     public void stop() {
@@ -92,7 +85,7 @@ public class CommunicationDialog extends AlertDialog implements Progress {
         setError(error);    }
 
     public void title(final String message) {
-        setTitle(message);
+        setMessage(message);
     }
 
     public void progress(final String progress) {
