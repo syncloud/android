@@ -14,7 +14,6 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppStoreAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
-import org.syncloud.apps.sam.App;
 import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Commands;
 import org.syncloud.apps.sam.Sam;
@@ -32,7 +31,6 @@ public class DeviceAppStoreActivity extends Activity {
     private DeviceAppStoreAppsAdapter deviceAppsAdapter;
     private Device device;
     private boolean connected = false;
-    private boolean showAdminApps = false;
     private Sam sam;
     private CommunicationDialog progress;
     private Ssh ssh;
@@ -176,8 +174,7 @@ public class DeviceAppStoreActivity extends Activity {
         connected = true;
         deviceAppsAdapter.clear();
         for (AppVersions app : appsVersions) {
-            if (showAdminApps || app.app.appType() == App.Type.user)
-                deviceAppsAdapter.add(app);
+            deviceAppsAdapter.add(app);
         }
     }
 
@@ -216,10 +213,6 @@ public class DeviceAppStoreActivity extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_update_apps) {
             updateSam();
-        } else if (id == R.id.action_show_admin_apps) {
-            item.setChecked(!item.isChecked());
-            showAdminApps = item.isChecked();
-            listApps();
         } else if (id == R.id.action_reboot_device) {
           reboot();
         }

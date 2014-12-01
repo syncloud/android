@@ -8,13 +8,6 @@
         android:orderInCategory="100"
         app:showAsAction="never" />
 
-    <item android:id="@+id/action_show_admin_apps"
-        android:title="@string/all_apps"
-        android:orderInCategory="100"
-        app:showAsAction="never"
-        android:checkable="true"
-        />
-
     <item android:id="@+id/action_reboot_device"
         android:title="@string/revoot_device"
         android:orderInCategory="100"
