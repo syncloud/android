@@ -13,4 +13,9 @@
         android:orderInCategory="100"
         app:showAsAction="never"
         />
+
+    <item android:id="@+id/action_deactivate"
+          android:title="Deactivate device"
+          android:orderInCategory="100"
+          app:showAsAction="never" />
 </menu>

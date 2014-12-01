@@ -18,7 +18,9 @@ import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
+import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.sam.AppVersions;
+import org.syncloud.apps.sam.Commands;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
 import org.syncloud.apps.sam.App;
@@ -39,7 +41,9 @@ public class DeviceAppsActivity extends Activity {
     private Sam sam;
     private CommunicationDialog progress;
     private Ssh ssh;
+    private InsiderManager insider;
     private Preferences preferences;
+
 
     private TextView txtDeviceTitle;
     private TextView txtDomainName;
@@ -56,11 +60,14 @@ public class DeviceAppsActivity extends Activity {
         txtDomainName = (TextView) findViewById(R.id.txt_domain_name);
 
         SyncloudApplication application = (SyncloudApplication) getApplication();
+
         db = application.getDb();
         preferences = application.getPreferences();
 
         ssh = application.createSsh();
         sam = new Sam(ssh);
+
+        insider = new InsiderManager(ssh);
 
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
@@ -142,7 +149,9 @@ public class DeviceAppsActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_reboot_device) {
-          reboot();
+            reboot();
+        } else if (id == R.id.action_deactivate) {
+            deactivate();
         } else if (id == R.id.action_manage_apps) {
             Intent intent = new Intent(this, DeviceAppStoreActivity.class);
             intent.putExtra(SyncloudApplication.DEVICE, device);
@@ -160,11 +169,36 @@ public class DeviceAppsActivity extends Activity {
         }
     }
 
+    public void deactivate() {
+        new ProgressAsyncTask<Void, Result.Void>()
+                .setTitle("Deactivating device")
+                .setProgress(progress)
+                .doWork(new ProgressAsyncTask.Work<Void, Result.Void>() {
+                    @Override
+                    public Result<Result.Void> run(Void... args) {
+                        return insider.dropDomain(device).flatMap(new Result.Function<String,Result<Result.Void>>() {
+                            @Override
+                            public Result<Result.Void> apply(String input) throws Exception {
+                                db.remove(device);
+                                return Result.VOID;
+                            }
+                        });
+                    }
+                })
+                .onSuccess(new ProgressAsyncTask.Success<Result.Void>() {
+                    @Override
+                    public void run(Result.Void result) {
+//                        Intent intent = new Intent(DeviceAppsActivity.this, DevicesSavedActivity.class);
+//                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .execute();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         progress.dismiss();
     }
-
-
 }

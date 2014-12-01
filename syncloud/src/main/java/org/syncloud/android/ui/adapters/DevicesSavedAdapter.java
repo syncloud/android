@@ -36,11 +36,6 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
         }
     }
 
-    public void removeSaved(Device device) {
-        db().remove(device);
-        remove(device);
-    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -51,15 +46,8 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
         TextView txtDeviceTitle = (TextView) rowView.findViewById(R.id.txt_device_title);
         TextView txtDomainName = (TextView) rowView.findViewById(R.id.txt_domain_name);
         TextView txtMacAddress = (TextView) rowView.findViewById(R.id.txt_mac_address);
-        ImageButton deviceRemove = (ImageButton) rowView.findViewById(R.id.device_remove);
 
         final Device device = getItem(position);
-        deviceRemove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                removeSaved(device);
-            }
-        });
         deviceInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
