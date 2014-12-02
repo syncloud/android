@@ -171,7 +171,7 @@ public class DeviceAppsActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void openApp(String appId) {
+    private void openApp(String appId) {
         if (appRegistry.containsKey(appId)) {
             Intent intent = new Intent(this, appRegistry.get(appId));
             intent.putExtra(SyncloudApplication.DEVICE, device);
@@ -198,8 +198,6 @@ public class DeviceAppsActivity extends Activity {
                 .onSuccess(new ProgressAsyncTask.Success<Result.Void>() {
                     @Override
                     public void run(Result.Void result) {
-//                        Intent intent = new Intent(DeviceAppsActivity.this, DevicesSavedActivity.class);
-//                        startActivity(intent);
                         finish();
                     }
                 })
