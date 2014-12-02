@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -47,7 +49,7 @@ public class DeviceAppsActivity extends Activity {
 
     private TextView txtDeviceTitle;
     private TextView txtDomainName;
-    private  ListView listApplications;
+    private ListView listApplications;
 
     private DeviceAppsAdapter deviceAppsAdapter;
 
@@ -86,6 +88,14 @@ public class DeviceAppsActivity extends Activity {
         listApplications = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listApplications.setAdapter(deviceAppsAdapter);
+        listApplications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                Object obj = listApplications.getItemAtPosition(position);
+                AppVersions appVersions = (AppVersions)obj;
+                openApp(appVersions.app.id);
+            }
+        });
 
         listApps();
     }

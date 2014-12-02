@@ -4,45 +4,43 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingTop="20dp">
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:gravity="center_vertical|start"
+    android:descendantFocusability="blocksDescendants"
+    >
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
+    <LinearLayout
+        android:id="@+id/app_icon"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_weight="0"
         >
 
-        <LinearLayout
-            android:id="@+id/app_icon"
+        <ImageView
+            android:id="@+id/app_icon_user"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
-            android:layout_centerVertical="true"
-            >
+            android:padding="10dp"
+            android:background="@drawable/ic_action_computer"
+            />
 
-            <ImageButton
-                android:id="@+id/app_icon_user"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:background="@drawable/ic_action_computer"/>
-
-            <ImageButton
-                android:id="@+id/app_icon_util"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:background="@drawable/ic_action_settings"/>
-
-            </LinearLayout>
-        <TextView
-            android:id="@+id/app_name"
+        <ImageView
+            android:id="@+id/app_icon_util"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/app_buttons"
-            android:layout_toRightOf="@+id/app_icon"
-            android:text="app name (v0.1) sd ffsd sdf sdf sd  sd sd sd " />
+            android:padding="10dp"
+            android:background="@drawable/ic_action_settings"
+            />
 
-    </RelativeLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/app_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Application name"
+        />
+
 </LinearLayout>
