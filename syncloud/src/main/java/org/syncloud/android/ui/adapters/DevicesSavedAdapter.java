@@ -42,19 +42,11 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_device_saved, null);
 
-        LinearLayout deviceInfo = (LinearLayout) rowView.findViewById(R.id.device_info);
         TextView txtDeviceTitle = (TextView) rowView.findViewById(R.id.txt_device_title);
         TextView txtDomainName = (TextView) rowView.findViewById(R.id.txt_domain_name);
         TextView txtMacAddress = (TextView) rowView.findViewById(R.id.txt_mac_address);
 
         final Device device = getItem(position);
-        deviceInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                activity.open(device);
-            }
-        });
-
 
         txtDeviceTitle.setText(device.id().title);
         txtDomainName.setText(device.userDomain());

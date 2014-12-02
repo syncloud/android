@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.syncloud.android.R;
@@ -15,7 +16,6 @@ import org.syncloud.android.ui.adapters.DevicesSavedAdapter;
 import org.syncloud.ssh.model.Device;
 
 public class DevicesSavedActivity extends Activity {
-
 
     private DevicesSavedAdapter adapter;
 
@@ -28,12 +28,21 @@ public class DevicesSavedActivity extends Activity {
         setContentView(R.layout.activity_devices_saved);
         final ListView listview = (ListView) findViewById(R.id.devices_saved);
         listview.setEmptyView(findViewById(android.R.id.empty));
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Object obj = listview.getItemAtPosition(position);
+                Device device = (Device)obj;
+                open(device);
+            }
+        });
+
         adapter = new DevicesSavedAdapter(this);
         listview.setAdapter(adapter);
         adapter.refresh();
     }
 
-    public void open(Device device) {
+    private void open(Device device) {
         Intent intent = new Intent(this, DeviceAppsActivity.class);
         intent.putExtra(SyncloudApplication.DEVICE, device);
         startActivityForResult(intent, 1);

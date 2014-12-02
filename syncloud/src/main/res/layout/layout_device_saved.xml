@@ -5,7 +5,10 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="20dp">
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:descendantFocusability="blocksDescendants"
+    >
 
     <TextView
         android:id="@+id/txt_device_title"
