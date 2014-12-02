@@ -4,7 +4,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,14 +26,6 @@ public class DevicesDiscoveredAdapter extends ArrayAdapter<IdentifiedEndpoint> {
         View rowView = inflater.inflate(R.layout.layout_device_discovered, null);
 
         final IdentifiedEndpoint ie = getItem(position);
-
-        ImageButton deviceAdd = (ImageButton) rowView.findViewById(R.id.device_add);
-        deviceAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                activity.open(ie);
-            }
-        });
 
         TextView txtMain = (TextView) rowView.findViewById(R.id.txt_main_name);
         TextView txtHost = (TextView) rowView.findViewById(R.id.txt_host);

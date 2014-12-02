@@ -13,6 +13,7 @@ import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -73,6 +74,15 @@ public class DevicesDiscoveryActivity extends Activity {
         refreshBtn = (Button) findViewById(R.id.discovery_refresh_btn);
         listAdapter = new DevicesDiscoveredAdapter(this);
         resultsList.setAdapter(listAdapter);
+
+        resultsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Object obj = resultsList.getItemAtPosition(position);
+                IdentifiedEndpoint ie = (IdentifiedEndpoint)obj;
+                open(ie);
+            }
+        });
 
         map = newHashMap();
 
@@ -172,7 +182,7 @@ public class DevicesDiscoveryActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void open(final IdentifiedEndpoint endpoint) {
+    private void open(final IdentifiedEndpoint endpoint) {
         if (endpoint.id() == null) {
             new AlertDialog.Builder(this)
                     .setTitle("Can't identify device")
