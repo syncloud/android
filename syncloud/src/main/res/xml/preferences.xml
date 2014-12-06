@@ -33,6 +33,14 @@
             />
 
         <ListPreference
+            android:key="pref_release"
+            android:title="Release"
+            android:dialogTitle="Release"
+            android:entries="@array/pref_release_titles"
+            android:entryValues="@array/pref_release_values"
+            android:defaultValue="0.7" />
+
+        <ListPreference
             android:key="pref_ssh_mode"
             android:title="Current connection mode"
             android:dialogTitle="Connection mode"

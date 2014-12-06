@@ -61,7 +61,7 @@ public class DeviceAppStoreActivity extends Activity {
         deviceAppsAdapter = new DeviceAppStoreAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
         ssh = application.createSsh();
-        sam = new Sam(ssh);
+        sam = new Sam(ssh, preferences);
 
         listApps();
     }

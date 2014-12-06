@@ -3,12 +3,13 @@ package org.syncloud.android;
 import android.content.SharedPreferences;
 
 import org.apache.log4j.Logger;
+import org.syncloud.apps.sam.Release;
 import org.syncloud.ssh.EndpointPreference;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Preferences implements EndpointPreference {
+public class Preferences implements EndpointPreference, Release{
 
     private static Logger logger = Logger.getLogger(Preferences.class);
 
@@ -23,6 +24,7 @@ public class Preferences implements EndpointPreference {
     public static final String KEY_PREF_DISCOVERY_LIBRARY = "pref_discovery_library";
     public static final String KEY_PREF_LOGS = "pref_logs";
     public static final String KEY_PREF_SSH_MODE = "pref_ssh_mode";
+    public static final String KEY_PREF_RELEASE = "pref_release";
 
     private SharedPreferences preferences;
 
@@ -67,6 +69,10 @@ public class Preferences implements EndpointPreference {
 
     public String getDiscoveryLibrary() {
         return preferences.getString(KEY_PREF_DISCOVERY_LIBRARY, "JmDNS");
+    }
+
+    public String getVersion() {
+        return preferences.getString(KEY_PREF_RELEASE, null);
     }
 
     @Override

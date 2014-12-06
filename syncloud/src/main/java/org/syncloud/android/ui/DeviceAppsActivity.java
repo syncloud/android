@@ -67,7 +67,7 @@ public class DeviceAppsActivity extends Activity {
         preferences = application.getPreferences();
 
         ssh = application.createSsh();
-        sam = new Sam(ssh);
+        sam = new Sam(ssh, preferences);
 
         insider = new InsiderManager(ssh);
 

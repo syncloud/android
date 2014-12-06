@@ -18,6 +18,7 @@ import java.util.Set;
 import static org.syncloud.android.Preferences.KEY_PREF_API_URL;
 import static org.syncloud.android.Preferences.KEY_PREF_DISCOVERY_LIBRARY;
 import static org.syncloud.android.Preferences.KEY_PREF_EMAIL;
+import static org.syncloud.android.Preferences.KEY_PREF_RELEASE;
 import static org.syncloud.android.Preferences.KEY_PREF_SSH_MODE;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -26,12 +27,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private Preference feedbackPref;
     private SyncloudApplication application;
     private Set<String> summaryUpdatable = Sets.newHashSet(
-        KEY_PREF_API_URL,
-//        KEY_PREF_EMAIL,
-        KEY_PREF_DISCOVERY_LIBRARY,
-        KEY_PREF_SSH_MODE);
+            KEY_PREF_API_URL,
+            KEY_PREF_DISCOVERY_LIBRARY,
+            KEY_PREF_SSH_MODE,
+            KEY_PREF_RELEASE
+    //        KEY_PREF_EMAIL,
+    );
+
     private PreferenceCategory systemCategory;
     private Preference preferenceSshMode;
+    private Preference preferenceRelease;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         systemCategory = (PreferenceCategory) findPreference(Preferences.KEY_CATEGORY_SYSTEM);
         preferenceSshMode = findPreference(KEY_PREF_SSH_MODE);
+        preferenceRelease = findPreference(KEY_PREF_RELEASE);
 
         Preference debugPreference = findPreference(Preferences.KEY_PREF_DEBUG_MODE);
         debugPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -100,8 +106,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private void debugMode(boolean isDebug) {
         if (isDebug) {
             systemCategory.addPreference(preferenceSshMode);
+            systemCategory.addPreference(preferenceRelease);
         } else {
             systemCategory.removePreference(preferenceSshMode);
+            systemCategory.removePreference(preferenceRelease);
         }
     }
 

@@ -16,11 +16,12 @@ import static org.syncloud.common.model.Result.value;
 
 public class Sam {
     public static final ObjectMapper JSON = new ObjectMapper();
-    public static final String RELEASE = "0.7";
     private Ssh ssh;
+    private Release release;
 
-    public Sam(Ssh ssh) {
+    public Sam(Ssh ssh, Release release) {
         this.ssh = ssh;
+        this.release = release;
     }
 
     public static String cmd(String... arguments) {
@@ -48,7 +49,7 @@ public class Sam {
     }
 
     public Result<List<AppVersions>> update(Device device) {
-        return appsVersions(device, Commands.update, "--release", RELEASE);
+        return appsVersions(device, Commands.update, "--release", release.getVersion());
     }
 
     public Result<List<AppVersions>> list(Device device) {

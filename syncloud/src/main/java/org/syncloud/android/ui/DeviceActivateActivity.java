@@ -87,7 +87,7 @@ public class DeviceActivateActivity extends Activity {
         preferences = application.getPreferences();
 
         Ssh ssh = application.createSsh();
-        sam = new Sam(ssh);
+        sam = new Sam(ssh, preferences);
         insider = new InsiderManager(ssh);
         accessManager = new RemoteAccessManager(insider, ssh);
 

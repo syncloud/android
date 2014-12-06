@@ -22,13 +22,15 @@ import static org.syncloud.common.model.Result.value;
 
 public class SamTest {
 
+    private Release testRelease = new TestRelease();
+
     @Test
     public void testRunNoArgs() {
 
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, testRelease);
         sam.run(device, Commands.update);
 
         verify(ssh).execute(device, "sam update");
@@ -40,7 +42,7 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, testRelease);
         sam.run(device, Commands.update, "--release", "0.1");
 
         verify(ssh).execute(device, "sam update --release 0.1");
@@ -55,7 +57,7 @@ public class SamTest {
         String command = cmd(Commands.list);
         when(ssh.execute(device, command)).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, testRelease);
 
         Result<java.util.List<AppVersions>> result = sam.list(device);
         assertEquals(9, result.getValue().size());
@@ -72,7 +74,7 @@ public class SamTest {
         String command = cmd(Commands.list);
         when(ssh.execute(device, command)).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, testRelease);
 
         Result<java.util.List<AppVersions>> result = sam.list(device);
         assertFalse(result.hasError());
@@ -90,7 +92,7 @@ public class SamTest {
         String command = cmd(Commands.list);
         when(ssh.execute(device, command)).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, testRelease);
 
         assertTrue(sam.list(device).hasError());
 
@@ -107,7 +109,7 @@ public class SamTest {
         String command = cmd(Commands.list);
         when(ssh.execute(device, command)).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, testRelease);
 
         assertTrue(sam.list(device).hasError());
 
@@ -128,14 +130,21 @@ public class SamTest {
         Ssh ssh = mock(Ssh.class);
         Device device = mock(Device.class);
         String json = Resources.toString(getResource(response), UTF_8);
-        String command = cmd(Commands.update, "--release", Sam.RELEASE);
+        String command = cmd(Commands.update, "--release", testRelease.getVersion());
         when(ssh.execute(device, command)).thenReturn(value(json));
 
-        Sam sam = new Sam(ssh);
+        Sam sam = new Sam(ssh, testRelease);
 
         assertEquals(sam.update(device).getValue().size(), expectedUpdates);
 
         verify(ssh).execute(device, command);
+    }
+
+    class TestRelease implements Release {
+        @Override
+        public String getVersion() {
+            return "TEST";
+        }
     }
 
 }
