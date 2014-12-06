@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
@@ -19,11 +20,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.discovery.DiscoveryManager;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
-import org.syncloud.android.discovery.AsyncDiscovery;
 import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.SshRunner;
@@ -33,19 +36,17 @@ import org.syncloud.ssh.model.Identification;
 import org.syncloud.ssh.model.IdentifiedEndpoint;
 
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 public class DevicesDiscoveryActivity extends Activity {
+
+    private static Logger logger = LogManager.getLogger(DevicesDiscoveryActivity.class.getName());
+
     private Preferences preferences;
 
-    private AsyncDiscovery asyncDiscovery;
-    private final ScheduledExecutorService scheduler =
-            Executors.newScheduledThreadPool(1);
+    private DiscoveryManager discoveryManager;
     private Button refreshBtn;
     private ProgressBar progressBar;
     private DevicesDiscoveredAdapter listAdapter;
@@ -57,6 +58,8 @@ public class DevicesDiscoveryActivity extends Activity {
 
     private Map<Endpoint, IdentifiedEndpoint> map;
     private Tools tools;
+    private Boolean discoveryInProgress = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +118,7 @@ public class DevicesDiscoveryActivity extends Activity {
             }
         };
 
-        asyncDiscovery = new AsyncDiscovery(
+        discoveryManager = new DiscoveryManager(
                 (WifiManager) getSystemService(Context.WIFI_SERVICE),
                 (NsdManager) getSystemService(Context.NSD_SERVICE),
                 deviceEndpointListener);
@@ -133,34 +136,13 @@ public class DevicesDiscoveryActivity extends Activity {
     private void discoveryStart() {
         listAdapter.clear();
         if (isWifiConnected()) {
-            layoutResults.setVisibility(View.VISIBLE);
-            layoutNoWifi.setVisibility(View.GONE);
-            refreshBtn.setEnabled(false);
-            progressBar.setVisibility(View.VISIBLE);
-            asyncDiscovery.start(preferences.getDiscoveryLibrary());
-            //        use for testing without wi-fi
-            //        listAdapter.add(new DirectEndpoint("localhost", 22, "vsapronov", "somepassword", null));
-            scheduler.schedule(new Runnable() {
-                @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            discoveryStop();
-                        }
-                    });
-                }
-            }, 20, TimeUnit.SECONDS);
+            if (!discoveryInProgress) {
+                new DiscoveryTask().execute(preferences.getDiscoveryLibrary());
+            }
         } else {
             layoutResults.setVisibility(View.GONE);
             layoutNoWifi.setVisibility(View.VISIBLE);
         }
-    }
-
-    private void discoveryStop() {
-        asyncDiscovery.stop();
-        progressBar.setVisibility(View.INVISIBLE);
-        refreshBtn.setEnabled(true);
     }
 
     @Override
@@ -206,10 +188,41 @@ public class DevicesDiscoveryActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        asyncDiscovery.stop();
+        logger.info("leaving the screen");
+        if (discoveryInProgress)
+            discoveryManager.cancel();
     }
 
     public void refresh(View view) {
         discoveryStart();
+    }
+
+    public class DiscoveryTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            discoveryInProgress = true;
+            layoutResults.setVisibility(View.VISIBLE);
+            layoutNoWifi.setVisibility(View.GONE);
+            refreshBtn.setEnabled(false);
+            progressBar.setVisibility(View.VISIBLE);
+            //use for testing without wi-fi
+            //listAdapter.add(new DirectEndpoint("localhost", 22, "vsapronov", "somepassword", null));
+
+        }
+
+        @Override
+        protected Void doInBackground(String... libraries) {
+            discoveryManager.run(libraries[0], 20);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            logger.info("show controls");
+            progressBar.setVisibility(View.INVISIBLE);
+            refreshBtn.setEnabled(true);
+            discoveryInProgress = false;
+        }
     }
 }
