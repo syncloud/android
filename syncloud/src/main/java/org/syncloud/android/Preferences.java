@@ -12,6 +12,8 @@ public class Preferences implements EndpointPreference {
 
     private static Logger logger = Logger.getLogger(Preferences.class);
 
+    public static final String KEY_CATEGORY_SYSTEM = "system";
+
     public static final String KEY_PREF_API_URL = "pref_api_url";
     public static final String KEY_PREF_DEBUG_MODE = "pref_debug_mode";
     public static final String KEY_PREF_ACCOUNT_REMOVE = "pref_account_remove";

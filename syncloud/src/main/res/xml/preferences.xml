@@ -1,6 +1,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="System">
+    <PreferenceCategory android:title="System" android:key="system">
 
         <ListPreference
             android:key="pref_api_url"
