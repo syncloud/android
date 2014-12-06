@@ -1,5 +1,7 @@
 package org.syncloud.android.ui;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -7,6 +9,7 @@ import android.os.AsyncTask;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +28,8 @@ import org.syncloud.redirect.UserService;
 import org.syncloud.redirect.model.ParameterMessages;
 import org.syncloud.redirect.model.RestError;
 import org.syncloud.redirect.model.RestResult;
+
+import java.util.regex.Pattern;
 
 import static org.apache.commons.lang3.StringUtils.join;
 
@@ -57,6 +62,7 @@ public class AuthCredentialsActivity extends Activity {
         emailLoginFormView = (LinearLayout) findViewById(R.id.email_login_form);
 
         emailView = (EditText) findViewById(R.id.email);
+        emailView.setText(suggestEMail());
 
         passwordView = (EditText) findViewById(R.id.password);
         passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -108,6 +114,17 @@ public class AuthCredentialsActivity extends Activity {
                         .show();
             }
         }
+    }
+
+    private String suggestEMail() {
+        Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
+        Account[] accounts = AccountManager.get(this).getAccounts();
+        for (Account account : accounts) {
+            if (emailPattern.matcher(account.name).matches()) {
+                return  account.name;
+            }
+        }
+        return "";
     }
 
     private EditText getControl(String parameter) {
