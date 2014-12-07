@@ -22,6 +22,7 @@ public class SshRunner {
 
     public Result<String> run(Endpoint endpoint, Credentials credentials, String command) throws JSchException, IOException {
 
+        logger.info("executing: " + command);
         JSch jsch = new JSch();
 
         Session session = jsch.getSession(credentials.login(), endpoint.host(), endpoint.port());

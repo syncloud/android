@@ -5,6 +5,7 @@ dependencies {
     compile 'com.google.guava:guava:16.0.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.10'
+    compile 'log4j:log4j:1.2.17'
 }
 
 jacocoTestReport() {

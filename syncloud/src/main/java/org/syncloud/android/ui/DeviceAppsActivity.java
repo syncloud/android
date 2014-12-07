@@ -158,7 +158,9 @@ public class DeviceAppsActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_reboot_device) {
+        if (id == R.id.action_settings) {
+            startActivityForResult(new Intent(this, SettingsActivity.class), 2);
+        } else if (id == R.id.action_reboot_device) {
             reboot();
         } else if (id == R.id.action_deactivate) {
             deactivate();

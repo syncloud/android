@@ -9,7 +9,6 @@ dependencies {
     compile 'dnsjava:dnsjava:2.1.6'
     compile 'org.apache.commons:commons-exec:1.2'
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'log4j:log4j:1.2.17'
     testCompile 'junit:junit:4.10'
     testCompile 'org.mockito:mockito-all:1.9.5'
 

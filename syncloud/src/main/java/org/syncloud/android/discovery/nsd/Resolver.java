@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Resolver {
-    private static Logger logger = LogManager.getLogger(Resolver.class.getName());
+    private static Logger logger = Logger.getLogger(Resolver.class.getName());
 
     private DeviceEndpointListener deviceEndpointListener;
     private NsdManager manager;

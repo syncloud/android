@@ -3,6 +3,7 @@ package org.syncloud.android.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -194,7 +195,12 @@ public class DeviceAppStoreActivity extends Activity {
                         upgradeAll();
                     }
                 })
-                .setNegativeButton("Not now", null)
+                .setNegativeButton("Not now", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        listApps();
+                    }
+                })
                 .show();
     }
 
@@ -211,7 +217,9 @@ public class DeviceAppStoreActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_update_apps) {
+        if (id == R.id.action_settings) {
+            startActivityForResult(new Intent(this, SettingsActivity.class), 2);
+        } else if (id == R.id.action_update_apps) {
             updateSam();
         } else if (id == R.id.action_reboot_device) {
           reboot();

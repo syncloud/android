@@ -14,7 +14,7 @@ import java.net.InetAddress;
 
 public class DiscoveryManager {
 
-    private static Logger logger = LogManager.getLogger(DiscoveryManager.class.getName());
+    private static Logger logger = Logger.getLogger(DiscoveryManager.class.getName());
 
     private MulticastLock lock;
 

@@ -88,5 +88,4 @@ dependencies {
     compile 'com.google.android.gms:play-services:4.2.42'
     compile 'de.mindpipe.android:android-logging-log4j:1.0.3'
     compile 'ch.acra:acra:4.5.0'
-    compile 'log4j:log4j:1.2.17'
 }

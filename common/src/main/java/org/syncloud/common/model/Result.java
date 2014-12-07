@@ -2,7 +2,11 @@ package org.syncloud.common.model;
 
 import com.google.common.base.Optional;
 
+import org.apache.log4j.Logger;
+
 public class Result<T> {
+
+    private static Logger logger = Logger.getLogger(Result.class.getName());
 
     public enum Void { Void }
 
@@ -46,6 +50,7 @@ public class Result<T> {
             try {
                 return Result.value(func.apply(getValue()));
             } catch (Exception e) {
+                logger.error(e.getMessage(), e);
                 return Result.error(e.getMessage());
             }
     }

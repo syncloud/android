@@ -15,7 +15,7 @@ import javax.jmdns.ServiceListener;
 
 public class EventToDeviceConverter implements ServiceListener {
 
-    private static Logger logger = LogManager.getLogger(EventToDeviceConverter.class.getName());
+    private static Logger logger = Logger.getLogger(EventToDeviceConverter.class.getName());
 
     private String serviceName;
     private DeviceEndpointListener deviceEndpointListener;

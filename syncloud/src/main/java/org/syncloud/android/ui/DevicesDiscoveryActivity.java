@@ -42,7 +42,7 @@ import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 public class DevicesDiscoveryActivity extends Activity {
 
-    private static Logger logger = LogManager.getLogger(DevicesDiscoveryActivity.class.getName());
+    private static Logger logger = Logger.getLogger(DevicesDiscoveryActivity.class.getName());
 
     private Preferences preferences;
 

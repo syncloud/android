@@ -13,7 +13,7 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
 public class MulticastLock {
-    private static Logger logger = LogManager.getLogger(MulticastLock.class.getName());
+    private static Logger logger = Logger.getLogger(MulticastLock.class.getName());
 
     public final static String MULTICAST_LOCK_TAG = MulticastLock.class.toString();
 

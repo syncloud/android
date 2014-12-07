@@ -12,7 +12,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 public class EventToDeviceConverter implements NsdManager.DiscoveryListener {
 
-    private static Logger logger = LogManager.getLogger(EventToDeviceConverter.class.getName());
+    private static Logger logger = Logger.getLogger(EventToDeviceConverter.class.getName());
 
     private NsdManager manager;
     private String lookForServiceName;

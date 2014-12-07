@@ -1,19 +1,25 @@
 package org.syncloud.apps.sam;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 
 import org.junit.Test;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.SshResult;
 
 import java.io.IOException;
+import java.util.List;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.getResource;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +34,8 @@ public class SamTest {
     public void testRunNoArgs() {
 
         Ssh ssh = mock(Ssh.class);
+        when(ssh.execute(any(Device.class), anyString())).thenReturn(Result.value(""));
+
         Device device = mock(Device.class);
 
         Sam sam = new Sam(ssh, testRelease);
@@ -37,9 +45,53 @@ public class SamTest {
     }
 
     @Test
+    public void testRunSuccess() throws IOException {
+        String json = "{\n" +
+                "    \"message\": \"installed app\",\n" +
+                "    \"data\": {},\n" +
+                "    \"success\": true\n" +
+                "    }";
+
+        Ssh ssh = mock(Ssh.class);
+        when(ssh.execute(any(Device.class), anyString())).thenReturn(Result.value(json));
+
+        Device device = mock(Device.class);
+
+        Sam sam = new Sam(ssh, testRelease);
+        Result<String> result = sam.run(device, Commands.update);
+
+        assertFalse(result.hasError());
+        assertEquals("installed app", result.getValue());
+
+    }
+
+    @Test
+    public void testRunError() throws IOException {
+        String json = "{\n" +
+                "    \"message\": \"unable to install app\",\n" +
+                "    \"data\": {},\n" +
+                "    \"success\": false\n" +
+                "    }";
+
+        Ssh ssh = mock(Ssh.class);
+        when(ssh.execute(any(Device.class), anyString())).thenReturn(Result.value(json));
+
+        Device device = mock(Device.class);
+
+        Sam sam = new Sam(ssh, testRelease);
+        Result<String> result = sam.run(device, Commands.update);
+
+        assertTrue(result.hasError());
+        assertEquals("unable to install app", result.getError());
+
+    }
+
+    @Test
     public void testRunWithArgs() {
 
         Ssh ssh = mock(Ssh.class);
+        when(ssh.execute(any(Device.class), anyString())).thenReturn(Result.value(""));
+
         Device device = mock(Device.class);
 
         Sam sam = new Sam(ssh, testRelease);
@@ -59,7 +111,7 @@ public class SamTest {
 
         Sam sam = new Sam(ssh, testRelease);
 
-        Result<java.util.List<AppVersions>> result = sam.list(device);
+        Result<List<AppVersions>> result = sam.list(device);
         assertEquals(9, result.getValue().size());
 
         verify(ssh).execute(device, command);
@@ -76,7 +128,7 @@ public class SamTest {
 
         Sam sam = new Sam(ssh, testRelease);
 
-        Result<java.util.List<AppVersions>> result = sam.list(device);
+        Result<List<AppVersions>> result = sam.list(device);
         assertFalse(result.hasError());
         assertEquals(0, result.getValue().size());
 

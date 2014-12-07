@@ -8,6 +8,7 @@ import org.syncloud.common.model.Result;
 
 public class Ssh {
 
+    public static final String VERIFY_COMMAND = "date";
     private static Logger logger = Logger.getLogger(Ssh.class);
 
     public static final int SSH_SERVER_PORT = 22;
@@ -22,19 +23,21 @@ public class Ssh {
     }
 
     public Result<String> execute(final Device device, final String command) {
+        return run(select(device), device.credentials(), command);
+    }
 
-        logger.info(command);
-
-        Result<String> first = run(selector.first(device), device.credentials(), command);
+    private Result<Endpoint> select(final Device device) {
+        Result<Endpoint> firstEndpoint = selector.first(device);
+        Result<String> first = run(firstEndpoint, device.credentials(), VERIFY_COMMAND);
         if (!first.hasError())
-            return first;
+            return firstEndpoint;
 
-        Result<String> second = run(selector.second(device), device.credentials(), command);
+        Result<Endpoint> secondEndpoint = selector.second(device);
+        Result<String> second = run(secondEndpoint, device.credentials(), VERIFY_COMMAND);
         if (!second.hasError())
             preference.swap();
 
-        return second;
-
+        return secondEndpoint;
     }
 
     private Result<String> run(Result<Endpoint> endpoint, Credentials credentials, String command) {
