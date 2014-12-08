@@ -32,6 +32,7 @@ import org.syncloud.ssh.model.IdentifiedEndpoint;
 import java.util.List;
 
 import static org.syncloud.common.model.Result.VOID;
+import static org.syncloud.common.model.Result.error;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 
@@ -186,34 +187,59 @@ public class DeviceActivateActivity extends Activity {
 
     private Result<Result.Void> doActivate(final String email, final String pass, final String domain) {
         logger.info("activate");
-        return sam.update(device).flatMap(new Result.Function<List<AppVersions>, Result<String>>() {
-            @Override
-            public Result<String> apply(List<AppVersions> input) throws Exception {
-                return sam.run(device, Commands.upgrade_all);
-            }
-        }).flatMap(new Result.Function<String, Result<String>>() {
-            @Override
-            public Result<String> apply(String input) throws Exception {
-                return insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
-            }
-        }).flatMap(new Result.Function<String, Result<String>>() {
-            @Override
-            public Result<String> apply(String input) throws Exception {
-                return insider.acquireDomain(device, email, pass, domain);
-            }
-        }).flatMap(new Result.Function<String, Result<Device>>() {
-            @Override
-            public Result<Device> apply(String input) throws Exception {
-                return accessManager.enable(device, preferences.getDomain());
-            }
-        }).flatMap(new Result.Function<Device, Result<Result.Void>>() {
-            @Override
-            public Result<Result.Void> apply(Device input) throws Exception {
-                Db db = ((SyncloudApplication) getApplication()).getDb();
-                db.upsert(input);
-                return VOID;
-            }
-        });
+
+        Result<List<AppVersions>> updateResult = sam.update(device);
+        if (updateResult.hasError())
+            return error(updateResult.getError());
+
+        Result<String> upgradeAllResult = sam.run(device, Commands.upgrade_all);
+        if (upgradeAllResult.hasError())
+            return error(upgradeAllResult.getError());
+
+        Result<String> redirectResult = insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
+        if (redirectResult.hasError())
+            return error(redirectResult.getError());
+
+        Result<String> acquireDomainResult = insider.acquireDomain(device, email, pass, domain);
+        if (acquireDomainResult.hasError())
+            return error(acquireDomainResult.getError());
+
+        Result<Device> remoteAccessResult = accessManager.enable(device, preferences.getDomain());
+        if (remoteAccessResult.hasError())
+            return error(remoteAccessResult.getError());
+
+        Db db = ((SyncloudApplication) getApplication()).getDb();
+        db.insert(remoteAccessResult.getValue());
+
+        return VOID;
+//        return sam.update(device).flatMap(new Result.Function<List<AppVersions>, Result<String>>() {
+//            @Override
+//            public Result<String> apply(List<AppVersions> input) throws Exception {
+//                return sam.run(device, Commands.upgrade_all);
+//            }
+//        }).flatMap(new Result.Function<String, Result<String>>() {
+//            @Override
+//            public Result<String> apply(String input) throws Exception {
+//                return insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
+//            }
+//        }).flatMap(new Result.Function<String, Result<String>>() {
+//            @Override
+//            public Result<String> apply(String input) throws Exception {
+//                return insider.acquireDomain(device, email, pass, domain);
+//            }
+//        }).flatMap(new Result.Function<String, Result<Device>>() {
+//            @Override
+//            public Result<Device> apply(String input) throws Exception {
+//                return accessManager.enable(device, preferences.getDomain());
+//            }
+//        }).flatMap(new Result.Function<Device, Result<Result.Void>>() {
+//            @Override
+//            public Result<Result.Void> apply(Device input) throws Exception {
+//                Db db = ((SyncloudApplication) getApplication()).getDb();
+//                db.upsert(input);
+//                return VOID;
+//            }
+//        });
     }
 
     @Override
