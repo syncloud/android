@@ -1,7 +1,8 @@
 package org.syncloud.ssh;
 
+import com.google.common.base.Optional;
+
 import org.apache.log4j.Logger;
-import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.common.model.Result;
@@ -23,38 +24,33 @@ public class Ssh {
     }
 
     public Result<String> execute(final Device device, final String command) {
-        return run(select(device), device.credentials(), command);
-    }
-
-    private Result<Endpoint> select(final Device device) {
-        Result<Endpoint> firstEndpoint = selector.first(device);
-        Result<String> first = run(firstEndpoint, device.credentials(), VERIFY_COMMAND);
-        if (!first.hasError())
-            return firstEndpoint;
-
-        Result<Endpoint> secondEndpoint = selector.second(device);
-        Result<String> second = run(secondEndpoint, device.credentials(), VERIFY_COMMAND);
-        if (!second.hasError())
-            preference.swap();
-
-        return secondEndpoint;
-    }
-
-    private Result<String> run(Result<Endpoint> endpoint, Credentials credentials, String command) {
-
-        if (endpoint.hasError()) {
-            logger.error(endpoint.getError());
-            return Result.error(endpoint.getError());
-        }
-
-        try {
-            return sshRunner.run(endpoint.getValue(), credentials, command);
-        } catch (Exception e) {
-            logger.error("Endpoint is not available: " + e.getMessage());
+        Optional<Endpoint> selected = select(device);
+        if(selected.isPresent()) {
+            Optional<String> result = sshRunner.run(selected.get(), device.credentials(), command);
+            if (result.isPresent())
+                return Result.value(result.get());
         }
 
         return Result.error("unable to connect");
 
+    }
+
+    private Optional<Endpoint> select(final Device device) {
+        Optional<Endpoint> firstEndpoint = selector.select(device, true);
+        if (firstEndpoint.isPresent()){
+            if (sshRunner.run(firstEndpoint.get(), device.credentials(), VERIFY_COMMAND).isPresent())
+                return firstEndpoint;
+        }
+
+        Optional<Endpoint> secondEndpoint = selector.select(device, false);
+        if (secondEndpoint.isPresent()) {
+            if (sshRunner.run(secondEndpoint.get(), device.credentials(), VERIFY_COMMAND).isPresent()) {
+                preference.swap();
+                return secondEndpoint;
+            }
+        }
+
+        return Optional.absent();
     }
 
 

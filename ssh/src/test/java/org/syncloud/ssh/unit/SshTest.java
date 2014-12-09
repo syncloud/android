@@ -1,5 +1,6 @@
 package org.syncloud.ssh.unit;
 
+import com.google.common.base.Optional;
 import com.jcraft.jsch.JSchException;
 
 import org.junit.Assert;
@@ -17,6 +18,7 @@ import java.io.IOException;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -33,21 +35,19 @@ public class SshTest {
 
         SshRunner runner = mock(SshRunner.class);
         when(runner.run(any(Endpoint.class), any(Credentials.class), anyString()))
-                .thenThrow(new JSchException("bad"))
-                .thenThrow(new JSchException("bad"));
+                .thenReturn(Optional.<String>absent())
+                .thenReturn(Optional.<String>absent());
 
         EndpointSelector resolver = mock(EndpointSelector.class);
-        when(resolver.first(any(Device.class))).thenReturn(Result.value(localEndpoint));
-        when(resolver.second(any(Device.class))).thenReturn(Result.value(localEndpoint));
+        when(resolver.select(any(Device.class), eq(true))).thenReturn(Optional.of(localEndpoint));
+        when(resolver.select(any(Device.class), eq(false))).thenReturn(Optional.of(localEndpoint));
 
-//        Progress progress = mock(Progress.class);
         EndpointPreference preference = mock(EndpointPreference.class);
         Ssh ssh = new Ssh(runner, resolver, preference);
 
         Result<String> result = ssh.execute(device, "command");
 
         Assert.assertTrue(result.hasError());
-//        verify(progress, atLeastOnce()).error(anyString());
         verify(preference, times(0)).swap();
 
     }
@@ -57,13 +57,12 @@ public class SshTest {
 
         SshRunner runner = mock(SshRunner.class);
         when(runner.run(any(Endpoint.class), any(Credentials.class), anyString()))
-                .thenReturn(Result.value("good"));
+                .thenReturn(Optional.of("good"));
 
         EndpointSelector selector = mock(EndpointSelector.class);
-        when(selector.first(any(Device.class))).thenReturn(Result.value(localEndpoint));
-        when(selector.second(any(Device.class))).thenReturn(Result.value(localEndpoint));
+        when(selector.select(any(Device.class), eq(true))).thenReturn(Optional.of(localEndpoint));
+        when(selector.select(any(Device.class), eq(false))).thenReturn(Optional.of(localEndpoint));
 
-//        Progress progress = mock(Progress.class);
         EndpointPreference preference = mock(EndpointPreference.class);
         when(preference.isRemote()).thenReturn(true);
         Ssh ssh = new Ssh(runner, selector, preference);
@@ -71,8 +70,7 @@ public class SshTest {
         Result<String> result = ssh.execute(device, "command");
 
         Assert.assertFalse(result.hasError());
-//        verify(progress, times(0)).error(anyString());
-        verify(selector).first(any(Device.class));
+        verify(selector).select(any(Device.class), eq(true));
         verify(preference, times(0)).swap();
 
     }
@@ -82,14 +80,13 @@ public class SshTest {
 
         SshRunner runner = mock(SshRunner.class);
         when(runner.run(any(Endpoint.class), any(Credentials.class), anyString()))
-                .thenThrow(new JSchException("bad"))
-                .thenReturn(Result.value("good"));
+                .thenReturn(Optional.<String>absent())
+                .thenReturn(Optional.of("good"));
 
         EndpointSelector selector = mock(EndpointSelector.class);
-        when(selector.first(any(Device.class))).thenReturn(Result.value(localEndpoint));
-        when(selector.second(any(Device.class))).thenReturn(Result.value(localEndpoint));
+        when(selector.select(any(Device.class), eq(true))).thenReturn(Optional.of(localEndpoint));
+        when(selector.select(any(Device.class), eq(false))).thenReturn(Optional.of(localEndpoint));
 
-//        Progress progress = mock(Progress.class);
         EndpointPreference preference = mock(EndpointPreference.class);
         when(preference.isRemote()).thenReturn(true);
         Ssh ssh = new Ssh(runner, selector, preference);
@@ -97,9 +94,8 @@ public class SshTest {
         Result<String> result = ssh.execute(device, "command");
 
         Assert.assertFalse(result.hasError());
-//        verify(progress, times(0)).error(anyString());
-        verify(selector).first(any(Device.class));
-        verify(selector).second(any(Device.class));
+        verify(selector).select(any(Device.class), eq(true));
+        verify(selector).select(any(Device.class), eq(false));
         verify(preference).swap();
 
     }

@@ -40,12 +40,12 @@ public class EndpointSelectorTest {
         EndpointSelector selector = new EndpointSelector(resolver, preference);
 
         when(preference.isRemote()).thenReturn(false);
-        assertEquals(localEndpoint, selector.first(device).getValue());
-        assertEquals(remoteEndpoint, selector.second(device).getValue());
+        assertEquals(localEndpoint, selector.select(device, true).get());
+        assertEquals(remoteEndpoint, selector.select(device, false).get());
 
         when(preference.isRemote()).thenReturn(true);
-        assertEquals(remoteEndpoint, selector.first(device).getValue());
-        assertEquals(localEndpoint, selector.second(device).getValue());
+        assertEquals(remoteEndpoint, selector.select(device, true).get());
+        assertEquals(localEndpoint, selector.select(device ,false).get());
     }
 
 }
