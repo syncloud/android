@@ -1,5 +1,7 @@
 package org.syncloud.ssh.unit;
 
+import com.google.common.base.Optional;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -31,7 +33,7 @@ public class EndpointSelectorTest {
     public void testPreferred() {
 
         EndpointResolver resolver = mock(EndpointResolver.class);
-        when(resolver.dnsService(anyString(), anyString())).thenReturn(Result.value(remoteEndpoint));
+        when(resolver.dnsService(anyString(), anyString())).thenReturn(Optional.of(remoteEndpoint));
 
         EndpointPreference preference = mock(EndpointPreference.class);
 

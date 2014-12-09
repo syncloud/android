@@ -1,5 +1,7 @@
 package org.syncloud.ssh;
 
+import com.google.common.base.Optional;
+
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.Endpoint;
@@ -27,9 +29,14 @@ public class EndpointSelector {
     private Result<Endpoint> select(Device device, boolean first) {
 
         boolean valid = first ? preference.isRemote() : !preference.isRemote();
-        if (valid)
-            return resolver.dnsService(device.userDomain(), SSH_TYPE);
-        else
+        if (valid){
+            String domain = device.userDomain();
+            Optional<Endpoint> endpointOptional = resolver.dnsService(domain, SSH_TYPE);
+            if (endpointOptional.isPresent())
+                return Result.value(endpointOptional.get());
+            else
+                return Result.error("Public address is not available yet for " + domain + ", " + SSH_TYPE);
+        } else
             return Result.value(device.localEndpoint());
 
     }

@@ -1,5 +1,7 @@
 package org.syncloud.ssh.unit;
 
+import com.google.common.base.Optional;
+
 import org.junit.Test;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Dns;
@@ -40,9 +42,9 @@ public class EndpointResolverTest {
 
         EndpointResolver resolver = new EndpointResolver(mock(Dns.class));
 
-        Result<Endpoint> endpoint = resolver.dnsService(userDomain, type);
+        Optional<Endpoint> endpoint = resolver.dnsService(userDomain, type);
 
-        assertTrue(endpoint.hasError());
+        assertFalse(endpoint.isPresent());
     }
 
     @Test
@@ -54,10 +56,10 @@ public class EndpointResolverTest {
 
         EndpointResolver resolver = new EndpointResolver(dns);
 
-        Result<Endpoint> endpoint = resolver.dnsService(userDomain, type);
+        Optional<Endpoint> endpoint = resolver.dnsService(userDomain, type);
 
-        assertFalse(endpoint.hasError() ? endpoint.getError() : "", endpoint.hasError());
-        assertEquals(remoteEndpoint, endpoint.getValue());
+        assertTrue(endpoint.isPresent());
+        assertEquals(remoteEndpoint, endpoint.get());
     }
 
     @Test
@@ -68,8 +70,8 @@ public class EndpointResolverTest {
 
         EndpointResolver resolver = new EndpointResolver(dns);
 
-        Result<Endpoint> endpoint = resolver.dnsService(userDomain, type);
+        Optional<Endpoint> endpoint = resolver.dnsService(userDomain, type);
 
-        assertTrue(endpoint.hasError());
+        assertFalse(endpoint.isPresent());
     }
 }
