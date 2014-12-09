@@ -12,6 +12,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.common.base.Optional;
+
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
@@ -33,6 +35,7 @@ import java.util.List;
 
 import static org.syncloud.common.model.Result.VOID;
 import static org.syncloud.common.model.Result.error;
+import static org.syncloud.common.model.Result.value;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 
@@ -138,7 +141,11 @@ public class DeviceActivateActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
                     public Result<String> run(Void... args) {
-                        return insider.userDomain(device);
+                        Optional<String> stringOptional = insider.userDomain(device);
+                        if (stringOptional.isPresent())
+                            return value(stringOptional.get());
+                        else
+                            return error("unable to get user domain");
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {
@@ -196,13 +203,11 @@ public class DeviceActivateActivity extends Activity {
         if (upgradeAllResult.hasError())
             return error(upgradeAllResult.getError());
 
-        Result<String> redirectResult = insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
-        if (redirectResult.hasError())
-            return error(redirectResult.getError());
+        if (!insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl()).isPresent())
+            return error("unable to set redirect info");
 
-        Result<String> acquireDomainResult = insider.acquireDomain(device, email, pass, domain);
-        if (acquireDomainResult.hasError())
-            return error(acquireDomainResult.getError());
+        if (!insider.acquireDomain(device, email, pass, domain).isPresent())
+            return error("unable to acquire domain");
 
         Result<Device> remoteAccessResult = accessManager.enable(device, preferences.getDomain());
         if (remoteAccessResult.hasError())

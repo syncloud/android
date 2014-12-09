@@ -1,6 +1,7 @@
 package org.syncloud.apps.remote;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
 
 import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.common.model.Result;
@@ -23,34 +24,30 @@ public class RemoteAccessManager {
         this.ssh = ssh;
     }
 
-    public Result<String> disable(Device device) {
-        return ssh.execute(device, REMOTE_BIN + " disable");
-    }
-
     public Result<Device> enable(final Device device, final String domain) {
         final Endpoint endpoint = device.localEndpoint();
-        return ssh.execute(device, REMOTE_BIN + " enable")
-                .flatMap(new Result.Function<String, Result<Device>>() {
-                    @Override
-                    public Result<Device> apply(final String data) throws Exception {
-                        final String key = JSON.readValue(data, StringResult.class).data;
-                        return insider.userDomain(device)
-                                .map(new Result.Function<String, Device>() {
-                                    @Override
-                                    public Device apply(String userDomain) throws Exception {
-                                        Endpoint remoteEndpoint = new Endpoint(endpoint.host(), REMOTE_ACCESS_PORT);
-                                        Credentials credentials = new Credentials("root", "syncloud", key);
-                                        Device newDevice = new Device(
-                                                device.macAddress(),
-                                                device.id(),
-                                                userDomain + "." + domain,
-                                                remoteEndpoint,
-                                                credentials);
-                                        return newDevice;
-                                    }
-                                });
-                    }
-                });
+        Optional<String> execute = ssh.execute(device, REMOTE_BIN + " enable");
+        if (execute.isPresent()) {
+            try {
+                final String key = JSON.readValue(execute.get(), StringResult.class).data;
+                Optional<String> userDomain = insider.userDomain(device);
+                if (userDomain.isPresent()) {
+                    return Result.value(new Device(
+                            device.macAddress(),
+                            device.id(),
+                            userDomain.get() + "." + domain,
+                            new Endpoint(endpoint.host(), REMOTE_ACCESS_PORT),
+                            new Credentials("root", "syncloud", key)));
+
+                }
+            } catch (Exception e) {
+                Result.error("unable to remote access app ssh response");
+            }
+        }
+
+        return Result.error("unable to enable remote access");
+
+
     }
 
 }

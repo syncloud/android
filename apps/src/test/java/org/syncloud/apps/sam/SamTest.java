@@ -2,6 +2,7 @@ package org.syncloud.apps.sam;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class SamTest {
     public void testRunNoArgs() {
 
         Ssh ssh = mock(Ssh.class);
-        when(ssh.execute(any(Device.class), anyString())).thenReturn(Result.value(""));
+        when(ssh.execute(any(Device.class), anyString())).thenReturn(Optional.of(""));
 
         Device device = mock(Device.class);
 
@@ -53,7 +54,7 @@ public class SamTest {
                 "    }";
 
         Ssh ssh = mock(Ssh.class);
-        when(ssh.execute(any(Device.class), anyString())).thenReturn(Result.value(json));
+        when(ssh.execute(any(Device.class), anyString())).thenReturn(Optional.of(json));
 
         Device device = mock(Device.class);
 
@@ -74,7 +75,7 @@ public class SamTest {
                 "    }";
 
         Ssh ssh = mock(Ssh.class);
-        when(ssh.execute(any(Device.class), anyString())).thenReturn(Result.value(json));
+        when(ssh.execute(any(Device.class), anyString())).thenReturn(Optional.of(json));
 
         Device device = mock(Device.class);
 
@@ -90,7 +91,7 @@ public class SamTest {
     public void testRunWithArgs() {
 
         Ssh ssh = mock(Ssh.class);
-        when(ssh.execute(any(Device.class), anyString())).thenReturn(Result.value(""));
+        when(ssh.execute(any(Device.class), anyString())).thenReturn(Optional.of(""));
 
         Device device = mock(Device.class);
 
@@ -107,7 +108,7 @@ public class SamTest {
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.json"), UTF_8);
         String command = cmd(Commands.list);
-        when(ssh.execute(device, command)).thenReturn(value(json));
+        when(ssh.execute(device, command)).thenReturn(Optional.of(json));
 
         Sam sam = new Sam(ssh, testRelease);
 
@@ -124,7 +125,7 @@ public class SamTest {
         Device device = mock(Device.class);
         String json = Resources.toString(getResource("app.list.empty.json"), UTF_8);
         String command = cmd(Commands.list);
-        when(ssh.execute(device, command)).thenReturn(value(json));
+        when(ssh.execute(device, command)).thenReturn(Optional.of(json));
 
         Sam sam = new Sam(ssh, testRelease);
 
@@ -142,7 +143,7 @@ public class SamTest {
         Device device = mock(Device.class);
         String json = "";
         String command = cmd(Commands.list);
-        when(ssh.execute(device, command)).thenReturn(value(json));
+        when(ssh.execute(device, command)).thenReturn(Optional.of(json));
 
         Sam sam = new Sam(ssh, testRelease);
 
@@ -159,7 +160,7 @@ public class SamTest {
         String json = Resources.toString(getResource("app.list.error.json"), UTF_8);
 
         String command = cmd(Commands.list);
-        when(ssh.execute(device, command)).thenReturn(value(json));
+        when(ssh.execute(device, command)).thenReturn(Optional.of(json));
 
         Sam sam = new Sam(ssh, testRelease);
 
@@ -183,7 +184,7 @@ public class SamTest {
         Device device = mock(Device.class);
         String json = Resources.toString(getResource(response), UTF_8);
         String command = cmd(Commands.update, "--release", testRelease.getVersion());
-        when(ssh.execute(device, command)).thenReturn(value(json));
+        when(ssh.execute(device, command)).thenReturn(Optional.of(json));
 
         Sam sam = new Sam(ssh, testRelease);
 

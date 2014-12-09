@@ -23,15 +23,13 @@ public class Ssh {
         this.preference = preference;
     }
 
-    public Result<String> execute(final Device device, final String command) {
+    public Optional<String> execute(final Device device, final String command) {
         Optional<Endpoint> selected = select(device);
         if(selected.isPresent()) {
-            Optional<String> result = sshRunner.run(selected.get(), device.credentials(), command);
-            if (result.isPresent())
-                return Result.value(result.get());
+            return sshRunner.run(selected.get(), device.credentials(), command);
         }
-
-        return Result.error("unable to connect");
+        logger.error("unable to connect");
+        return Optional.absent();
 
     }
 

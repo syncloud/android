@@ -2,12 +2,14 @@ package org.syncloud.apps.sam;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
 
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.SshResult;
 
+import java.io.IOException;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -31,13 +33,15 @@ public class Sam {
     }
 
     private <TContent> Result<TContent> runTyped(final TypeReference type, Device device, String... arguments) {
-        return ssh.execute(device, cmd(arguments)).flatMap(new Result.Function<String, Result<TContent>>() {
-            @Override
-            public Result<TContent> apply(String v) throws Exception {
-                SshResult<TContent> result = JSON.readValue(v, type);
-                return value(result.data);
+        Optional<String> execute = ssh.execute(device, cmd(arguments));
+        if (execute.isPresent()) {
+            try {
+                return value(JSON.<SshResult<TContent>>readValue(execute.get(), type).data);
+            } catch (IOException e) {
+                return error("unable to parse command response");
             }
-        });
+        }
+        return error("unable to execute command");
     }
 
     private Result<List<AppVersions>> appsVersions(Device device, String... arguments) {
@@ -45,16 +49,22 @@ public class Sam {
     }
 
     public Result<String> run(Device device, String... arguments) {
-        return ssh.execute(device, cmd(arguments)).flatMap(new Result.Function<String, Result<String>>() {
-            @Override
-            public Result<String> apply(String v) throws Exception {
-                SshResult result = JSON.readValue(v, SshResult.class);
+        Optional<String> execute = ssh.execute(device, cmd(arguments));
+        if (execute.isPresent()) {
+
+            try {
+                SshResult result = JSON.readValue(execute.get(), SshResult.class);
                 if (result.success)
                     return value(result.message);
                 else
                     return error(result.message);
+
+            } catch (IOException e) {
+                return error("unable to parse execute response");
             }
-        });
+        }
+
+        return error("unable to execute command");
     }
 
     public Result<List<AppVersions>> update(Device device) {

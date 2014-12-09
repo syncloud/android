@@ -13,6 +13,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
+import com.google.common.base.Optional;
+
+import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
@@ -35,6 +38,8 @@ import static android.os.AsyncTask.execute;
 import static org.syncloud.android.SyncloudApplication.appRegistry;
 
 public class DeviceAppsActivity extends Activity {
+
+    private static Logger logger = Logger.getLogger(DeviceAppsActivity.class);
 
     private Device device;
     private Db db;
@@ -188,14 +193,14 @@ public class DeviceAppsActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, Result.Void>() {
                     @Override
                     public Result<Result.Void> run(Void... args) {
-                        return insider.dropDomain(device).flatMap(new Result.Function<String,Result<Result.Void>>() {
-                            @Override
-                            public Result<Result.Void> apply(String input) throws Exception {
-                                db.remove(device);
-                                return Result.VOID;
-                            }
-                        });
+                        if (insider.dropDomain(device).isPresent()) {
+                            db.remove(device);
+                        } else {
+                            logger.error("unable to drop domain");
+                        }
+                        return Result.VOID;
                     }
+
                 })
                 .onSuccess(new ProgressAsyncTask.Success<Result.Void>() {
                     @Override

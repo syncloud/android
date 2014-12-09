@@ -17,6 +17,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.common.base.Optional;
+
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.tasks.ProgressAsyncTask;
@@ -102,8 +104,11 @@ public class Owncloud extends Activity {
                 .doWork(new ProgressAsyncTask.Work<String, String>() {
                     @Override
                     public Result<String> run(String... args) {
-                        Result<String> finishResult = owncloudManager.finishSetup(device, login, pass, protocol);
-                        return finishResult;
+                        Optional<String> finishResult = owncloudManager.finishSetup(device, login, pass, protocol);
+                        if (finishResult.isPresent())
+                            return Result.value(finishResult.get());
+                        else
+                            return Result.error("unable to finish setup");
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<String>() {
@@ -123,8 +128,11 @@ public class Owncloud extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
                     public Result<String> run(Void... args) {
-                        Result<String> result = owncloudManager.owncloudUrl(device);
-                        return result;
+                        Optional<String> result = owncloudManager.owncloudUrl(device);
+                        if (result.isPresent())
+                            return Result.value(result.get());
+                        else
+                            return Result.error("unable to get ownCloud url");
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {

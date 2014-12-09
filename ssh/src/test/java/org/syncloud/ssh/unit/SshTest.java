@@ -45,15 +45,15 @@ public class SshTest {
         EndpointPreference preference = mock(EndpointPreference.class);
         Ssh ssh = new Ssh(runner, resolver, preference);
 
-        Result<String> result = ssh.execute(device, "command");
+        Optional<String> result = ssh.execute(device, "command");
 
-        Assert.assertTrue(result.hasError());
+        Assert.assertFalse(result.isPresent());
         verify(preference, times(0)).swap();
 
     }
 
     @Test
-    public void testExecute_Preferred_Good() throws JSchException, IOException {
+    public void testExecute_Preferred_Good() {
 
         SshRunner runner = mock(SshRunner.class);
         when(runner.run(any(Endpoint.class), any(Credentials.class), anyString()))
@@ -67,9 +67,9 @@ public class SshTest {
         when(preference.isRemote()).thenReturn(true);
         Ssh ssh = new Ssh(runner, selector, preference);
 
-        Result<String> result = ssh.execute(device, "command");
+        Optional<String> result = ssh.execute(device, "command");
 
-        Assert.assertFalse(result.hasError());
+        Assert.assertTrue(result.isPresent());
         verify(selector).select(any(Device.class), eq(true));
         verify(preference, times(0)).swap();
 
@@ -91,9 +91,9 @@ public class SshTest {
         when(preference.isRemote()).thenReturn(true);
         Ssh ssh = new Ssh(runner, selector, preference);
 
-        Result<String> result = ssh.execute(device, "command");
+        Optional<String> result = ssh.execute(device, "command");
 
-        Assert.assertFalse(result.hasError());
+        Assert.assertTrue(result.isPresent());
         verify(selector).select(any(Device.class), eq(true));
         verify(selector).select(any(Device.class), eq(false));
         verify(preference).swap();
