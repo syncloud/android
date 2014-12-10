@@ -42,9 +42,10 @@ import static org.acra.ReportField.*;
 public class SyncloudApplication extends Application {
 
     private String TAG = SyncloudApplication.class.getSimpleName();
-
     public static String DEVICE = "device";
+
     public static String DEVICE_ENDPOINT = "device_endpoint";
+    public static final String DEVICE_ID = "device_id";
 
     public static Map<String, Class> appRegistry = new HashMap<String, Class>() {{
 //        put("remote", Remote_Access.class);

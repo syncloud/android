@@ -29,6 +29,8 @@ import org.syncloud.apps.sam.Sam;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.Endpoint;
+import org.syncloud.ssh.model.Identification;
 import org.syncloud.ssh.model.IdentifiedEndpoint;
 
 import java.util.List;
@@ -43,7 +45,6 @@ public class DeviceActivateActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(DeviceActivateActivity.class);
 
-    private IdentifiedEndpoint endpoint;
     private Preferences preferences;
     private Device device;
 
@@ -80,12 +81,13 @@ public class DeviceActivateActivity extends Activity {
 
         SyncloudApplication application = (SyncloudApplication) getApplication();
 
-        endpoint = (IdentifiedEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
+        Endpoint endpoint = (Endpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
+        Identification identification = (Identification) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ID);
         device = new Device(
-                endpoint.id().mac_address,
-                endpoint.id(),
+                identification.mac_address,
+                identification,
                 null,
-                endpoint.endpoint(),
+                endpoint,
                 getStandardCredentials());
 
         preferences = application.getPreferences();
@@ -145,7 +147,7 @@ public class DeviceActivateActivity extends Activity {
                         if (stringOptional.isPresent())
                             return value(stringOptional.get());
                         else
-                            return error("unable to get user domain");
+                            return error("");
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {

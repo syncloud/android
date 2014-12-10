@@ -20,6 +20,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.google.common.base.Optional;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
@@ -58,7 +60,6 @@ public class DevicesDiscoveryActivity extends Activity {
 
     private Map<Endpoint, IdentifiedEndpoint> map;
     private Tools tools;
-    private Boolean discoveryInProgress = false;
 
 
     @Override
@@ -89,39 +90,9 @@ public class DevicesDiscoveryActivity extends Activity {
 
         map = newHashMap();
 
-        DeviceEndpointListener deviceEndpointListener = new DeviceEndpointListener() {
-            @Override
-            public void added(final Endpoint endpoint) {
-                Result<Identification> idResult = tools.getId(endpoint, getStandardCredentials());
-                Identification id = null;
-                if (!idResult.hasError())
-                    id = idResult.getValue();
-                final IdentifiedEndpoint ie = new IdentifiedEndpoint(endpoint, id);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        map.put(endpoint, ie);
-                        listAdapter.add(ie);
-                    }
-                });
-            }
-
-            @Override
-            public void removed(final Endpoint endpoint) {
-                final IdentifiedEndpoint ie = map.remove(endpoint);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        listAdapter.remove(ie);
-                    }
-                });
-            }
-        };
-
         discoveryManager = new DiscoveryManager(
                 (WifiManager) getSystemService(Context.WIFI_SERVICE),
-                (NsdManager) getSystemService(Context.NSD_SERVICE),
-                deviceEndpointListener);
+                (NsdManager) getSystemService(Context.NSD_SERVICE));
 
         discoveryStart();
     }
@@ -136,9 +107,7 @@ public class DevicesDiscoveryActivity extends Activity {
     private void discoveryStart() {
         listAdapter.clear();
         if (isWifiConnected()) {
-            if (!discoveryInProgress) {
-                new DiscoveryTask().execute(preferences.getDiscoveryLibrary());
-            }
+            new DiscoveryTask().execute(preferences.getDiscoveryLibrary());
         } else {
             layoutResults.setVisibility(View.GONE);
             layoutNoWifi.setVisibility(View.VISIBLE);
@@ -165,7 +134,7 @@ public class DevicesDiscoveryActivity extends Activity {
     }
 
     private void open(final IdentifiedEndpoint endpoint) {
-        if (endpoint.id() == null) {
+        if (!endpoint.id().isPresent()) {
             new AlertDialog.Builder(this)
                     .setTitle("Can't identify device")
                     .setMessage("Sorry, there's no identification information for this device. Most probably it is running old release of Syncloud. Please upgrade it to latest release and try to activate again.")
@@ -173,7 +142,8 @@ public class DevicesDiscoveryActivity extends Activity {
                     .show();
         } else {
             Intent intent = new Intent(this, DeviceActivateActivity.class);
-            intent.putExtra(SyncloudApplication.DEVICE_ENDPOINT, endpoint);
+            intent.putExtra(SyncloudApplication.DEVICE_ENDPOINT, endpoint.endpoint());
+            intent.putExtra(SyncloudApplication.DEVICE_ID, endpoint.id().get());
             startActivity(intent);
             setResult(Activity.RESULT_OK, new Intent(this, DevicesSavedActivity.class));
             finish();
@@ -189,31 +159,47 @@ public class DevicesDiscoveryActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         logger.info("leaving the screen");
-        if (discoveryInProgress)
-            discoveryManager.cancel();
+        discoveryManager.cancel();
     }
 
     public void refresh(View view) {
         discoveryStart();
     }
 
-    public class DiscoveryTask extends AsyncTask<String, Void, Void> {
+    public class DiscoveryTask extends AsyncTask<String, Progress, Void> {
+
+        private final DeviceEndpointListener deviceEndpointListener;
+
+        public DiscoveryTask() {
+            deviceEndpointListener = new DeviceEndpointListener() {
+                @Override
+                public void added(final Endpoint endpoint) {
+                    Optional<Identification> id = tools.getId(endpoint, getStandardCredentials());
+                    final IdentifiedEndpoint ie = new IdentifiedEndpoint(endpoint, id);
+                    publishProgress(new Progress(true, endpoint, ie));
+                }
+
+                @Override
+                public void removed(final Endpoint endpoint) {
+                    final IdentifiedEndpoint ie = map.remove(endpoint);
+                    publishProgress(new Progress(false, endpoint, ie));
+                }
+            };
+        }
 
         @Override
         protected void onPreExecute() {
-            discoveryInProgress = true;
+            refreshBtn.setEnabled(false);
             layoutResults.setVisibility(View.VISIBLE);
             layoutNoWifi.setVisibility(View.GONE);
-            refreshBtn.setEnabled(false);
             progressBar.setVisibility(View.VISIBLE);
             //use for testing without wi-fi
             //listAdapter.add(new DirectEndpoint("localhost", 22, "vsapronov", "somepassword", null));
-
         }
 
         @Override
         protected Void doInBackground(String... libraries) {
-            discoveryManager.run(libraries[0], 20);
+            discoveryManager.run(libraries[0], 20, deviceEndpointListener);
             return null;
         }
 
@@ -222,7 +208,30 @@ public class DevicesDiscoveryActivity extends Activity {
             logger.info("show controls");
             progressBar.setVisibility(View.INVISIBLE);
             refreshBtn.setEnabled(true);
-            discoveryInProgress = false;
+        }
+
+        @Override
+        protected void onProgressUpdate(Progress... progresses) {
+            Progress progress = progresses[0];
+            IdentifiedEndpoint ie = progress.identifiedEndpoint;
+            if (progress.isAdded) {
+                map.put(progress.endpoint, ie);
+                listAdapter.add(ie);
+            } else {
+                listAdapter.remove(ie);
+            }
+        }
+    }
+
+    public class Progress {
+        boolean isAdded = true;
+        Endpoint endpoint;
+        IdentifiedEndpoint identifiedEndpoint;
+
+        public Progress(boolean isAdded, Endpoint endpoint, IdentifiedEndpoint identifiedEndpoint) {
+            this.isAdded = isAdded;
+            this.endpoint = endpoint;
+            this.identifiedEndpoint = identifiedEndpoint;
         }
     }
 }

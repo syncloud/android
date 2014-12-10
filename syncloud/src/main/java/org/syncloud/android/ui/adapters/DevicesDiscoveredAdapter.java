@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import org.syncloud.android.R;
 import org.syncloud.android.ui.DevicesDiscoveryActivity;
+import org.syncloud.ssh.model.Identification;
 import org.syncloud.ssh.model.IdentifiedEndpoint;
 
 public class DevicesDiscoveredAdapter extends ArrayAdapter<IdentifiedEndpoint> {
@@ -37,15 +38,16 @@ public class DevicesDiscoveredAdapter extends ArrayAdapter<IdentifiedEndpoint> {
 
         txtHost.setText(ie.endpoint().host());
 
-        if (ie.id() != null) {
-            txtMain.setText(ie.id().title);
+        if (ie.id().isPresent()) {
+            Identification identification = ie.id().get();
+            txtMain.setText(identification.title);
 
             txtNoIdentification.setVisibility(View.GONE);
             layoutHost.setVisibility(View.VISIBLE);
             layoutMacAddress.setVisibility(View.VISIBLE);
 
             txtHost.setText(ie.endpoint().host());
-            txtMacAddress.setText(ie.id().mac_address);
+            txtMacAddress.setText(identification.mac_address);
         } else {
             txtMain.setText(ie.endpoint().host());
 

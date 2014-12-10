@@ -19,17 +19,15 @@ public class DiscoveryManager {
     private MulticastLock lock;
 
     private Discovery discovery;
-    private DeviceEndpointListener deviceEndpointListener;
     private NsdManager manager;
     private Boolean canceled = false;
 
-    public DiscoveryManager(WifiManager wifi, NsdManager manager, DeviceEndpointListener deviceEndpointListener) {
+    public DiscoveryManager(WifiManager wifi, NsdManager manager) {
         this.lock = new MulticastLock(wifi);
-        this.deviceEndpointListener = deviceEndpointListener;
         this.manager = manager;
     }
 
-    public void run(final String discoveryLibrary, int timeoutSeconds) {
+    public void run(final String discoveryLibrary, int timeoutSeconds, DeviceEndpointListener deviceEndpointListener) {
         canceled = false;
         logger.info("starting discovery");
         if (discovery == null) {

@@ -26,20 +26,22 @@ public class Tools {
         this.ssh = ssh;
     }
 
-    public Result<Identification> getId(Endpoint endpoint, Credentials credentials) {
+    public Optional<Identification> getId(Endpoint endpoint, Credentials credentials) {
         Optional<String> result = ssh.run(endpoint, credentials, "syncloud-id id");
         if (result.isPresent()) {
             String data = result.get();
             logger.debug("identification response: " + data);
             try {
                 SshResult<Identification> sshResult = JSON.readValue(data, new TypeReference<SshResult<Identification>>() {});
-                return Result.value(sshResult.data);
+                return Optional.of(sshResult.data);
             } catch (IOException e) {
                 logger.error("unable to parse identification response: " + e.getMessage());
             }
         } else {
             logger.error("unable to get identification");
         }
-        return error("identification is not available");
+
+        error("identification is not available");
+        return Optional.absent();
     }
 }
