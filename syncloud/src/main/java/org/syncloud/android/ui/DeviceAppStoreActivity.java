@@ -9,9 +9,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import com.google.common.base.Optional;
+
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppStoreAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
@@ -73,8 +76,10 @@ public class DeviceAppStoreActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public Result<List<AppVersions>> run(Void... args) {
-                        return sam.list(device);
+                    public AsyncResult<List<AppVersions>> run(Void... args) {
+                        return new AsyncResult<List<AppVersions>>(
+                                sam.list(device),
+                                "unable to get list of apps");
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
@@ -92,8 +97,10 @@ public class DeviceAppStoreActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public Result<List<AppVersions>> run(Void... args) {
-                        return sam.update(device);
+                    public AsyncResult<List<AppVersions>> run(Void... args) {
+                        return new AsyncResult<List<AppVersions>>(
+                                sam.update(device),
+                                "unable to update sam");
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
@@ -112,12 +119,16 @@ public class DeviceAppStoreActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public Result<List<AppVersions>> run(Void... args) {
+                    public AsyncResult<List<AppVersions>> run(Void... args) {
                         Result<String> upgradeResult = sam.run(device, Commands.upgrade_all);
                         if (upgradeResult.hasError()) {
-                            return error(upgradeResult.getError());
+                            return new AsyncResult<List<AppVersions>>(
+                                    Optional.<List<AppVersions>>absent(),
+                                    upgradeResult.getError());
                         } else {
-                            return sam.list(device);
+                            return new AsyncResult<List<AppVersions>>(
+                                    sam.list(device),
+                                    "unable to get list of apps");
                         }
                     }
                 })
@@ -136,12 +147,16 @@ public class DeviceAppStoreActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<String, List<AppVersions>>() {
                     @Override
-                    public Result run(String... args) {
+                    public AsyncResult<List<AppVersions>> run(String... args) {
                         Result<String> commandResult = sam.run(device, args);
                         if (commandResult.hasError()) {
-                            return error(commandResult.getError());
+                            return new AsyncResult<List<AppVersions>>(
+                                    Optional.<List<AppVersions>>absent(),
+                                    commandResult.getError());
                         } else {
-                            return sam.list(device);
+                            return new AsyncResult<List<AppVersions>>(
+                                    sam.list(device),
+                                    "unable to get list of apps");
                         }
                     }
                 })

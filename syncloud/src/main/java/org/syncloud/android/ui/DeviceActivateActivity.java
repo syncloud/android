@@ -1,6 +1,7 @@
 package org.syncloud.android.ui;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Layout;
 import android.view.Menu;
@@ -19,6 +20,7 @@ import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
+import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.insider.InsiderManager;
@@ -142,17 +144,15 @@ public class DeviceActivateActivity extends Activity {
                 .showError(false)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public Result<String> run(Void... args) {
-                        Optional<String> stringOptional = insider.userDomain(device);
-                        if (stringOptional.isPresent())
-                            return value(stringOptional.get());
-                        else
-                            return error("");
+                    public AsyncResult<String> run(Void... args) {
+                        return new AsyncResult<String>(
+                                insider.userDomain(device),
+                                "unable to get user domain");
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {
                     @Override
-                    public void run(Result<String> result) {
+                    public void run(AsyncResult<String> result) {
                         if (result.hasError()) {
                             txtStatusValue.setText("not yet");
                         } else {
@@ -176,77 +176,58 @@ public class DeviceActivateActivity extends Activity {
             return;
         }
 
-        new ProgressAsyncTask<Void, Result.Void>()
+        new ProgressAsyncTask<Void, Void>()
                 .setTitle("Activating device")
                 .setProgress(progress)
-                .doWork(new ProgressAsyncTask.Work<Void, Result.Void>() {
+                .doWork(new ProgressAsyncTask.Work<Void, Void>() {
                     @Override
-                    public Result<Result.Void> run(Void... args) {
-                        return doActivate(email, pass, domain);
+                    public AsyncResult<Void> run(Void... args) {
+                        doActivate(email, pass, domain);
+                        return null;
                     }
                 })
-                .onSuccess(new ProgressAsyncTask.Success<Result.Void>() {
+                .onSuccess(new ProgressAsyncTask.Success<Void>() {
                     @Override
-                    public void run(Result.Void result) {
+                    public void run(Void result) {
                         finish();
                     }
                 })
                 .execute();
     }
 
-    private Result<Result.Void> doActivate(final String email, final String pass, final String domain) {
+    private boolean doActivate(final String email, final String pass, final String domain) {
         logger.info("activate");
 
-        Result<List<AppVersions>> updateResult = sam.update(device);
-        if (updateResult.hasError())
-            return error(updateResult.getError());
+        if (!sam.update(device).isPresent()) {
+            logger.error("unable to update sam");
+            return false;
+        }
 
         Result<String> upgradeAllResult = sam.run(device, Commands.upgrade_all);
-        if (upgradeAllResult.hasError())
-            return error(upgradeAllResult.getError());
+        if (upgradeAllResult.hasError()) {
+            logger.error(upgradeAllResult.getError());
+            return false;
+        }
+        if (!insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl()).isPresent()) {
+            logger.error("unable to set redirect info");
+            return false;
+        }
 
-        if (!insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl()).isPresent())
-            return error("unable to set redirect info");
-
-        if (!insider.acquireDomain(device, email, pass, domain).isPresent())
-            return error("unable to acquire domain");
+        if (!insider.acquireDomain(device, email, pass, domain).isPresent()) {
+            logger.error("unable to acquire domain");
+            return false;
+        }
 
         Result<Device> remoteAccessResult = accessManager.enable(device, preferences.getDomain());
-        if (remoteAccessResult.hasError())
-            return error(remoteAccessResult.getError());
+        if (remoteAccessResult.hasError()) {
+            logger.error(remoteAccessResult.getError());
+            return false;
+        }
 
         Db db = ((SyncloudApplication) getApplication()).getDb();
         db.insert(remoteAccessResult.getValue());
 
-        return VOID;
-//        return sam.update(device).flatMap(new Result.Function<List<AppVersions>, Result<String>>() {
-//            @Override
-//            public Result<String> apply(List<AppVersions> input) throws Exception {
-//                return sam.run(device, Commands.upgrade_all);
-//            }
-//        }).flatMap(new Result.Function<String, Result<String>>() {
-//            @Override
-//            public Result<String> apply(String input) throws Exception {
-//                return insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
-//            }
-//        }).flatMap(new Result.Function<String, Result<String>>() {
-//            @Override
-//            public Result<String> apply(String input) throws Exception {
-//                return insider.acquireDomain(device, email, pass, domain);
-//            }
-//        }).flatMap(new Result.Function<String, Result<Device>>() {
-//            @Override
-//            public Result<Device> apply(String input) throws Exception {
-//                return accessManager.enable(device, preferences.getDomain());
-//            }
-//        }).flatMap(new Result.Function<Device, Result<Result.Void>>() {
-//            @Override
-//            public Result<Result.Void> apply(Device input) throws Exception {
-//                Db db = ((SyncloudApplication) getApplication()).getDb();
-//                db.upsert(input);
-//                return VOID;
-//            }
-//        });
+        return true;
     }
 
     @Override

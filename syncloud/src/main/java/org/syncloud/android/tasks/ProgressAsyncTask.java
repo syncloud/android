@@ -3,20 +3,19 @@ package org.syncloud.android.tasks;
 import android.os.AsyncTask;
 
 import org.syncloud.android.Progress;
-import org.syncloud.common.model.Result;
 
-public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void, Result<TResult>> {
+public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void, AsyncResult<TResult>> {
 
     public interface Success<TResult> {
         void run(TResult result);
     }
 
     public interface Completed<TResult> {
-        void run(Result<TResult> result);
+        void run(AsyncResult<TResult> result);
     }
 
     public interface Work<TParams, TResult> {
-        Result<TResult> run(TParams... args);
+        AsyncResult<TResult> run(TParams... args);
     }
 
     private String title;
@@ -37,7 +36,7 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
     }
 
     @Override
-    protected Result<TResult> doInBackground(TParams... args) {
+    protected AsyncResult<TResult> doInBackground(TParams... args) {
         if (work != null)
             return work.run(args);
         else
@@ -84,15 +83,18 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
     }
 
     @Override
-    protected void onPostExecute(Result<TResult> result) {
+    protected void onPostExecute(AsyncResult<TResult> result) {
         if (progress != null) {
-            if (result.hasError() && showError)
+            if (result != null && result.hasError() && showError)
                 progress.error(result.getError());
             else
                 progress.stop();
         }
-        if (!result.hasError() && success != null)
-            success.run(result.getValue());
+        if (result == null)
+            success.run(null);
+        else
+            if (!result.hasError() && success != null)
+                success.run(result.getValue());
 
         if (completed != null)
             completed.run(result);

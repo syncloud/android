@@ -47,7 +47,10 @@ public class InsiderManager {
         return ssh.execute(device, format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl));
     }
 
-    public Optional<String> dropDomain(Device device) {
-        return ssh.execute(device, format("%s drop_domain", INSIDER_BIN));
+    public boolean dropDomain(Device device) {
+        Optional<String> execute = ssh.execute(device, format("%s drop_domain", INSIDER_BIN));
+        if (!execute.isPresent())
+            logger.error("unable to drop domain");
+        return execute.isPresent();
     }
 }

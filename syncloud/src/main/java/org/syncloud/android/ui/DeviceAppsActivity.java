@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.db.Db;
@@ -128,8 +130,10 @@ public class DeviceAppsActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public Result<List<AppVersions>> run(Void... args) {
-                        return sam.list(device);
+                    public AsyncResult<List<AppVersions>> run(Void... args) {
+                        return new AsyncResult<List<AppVersions>>(
+                                sam.list(device),
+                                "unable to get list of apps");
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
@@ -187,24 +191,20 @@ public class DeviceAppsActivity extends Activity {
     }
 
     public void deactivate() {
-        new ProgressAsyncTask<Void, Result.Void>()
+        new ProgressAsyncTask<Void, Void>() {}
                 .setTitle("Deactivating device")
                 .setProgress(progress)
-                .doWork(new ProgressAsyncTask.Work<Void, Result.Void>() {
+                .doWork(new ProgressAsyncTask.Work<Void, Void>() {
                     @Override
-                    public Result<Result.Void> run(Void... args) {
-                        if (insider.dropDomain(device).isPresent()) {
+                    public AsyncResult<Void> run(Void... args) {
+                        if (insider.dropDomain(device))
                             db.remove(device);
-                        } else {
-                            logger.error("unable to drop domain");
-                        }
-                        return Result.VOID;
+                        return null;
                     }
-
                 })
-                .onSuccess(new ProgressAsyncTask.Success<Result.Void>() {
+                .onSuccess(new ProgressAsyncTask.Success<Void>() {
                     @Override
-                    public void run(Result.Void result) {
+                    public void run(Void result) {
                         finish();
                     }
                 })

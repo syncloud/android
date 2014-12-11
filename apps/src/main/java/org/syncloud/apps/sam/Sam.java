@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
+import org.apache.log4j.Logger;
 import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
@@ -18,6 +19,8 @@ import static org.syncloud.common.model.Result.error;
 import static org.syncloud.common.model.Result.value;
 
 public class Sam {
+    private static Logger logger = Logger.getLogger(Sam.class);
+
     public static final ObjectMapper JSON = new ObjectMapper();
     private Ssh ssh;
     private Release release;
@@ -32,19 +35,21 @@ public class Sam {
         return "sam "+ join(cmd, " ");
     }
 
-    private <TContent> Result<TContent> runTyped(final TypeReference type, Device device, String... arguments) {
+    private <TContent> Optional<TContent> runTyped(final TypeReference type, Device device, String... arguments) {
         Optional<String> execute = ssh.execute(device, cmd(arguments));
         if (execute.isPresent()) {
             try {
-                return value(JSON.<SshResult<TContent>>readValue(execute.get(), type).data);
+                return Optional.of(JSON.<SshResult<TContent>>readValue(execute.get(), type).data);
             } catch (IOException e) {
-                return error("unable to parse command response");
+                logger.error("unable to parse command response");
+                return Optional.absent();
             }
         }
-        return error("unable to execute command");
+        logger.error("unable to execute command");
+        return Optional.absent();
     }
 
-    private Result<List<AppVersions>> appsVersions(Device device, String... arguments) {
+    private Optional<List<AppVersions>> appsVersions(Device device, String... arguments) {
         return runTyped(new TypeReference<SshResult<List<AppVersions>>>() {}, device, arguments);
     }
 
@@ -67,11 +72,11 @@ public class Sam {
         return error("unable to execute command");
     }
 
-    public Result<List<AppVersions>> update(Device device) {
+    public Optional<List<AppVersions>> update(Device device) {
         return appsVersions(device, Commands.update, "--release", release.getVersion());
     }
 
-    public Result<List<AppVersions>> list(Device device) {
+    public Optional<List<AppVersions>> list(Device device) {
         return appsVersions(device, Commands.list);
     }
 }

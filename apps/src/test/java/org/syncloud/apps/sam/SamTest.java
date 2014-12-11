@@ -112,8 +112,8 @@ public class SamTest {
 
         Sam sam = new Sam(ssh, testRelease);
 
-        Result<List<AppVersions>> result = sam.list(device);
-        assertEquals(9, result.getValue().size());
+        Optional<List<AppVersions>> result = sam.list(device);
+        assertEquals(9, result.get().size());
 
         verify(ssh).execute(device, command);
     }
@@ -129,9 +129,9 @@ public class SamTest {
 
         Sam sam = new Sam(ssh, testRelease);
 
-        Result<List<AppVersions>> result = sam.list(device);
-        assertFalse(result.hasError());
-        assertEquals(0, result.getValue().size());
+        Optional<List<AppVersions>> result = sam.list(device);
+        assertTrue(result.isPresent());
+        assertEquals(0, result.get().size());
 
         verify(ssh).execute(device, command);
     }
@@ -147,7 +147,7 @@ public class SamTest {
 
         Sam sam = new Sam(ssh, testRelease);
 
-        assertTrue(sam.list(device).hasError());
+        assertFalse(sam.list(device).isPresent());
 
         verify(ssh).execute(device, command);
     }
@@ -164,7 +164,7 @@ public class SamTest {
 
         Sam sam = new Sam(ssh, testRelease);
 
-        assertTrue(sam.list(device).hasError());
+        assertFalse(sam.list(device).isPresent());
 
         verify(ssh).execute(device, command);
     }
@@ -188,7 +188,7 @@ public class SamTest {
 
         Sam sam = new Sam(ssh, testRelease);
 
-        assertEquals(sam.update(device).getValue().size(), expectedUpdates);
+        assertEquals(sam.update(device).get().size(), expectedUpdates);
 
         verify(ssh).execute(device, command);
     }
