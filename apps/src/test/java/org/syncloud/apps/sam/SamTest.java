@@ -1,15 +1,11 @@
 package org.syncloud.apps.sam;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 
 import org.junit.Test;
-import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.SshResult;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,7 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.syncloud.apps.sam.Sam.cmd;
-import static org.syncloud.common.model.Result.value;
 
 public class SamTest {
 
@@ -59,10 +54,9 @@ public class SamTest {
         Device device = mock(Device.class);
 
         Sam sam = new Sam(ssh, testRelease);
-        Result<String> result = sam.run(device, Commands.update);
+        Boolean result = sam.run(device, Commands.update);
 
-        assertFalse(result.hasError());
-        assertEquals("installed app", result.getValue());
+        assertTrue(result);
 
     }
 
@@ -80,10 +74,9 @@ public class SamTest {
         Device device = mock(Device.class);
 
         Sam sam = new Sam(ssh, testRelease);
-        Result<String> result = sam.run(device, Commands.update);
+        Boolean result = sam.run(device, Commands.update);
 
-        assertTrue(result.hasError());
-        assertEquals("unable to install app", result.getError());
+        assertFalse(result);
 
     }
 

@@ -19,16 +19,14 @@ import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppStoreAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.sam.AppVersions;
-import org.syncloud.apps.sam.Commands;
 import org.syncloud.apps.sam.Sam;
-import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 
 import java.util.List;
 
 import static android.os.AsyncTask.execute;
-import static org.syncloud.common.model.Result.error;
+import static org.syncloud.apps.sam.Commands.upgrade_all;
 
 public class DeviceAppStoreActivity extends Activity {
 
@@ -120,11 +118,10 @@ public class DeviceAppStoreActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
                     public AsyncResult<List<AppVersions>> run(Void... args) {
-                        Result<String> upgradeResult = sam.run(device, Commands.upgrade_all);
-                        if (upgradeResult.hasError()) {
+                        if (!sam.run(device, upgrade_all)) {
                             return new AsyncResult<List<AppVersions>>(
                                     Optional.<List<AppVersions>>absent(),
-                                    upgradeResult.getError());
+                                    "unable to upgrade apps");
                         } else {
                             return new AsyncResult<List<AppVersions>>(
                                     sam.list(device),
@@ -148,11 +145,10 @@ public class DeviceAppStoreActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<String, List<AppVersions>>() {
                     @Override
                     public AsyncResult<List<AppVersions>> run(String... args) {
-                        Result<String> commandResult = sam.run(device, args);
-                        if (commandResult.hasError()) {
+                        if (!sam.run(device, args)) {
                             return new AsyncResult<List<AppVersions>>(
                                     Optional.<List<AppVersions>>absent(),
-                                    commandResult.getError());
+                                    "unable to execute command");
                         } else {
                             return new AsyncResult<List<AppVersions>>(
                                     sam.list(device),

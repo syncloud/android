@@ -2,10 +2,7 @@ package org.syncloud.ssh.unit;
 
 import com.google.common.base.Optional;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
-import org.syncloud.common.model.Result;
 import org.syncloud.ssh.EndpointPreference;
 import org.syncloud.ssh.EndpointResolver;
 import org.syncloud.ssh.EndpointSelector;

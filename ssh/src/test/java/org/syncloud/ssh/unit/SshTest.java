@@ -5,7 +5,6 @@ import com.jcraft.jsch.JSchException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.syncloud.common.model.Result;
 import org.syncloud.ssh.EndpointPreference;
 import org.syncloud.ssh.EndpointSelector;
 import org.syncloud.ssh.SshRunner;

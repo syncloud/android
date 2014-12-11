@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import org.apache.log4j.Logger;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.Endpoint;
-import org.syncloud.common.model.Result;
 
 public class Ssh {
 

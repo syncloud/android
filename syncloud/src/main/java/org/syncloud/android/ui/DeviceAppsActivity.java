@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,8 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-
-import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
@@ -27,9 +24,7 @@ import org.syncloud.android.db.Db;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.sam.AppVersions;
-import org.syncloud.apps.sam.Commands;
 import org.syncloud.apps.sam.Sam;
-import org.syncloud.common.model.Result;
 import org.syncloud.apps.sam.App;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;

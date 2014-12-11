@@ -39,12 +39,12 @@ public class InsiderManager {
         return Optional.absent();
     }
 
-    public Optional<String> acquireDomain(final Device device, String email, String pass, String domain) {
-        return ssh.execute(device, format("%s acquire_domain %s %s %s", INSIDER_BIN, email, pass, domain));
+    public boolean acquireDomain(final Device device, String email, String pass, String domain) {
+        return ssh.execute(device, format("%s acquire_domain %s %s %s", INSIDER_BIN, email, pass, domain)).isPresent();
     }
 
-    public Optional<String> setRedirectInfo(Device device, String domain, String apiUl) {
-        return ssh.execute(device, format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl));
+    public boolean setRedirectInfo(Device device, String domain, String apiUl) {
+        return ssh.execute(device, format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl)).isPresent();
     }
 
     public boolean dropDomain(Device device) {

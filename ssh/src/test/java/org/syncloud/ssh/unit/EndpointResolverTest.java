@@ -3,11 +3,8 @@ package org.syncloud.ssh.unit;
 import com.google.common.base.Optional;
 
 import org.junit.Test;
-import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Dns;
 import org.syncloud.ssh.EndpointResolver;
-import org.syncloud.ssh.model.Credentials;
-import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.Endpoint;
 import org.xbill.DNS.Record;
 import org.xbill.DNS.SRVRecord;

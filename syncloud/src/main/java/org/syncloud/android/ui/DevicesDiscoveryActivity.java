@@ -22,7 +22,6 @@ import android.widget.ProgressBar;
 
 import com.google.common.base.Optional;
 
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
@@ -30,7 +29,6 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.discovery.DiscoveryManager;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.DeviceEndpointListener;
-import org.syncloud.common.model.Result;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.Tools;
 import org.syncloud.ssh.model.Endpoint;

@@ -3,7 +3,6 @@ package org.syncloud.ssh;
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
-import org.syncloud.common.model.Result;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.Endpoint;
 

@@ -1,15 +1,12 @@
 package org.syncloud.android.ui;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,21 +22,15 @@ import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.remote.RemoteAccessManager;
-import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Commands;
 import org.syncloud.apps.sam.Sam;
-import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.model.Identification;
-import org.syncloud.ssh.model.IdentifiedEndpoint;
 
-import java.util.List;
-
-import static org.syncloud.common.model.Result.VOID;
-import static org.syncloud.common.model.Result.error;
-import static org.syncloud.common.model.Result.value;
+import static org.syncloud.android.tasks.AsyncResult.error;
+import static org.syncloud.android.tasks.AsyncResult.value;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 
@@ -176,19 +167,20 @@ public class DeviceActivateActivity extends Activity {
             return;
         }
 
-        new ProgressAsyncTask<Void, Void>()
+        new ProgressAsyncTask<Void, String>()
                 .setTitle("Activating device")
                 .setProgress(progress)
-                .doWork(new ProgressAsyncTask.Work<Void, Void>() {
+                .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public AsyncResult<Void> run(Void... args) {
-                        doActivate(email, pass, domain);
-                        return null;
+                    public AsyncResult<String> run(Void... args) {
+                        return doActivate(email, pass, domain) ?
+                                value("Activated") :
+                                AsyncResult.<String>error("Unable to activate");
                     }
                 })
-                .onSuccess(new ProgressAsyncTask.Success<Void>() {
+                .onSuccess(new ProgressAsyncTask.Success<String>() {
                     @Override
-                    public void run(Void result) {
+                    public void run(String result) {
                         finish();
                     }
                 })
@@ -203,29 +195,28 @@ public class DeviceActivateActivity extends Activity {
             return false;
         }
 
-        Result<String> upgradeAllResult = sam.run(device, Commands.upgrade_all);
-        if (upgradeAllResult.hasError()) {
-            logger.error(upgradeAllResult.getError());
+        if (!sam.run(device, Commands.upgrade_all)) {
+            logger.error("unable to upgrade apps");
             return false;
         }
-        if (!insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl()).isPresent()) {
+        if (!insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl())) {
             logger.error("unable to set redirect info");
             return false;
         }
 
-        if (!insider.acquireDomain(device, email, pass, domain).isPresent()) {
+        if (!insider.acquireDomain(device, email, pass, domain)) {
             logger.error("unable to acquire domain");
             return false;
         }
 
-        Result<Device> remoteAccessResult = accessManager.enable(device, preferences.getDomain());
-        if (remoteAccessResult.hasError()) {
-            logger.error(remoteAccessResult.getError());
+        Optional<Device> remoteAccessResult = accessManager.enable(device, preferences.getDomain());
+        if (!remoteAccessResult.isPresent()) {
+            logger.error("unable to enable remote access");
             return false;
         }
 
         Db db = ((SyncloudApplication) getApplication()).getDb();
-        db.insert(remoteAccessResult.getValue());
+        db.insert(remoteAccessResult.get());
 
         return true;
     }

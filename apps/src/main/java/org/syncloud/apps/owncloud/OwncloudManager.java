@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
-import org.syncloud.common.model.Result;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.StringResult;
