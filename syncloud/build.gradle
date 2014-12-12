@@ -12,14 +12,6 @@ android {
     }
 
     productFlavors {
-        local {
-            packageName "org.syncloud.android.local"
-        }
-
-        alpha {
-            packageName "org.syncloud.android.alpha"
-        }
-
         beta {
             packageName "org.syncloud.android.beta"
         }

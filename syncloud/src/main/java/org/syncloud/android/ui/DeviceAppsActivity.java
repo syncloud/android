@@ -41,7 +41,6 @@ public class DeviceAppsActivity extends Activity {
     private Device device;
     private Db db;
     private boolean connected = false;
-    private boolean showAdminApps = false;
     private Sam sam;
     private CommunicationDialog progress;
     private Ssh ssh;
@@ -144,7 +143,7 @@ public class DeviceAppsActivity extends Activity {
         connected = true;
         deviceAppsAdapter.clear();
         for (AppVersions app : appsVersions) {
-            if (showAdminApps || app.app.appType() == App.Type.user)
+            if (app.app.appType() == App.Type.user && app.installed())
                 deviceAppsAdapter.add(app);
         }
     }

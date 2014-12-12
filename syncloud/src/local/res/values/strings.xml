@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">Syncloud Debug</string>
-    <string name="device_activation_email">test@example.com</string>
-    <string name="device_activation_password">pass123</string>
-    <string name="device_activation_domain">testdomain</string>
-</resources>
