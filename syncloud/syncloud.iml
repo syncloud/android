@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" external.system.module.group="android" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+<module external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
@@ -10,7 +10,7 @@
       <configuration>
         <option name="SELECTED_BUILD_VARIANT" value="betaDebug" />
         <option name="ASSEMBLE_TASK_NAME" value="assembleBetaDebug" />
-        <option name="COMPILE_JAVA_TASK_NAME" value="compileBetaDebugJava" />
+        <option name="COMPILE_JAVA_TASK_NAME" value="compileBetaDebugSources" />
         <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleBetaDebugTest" />
         <option name="SOURCE_GEN_TASK_NAME" value="generateBetaDebugSources" />
         <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateBetaDebugTestSources" />
@@ -31,6 +31,7 @@
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/beta/debug" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/beta/debug" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/beta/debug" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/beta/debug" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/betaDebug/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/betaDebug/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/betaDebug/assets" type="java-resource" />
@@ -43,6 +44,7 @@
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/test/beta/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/test/beta/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/test/beta/debug" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/test/beta/debug" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/beta/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/beta/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/beta/assets" type="java-resource" />
@@ -98,6 +100,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
+      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

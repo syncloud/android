@@ -13,11 +13,11 @@ android {
 
     productFlavors {
         beta {
-            packageName "org.syncloud.android.beta"
+            applicationId "org.syncloud.android.beta"
         }
 
         prod {
-            packageName "org.syncloud.android"
+            applicationId "org.syncloud.android"
         }
     }
 
