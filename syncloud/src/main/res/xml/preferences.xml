@@ -38,7 +38,7 @@
             android:dialogTitle="Release"
             android:entries="@array/pref_release_titles"
             android:entryValues="@array/pref_release_values"
-            android:defaultValue="0.7" />
+            android:defaultValue="0.8" />
 
         <ListPreference
             android:key="pref_ssh_mode"
