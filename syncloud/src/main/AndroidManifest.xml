@@ -41,8 +41,8 @@
         <activity
             android:name=".ui.DeviceAppStoreActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_app_store" >
+            android:label="@string/title_activity_app_store"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.apps.Owncloud"
@@ -94,6 +94,10 @@
         <activity
             android:name=".ui.LogsActivity"
             android:label="@string/title_activity_logs" >
+        </activity>
+        <activity
+            android:name=".ui.apps.GitBucket"
+            android:label="@string/title_activity_git_bucket" >
         </activity>
     </application>
 

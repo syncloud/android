@@ -13,6 +13,7 @@ import org.acra.sender.ReportSender;
 import org.acra.sender.ReportSenderException;
 import org.syncloud.android.log.ConfigureLog4J;
 import org.syncloud.android.ui.DeviceActivateActivity;
+import org.syncloud.android.ui.apps.GitBucket;
 import org.syncloud.android.ui.apps.Owncloud;
 import org.syncloud.android.db.Db;
 import org.syncloud.ssh.Dns;
@@ -48,9 +49,8 @@ public class SyncloudApplication extends Application {
     public static final String DEVICE_ID = "device_id";
 
     public static Map<String, Class> appRegistry = new HashMap<String, Class>() {{
-//        put("remote", Remote_Access.class);
-//        put("insider", DeviceActivateActivity.class);
         put("syncloud-owncloud-ctl", Owncloud.class);
+        put("syncloud-gitbucket-ctl", GitBucket.class);
     }};
     private Db db;
     private Preferences preferences;
