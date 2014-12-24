@@ -143,7 +143,7 @@ public class DeviceAppsActivity extends Activity {
         connected = true;
         deviceAppsAdapter.clear();
         for (AppVersions app : appsVersions) {
-            if (app.app.appType() == App.Type.user && app.installed())
+            if (app.app.ui && app.installed())
                 deviceAppsAdapter.add(app);
         }
     }

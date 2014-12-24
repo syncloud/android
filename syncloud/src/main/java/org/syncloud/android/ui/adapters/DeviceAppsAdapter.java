@@ -35,7 +35,7 @@ public class DeviceAppsAdapter extends ArrayAdapter<AppVersions> {
         final AppVersions appVersions = getItem(position);
         textView.setText(appVersions.app.name + " " + appVersions.current_version);
 
-        if (appVersions.app.appType() == App.Type.user) {
+        if (appVersions.app.ui) {
             appTypeUser.setVisibility(View.VISIBLE);
             appTypeUtil.setVisibility(View.GONE);
         } else {

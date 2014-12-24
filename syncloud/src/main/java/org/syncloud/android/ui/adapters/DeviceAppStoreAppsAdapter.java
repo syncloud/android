@@ -41,7 +41,7 @@ public class DeviceAppStoreAppsAdapter extends ArrayAdapter<AppVersions> {
         ImageButton appTypeUser = (ImageButton) rowView.findViewById(R.id.app_icon_user);
         ImageButton appTypeUtil = (ImageButton) rowView.findViewById(R.id.app_icon_util);
 
-        if (appVersions.app.appType() == App.Type.user) {
+        if (appVersions.app.ui) {
             appTypeUser.setVisibility(View.VISIBLE);
             appTypeUtil.setVisibility(View.GONE);
         } else {
