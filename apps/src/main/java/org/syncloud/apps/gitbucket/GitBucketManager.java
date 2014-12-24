@@ -25,6 +25,10 @@ public class GitBucketManager {
         return ssh.execute(device, String.format("%s enable %s %s", CTL_BIN, login, password));
     }
 
+    public Optional<String> disable(Device device) {
+        return ssh.execute(device, String.format("%s disable", CTL_BIN));
+    }
+
     public Optional<String> url(Device device) {
 
         Optional<String> execute = ssh.execute(device, String.format("%s url", CTL_BIN));

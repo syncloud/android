@@ -45,11 +45,18 @@
 
         <Button
             android:id="@+id/btn_web"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:onClick="showWeb"
             android:text="Open Browser"
+            />
+
+        <Button
+            android:id="@+id/btn_deactivate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="deactivate"
+            android:text="Deactivate"
             />
 
     </LinearLayout>
@@ -59,6 +66,31 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/txt_login"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/admin_login"
+            android:inputType="text"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <EditText
+            android:id="@+id/txt_password"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/admin_password"
+            android:inputType="textPassword"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <Button
+            android:id="@+id/btn_activate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:onClick="activate"
+            android:text="@string/activate_button"/>
+
     </LinearLayout>
 
 </RelativeLayout>

@@ -6,7 +6,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,9 +29,11 @@ public class GitBucket extends ActionBarActivity {
     private GitBucketManager manager;
 
     private LinearLayout activatedControls;
-    private LinearLayout notActivatedControls;
-
     private TextView txtUrl;
+
+    private LinearLayout notActivatedControls;
+    private EditText loginText;
+    private EditText passText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +47,11 @@ public class GitBucket extends ActionBarActivity {
         manager = new GitBucketManager(application.createSsh());
 
         activatedControls = (LinearLayout) findViewById(R.id.activated_controls);
-        notActivatedControls = (LinearLayout) findViewById(R.id.not_activated_controls);
         txtUrl = (TextView) findViewById(R.id.txt_url);
+
+        notActivatedControls = (LinearLayout) findViewById(R.id.not_activated_controls);
+        loginText = (EditText) findViewById(R.id.txt_login);
+        passText = (EditText) findViewById(R.id.txt_password);
 
         activatedControls.setVisibility(View.GONE);
         notActivatedControls.setVisibility(View.GONE);
@@ -72,6 +81,69 @@ public class GitBucket extends ActionBarActivity {
                         } else {
                             setActive(false);
                         }
+                    }
+                })
+                .execute();
+    }
+
+    private boolean activateValidate(String login, String pass) {
+        boolean valid = true;
+
+        if (TextUtils.isEmpty(pass)) {
+            passText.setError(getString(R.string.error_field_required));
+            passText.requestFocus();
+            valid = false;
+        }
+        if (TextUtils.isEmpty(login)) {
+            loginText.setError(getString(R.string.error_field_required));
+            loginText.requestFocus();
+            valid = false;
+        }
+        return valid;
+    }
+
+    public void activate(View view) {
+        final String login = loginText.getText().toString();
+        final String pass = passText.getText().toString();
+
+        if (!activateValidate(login, pass)) return;
+
+        new ProgressAsyncTask<String, String>()
+                .setTitle("Activating ...")
+                .setProgress(progress)
+                .doWork(new ProgressAsyncTask.Work<String, String>() {
+                    @Override
+                    public AsyncResult<String> run(String... args) {
+                        return new AsyncResult<String>(
+                                manager.enable(device, login, pass),
+                                "unable to activate");
+                    }
+                })
+                .onSuccess(new ProgressAsyncTask.Success<String>() {
+                    @Override
+                    public void run(String result) {
+                        status();
+                    }
+                })
+                .execute();
+    }
+
+    public void deactivate(View view) {
+        new ProgressAsyncTask<String, String>()
+                .setTitle("Deactivating ...")
+                .setProgress(progress)
+                .doWork(new ProgressAsyncTask.Work<String, String>() {
+                    @Override
+                    public AsyncResult<String> run(String... args) {
+                        return new AsyncResult<String>(
+                                manager.disable(device),
+                                "unable to deactivate");
+                    }
+                })
+                .onSuccess(new ProgressAsyncTask.Success<String>() {
+                    @Override
+                    public void run(String result) {
+                        status();
                     }
                 })
                 .execute();

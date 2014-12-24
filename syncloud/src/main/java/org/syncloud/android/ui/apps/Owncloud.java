@@ -54,16 +54,15 @@ public class Owncloud extends Activity {
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
 
         activatedControls = (LinearLayout) findViewById(R.id.owncloud_activated_controls);
-        notActivatedControls = (LinearLayout) findViewById(R.id.owncloud_not_activated_controls);
         url = (TextView) findViewById(R.id.owncloud_url);
-        activateBtn = (Button) findViewById(R.id.owncloud_activate);
-
         webBtn = (Button) findViewById(R.id.owncloud_web_btn);
         mobileBtn = (Button) findViewById(R.id.owncloud_mobile_btn);
 
+        notActivatedControls = (LinearLayout) findViewById(R.id.owncloud_not_activated_controls);
         loginText = (EditText) findViewById(R.id.txtLogin);
         passText = (EditText) findViewById(R.id.txtPassword);
         chkHttps = (CheckBox) findViewById(R.id.chkHttps);
+        activateBtn = (Button) findViewById(R.id.owncloud_activate);
 
         setVisibility(View.GONE, View.GONE);
 
