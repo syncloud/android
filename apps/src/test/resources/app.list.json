@@ -6,7 +6,7 @@
             "current_version" : "0.55-9",
             "app" :
                {
-                  "type" : "admin",
+                  "ui" : false,
                   "id" : "insider",
                   "name" : "Insider: Public address and name"
                },
@@ -16,7 +16,7 @@
             "current_version" : "0.13-1",
             "app" :
                {
-                  "type" : "admin",
+                  "ui" : false,
                   "id" : "image-base",
                   "name" : "Base image tweaks"
                },
@@ -26,7 +26,7 @@
             "current_version" : "0.2-1",
             "app" :
                {
-                  "type" : "admin",
+                  "ui" : false,
                   "id" : "image-boot",
                   "name" : "Boot image tweaks"
                },
@@ -36,7 +36,7 @@
             "current_version" : "0.4-3",
             "app" :
                {
-                  "type" : "admin",
+                  "ui" : false,
                   "id" : "sam",
                   "name" : "Syncloud Application Manager"
                },
@@ -46,7 +46,7 @@
             "current_version" : "0.4-3",
             "app" :
                {
-                  "type" : "admin",
+                  "ui" : false,
                   "id" : "remote-access",
                   "name" : "Remote Management"
                },
@@ -56,7 +56,7 @@
             "current_version" : "v0.1-6",
             "app" :
                {
-                  "type" : "admin",
+                  "ui" : false,
                   "id" : "syncloud-ci",
                   "name" : "Syncloud Continuous Integration"
                },
@@ -66,7 +66,7 @@
             "current_version" : "v7.0.1-5",
             "app" :
                {
-                  "type" : "user",
+                  "ui" : false,
                   "id" : "owncloud",
                   "name" : "ownCloud"
                },
@@ -76,7 +76,7 @@
             "current_version" : "0.32-3",
             "app" :
                {
-                  "type" : "admin",
+                  "ui" : false,
                   "id" : "owncloud-ctl",
                   "name" : "ownCloud control tool"
                },
@@ -86,7 +86,7 @@
             "current_version" : "v0.2",
             "app" :
                {
-                  "type" : "admin",
+                  "ui" : false,
                   "id" : "discovery",
                   "name" : "Discovery"
                },

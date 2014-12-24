@@ -4,7 +4,7 @@
                   "current_version" : "0.55-9",
                   "app" :
                      {
-                        "type" : "admin",
+                        "ui" : false,
                         "id" : "insider",
                         "name" : "Insider: Public address and name"
                      },
@@ -14,7 +14,7 @@
                   "current_version" : "0.13-1",
                   "app" :
                      {
-                        "type" : "admin",
+                        "ui" : false,
                         "id" : "image-base",
                         "name" : "Base image tweaks"
                      },
