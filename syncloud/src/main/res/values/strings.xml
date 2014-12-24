@@ -19,7 +19,7 @@
     <string name="title_activity_device">Apps</string>
     <string name="title_activity_app_store">Manage Apps</string>
     <string name="device_label">Device:</string>
-    <string name="title_activity_owncloud">owncloud</string>
+    <string name="title_activity_owncloud">ownCloud</string>
     <string name="title_activity_dns">dns</string>
     <string name="dns_label">Public Name</string>
     <string name="owncloud_label">ownCloud: File storage</string>

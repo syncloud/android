@@ -49,8 +49,8 @@ public class SyncloudApplication extends Application {
     public static final String DEVICE_ID = "device_id";
 
     public static Map<String, Class> appRegistry = new HashMap<String, Class>() {{
-        put("syncloud-owncloud-ctl", Owncloud.class);
-        put("syncloud-gitbucket-ctl", GitBucket.class);
+        put("syncloud-owncloud", Owncloud.class);
+        put("syncloud-gitbucket", GitBucket.class);
     }};
     private Db db;
     private Preferences preferences;
