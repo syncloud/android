@@ -12,16 +12,19 @@ import org.acra.collector.CrashReportData;
 import org.acra.sender.ReportSender;
 import org.acra.sender.ReportSenderException;
 import org.syncloud.android.log.ConfigureLog4J;
-import org.syncloud.android.ui.DeviceActivateActivity;
 import org.syncloud.android.ui.apps.GitBucket;
 import org.syncloud.android.ui.apps.Owncloud;
 import org.syncloud.android.db.Db;
+import org.syncloud.redirect.IUserCache;
+import org.syncloud.redirect.UserCache;
+import org.syncloud.redirect.UserService;
 import org.syncloud.ssh.Dns;
 import org.syncloud.ssh.EndpointResolver;
 import org.syncloud.ssh.EndpointSelector;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.Ssh;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,6 +58,9 @@ public class SyncloudApplication extends Application {
     private Db db;
     private Preferences preferences;
 
+    private IUserCache userCache;
+    private UserService userService;
+
     @Override
     public void onCreate() {
 
@@ -73,10 +79,20 @@ public class SyncloudApplication extends Application {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         preferences = new Preferences(sharedPreferences);
+
+        userCache = new UserCache(new File(this.getApplicationContext().getFilesDir(), "user.json"));
     }
 
     public Db getDb() {
         return db;
+    }
+
+    public IUserCache userCache() {
+        return userCache;
+    }
+
+    public UserService userService() {
+        return new UserService(preferences.getApiUrl(), userCache);
     }
 
     public Preferences getPreferences() {

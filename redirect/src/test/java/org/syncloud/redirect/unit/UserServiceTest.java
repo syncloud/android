@@ -1,16 +1,24 @@
 package org.syncloud.redirect.unit;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.syncloud.redirect.UserService;
 import org.syncloud.redirect.model.RestResult;
+import org.syncloud.redirect.model.User;
 import org.syncloud.redirect.unit.server.Rest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.syncloud.redirect.UserService.createUser;
-import static org.syncloud.redirect.UserService.getUser;
 
 public class UserServiceTest {
+
+    private UserService userService;
+
+    @Before
+    public void setup() {
+        this.userService = new UserService(Rest.URL, null);
+    }
 
     @After
     public void tearDown() {
@@ -20,7 +28,7 @@ public class UserServiceTest {
     @Test
     public void testGetUserExisting() {
         Rest.start(Rest.ExistingUser.class);
-        RestResult<String> result = getUser("test", "test", Rest.URL);
+        RestResult<User> result = this.userService.getUser("test", "test", false);
 
         assertFalse(getErrorOrEmpty(result), result.hasError());
         assertNotNull(result.getValue());
@@ -29,7 +37,7 @@ public class UserServiceTest {
     @Test
     public void testGetUserMissing() {
         Rest.start(Rest.MissingUser.class);
-        RestResult<String> result = getUser("test", "test", Rest.URL);
+        RestResult<User> result = this.userService.getUser("test", "test", false);
 
         assertTrue(getErrorOrEmpty(result), result.hasError());
     }
@@ -37,7 +45,7 @@ public class UserServiceTest {
     @Test
     public void testCreateUserNew() {
         Rest.start(Rest.MissingUser.class);
-        RestResult<String> result = createUser("test", "test", "user_domain", Rest.URL);
+        RestResult<User> result = this.userService.createUser("test", "test");
 
         assertFalse(getErrorOrEmpty(result), result.hasError());
         assertNotNull(result.getValue());
@@ -46,7 +54,7 @@ public class UserServiceTest {
     @Test
     public void testCreateUserExisting() {
         Rest.start(Rest.ExistingUser.class);
-        RestResult<String> result = createUser("test", "test", "user_domain", Rest.URL);
+        RestResult<User> result = this.userService.createUser("test", "test");
 
         assertTrue(getErrorOrEmpty(result), result.hasError());
     }

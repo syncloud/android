@@ -28,6 +28,7 @@ import org.syncloud.redirect.UserService;
 import org.syncloud.redirect.model.ParameterMessages;
 import org.syncloud.redirect.model.RestError;
 import org.syncloud.redirect.model.RestResult;
+import org.syncloud.redirect.model.User;
 
 import java.util.regex.Pattern;
 
@@ -44,6 +45,7 @@ public class AuthCredentialsActivity extends Activity {
 
     private UserTask authTask = null;
     private Preferences preferences;
+    private UserService userService;
 
     private LinearLayout emailLoginFormView;
     private EditText emailView;
@@ -57,7 +59,9 @@ public class AuthCredentialsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth_credentials);
 
-        preferences = ((SyncloudApplication) getApplication()).getPreferences();
+        SyncloudApplication application = (SyncloudApplication) getApplication();
+        preferences = application.getPreferences();
+        userService = application.userService();
 
         emailLoginFormView = (LinearLayout) findViewById(R.id.email_login_form);
 
@@ -250,7 +254,7 @@ public class AuthCredentialsActivity extends Activity {
         finish();
     }
 
-    public class UserTask extends AsyncTask<Void, Void, RestResult<String>> {
+    public class UserTask extends AsyncTask<Void, Void, RestResult<User>> {
 
         private final boolean register;
         private final Preferences preferences;
@@ -266,12 +270,12 @@ public class AuthCredentialsActivity extends Activity {
         }
 
         @Override
-        protected RestResult<String> doInBackground(Void... params) {
-            RestResult<String> result;
+        protected RestResult<User> doInBackground(Void... params) {
+            RestResult<User> result;
             if (register) {
-                result = UserService.createUser(email, password, preferences.getApiUrl());
+                result = userService.createUser(email, password);
             } else {
-                result = UserService.getUser(email, password, preferences.getApiUrl());
+                result = userService.getUser(email, password, false);
             }
             if (!result.hasError())
                 preferences.setCredentials(email, password);
@@ -279,7 +283,7 @@ public class AuthCredentialsActivity extends Activity {
         }
 
         @Override
-        protected void onPostExecute(final RestResult<String> result) {
+        protected void onPostExecute(final RestResult<User> result) {
             authTask = null;
             showProgress(false);
 

@@ -17,6 +17,7 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.redirect.UserService;
 import org.syncloud.redirect.model.RestResult;
+import org.syncloud.redirect.model.User;
 
 public class AuthActivity extends Activity {
 
@@ -25,12 +26,16 @@ public class AuthActivity extends Activity {
     private ProgressBar progressBar;
     private LinearLayout signInOrOut;
 
+    private UserService userService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
 
-        preferences = ((SyncloudApplication) getApplication()).getPreferences();
+        SyncloudApplication application = (SyncloudApplication) getApplication();
+        preferences = application.getPreferences();
+        userService = application.userService();
 
         progressBar = (ProgressBar) findViewById(R.id.progress_check_user);
         signInOrOut = (LinearLayout) findViewById(R.id.sign_in_or_up);
@@ -75,7 +80,7 @@ public class AuthActivity extends Activity {
         startActivityForResult(credentialsIntent, 1);
     }
 
-    public class CheckCredentialsTask extends AsyncTask<Void, Void, RestResult<String>> {
+    public class CheckCredentialsTask extends AsyncTask<Void, Void, RestResult<User>> {
         private Preferences preferences;
 
         public CheckCredentialsTask(Preferences preferences) {
@@ -89,15 +94,15 @@ public class AuthActivity extends Activity {
         }
 
         @Override
-        protected RestResult<String> doInBackground(Void... voids) {
+        protected RestResult<User> doInBackground(Void... voids) {
             String email = preferences.getEmail();
             String password = preferences.getPassword();
-            RestResult<String> result = UserService.getUser(email, password, preferences.getApiUrl());
+            RestResult<User> result = userService.getUser(email, password, true);
             return result;
         }
 
         @Override
-        protected void onPostExecute(RestResult<String> result) {
+        protected void onPostExecute(RestResult<User> result) {
             progressBar.setVisibility(View.INVISIBLE);
             if (result.hasError()) {
                 signInOrOut.setVisibility(View.VISIBLE);
