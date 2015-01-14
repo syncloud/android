@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
@@ -76,5 +77,22 @@ public class DevicesSavedActivity extends Activity {
 
     public void discover(View view) {
         startActivityForResult(new Intent(this, DevicesDiscoveryActivity.class), 1);
+    }
+
+    public void shareDevice(Device device) {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("message/rfc822");
+        i.putExtra(Intent.EXTRA_SUBJECT, device.userDomain());
+        String body = "";
+        body += "Host: " + device.userDomain() + "\n";
+        body += "Login: " + device.credentials().login() + "\n";
+        body += "Password: " + device.credentials().password() + "\n";
+        body += "KEY:\n\n" + device.credentials().key() + "\n";
+        i.putExtra(Intent.EXTRA_TEXT, body);
+        try {
+            startActivity(Intent.createChooser(i, "Send mail..."));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+        }
     }
 }
