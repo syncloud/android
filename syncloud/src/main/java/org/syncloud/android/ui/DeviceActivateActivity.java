@@ -17,6 +17,7 @@ import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.Db;
+import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
@@ -28,6 +29,7 @@ import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.model.Identification;
+import org.syncloud.ssh.model.Key;
 
 import static org.syncloud.android.tasks.AsyncResult.error;
 import static org.syncloud.android.tasks.AsyncResult.value;
@@ -55,6 +57,8 @@ public class DeviceActivateActivity extends Activity {
     private RemoteAccessManager accessManager;
     private LinearLayout layoutMacAddress;
 
+    private SyncloudApplication application;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +76,7 @@ public class DeviceActivateActivity extends Activity {
 
         progress = new CommunicationDialog(this);
 
-        SyncloudApplication application = (SyncloudApplication) getApplication();
+        this.application = (SyncloudApplication) getApplication();
 
         Endpoint endpoint = (Endpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
         Identification identification = (Identification) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ID);
@@ -215,8 +219,13 @@ public class DeviceActivateActivity extends Activity {
             return false;
         }
 
-        Db db = ((SyncloudApplication) getApplication()).getDb();
-        db.insert(remoteAccessResult.get());
+        Device device = remoteAccessResult.get();
+//        Db db = this.application.getDb();
+//        db.insert(device);
+
+        Key key = new Key(device.macAddress(), device.credentials().key());
+        KeysStorage keysStorage = this.application.keysStorage();
+        keysStorage.upsert(key);
 
         return true;
     }

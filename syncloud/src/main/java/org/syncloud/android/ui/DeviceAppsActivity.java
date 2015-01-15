@@ -39,7 +39,7 @@ public class DeviceAppsActivity extends Activity {
     private static Logger logger = Logger.getLogger(DeviceAppsActivity.class);
 
     private Device device;
-    private Db db;
+//    private Db db;
     private boolean connected = false;
     private Sam sam;
     private CommunicationDialog progress;
@@ -64,7 +64,7 @@ public class DeviceAppsActivity extends Activity {
 
         SyncloudApplication application = (SyncloudApplication) getApplication();
 
-        db = application.getDb();
+//        db = application.getDb();
         preferences = application.getPreferences();
 
         ssh = application.createSsh();
@@ -191,8 +191,9 @@ public class DeviceAppsActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, Void>() {
                     @Override
                     public AsyncResult<Void> run(Void... args) {
-                        if (insider.dropDomain(device))
-                            db.remove(device);
+                        insider.dropDomain(device);
+//                        if (insider.dropDomain(device))
+//                            db.remove(device);
                         return null;
                     }
                 })

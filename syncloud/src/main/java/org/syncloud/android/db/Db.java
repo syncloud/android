@@ -20,7 +20,7 @@ public class Db extends SQLiteOpenHelper {
 
     private static Logger logger = Logger.getLogger(Db.class);
 
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
     private static final String DATABASE_NAME = "syncloud";
     public static final String DEVICE_TABLE = "device";
     public static final String USER_DOMAIN = "user_domain";

@@ -27,17 +27,6 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
         preferences = ((SyncloudApplication) activity.getApplication()).getPreferences();
     }
 
-    private Db db() {
-        return  ((SyncloudApplication) activity.getApplication()).getDb();
-    }
-
-    public void refresh() {
-        clear();
-        for (Device device : db().list()) {
-            add(device);
-        }
-    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 

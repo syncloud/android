@@ -13,11 +13,22 @@ import android.widget.Toast;
 
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.Utils;
+import org.syncloud.android.db.Db;
+import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.ui.adapters.DevicesSavedAdapter;
+import org.syncloud.redirect.IUserCache;
+import org.syncloud.redirect.model.User;
 import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.Key;
+
+import java.util.List;
 
 public class DevicesSavedActivity extends Activity {
 
+    private Db db;
+    private KeysStorage keysStorage;
+    private IUserCache userCache;
     private DevicesSavedAdapter adapter;
 
     @Override
@@ -40,7 +51,28 @@ public class DevicesSavedActivity extends Activity {
 
         adapter = new DevicesSavedAdapter(this);
         listview.setAdapter(adapter);
-        adapter.refresh();
+
+        SyncloudApplication application = (SyncloudApplication) getApplication();
+//        db = application.getDb();
+        keysStorage = application.keysStorage();
+        userCache = application.userCache();
+
+        refreshDevices();
+    }
+
+    private void refreshDevices() {
+        try {
+            User user = userCache.load();
+            List<Key> keys = keysStorage.list();
+            List<Device> devices = Utils.toDevices(user.domains, keys);
+
+            adapter.clear();
+//        List<Device> devices = db.list();
+            for (Device device : devices)
+                adapter.add(device);
+        } catch (Exception ex) {
+
+        }
     }
 
     private void open(Device device) {
@@ -52,7 +84,7 @@ public class DevicesSavedActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        adapter.refresh();
+        refreshDevices();
     }
 
     @Override

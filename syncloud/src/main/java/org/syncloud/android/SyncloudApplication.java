@@ -11,6 +11,7 @@ import org.acra.annotation.ReportsCrashes;
 import org.acra.collector.CrashReportData;
 import org.acra.sender.ReportSender;
 import org.acra.sender.ReportSenderException;
+import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.log.ConfigureLog4J;
 import org.syncloud.android.ui.apps.GitBucket;
 import org.syncloud.android.ui.apps.Owncloud;
@@ -56,6 +57,7 @@ public class SyncloudApplication extends Application {
         put("syncloud-gitbucket", GitBucket.class);
     }};
     private Db db;
+    private KeysStorage keysStorage;
     private Preferences preferences;
 
     private IUserCache userCache;
@@ -75,7 +77,8 @@ public class SyncloudApplication extends Application {
         ConfigureLog4J.configure();
 
         super.onCreate();
-        db = new Db(getApplicationContext());
+//        db = new Db(getApplicationContext());
+        keysStorage = new KeysStorage(getApplicationContext());
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         preferences = new Preferences(sharedPreferences);
@@ -86,6 +89,8 @@ public class SyncloudApplication extends Application {
     public Db getDb() {
         return db;
     }
+
+    public KeysStorage keysStorage() { return keysStorage; }
 
     public IUserCache userCache() {
         return userCache;
