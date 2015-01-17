@@ -15,9 +15,8 @@ import android.widget.TextView;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.redirect.UserService;
-import org.syncloud.redirect.model.RestResult;
-import org.syncloud.redirect.model.User;
+import org.syncloud.redirect.IUserService;
+import org.syncloud.redirect.UserResult;
 
 public class AuthActivity extends Activity {
 
@@ -26,7 +25,7 @@ public class AuthActivity extends Activity {
     private ProgressBar progressBar;
     private LinearLayout signInOrOut;
 
-    private UserService userService;
+    private IUserService userService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,16 +50,12 @@ public class AuthActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.auth, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
@@ -80,7 +75,7 @@ public class AuthActivity extends Activity {
         startActivityForResult(credentialsIntent, 1);
     }
 
-    public class CheckCredentialsTask extends AsyncTask<Void, Void, RestResult<User>> {
+    public class CheckCredentialsTask extends AsyncTask<Void, Void, UserResult> {
         private Preferences preferences;
 
         public CheckCredentialsTask(Preferences preferences) {
@@ -94,15 +89,15 @@ public class AuthActivity extends Activity {
         }
 
         @Override
-        protected RestResult<User> doInBackground(Void... voids) {
+        protected UserResult doInBackground(Void... voids) {
             String email = preferences.getEmail();
             String password = preferences.getPassword();
-            RestResult<User> result = userService.getUser(email, password, true);
+            UserResult result = userService.getUser(email, password);
             return result;
         }
 
         @Override
-        protected void onPostExecute(RestResult<User> result) {
+        protected void onPostExecute(UserResult result) {
             progressBar.setVisibility(View.INVISIBLE);
             if (result.hasError()) {
                 signInOrOut.setVisibility(View.VISIBLE);

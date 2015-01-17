@@ -20,12 +20,10 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
-import org.syncloud.android.db.Db;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Sam;
-import org.syncloud.apps.sam.App;
 import org.syncloud.ssh.Ssh;
 import org.syncloud.ssh.model.Device;
 
@@ -39,7 +37,6 @@ public class DeviceAppsActivity extends Activity {
     private static Logger logger = Logger.getLogger(DeviceAppsActivity.class);
 
     private Device device;
-//    private Db db;
     private boolean connected = false;
     private Sam sam;
     private CommunicationDialog progress;
@@ -64,7 +61,6 @@ public class DeviceAppsActivity extends Activity {
 
         SyncloudApplication application = (SyncloudApplication) getApplication();
 
-//        db = application.getDb();
         preferences = application.getPreferences();
 
         ssh = application.createSsh();
@@ -150,16 +146,12 @@ public class DeviceAppsActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.device, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             startActivityForResult(new Intent(this, SettingsActivity.class), 2);

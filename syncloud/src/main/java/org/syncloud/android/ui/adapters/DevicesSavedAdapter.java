@@ -5,8 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,7 +12,6 @@ import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.DevicesSavedActivity;
-import org.syncloud.android.db.Db;
 import org.syncloud.ssh.model.Device;
 
 public class DevicesSavedAdapter extends ArrayAdapter<Device> {

@@ -15,10 +15,10 @@ import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.log.ConfigureLog4J;
 import org.syncloud.android.ui.apps.GitBucket;
 import org.syncloud.android.ui.apps.Owncloud;
-import org.syncloud.android.db.Db;
-import org.syncloud.redirect.IUserCache;
-import org.syncloud.redirect.UserCache;
-import org.syncloud.redirect.UserService;
+import org.syncloud.redirect.IUserService;
+import org.syncloud.redirect.RedirectService;
+import org.syncloud.redirect.UserCachedService;
+import org.syncloud.redirect.UserStorage;
 import org.syncloud.ssh.Dns;
 import org.syncloud.ssh.EndpointResolver;
 import org.syncloud.ssh.EndpointSelector;
@@ -56,12 +56,9 @@ public class SyncloudApplication extends Application {
         put("syncloud-owncloud", Owncloud.class);
         put("syncloud-gitbucket", GitBucket.class);
     }};
-    private Db db;
     private KeysStorage keysStorage;
     private Preferences preferences;
-
-    private IUserCache userCache;
-    private UserService userService;
+    private UserStorage userStorage;
 
     @Override
     public void onCreate() {
@@ -77,27 +74,19 @@ public class SyncloudApplication extends Application {
         ConfigureLog4J.configure();
 
         super.onCreate();
-//        db = new Db(getApplicationContext());
         keysStorage = new KeysStorage(getApplicationContext());
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         preferences = new Preferences(sharedPreferences);
-
-        userCache = new UserCache(new File(this.getApplicationContext().getFilesDir(), "user.json"));
-    }
-
-    public Db getDb() {
-        return db;
+        userStorage = new UserStorage(new File(getApplicationContext().getFilesDir(), "user.json"));
     }
 
     public KeysStorage keysStorage() { return keysStorage; }
 
-    public IUserCache userCache() {
-        return userCache;
-    }
-
-    public UserService userService() {
-        return new UserService(preferences.getApiUrl(), userCache);
+    public IUserService userService() {
+        RedirectService redirectService = new RedirectService(preferences.getApiUrl());
+        UserCachedService userService = new UserCachedService(redirectService, userStorage);
+        return userService;
     }
 
     public Preferences getPreferences() {

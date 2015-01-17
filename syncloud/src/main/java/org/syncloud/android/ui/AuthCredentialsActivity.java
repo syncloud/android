@@ -24,11 +24,10 @@ import android.widget.TextView;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.redirect.UserService;
+import org.syncloud.redirect.IUserService;
+import org.syncloud.redirect.UserResult;
 import org.syncloud.redirect.model.ParameterMessages;
 import org.syncloud.redirect.model.RestError;
-import org.syncloud.redirect.model.RestResult;
-import org.syncloud.redirect.model.User;
 
 import java.util.regex.Pattern;
 
@@ -45,7 +44,7 @@ public class AuthCredentialsActivity extends Activity {
 
     private UserTask authTask = null;
     private Preferences preferences;
-    private UserService userService;
+    private IUserService userService;
 
     private LinearLayout emailLoginFormView;
     private EditText emailView;
@@ -147,9 +146,6 @@ public class AuthCredentialsActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             startActivityForResult(new Intent(this, SettingsActivity.class), 2);
@@ -193,8 +189,6 @@ public class AuthCredentialsActivity extends Activity {
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
             focusView.requestFocus();
         } else {
             showProgress(true);
@@ -254,7 +248,7 @@ public class AuthCredentialsActivity extends Activity {
         finish();
     }
 
-    public class UserTask extends AsyncTask<Void, Void, RestResult<User>> {
+    public class UserTask extends AsyncTask<Void, Void, UserResult> {
 
         private final boolean register;
         private final Preferences preferences;
@@ -270,12 +264,12 @@ public class AuthCredentialsActivity extends Activity {
         }
 
         @Override
-        protected RestResult<User> doInBackground(Void... params) {
-            RestResult<User> result;
+        protected UserResult doInBackground(Void... params) {
+            UserResult result;
             if (register) {
                 result = userService.createUser(email, password);
             } else {
-                result = userService.getUser(email, password, false);
+                result = userService.getUser(email, password);
             }
             if (!result.hasError())
                 preferences.setCredentials(email, password);
@@ -283,12 +277,12 @@ public class AuthCredentialsActivity extends Activity {
         }
 
         @Override
-        protected void onPostExecute(final RestResult<User> result) {
+        protected void onPostExecute(final UserResult result) {
             authTask = null;
             showProgress(false);
 
             if (result.hasError())
-                showError(result.getError());
+                showError(result.error());
             else
                 finishSuccess();
         }

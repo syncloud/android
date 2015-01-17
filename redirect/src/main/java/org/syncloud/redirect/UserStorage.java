@@ -10,18 +10,17 @@ import java.io.IOException;
 
 import static org.syncloud.common.Jackson.createObjectMapper;
 
-public class UserCache implements IUserCache {
-    private static Logger logger = Logger.getLogger(UserCache.class);
+public class UserStorage {
+    private static Logger logger = Logger.getLogger(UserStorage.class);
 
     private static ObjectMapper mapper = createObjectMapper();
 
     private File file;
 
-    public UserCache(File file) {
+    public UserStorage(File file) {
         this.file = file;
     }
 
-    @Override
     public User load() {
         try {
             User user = mapper.readValue(this.file, User.class);
@@ -32,7 +31,6 @@ public class UserCache implements IUserCache {
         }
     }
 
-    @Override
     public void save(User user) {
         try {
             mapper.writeValue(this.file, user);

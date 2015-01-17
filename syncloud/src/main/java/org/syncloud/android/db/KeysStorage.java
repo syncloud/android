@@ -15,7 +15,7 @@ import java.util.List;
 import static com.google.common.collect.Lists.newArrayList;
 
 public class KeysStorage extends SQLiteOpenHelper {
-    private static Logger logger = Logger.getLogger(Db.class);
+    private static Logger logger = Logger.getLogger(KeysStorage.class);
 
     private static final int DATABASE_VERSION = 8;
     private static final String DATABASE_NAME = "syncloud";

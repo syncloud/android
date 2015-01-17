@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.db.Db;
 import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
@@ -31,7 +30,6 @@ import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.model.Identification;
 import org.syncloud.ssh.model.Key;
 
-import static org.syncloud.android.tasks.AsyncResult.error;
 import static org.syncloud.android.tasks.AsyncResult.value;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
@@ -114,16 +112,11 @@ public class DeviceActivateActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.dns, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
@@ -220,8 +213,6 @@ public class DeviceActivateActivity extends Activity {
         }
 
         Device device = remoteAccessResult.get();
-//        Db db = this.application.getDb();
-//        db.insert(device);
 
         Key key = new Key(device.macAddress(), device.credentials().key());
         KeysStorage keysStorage = this.application.keysStorage();

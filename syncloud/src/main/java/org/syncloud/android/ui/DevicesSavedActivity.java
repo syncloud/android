@@ -2,6 +2,7 @@ package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -11,13 +12,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.Utils;
-import org.syncloud.android.db.Db;
 import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.ui.adapters.DevicesSavedAdapter;
-import org.syncloud.redirect.IUserCache;
+import org.syncloud.redirect.IUserService;
+import org.syncloud.redirect.UserResult;
 import org.syncloud.redirect.model.User;
 import org.syncloud.ssh.model.Device;
 import org.syncloud.ssh.model.Key;
@@ -26,10 +28,11 @@ import java.util.List;
 
 public class DevicesSavedActivity extends Activity {
 
-    private Db db;
     private KeysStorage keysStorage;
-    private IUserCache userCache;
     private DevicesSavedAdapter adapter;
+    private SyncloudApplication application;
+    private Preferences preferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,28 +55,27 @@ public class DevicesSavedActivity extends Activity {
         adapter = new DevicesSavedAdapter(this);
         listview.setAdapter(adapter);
 
-        SyncloudApplication application = (SyncloudApplication) getApplication();
-//        db = application.getDb();
+        application = (SyncloudApplication) getApplication();
+        preferences = application.getPreferences();
+
         keysStorage = application.keysStorage();
-        userCache = application.userCache();
 
         refreshDevices();
     }
 
     private void refreshDevices() {
-        try {
-            User user = userCache.load();
-            List<Key> keys = keysStorage.list();
-            List<Device> devices = Utils.toDevices(user.domains, keys);
-
-            adapter.clear();
-//        List<Device> devices = db.list();
-            for (Device device : devices)
-                adapter.add(device);
-        } catch (Exception ex) {
-
-        }
+        new CheckCredentialsTask(application, preferences).execute();
     }
+
+    private void updateUser(User user) {
+        List<Key> keys = keysStorage.list();
+        List<Device> devices = Utils.toDevices(user.domains, keys);
+
+        adapter.clear();
+        for (Device device : devices)
+            adapter.add(device);
+    }
+
 
     private void open(Device device) {
         Intent intent = new Intent(this, DeviceAppsActivity.class);
@@ -89,17 +91,12 @@ public class DevicesSavedActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             startActivityForResult(new Intent(this, SettingsActivity.class), 2);
@@ -127,4 +124,34 @@ public class DevicesSavedActivity extends Activity {
             Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public class CheckCredentialsTask extends AsyncTask<Void, Void, UserResult> {
+        private Preferences preferences;
+        private IUserService userService;
+
+        public CheckCredentialsTask(SyncloudApplication application, Preferences preferences) {
+            this.preferences = preferences;
+            this.userService = application.userService();
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected UserResult doInBackground(Void... voids) {
+            String email = preferences.getEmail();
+            String password = preferences.getPassword();
+            UserResult result = userService.getUser(email, password);
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(UserResult result) {
+            if (!result.hasError()) {
+                updateUser(result.user());
+            }
+        }
+    }
+
 }

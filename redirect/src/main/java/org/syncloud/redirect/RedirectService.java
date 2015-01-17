@@ -10,10 +10,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.syncloud.redirect.model.RestError;
-import org.syncloud.redirect.model.RestResult;
 import org.syncloud.redirect.model.RestUser;
-import org.syncloud.redirect.model.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,27 +20,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.syncloud.common.Jackson.createObjectMapper;
-import static org.syncloud.redirect.model.RestResult.error;
-import static org.syncloud.redirect.model.RestResult.value;
+import static org.syncloud.redirect.UserResult.error;
 
-public class UserService {
+public class RedirectService implements IUserService {
 
     private String apiUrl;
-    private IUserCache cache;
 
-    public UserService(String apiUrl, IUserCache cache) {
+    public RedirectService(String apiUrl) {
         this.apiUrl = apiUrl;
-        this.cache = cache;
     }
 
     private static ObjectMapper mapper = createObjectMapper();
 
-    public RestResult<User> getUser(String email, String password, boolean canUseCache) {
+    public UserResult getUser(String email, String password) {
 
         CloseableHttpClient http = HttpClients.createDefault();
-        HttpGet get = new HttpGet(apiUrl +
-                "/user/get?email=" + email +
-                "&password=" + password);
+        HttpGet get = new HttpGet(apiUrl + "/user/get?email=" + email + "&password=" + password);
 
         try {
             CloseableHttpResponse response = http.execute(get);
@@ -52,22 +44,13 @@ public class UserService {
             int statusCode = response.getStatusLine().getStatusCode();
             response.close();
             RestUser restUser = mapper.readValue(textJsonResponse, RestUser.class);
-            if (statusCode == 200) {
-                User user = restUser.data;
-                cache.save(user);
-                return value(user);
-            }
-            if (statusCode != 403 && canUseCache) {
-                User user = cache.load();
-                return value(user);
-            }
-            return error(restUser);
+            return new UserResult(statusCode, restUser);
         } catch (Exception e) {
-            return error(new RestError(e.getMessage()));
+            return error("Failed to get user", e);
         }
     }
 
-    public RestResult<User> createUser(String email, String password) {
+    public UserResult createUser(String email, String password) {
         CloseableHttpClient http = HttpClients.createDefault();
         HttpPost post = new HttpPost(apiUrl + "/user/create");
 
@@ -82,11 +65,9 @@ public class UserService {
             int statusCode = response.getStatusLine().getStatusCode();
             response.close();
             RestUser restUser = mapper.readValue(textJsonResponse, RestUser.class);
-            if (statusCode == 200)
-                return value(restUser.data);
-            return error(restUser);
+            return new UserResult(statusCode, restUser);
         } catch (Exception e) {
-            return error(new RestError(e.getMessage()));
+            return error("Failed to create user", e);
         }
     }
 
