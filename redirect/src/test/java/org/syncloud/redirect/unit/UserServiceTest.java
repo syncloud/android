@@ -6,7 +6,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.syncloud.redirect.RedirectService;
 import org.syncloud.redirect.UserResult;
-import org.syncloud.redirect.model.RestResult;
 import org.syncloud.redirect.unit.server.Rest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -60,9 +59,5 @@ public class UserServiceTest {
         UserResult result = this.redirectService.createUser("test", "test");
 
         assertTrue(result.hasError());
-    }
-
-    private String getErrorOrEmpty(RestResult result) {
-        return result.hasError() ? result.getError().message : "";
     }
 }
