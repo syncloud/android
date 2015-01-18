@@ -48,8 +48,8 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
         btnDeleteDevice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                db().remove(device);
-                refresh();
+//                db().remove(device);
+//                refresh();
             }
         });
         btnShareDevice.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
