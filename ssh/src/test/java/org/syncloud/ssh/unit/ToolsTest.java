@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.syncloud.ssh.ConnectionPointProvider;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.Tools;
 import org.syncloud.ssh.model.Credentials;
@@ -23,7 +24,7 @@ public class ToolsTest {
     public void testGetId() {
         SshRunner sshRunner = mock(SshRunner.class);
 
-        when(sshRunner.run(any(Endpoint.class), any(Credentials.class), anyString()))
+        when(sshRunner.run(any(ConnectionPointProvider.class), anyString()))
                 .thenReturn(Optional.of("{\"data\":{" +
                         "\"name\": \"test\"," +
                         "\"title\": \"test_title\"," +
@@ -31,7 +32,7 @@ public class ToolsTest {
                         "}}, \"message\":\"good\", \"true\""));
 
         Tools tools = new Tools(sshRunner);
-        Optional<Identification> id = tools.getId(null, null);
+        Optional<Identification> id = tools.getId(null);
 
         assertTrue(id.isPresent());
         assertEquals("test", id.get().name);
