@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
-import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.ConnectionPointProvider;
+import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.model.SshResult;
 
 import java.io.IOException;
@@ -19,11 +19,11 @@ public class Sam {
     private static Logger logger = Logger.getLogger(Sam.class);
 
     public static final ObjectMapper JSON = new ObjectMapper();
-    private Ssh ssh;
+    private SshRunner ssh;
     private Release release;
 
-    public Sam(Ssh ssh, Release release) {
-        this.ssh = ssh;
+    public Sam(SshRunner sshRunner, Release release) {
+        this.ssh = sshRunner;
         this.release = release;
     }
 
@@ -32,8 +32,8 @@ public class Sam {
         return "sam "+ join(cmd, " ");
     }
 
-    private <TContent> Optional<TContent> runTyped(final TypeReference type, Device device, String... arguments) {
-        Optional<String> execute = ssh.execute(device, cmd(arguments));
+    private <TContent> Optional<TContent> runTyped(final TypeReference type, ConnectionPointProvider connectionPoint, String... arguments) {
+        Optional<String> execute = ssh.run(connectionPoint, cmd(arguments));
         if (execute.isPresent()) {
             try {
                 return Optional.of(JSON.<SshResult<TContent>>readValue(execute.get(), type).data);
@@ -46,12 +46,12 @@ public class Sam {
         return Optional.absent();
     }
 
-    private Optional<List<AppVersions>> appsVersions(Device device, String... arguments) {
-        return runTyped(new TypeReference<SshResult<List<AppVersions>>>() {}, device, arguments);
+    private Optional<List<AppVersions>> appsVersions(ConnectionPointProvider connectionPoint, String... arguments) {
+        return runTyped(new TypeReference<SshResult<List<AppVersions>>>() {}, connectionPoint, arguments);
     }
 
-    public Boolean run(Device device, String... arguments) {
-        Optional<String> execute = ssh.execute(device, cmd(arguments));
+    public Boolean run(ConnectionPointProvider connectionPoint, String... arguments) {
+        Optional<String> execute = ssh.run(connectionPoint, cmd(arguments));
         if (execute.isPresent()) {
 
             try {
@@ -71,11 +71,11 @@ public class Sam {
         return false;
     }
 
-    public Optional<List<AppVersions>> update(Device device) {
-        return appsVersions(device, Commands.update, "--release", release.getVersion());
+    public Optional<List<AppVersions>> update(ConnectionPointProvider connectionPoint) {
+        return appsVersions(connectionPoint, Commands.update, "--release", release.getVersion());
     }
 
-    public Optional<List<AppVersions>> list(Device device) {
-        return appsVersions(device, Commands.list);
+    public Optional<List<AppVersions>> list(ConnectionPointProvider connectionPoint) {
+        return appsVersions(connectionPoint, Commands.list);
     }
 }

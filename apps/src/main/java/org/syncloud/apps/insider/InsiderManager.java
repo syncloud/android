@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
-import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.ConnectionPointProvider;
+import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.model.StringResult;
 
 import java.io.IOException;
@@ -19,14 +19,14 @@ public class InsiderManager {
 
     private static final String INSIDER_BIN = "insider";
     public static final ObjectMapper JSON = new ObjectMapper();
-    private Ssh ssh;
+    private SshRunner ssh;
 
-    public InsiderManager(Ssh ssh) {
-        this.ssh = ssh;
+    public InsiderManager() {
+        this.ssh = new SshRunner();
     }
 
-    public Optional<String> userDomain(Device device) {
-        Optional<String> execute = ssh.execute(device, format("%s user_domain", INSIDER_BIN));
+    public Optional<String> userDomain(ConnectionPointProvider connectionPoint) {
+        Optional<String> execute = ssh.run(connectionPoint, format("%s user_domain", INSIDER_BIN));
         if (execute.isPresent()) {
             try {
                 return Optional.of(JSON.readValue(execute.get(), StringResult.class).data);
@@ -39,16 +39,16 @@ public class InsiderManager {
         return Optional.absent();
     }
 
-    public boolean acquireDomain(final Device device, String email, String pass, String domain) {
-        return ssh.execute(device, format("%s acquire_domain %s %s %s", INSIDER_BIN, email, pass, domain)).isPresent();
+    public boolean acquireDomain(ConnectionPointProvider connectionPoint, String email, String pass, String domain) {
+        return ssh.run(connectionPoint, format("%s acquire_domain %s %s %s", INSIDER_BIN, email, pass, domain)).isPresent();
     }
 
-    public boolean setRedirectInfo(Device device, String domain, String apiUl) {
-        return ssh.execute(device, format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl)).isPresent();
+    public boolean setRedirectInfo(ConnectionPointProvider connectionPoint, String domain, String apiUl) {
+        return ssh.run(connectionPoint, format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl)).isPresent();
     }
 
-    public boolean dropDomain(Device device) {
-        Optional<String> execute = ssh.execute(device, format("%s drop_domain", INSIDER_BIN));
+    public boolean dropDomain(ConnectionPointProvider connectionPoint) {
+        Optional<String> execute = ssh.run(connectionPoint, format("%s drop_domain", INSIDER_BIN));
         if (!execute.isPresent())
             logger.error("unable to drop domain");
         return execute.isPresent();

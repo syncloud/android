@@ -22,13 +22,13 @@ import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.owncloud.OwncloudManager;
+import org.syncloud.ssh.ConnectionPointProvider;
 import org.syncloud.ssh.model.Device;
 
 
 public class Owncloud extends Activity {
 
     public static final String COM_OWNCLOUD_ANDROID = "com.owncloud.android";
-    private Device device;
     private CommunicationDialog progress;
     private TextView url;
     private Button activateBtn;
@@ -40,6 +40,7 @@ public class Owncloud extends Activity {
     private EditText passText;
     private CheckBox chkHttps;
     private OwncloudManager owncloudManager;
+    private ConnectionPointProvider connectionPoint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +51,9 @@ public class Owncloud extends Activity {
 
         progress = new CommunicationDialog(this);
 
-        owncloudManager = new OwncloudManager(application.createSsh());
-        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
+        owncloudManager = new OwncloudManager();
+        Device device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
+        connectionPoint = application.connectionPoint(device);
 
         activatedControls = (LinearLayout) findViewById(R.id.owncloud_activated_controls);
         url = (TextView) findViewById(R.id.owncloud_url);
@@ -81,7 +83,7 @@ public class Owncloud extends Activity {
                     @Override
                     public AsyncResult<String> run(String... args) {
                         return new AsyncResult<String>(
-                                owncloudManager.finishSetup(device, login, pass, protocol),
+                                owncloudManager.finishSetup(connectionPoint, login, pass, protocol),
                                 "unable to finish setup");
                     }
                 })
@@ -103,7 +105,7 @@ public class Owncloud extends Activity {
                     @Override
                     public AsyncResult<String> run(Void... args) {
                         return new AsyncResult<String>(
-                                owncloudManager.owncloudUrl(device),
+                                owncloudManager.owncloudUrl(connectionPoint),
                                 "unable to get ownCloud url");
                     }
                 })

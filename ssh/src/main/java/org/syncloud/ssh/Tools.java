@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
-import org.syncloud.ssh.model.Credentials;
-import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.model.Identification;
 import org.syncloud.ssh.model.SshResult;
 
@@ -23,8 +21,8 @@ public class Tools {
         this.ssh = ssh;
     }
 
-    public Optional<Identification> getId(Endpoint endpoint, Credentials credentials) {
-        Optional<String> result = ssh.run(endpoint, credentials, "syncloud-id id");
+    public Optional<Identification> getId(ConnectionPointProvider provider) {
+        Optional<String> result = ssh.run(provider, "syncloud-id id");
         if (result.isPresent()) {
             String data = result.get();
 //            logger.debug("identification response: " + data);

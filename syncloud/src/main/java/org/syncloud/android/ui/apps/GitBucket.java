@@ -20,13 +20,15 @@ import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.gitbucket.GitBucketManager;
+import org.syncloud.ssh.ConnectionPointProvider;
 import org.syncloud.ssh.model.Device;
 
 public class GitBucket extends ActionBarActivity {
 
-    private Device device;
-    private CommunicationDialog progress;
     private GitBucketManager manager;
+    private ConnectionPointProvider connectionPoint;
+
+    private CommunicationDialog progress;
 
     private LinearLayout activatedControls;
     private TextView txtUrl;
@@ -43,8 +45,10 @@ public class GitBucket extends ActionBarActivity {
         SyncloudApplication application = (SyncloudApplication) getApplication();
 
         progress = new CommunicationDialog(this);
-        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
-        manager = new GitBucketManager(application.createSsh());
+        Device device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
+        connectionPoint = application.connectionPoint(device);
+
+        manager = new GitBucketManager();
 
         activatedControls = (LinearLayout) findViewById(R.id.activated_controls);
         txtUrl = (TextView) findViewById(R.id.txt_url);
@@ -68,7 +72,7 @@ public class GitBucket extends ActionBarActivity {
                     @Override
                     public AsyncResult<String> run(Void... args) {
                         return new AsyncResult<String>(
-                                manager.url(device),
+                                manager.url(connectionPoint),
                                 "unable to get GitBucket txtUrl");
                     }
                 })
@@ -115,7 +119,7 @@ public class GitBucket extends ActionBarActivity {
                     @Override
                     public AsyncResult<String> run(String... args) {
                         return new AsyncResult<String>(
-                                manager.enable(device, login, pass),
+                                manager.enable(connectionPoint, login, pass),
                                 "unable to activate");
                     }
                 })
@@ -136,7 +140,7 @@ public class GitBucket extends ActionBarActivity {
                     @Override
                     public AsyncResult<String> run(String... args) {
                         return new AsyncResult<String>(
-                                manager.disable(device),
+                                manager.disable(connectionPoint),
                                 "unable to deactivate");
                     }
                 })

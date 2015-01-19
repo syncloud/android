@@ -3,8 +3,8 @@ package org.syncloud.ssh;
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
+import org.syncloud.ssh.model.ConnectionPoint;
 import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.Endpoint;
 
 public class EndpointSelector {
 
@@ -12,25 +12,19 @@ public class EndpointSelector {
 
     public static final String SSH_TYPE = "_ssh._tcp";
 
-    private EndpointResolver resolver;
     private EndpointPreference preference;
 
-    public EndpointSelector(EndpointResolver resolver, EndpointPreference preference) {
-        this.resolver = resolver;
+    public EndpointSelector(EndpointPreference preference) {
         this.preference = preference;
     }
 
-    public Optional<Endpoint> select(Device device, boolean first) {
+    public Optional<ConnectionPoint> select(Device device, boolean first) {
 
         boolean valid = first ? preference.isRemote() : !preference.isRemote();
         if (valid){
-            String domain = device.userDomain();
-            Optional<Endpoint> endpoint = resolver.dnsService(domain, SSH_TYPE);
-            if (!endpoint.isPresent())
-                logger.error("Public address is not available yet for " + domain + ", " + SSH_TYPE);
-            return endpoint;
+            return Optional.of(new ConnectionPoint(device.remoteEndpoint(), device.credentials()));
         } else
-            return Optional.of(device.localEndpoint());
+            return Optional.of(new ConnectionPoint(device.localEndpoint(), device.credentials()));
 
     }
 }

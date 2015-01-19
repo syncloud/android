@@ -24,13 +24,16 @@ import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.remote.RemoteAccessManager;
 import org.syncloud.apps.sam.Commands;
 import org.syncloud.apps.sam.Sam;
-import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.ConnectionPointProvider;
+import org.syncloud.ssh.SshRunner;
+import org.syncloud.ssh.model.ConnectionPoint;
+import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.model.Identification;
 import org.syncloud.ssh.model.Key;
 
 import static org.syncloud.android.tasks.AsyncResult.value;
+import static org.syncloud.ssh.SimpleConnectionPointProvider.simple;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 
@@ -39,7 +42,6 @@ public class DeviceActivateActivity extends Activity {
     private static Logger logger = Logger.getLogger(DeviceActivateActivity.class);
 
     private Preferences preferences;
-    private Device device;
 
     private CommunicationDialog progress;
     private TextView txtDeviceTitle;
@@ -56,6 +58,9 @@ public class DeviceActivateActivity extends Activity {
     private LinearLayout layoutMacAddress;
 
     private SyncloudApplication application;
+
+    private Identification identification;
+    private ConnectionPointProvider connectionPoint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,23 +82,18 @@ public class DeviceActivateActivity extends Activity {
         this.application = (SyncloudApplication) getApplication();
 
         Endpoint endpoint = (Endpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
-        Identification identification = (Identification) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ID);
-        device = new Device(
-                identification.mac_address,
-                identification,
-                null,
-                endpoint,
-                getStandardCredentials());
+        identification = (Identification) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ID);
+
+        connectionPoint = simple(new ConnectionPoint(endpoint, getStandardCredentials()));
 
         preferences = application.getPreferences();
 
-        Ssh ssh = application.createSsh();
-        sam = new Sam(ssh, preferences);
-        insider = new InsiderManager(ssh);
-        accessManager = new RemoteAccessManager(insider, ssh);
+        sam = new Sam(new SshRunner(), preferences);
+        insider = new InsiderManager();
+        accessManager = new RemoteAccessManager(insider);
 
-        txtDeviceTitle.setText(device.id().title);
-        txtMacAddress.setText(device.id().mac_address);
+        txtDeviceTitle.setText(this.identification.title);
+        txtMacAddress.setText(this.identification.mac_address);
 
         layoutMacAddress.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
 
@@ -134,7 +134,7 @@ public class DeviceActivateActivity extends Activity {
                     @Override
                     public AsyncResult<String> run(Void... args) {
                         return new AsyncResult<String>(
-                                insider.userDomain(device),
+                                insider.userDomain(connectionPoint),
                                 "unable to get user domain");
                     }
                 })
@@ -187,34 +187,34 @@ public class DeviceActivateActivity extends Activity {
     private boolean doActivate(final String email, final String pass, final String domain) {
         logger.info("activate");
 
-        if (!sam.update(device).isPresent()) {
+        if (!sam.update(connectionPoint).isPresent()) {
             logger.error("unable to update sam");
             return false;
         }
 
-        if (!sam.run(device, Commands.upgrade_all)) {
+        if (!sam.run(connectionPoint, Commands.upgrade_all)) {
             logger.error("unable to upgrade apps");
             return false;
         }
-        if (!insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl())) {
+        if (!insider.setRedirectInfo(connectionPoint, preferences.getDomain(), preferences.getApiUrl())) {
             logger.error("unable to set redirect info");
             return false;
         }
 
-        if (!insider.acquireDomain(device, email, pass, domain)) {
+        if (!insider.acquireDomain(connectionPoint, email, pass, domain)) {
             logger.error("unable to acquire domain");
             return false;
         }
 
-        Optional<Device> remoteAccessResult = accessManager.enable(device, preferences.getDomain());
-        if (!remoteAccessResult.isPresent()) {
+        Optional<Credentials> credentialsResult = accessManager.enable(connectionPoint, preferences.getDomain());
+        if (!credentialsResult.isPresent()) {
             logger.error("unable to enable remote access");
             return false;
         }
 
-        Device device = remoteAccessResult.get();
+        Credentials credentials = credentialsResult.get();
 
-        Key key = new Key(device.macAddress(), device.credentials().key());
+        Key key = new Key(identification.mac_address, credentials.key());
         KeysStorage keysStorage = this.application.keysStorage();
         keysStorage.upsert(key);
 

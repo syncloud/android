@@ -19,11 +19,13 @@ import org.syncloud.redirect.IUserService;
 import org.syncloud.redirect.RedirectService;
 import org.syncloud.redirect.UserCachedService;
 import org.syncloud.redirect.UserStorage;
+import org.syncloud.ssh.ConnectionPointProvider;
 import org.syncloud.ssh.Dns;
 import org.syncloud.ssh.EndpointResolver;
 import org.syncloud.ssh.EndpointSelector;
+import org.syncloud.ssh.SelectorConnectionPointProvider;
 import org.syncloud.ssh.SshRunner;
-import org.syncloud.ssh.Ssh;
+import org.syncloud.ssh.model.Device;
 
 import java.io.File;
 import java.util.HashMap;
@@ -93,11 +95,12 @@ public class SyncloudApplication extends Application {
         return preferences;
     }
 
-    public Ssh createSsh() {
-        return new Ssh(
+    public ConnectionPointProvider connectionPoint(Device device) {
+        return new SelectorConnectionPointProvider(
                 new SshRunner(),
-                new EndpointSelector(new EndpointResolver(new Dns()), preferences),
-                preferences);
+                new EndpointSelector(preferences),
+                getPreferences(),
+                device);
     }
 
     public void reportError() {

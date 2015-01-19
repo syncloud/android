@@ -31,6 +31,7 @@ import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.Tools;
+import org.syncloud.ssh.model.ConnectionPoint;
 import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.model.Identification;
 import org.syncloud.ssh.model.IdentifiedEndpoint;
@@ -38,6 +39,7 @@ import org.syncloud.ssh.model.IdentifiedEndpoint;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static org.syncloud.ssh.SimpleConnectionPointProvider.simple;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 public class DevicesDiscoveryActivity extends Activity {
@@ -172,7 +174,8 @@ public class DevicesDiscoveryActivity extends Activity {
             deviceEndpointListener = new DeviceEndpointListener() {
                 @Override
                 public void added(final Endpoint endpoint) {
-                    Optional<Identification> id = tools.getId(endpoint, getStandardCredentials());
+                    ConnectionPoint connectionPoint = new ConnectionPoint(endpoint, getStandardCredentials());
+                    Optional<Identification> id = tools.getId(simple(connectionPoint));
                     final IdentifiedEndpoint ie = new IdentifiedEndpoint(endpoint, id);
                     publishProgress(new Progress(true, endpoint, ie));
                 }

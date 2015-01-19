@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
-import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.ConnectionPointProvider;
+import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.model.StringResult;
 
 import java.io.IOException;
@@ -15,23 +15,23 @@ public class GitBucketManager {
 
     private static String CTL_BIN = "gitbucket-ctl";
     public static final ObjectMapper JSON = new ObjectMapper();
-    private Ssh ssh;
+    private SshRunner ssh;
 
-    public GitBucketManager(Ssh ssh) {
-        this.ssh = ssh;
+    public GitBucketManager() {
+        this.ssh = new SshRunner();
     }
 
-    public Optional<String> enable(Device device, String login, String password) {
-        return ssh.execute(device, String.format("%s enable %s %s", CTL_BIN, login, password));
+    public Optional<String> enable(ConnectionPointProvider connectionPoint, String login, String password) {
+        return ssh.run(connectionPoint, String.format("%s enable %s %s", CTL_BIN, login, password));
     }
 
-    public Optional<String> disable(Device device) {
-        return ssh.execute(device, String.format("%s disable", CTL_BIN));
+    public Optional<String> disable(ConnectionPointProvider connectionPoint) {
+        return ssh.run(connectionPoint, String.format("%s disable", CTL_BIN));
     }
 
-    public Optional<String> url(Device device) {
+    public Optional<String> url(ConnectionPointProvider connectionPoint) {
 
-        Optional<String> execute = ssh.execute(device, String.format("%s url", CTL_BIN));
+        Optional<String> execute = ssh.run(connectionPoint, String.format("%s url", CTL_BIN));
         if (execute.isPresent())
             try {
                 return Optional.of(JSON.readValue(execute.get(), StringResult.class).data);

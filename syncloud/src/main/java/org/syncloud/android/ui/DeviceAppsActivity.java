@@ -24,7 +24,8 @@ import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Sam;
-import org.syncloud.ssh.Ssh;
+import org.syncloud.ssh.ConnectionPointProvider;
+import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.model.Device;
 
 import java.util.List;
@@ -36,14 +37,15 @@ public class DeviceAppsActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(DeviceAppsActivity.class);
 
+    private SyncloudApplication application;
     private Device device;
     private boolean connected = false;
     private Sam sam;
     private CommunicationDialog progress;
-    private Ssh ssh;
     private InsiderManager insider;
     private Preferences preferences;
-
+    private SshRunner ssh;
+    private ConnectionPointProvider connectionPoint;
 
     private TextView txtDeviceTitle;
     private TextView txtDomainName;
@@ -59,16 +61,16 @@ public class DeviceAppsActivity extends Activity {
         txtDeviceTitle = (TextView) findViewById(R.id.txt_device_title);
         txtDomainName = (TextView) findViewById(R.id.txt_domain_name);
 
-        SyncloudApplication application = (SyncloudApplication) getApplication();
+        application = (SyncloudApplication) getApplication();
 
         preferences = application.getPreferences();
 
-        ssh = application.createSsh();
-        sam = new Sam(ssh, preferences);
-
-        insider = new InsiderManager(ssh);
+        ssh = new SshRunner();
+        sam = new Sam(new SshRunner(), preferences);
+        insider = new InsiderManager();
 
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
+        connectionPoint = application.connectionPoint(device);
 
         progress = new CommunicationDialog(this);
         progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -79,7 +81,7 @@ public class DeviceAppsActivity extends Activity {
             }
         });
 
-        txtDeviceTitle.setText(device.id().title);
+        txtDeviceTitle.setText(device.title());
         txtDomainName.setText(device.userDomain());
 
         listApplications = (ListView) findViewById(R.id.app_list);
@@ -106,7 +108,7 @@ public class DeviceAppsActivity extends Activity {
                         execute(new Runnable() {
                             @Override
                             public void run() {
-                                ssh.execute(device, "reboot");
+                                ssh.run(connectionPoint, "reboot");
                             }
                         });
                     }
@@ -122,7 +124,7 @@ public class DeviceAppsActivity extends Activity {
                     @Override
                     public AsyncResult<List<AppVersions>> run(Void... args) {
                         return new AsyncResult<List<AppVersions>>(
-                                sam.list(device),
+                                sam.list(connectionPoint),
                                 "unable to get list of apps");
                     }
                 })
@@ -183,7 +185,7 @@ public class DeviceAppsActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, Void>() {
                     @Override
                     public AsyncResult<Void> run(Void... args) {
-                        insider.dropDomain(device);
+                        insider.dropDomain(connectionPoint);
 //                        if (insider.dropDomain(device))
 //                            db.remove(device);
                         return null;

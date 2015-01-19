@@ -114,8 +114,6 @@ public class DevicesSavedActivity extends Activity {
         i.putExtra(Intent.EXTRA_SUBJECT, device.userDomain());
         String body = "";
         body += "Host: " + device.userDomain() + "\n";
-        body += "Login: " + device.credentials().login() + "\n";
-        body += "Password: " + device.credentials().password() + "\n";
         body += "KEY:\n\n" + device.credentials().key() + "\n";
         i.putExtra(Intent.EXTRA_TEXT, body);
         try {

@@ -29,12 +29,12 @@ public class EndpointSelectorTest {
     @Test
     public void testPreferred() {
 
-        EndpointResolver resolver = mock(EndpointResolver.class);
-        when(resolver.dnsService(anyString(), anyString())).thenReturn(Optional.of(remoteEndpoint));
+//        EndpointResolver resolver = mock(EndpointResolver.class);
+//        when(resolver.dnsService(anyString(), anyString())).thenReturn(Optional.of(remoteEndpoint));
 
         EndpointPreference preference = mock(EndpointPreference.class);
 
-        EndpointSelector selector = new EndpointSelector(resolver, preference);
+        EndpointSelector selector = new EndpointSelector(preference);
 
         when(preference.isRemote()).thenReturn(false);
         assertEquals(localEndpoint, selector.select(device, true).get());

@@ -8,6 +8,7 @@ import com.jcraft.jsch.Session;
 
 import org.apache.commons.exec.LogOutputStream;
 import org.apache.log4j.Logger;
+import org.syncloud.ssh.model.ConnectionPoint;
 import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Endpoint;
 
@@ -15,10 +16,17 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class SshRunner {
+    public static final int SSH_SERVER_PORT = 22;
 
     private static Logger logger = Logger.getLogger(SshRunner.class);
 
-    public Optional<String> run(Endpoint endpoint, Credentials credentials, String command) {
+    public Optional<String> run(ConnectionPointProvider connectionPoint, String command) {
+        return run(connectionPoint.get(), command);
+    }
+
+    public Optional<String> run(ConnectionPoint connectionPoint, String command) {
+        Endpoint endpoint = connectionPoint.endpoint();
+        Credentials credentials = connectionPoint.credentials();
 
         logger.info("executing: " + command);
         JSch jsch = new JSch();

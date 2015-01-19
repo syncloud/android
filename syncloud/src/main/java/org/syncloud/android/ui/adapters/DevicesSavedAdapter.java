@@ -39,7 +39,7 @@ public class DevicesSavedAdapter extends ArrayAdapter<Device> {
 
         final Device device = getItem(position);
 
-        txtDeviceTitle.setText(device.id().title);
+        txtDeviceTitle.setText(device.title());
         txtDomainName.setText(device.userDomain());
         txtMacAddress.setText(device.macAddress());
 

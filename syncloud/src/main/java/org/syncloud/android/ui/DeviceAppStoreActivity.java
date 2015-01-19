@@ -20,7 +20,8 @@ import org.syncloud.android.ui.adapters.DeviceAppStoreAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Sam;
-import org.syncloud.ssh.Ssh;
+import org.syncloud.ssh.ConnectionPointProvider;
+import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.model.Device;
 
 import java.util.List;
@@ -35,8 +36,9 @@ public class DeviceAppStoreActivity extends Activity {
     private boolean connected = false;
     private Sam sam;
     private CommunicationDialog progress;
-    private Ssh ssh;
     private Preferences preferences;
+    private SshRunner ssh;
+    private ConnectionPointProvider connectionPoint;
 
 
     @Override
@@ -57,13 +59,15 @@ public class DeviceAppStoreActivity extends Activity {
 
         preferences = application.getPreferences();
 
+        ssh = new SshRunner();
+
         device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
+        connectionPoint = application.connectionPoint(device);
 
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppStoreAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
-        ssh = application.createSsh();
-        sam = new Sam(ssh, preferences);
+        sam = new Sam(new SshRunner(), preferences);
 
         listApps();
     }
@@ -76,7 +80,7 @@ public class DeviceAppStoreActivity extends Activity {
                     @Override
                     public AsyncResult<List<AppVersions>> run(Void... args) {
                         return new AsyncResult<List<AppVersions>>(
-                                sam.list(device),
+                                sam.list(connectionPoint),
                                 "unable to get list of apps");
                     }
                 })
@@ -97,7 +101,7 @@ public class DeviceAppStoreActivity extends Activity {
                     @Override
                     public AsyncResult<List<AppVersions>> run(Void... args) {
                         return new AsyncResult<List<AppVersions>>(
-                                sam.update(device),
+                                sam.update(connectionPoint),
                                 "unable to update sam");
                     }
                 })
@@ -118,13 +122,13 @@ public class DeviceAppStoreActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
                     public AsyncResult<List<AppVersions>> run(Void... args) {
-                        if (!sam.run(device, upgrade_all)) {
+                        if (!sam.run(connectionPoint, upgrade_all)) {
                             return new AsyncResult<List<AppVersions>>(
                                     Optional.<List<AppVersions>>absent(),
                                     "unable to upgrade apps");
                         } else {
                             return new AsyncResult<List<AppVersions>>(
-                                    sam.list(device),
+                                    sam.list(connectionPoint),
                                     "unable to get list of apps");
                         }
                     }
@@ -145,13 +149,13 @@ public class DeviceAppStoreActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<String, List<AppVersions>>() {
                     @Override
                     public AsyncResult<List<AppVersions>> run(String... args) {
-                        if (!sam.run(device, args)) {
+                        if (!sam.run(connectionPoint, args)) {
                             return new AsyncResult<List<AppVersions>>(
                                     Optional.<List<AppVersions>>absent(),
                                     "unable to execute command");
                         } else {
                             return new AsyncResult<List<AppVersions>>(
-                                    sam.list(device),
+                                    sam.list(connectionPoint),
                                     "unable to get list of apps");
                         }
                     }
@@ -174,7 +178,7 @@ public class DeviceAppStoreActivity extends Activity {
                         execute(new Runnable() {
                             @Override
                             public void run() {
-                                ssh.execute(device, "reboot");
+                                ssh.run(connectionPoint, "reboot");
                             }
                         });
                     }
