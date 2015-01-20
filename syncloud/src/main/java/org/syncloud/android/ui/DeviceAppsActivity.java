@@ -39,7 +39,6 @@ public class DeviceAppsActivity extends Activity {
 
     private SyncloudApplication application;
     private Device device;
-    private boolean connected = false;
     private Sam sam;
     private CommunicationDialog progress;
     private InsiderManager insider;
@@ -73,13 +72,6 @@ public class DeviceAppsActivity extends Activity {
         connectionPoint = application.connectionPoint(device);
 
         progress = new CommunicationDialog(this);
-        progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                if (!connected)
-                    finish();
-            }
-        });
 
         txtDeviceTitle.setText(device.title());
         txtDomainName.setText(device.userDomain());
@@ -138,7 +130,6 @@ public class DeviceAppsActivity extends Activity {
     }
 
     private void onAppsLoaded(List<AppVersions> appsVersions) {
-        connected = true;
         deviceAppsAdapter.clear();
         for (AppVersions app : appsVersions) {
             if (app.app.ui && app.installed())

@@ -16,6 +16,6 @@ public class SimpleConnectionPointProvider implements ConnectionPointProvider {
 
     @Override
     public ConnectionPoint get() {
-        return null;
+        return connectionPoint;
     }
 }

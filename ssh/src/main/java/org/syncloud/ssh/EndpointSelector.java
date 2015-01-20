@@ -8,10 +8,6 @@ import org.syncloud.ssh.model.Device;
 
 public class EndpointSelector {
 
-    private static Logger logger = Logger.getLogger(EndpointSelector.class);
-
-    public static final String SSH_TYPE = "_ssh._tcp";
-
     private EndpointPreference preference;
 
     public EndpointSelector(EndpointPreference preference) {

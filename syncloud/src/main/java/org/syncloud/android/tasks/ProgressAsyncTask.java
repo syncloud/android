@@ -37,10 +37,15 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
 
     @Override
     protected AsyncResult<TResult> doInBackground(TParams... args) {
-        if (work != null)
-            return work.run(args);
-        else
+        if (work != null) {
+            try {
+                return work.run(args);
+            } catch (Throwable th) {
+                return AsyncResult.error(th.getMessage());
+            }
+        } else {
             return null;
+        }
     }
 
     public ProgressAsyncTask<TParams, TResult> showError(boolean value) {

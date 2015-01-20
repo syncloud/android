@@ -22,20 +22,20 @@ public class SelectorConnectionPointProvider implements ConnectionPointProvider 
 
     @Override
     public ConnectionPoint get() {
-        Optional<ConnectionPoint> firstEndpoint = selector.select(device, true);
-        if (firstEndpoint.isPresent()){
-            if (sshRunner.run(firstEndpoint.get(), VERIFY_COMMAND).isPresent())
-                return firstEndpoint.get();
+        Optional<ConnectionPoint> firstPoint = selector.select(device, true);
+        if (firstPoint.isPresent()){
+            if (sshRunner.run(firstPoint.get(), VERIFY_COMMAND).isPresent())
+                return firstPoint.get();
         }
 
-        Optional<ConnectionPoint> secondEndpoint = selector.select(device, false);
-        if (secondEndpoint.isPresent()) {
-            if (sshRunner.run(secondEndpoint.get(), VERIFY_COMMAND).isPresent()) {
+        Optional<ConnectionPoint> secondPoint = selector.select(device, false);
+        if (secondPoint.isPresent()) {
+            if (sshRunner.run(secondPoint.get(), VERIFY_COMMAND).isPresent()) {
                 preference.swap();
-                return secondEndpoint.get();
+                return secondPoint.get();
             }
         }
 
-        return null;
+        throw new RuntimeException("Can't run command, unable to get working connection point");
     }
 }
