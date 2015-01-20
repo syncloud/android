@@ -1,8 +1,5 @@
 package org.syncloud.ssh.model;
 
-import org.syncloud.redirect.model.Domain;
-import org.syncloud.redirect.model.Service;
-
 import java.io.Serializable;
 
 public class Device implements Serializable {
@@ -19,24 +16,6 @@ public class Device implements Serializable {
         this.remoteEndpoint = remoteEndpoint;
         this.credentials = credentials;
     }
-
-    public Device (Domain domain, Key key) {
-        Service sshService = domain.service("ssh");
-        Endpoint localEndpoint = new Endpoint(domain.local_ip, sshService.local_port);
-        Endpoint remoteEndpoint = new Endpoint(domain.ip, sshService.port);
-        Identification identification = new Identification(domain.device_mac_address, domain.device_name, domain.device_title);
-        String keyValue = null;
-        if (key != null)
-            keyValue = key.key;
-        Credentials credentials = new Credentials("root", "syncloud", keyValue);
-
-        this.id = identification;
-        this.userDomain = domain.user_domain;
-        this.localEndpoint = localEndpoint;
-        this.remoteEndpoint = remoteEndpoint;
-        this.credentials = credentials;
-    }
-
 
     public String macAddress() { return id.mac_address; }
 
