@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
@@ -21,7 +20,7 @@ import org.syncloud.android.ui.adapters.DevicesSavedAdapter;
 import org.syncloud.redirect.IUserService;
 import org.syncloud.redirect.UserResult;
 import org.syncloud.redirect.model.User;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.DomainModel;
 import org.syncloud.ssh.model.Key;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public class DevicesSavedActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Object obj = listview.getItemAtPosition(position);
-                Device device = (Device)obj;
+                DomainModel device = (DomainModel)obj;
                 open(device);
             }
         });
@@ -69,17 +68,17 @@ public class DevicesSavedActivity extends Activity {
 
     private void updateUser(User user) {
         List<Key> keys = keysStorage.list();
-        List<Device> devices = Utils.toDevices(user.domains, keys);
+        List<DomainModel> devices = Utils.toDevices(user.domains, keys);
 
         adapter.clear();
-        for (Device device : devices)
+        for (DomainModel device : devices)
             adapter.add(device);
     }
 
 
-    private void open(Device device) {
+    private void open(DomainModel device) {
         Intent intent = new Intent(this, DeviceAppsActivity.class);
-        intent.putExtra(SyncloudApplication.DEVICE, device);
+        intent.putExtra(SyncloudApplication.DOMAIN, device);
         startActivityForResult(intent, 1);
     }
 
@@ -106,21 +105,6 @@ public class DevicesSavedActivity extends Activity {
 
     public void discover(View view) {
         startActivityForResult(new Intent(this, DevicesDiscoveryActivity.class), 1);
-    }
-
-    public void shareDevice(Device device) {
-        Intent i = new Intent(Intent.ACTION_SEND);
-        i.setType("message/rfc822");
-        i.putExtra(Intent.EXTRA_SUBJECT, device.userDomain());
-        String body = "";
-        body += "Host: " + device.userDomain() + "\n";
-        body += "KEY:\n\n" + device.credentials().key() + "\n";
-        i.putExtra(Intent.EXTRA_TEXT, body);
-        try {
-            startActivity(Intent.createChooser(i, "Send mail..."));
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-        }
     }
 
     public class CheckCredentialsTask extends AsyncTask<Void, Void, UserResult> {

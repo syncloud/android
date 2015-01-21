@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import org.apache.log4j.Logger;
@@ -26,7 +27,7 @@ import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.ssh.ConnectionPointProvider;
 import org.syncloud.ssh.SshRunner;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.DomainModel;
 
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class DeviceAppsActivity extends Activity {
     private static Logger logger = Logger.getLogger(DeviceAppsActivity.class);
 
     private SyncloudApplication application;
-    private Device device;
+    private DomainModel domain;
     private Sam sam;
     private CommunicationDialog progress;
     private InsiderManager insider;
@@ -69,13 +70,13 @@ public class DeviceAppsActivity extends Activity {
         sam = new Sam(new SshRunner(), preferences);
         insider = new InsiderManager();
 
-        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
-        connectionPoint = application.connectionPoint(device);
+        domain = (DomainModel) getIntent().getSerializableExtra(SyncloudApplication.DOMAIN);
+        connectionPoint = application.connectionPoint(domain.device());
 
         progress = new CommunicationDialog(this);
 
-        txtDeviceTitle.setText(device.title());
-        txtDomainName.setText(device.userDomain());
+        txtDomainName.setText(domain.userDomain());
+        txtDeviceTitle.setText(domain.device().id().title());
 
         listApplications = (ListView) findViewById(R.id.list_apps);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
@@ -173,7 +174,7 @@ public class DeviceAppsActivity extends Activity {
             deactivate();
         } else if (id == R.id.action_manage_apps) {
             Intent intent = new Intent(this, DeviceAppStoreActivity.class);
-            intent.putExtra(SyncloudApplication.DEVICE, device);
+            intent.putExtra(SyncloudApplication.DOMAIN, domain);
             startActivityForResult(intent, 1);
         }
 
@@ -183,7 +184,7 @@ public class DeviceAppsActivity extends Activity {
     private void openApp(String appId) {
         if (appRegistry.containsKey(appId)) {
             Intent intent = new Intent(this, appRegistry.get(appId));
-            intent.putExtra(SyncloudApplication.DEVICE, device);
+            intent.putExtra(SyncloudApplication.DOMAIN, domain);
             startActivity(intent);
         }
     }
@@ -196,8 +197,8 @@ public class DeviceAppsActivity extends Activity {
                     @Override
                     public AsyncResult<Void> run(Void... args) {
                         insider.dropDomain(connectionPoint);
-//                        if (insider.dropDomain(device))
-//                            db.remove(device);
+//                        if (insider.dropDomain(domain))
+//                            db.remove(domain);
                         return null;
                     }
                 })
@@ -208,6 +209,21 @@ public class DeviceAppsActivity extends Activity {
                     }
                 })
                 .execute();
+    }
+
+    public void shareDevice() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("message/rfc822");
+        i.putExtra(Intent.EXTRA_SUBJECT, domain.userDomain());
+        String body = "";
+        body += "Host: " + domain.userDomain() + "\n";
+        body += "KEY:\n\n" + domain.device().credentials().key() + "\n";
+        i.putExtra(Intent.EXTRA_TEXT, body);
+        try {
+            startActivity(Intent.createChooser(i, "Send mail..."));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

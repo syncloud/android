@@ -3,54 +3,32 @@ package org.syncloud.ssh.model;
 import java.io.Serializable;
 
 public class Device implements Serializable {
-    private String  userDomain;
+    private Identification id;
     private Endpoint remoteEndpoint;
     private Endpoint localEndpoint;
     private Credentials credentials;
-    private Identification id;
 
-    public Device(Identification id, String userDomain, Endpoint localEndpoint, Endpoint remoteEndpoint, Credentials credentials) {
+    public Device(Identification id, Endpoint localEndpoint, Endpoint remoteEndpoint, Credentials credentials) {
         this.id = id;
-        this.userDomain = userDomain;
         this.localEndpoint = localEndpoint;
         this.remoteEndpoint = remoteEndpoint;
         this.credentials = credentials;
     }
 
-    public String macAddress() { return id.mac_address; }
+    public Endpoint localEndpoint() { return localEndpoint; }
 
-    public String name() { return id.name; }
+    public Endpoint remoteEndpoint() { return remoteEndpoint; }
 
-    public String title() { return id.title; }
+    public Identification id() { return id; }
 
-    public String userDomain() {
-        return userDomain;
-    }
-
-    public Endpoint localEndpoint() {
-        return localEndpoint;
-    }
-
-    public Endpoint remoteEndpoint() {
-        return remoteEndpoint;
-    }
-
-    public Identification id() {
-        return id;
-    }
-
-    public Credentials credentials() {
-        return credentials;
-    }
-
-
+    public Credentials credentials() { return credentials; }
 
     @Override
     public String toString() {
         return "Device{" +
-                "localEndpoint=" + localEndpoint +
+                "id=" + id +
                 ", remoteEndpoint=" + remoteEndpoint +
-                ", userDomain=" + userDomain +
+                ", localEndpoint=" + localEndpoint +
                 '}';
     }
 
@@ -61,13 +39,23 @@ public class Device implements Serializable {
 
         Device device = (Device) o;
 
-        if (macAddress() != null ? !macAddress().equals(device.macAddress()) : device.macAddress() != null) return false;
+        if (credentials != null ? !credentials.equals(device.credentials) : device.credentials != null)
+            return false;
+        if (id != null ? !id.equals(device.id) : device.id != null) return false;
+        if (localEndpoint != null ? !localEndpoint.equals(device.localEndpoint) : device.localEndpoint != null)
+            return false;
+        if (remoteEndpoint != null ? !remoteEndpoint.equals(device.remoteEndpoint) : device.remoteEndpoint != null)
+            return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return macAddress() != null ? macAddress().hashCode() : 0;
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (remoteEndpoint != null ? remoteEndpoint.hashCode() : 0);
+        result = 31 * result + (localEndpoint != null ? localEndpoint.hashCode() : 0);
+        result = 31 * result + (credentials != null ? credentials.hashCode() : 0);
+        return result;
     }
 }

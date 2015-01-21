@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 
 import org.syncloud.ssh.model.ConnectionPoint;
 import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.DomainModel;
 
 public class SelectorConnectionPointProvider implements ConnectionPointProvider {
     public static final String VERIFY_COMMAND = "date";

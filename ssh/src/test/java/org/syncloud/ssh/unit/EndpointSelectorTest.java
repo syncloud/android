@@ -14,14 +14,14 @@ import static org.mockito.Mockito.when;
 public class EndpointSelectorTest {
 
     private final int remotePort = 10000;
-    private final String domain = "syncloud.it";
-    private final String remoteHost = "device." + domain;
+    private final String user_domain = "syncloud.it";
+    private final String remoteHost = "domain." + user_domain;
     private Endpoint remoteEndpoint = new Endpoint(remoteHost, remotePort);
     private Endpoint localEndpoint = new Endpoint("localhost", 0);
     private Credentials credentials = new Credentials("login", "password", "key");
 
     private final String userDomain = "testdomain1.syncloud.info";
-    private final Device device = new Device(null, userDomain, localEndpoint, remoteEndpoint, credentials);
+    private final Device device = new Device(null, localEndpoint, remoteEndpoint, credentials);
 
     @Test
     public void testPreferred() {
@@ -35,7 +35,7 @@ public class EndpointSelectorTest {
 
         when(preference.isRemote()).thenReturn(true);
         assertEquals(remoteEndpoint, selector.select(device, true).get().endpoint());
-        assertEquals(localEndpoint, selector.select(device ,false).get().endpoint());
+        assertEquals(localEndpoint, selector.select(device,false).get().endpoint());
     }
 
 }

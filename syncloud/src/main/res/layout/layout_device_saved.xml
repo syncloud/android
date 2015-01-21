@@ -4,74 +4,38 @@
     android:id="@+id/device_info"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:paddingTop="10dp"
     android:paddingBottom="10dp"
     android:descendantFocusability="blocksDescendants"
     >
 
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/txt_device_title"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Device name"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:padding="2dp"
-            />
-
-        <TextView
-            android:id="@+id/txt_domain_name"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="somedomain.syncloud.it"
-            android:textSize="20sp"
-            android:padding="2dp"
-            />
-
-        <TextView
-            android:id="@+id/txt_mac_address"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="00:00:00:00:00"
-            android:textSize="20sp"
-            android:padding="2dp"
-            />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <TextView
+        android:id="@+id/txt_device_title"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="right|center_vertical"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:text="Device name"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:padding="2dp"
+        />
 
-        <ImageButton
-            android:id="@+id/delete_device_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:background="@drawable/ic_action_remove"
-            android:text="Delete"
-            />
+    <TextView
+        android:id="@+id/txt_domain_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="somedomain.syncloud.it"
+        android:textSize="20sp"
+        android:padding="2dp"
+        />
 
-        <ImageButton
-            android:id="@+id/share_device_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:background="@drawable/ic_action_share"
-            android:text="Share"
-            />
-
-
-    </LinearLayout>
-
+    <TextView
+        android:id="@+id/txt_mac_address"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="00:00:00:00:00"
+        android:textSize="20sp"
+        android:padding="2dp"
+        />
 
 </LinearLayout>

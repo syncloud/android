@@ -4,6 +4,7 @@ import org.syncloud.redirect.model.Domain;
 import org.syncloud.redirect.model.Service;
 import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.DomainModel;
 import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.model.Identification;
 import org.syncloud.ssh.model.Key;
@@ -20,8 +21,8 @@ public class Utils {
         return null;
     }
 
-    public static List<Device> toDevices(List<Domain> domains, List<Key> keys) {
-        List<Device> devices = newArrayList();
+    public static List<DomainModel> toDevices(List<Domain> domains, List<Key> keys) {
+        List<DomainModel> devices = newArrayList();
         for (Domain domain: domains) {
             Key c = find(keys, domain.device_mac_address);
             Service sshService = domain.service("ssh");
@@ -33,7 +34,7 @@ public class Utils {
         return devices;
     }
 
-    private static Device create(Service sshService, Domain domain, Key key) {
+    private static DomainModel create(Service sshService, Domain domain, Key key) {
 
         Endpoint localEndpoint = new Endpoint(domain.local_ip, sshService.local_port);
         Endpoint remoteEndpoint = new Endpoint(domain.ip, sshService.port);
@@ -43,12 +44,9 @@ public class Utils {
             keyValue = key.key;
         Credentials credentials = new Credentials("root", "syncloud", keyValue);
 
-        return new Device(
-                identification,
-                domain.user_domain,
-                localEndpoint,
-                remoteEndpoint,
-                credentials);
+        Device device = new Device(identification, localEndpoint, remoteEndpoint, credentials);
+
+        return new DomainModel(domain.user_domain, device);
     }
 
 }

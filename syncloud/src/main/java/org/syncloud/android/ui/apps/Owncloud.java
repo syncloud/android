@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -23,7 +21,7 @@ import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.owncloud.OwncloudManager;
 import org.syncloud.ssh.ConnectionPointProvider;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.DomainModel;
 
 
 public class Owncloud extends Activity {
@@ -52,8 +50,8 @@ public class Owncloud extends Activity {
         progress = new CommunicationDialog(this);
 
         owncloudManager = new OwncloudManager();
-        Device device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
-        connectionPoint = application.connectionPoint(device);
+        DomainModel domain = (DomainModel) getIntent().getSerializableExtra(SyncloudApplication.DOMAIN);
+        connectionPoint = application.connectionPoint(domain.device());
 
         activatedControls = (LinearLayout) findViewById(R.id.owncloud_activated_controls);
         url = (TextView) findViewById(R.id.owncloud_url);

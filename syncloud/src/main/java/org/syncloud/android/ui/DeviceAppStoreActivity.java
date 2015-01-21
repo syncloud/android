@@ -22,7 +22,7 @@ import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.ssh.ConnectionPointProvider;
 import org.syncloud.ssh.SshRunner;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.DomainModel;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ import static org.syncloud.apps.sam.Commands.upgrade_all;
 public class DeviceAppStoreActivity extends Activity {
 
     private DeviceAppStoreAppsAdapter deviceAppsAdapter;
-    private Device device;
+    private DomainModel domain;
     private boolean connected = false;
     private Sam sam;
     private CommunicationDialog progress;
@@ -61,8 +61,8 @@ public class DeviceAppStoreActivity extends Activity {
 
         ssh = new SshRunner();
 
-        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
-        connectionPoint = application.connectionPoint(device);
+        domain = (DomainModel) getIntent().getSerializableExtra(SyncloudApplication.DOMAIN);
+        connectionPoint = application.connectionPoint(domain.device());
 
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppStoreAppsAdapter(this);

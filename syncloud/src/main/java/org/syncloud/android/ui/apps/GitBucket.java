@@ -8,8 +8,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,7 +19,7 @@ import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.gitbucket.GitBucketManager;
 import org.syncloud.ssh.ConnectionPointProvider;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.DomainModel;
 
 public class GitBucket extends ActionBarActivity {
 
@@ -45,8 +43,8 @@ public class GitBucket extends ActionBarActivity {
         SyncloudApplication application = (SyncloudApplication) getApplication();
 
         progress = new CommunicationDialog(this);
-        Device device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
-        connectionPoint = application.connectionPoint(device);
+        DomainModel domain = (DomainModel) getIntent().getSerializableExtra(SyncloudApplication.DOMAIN);
+        connectionPoint = application.connectionPoint(domain.device());
 
         manager = new GitBucketManager();
 

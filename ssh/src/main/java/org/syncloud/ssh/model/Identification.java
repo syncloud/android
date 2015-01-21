@@ -14,4 +14,10 @@ public class Identification implements Serializable {
         this.title = title;
         this.mac_address = mac_address;
     }
+
+    public String macAddress() { return mac_address; }
+
+    public String name() { return name; }
+
+    public String title() { return title; }
 }

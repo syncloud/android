@@ -20,12 +20,11 @@ import org.syncloud.redirect.RedirectService;
 import org.syncloud.redirect.UserCachedService;
 import org.syncloud.redirect.UserStorage;
 import org.syncloud.ssh.ConnectionPointProvider;
-import org.syncloud.ssh.Dns;
-import org.syncloud.ssh.EndpointResolver;
 import org.syncloud.ssh.EndpointSelector;
 import org.syncloud.ssh.SelectorConnectionPointProvider;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.model.Device;
+import org.syncloud.ssh.model.DomainModel;
 
 import java.io.File;
 import java.util.HashMap;
@@ -49,7 +48,7 @@ import static org.acra.ReportField.*;
 public class SyncloudApplication extends Application {
 
     private String TAG = SyncloudApplication.class.getSimpleName();
-    public static String DEVICE = "device";
+    public static String DOMAIN = "domain";
 
     public static String DEVICE_ENDPOINT = "device_endpoint";
     public static final String DEVICE_ID = "device_id";
