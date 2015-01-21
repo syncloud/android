@@ -29,11 +29,34 @@
         android:paddingBottom="10dp"
         />
 
-    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/app_list"
+    <LinearLayout
+        android:id="@+id/layout_results"
+        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        />
+        android:layout_weight="1"
+        >
+
+        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/list_apps"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/txt_apps_error"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:text="Failed to load apps list"
+            android:visibility="gone"
+            />
+
+    </LinearLayout>
 
 </LinearLayout>

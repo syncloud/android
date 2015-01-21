@@ -48,6 +48,7 @@ public class DeviceAppsActivity extends Activity {
 
     private TextView txtDeviceTitle;
     private TextView txtDomainName;
+    private TextView txtAppsError;
     private ListView listApplications;
 
     private DeviceAppsAdapter deviceAppsAdapter;
@@ -76,7 +77,7 @@ public class DeviceAppsActivity extends Activity {
         txtDeviceTitle.setText(device.title());
         txtDomainName.setText(device.userDomain());
 
-        listApplications = (ListView) findViewById(R.id.app_list);
+        listApplications = (ListView) findViewById(R.id.list_apps);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listApplications.setAdapter(deviceAppsAdapter);
         listApplications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -87,6 +88,8 @@ public class DeviceAppsActivity extends Activity {
                 openApp(appVersions.app.id);
             }
         });
+
+        txtAppsError = (TextView) findViewById(R.id.txt_apps_error);
 
         listApps();
     }
@@ -112,6 +115,7 @@ public class DeviceAppsActivity extends Activity {
         new ProgressAsyncTask<Void, List<AppVersions>>()
                 .setTitle("Refreshing app list")
                 .setProgress(progress)
+                .showError(false)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
                     public AsyncResult<List<AppVersions>> run(Void... args) {
@@ -120,21 +124,36 @@ public class DeviceAppsActivity extends Activity {
                                 "unable to get list of apps");
                     }
                 })
-                .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
+                .onCompleted(new ProgressAsyncTask.Completed<List<AppVersions>>() {
                     @Override
-                    public void run(List<AppVersions> appsVersions) {
-                        onAppsLoaded(appsVersions);
+                    public void run(AsyncResult<List<AppVersions>> result) {
+                        onAppsLoaded(result);
                     }
                 })
                 .execute();
     }
 
-    private void onAppsLoaded(List<AppVersions> appsVersions) {
-        deviceAppsAdapter.clear();
-        for (AppVersions app : appsVersions) {
-            if (app.app.ui && app.installed())
-                deviceAppsAdapter.add(app);
+    private void onAppsLoaded(AsyncResult<List<AppVersions>> result) {
+        if (result.hasError()) {
+            listApplications.setVisibility(View.GONE);
+            txtAppsError.setVisibility(View.VISIBLE);
+            txtAppsError.setText(result.getError());
+        } else {
+            listApplications.setVisibility(View.VISIBLE);
+            txtAppsError.setVisibility(View.GONE);
+            List<AppVersions> appsVersions = result.getValue();
+            deviceAppsAdapter.clear();
+            for (AppVersions app : appsVersions) {
+                if (app.app.ui && app.installed())
+                    deviceAppsAdapter.add(app);
+            }
         }
+    }
+
+    private void onAppsLoadedError(String error) {
+        listApplications.setVisibility(View.GONE);
+        txtAppsError.setVisibility(View.VISIBLE);
+        txtAppsError.setText(error);
     }
 
     @Override
