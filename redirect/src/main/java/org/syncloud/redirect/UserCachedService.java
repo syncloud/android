@@ -30,7 +30,7 @@ public class UserCachedService implements IUserService {
 
     @Override
     public UserResult createUser(String email, String password) {
-        UserResult result = service.getUser(email, password);
+        UserResult result = service.createUser(email, password);
         if (!result.hasError())
             storage.save(result.user());
         return result;
