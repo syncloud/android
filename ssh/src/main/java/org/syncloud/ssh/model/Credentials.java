@@ -8,9 +8,12 @@ public class Credentials implements Serializable {
         return new Credentials("root", "syncloud", null);
     }
 
-    private String login;
-    private String password;
-    private String key;
+    public String login;
+    public String password;
+    public String key;
+
+    //JSON
+    public Credentials() {}
 
     public Credentials(String login, String password, String key) {
         this.login = login;

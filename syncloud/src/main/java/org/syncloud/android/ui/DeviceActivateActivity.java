@@ -21,9 +21,8 @@ import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.insider.InsiderManager;
-import org.syncloud.apps.remote.RemoteAccessManager;
-import org.syncloud.apps.sam.Commands;
 import org.syncloud.apps.sam.Sam;
+import org.syncloud.apps.server.Server;
 import org.syncloud.ssh.ConnectionPointProvider;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.model.ConnectionPoint;
@@ -54,13 +53,14 @@ public class DeviceActivateActivity extends Activity {
 
     private Sam sam;
     private InsiderManager insider;
-    private RemoteAccessManager accessManager;
     private LinearLayout layoutMacAddress;
 
     private SyncloudApplication application;
 
     private Identification identification;
     private ConnectionPointProvider connectionPoint;
+    private SshRunner ssh;
+    private Server server;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,9 +88,10 @@ public class DeviceActivateActivity extends Activity {
 
         preferences = application.getPreferences();
 
-        sam = new Sam(new SshRunner(), preferences);
+        ssh = new SshRunner();
+        sam = new Sam(ssh, preferences);
+        server = new Server(ssh);
         insider = new InsiderManager();
-        accessManager = new RemoteAccessManager(insider);
 
         txtDeviceTitle.setText(this.identification.title);
         txtMacAddress.setText(this.identification.mac_address);
@@ -145,7 +146,7 @@ public class DeviceActivateActivity extends Activity {
                             txtStatusValue.setText("not yet");
                         } else {
                             String domainName = result.getValue();
-                            String fullDomainName = domainName+"."+preferences.getDomain();
+                            String fullDomainName = domainName + "." + preferences.getDomain();
                             txtStatusValue.setText(fullDomainName);
                             editUserDomain.setText(domainName);
                         }
@@ -185,36 +186,23 @@ public class DeviceActivateActivity extends Activity {
     }
 
     private boolean doActivate(final String email, final String pass, final String domain) {
-        logger.info("activate");
+        logger.info("activate " + domain);
 
-        if (!sam.update(connectionPoint).isPresent()) {
-            logger.error("unable to update sam");
-            return false;
-        }
+        Optional<Credentials> credentialsResult = server.activate(
+                connectionPoint,
+                preferences.getVersion(),
+                preferences.getDomain(),
+                preferences.getApiUrl(),
+                email,
+                pass,
+                domain);
 
-        if (!sam.run(connectionPoint, Commands.upgrade_all)) {
-            logger.error("unable to upgrade apps");
-            return false;
-        }
-        if (!insider.setRedirectInfo(connectionPoint, preferences.getDomain(), preferences.getApiUrl())) {
-            logger.error("unable to set redirect info");
-            return false;
-        }
-
-        if (!insider.acquireDomain(connectionPoint, email, pass, domain)) {
-            logger.error("unable to acquire domain");
-            return false;
-        }
-
-        Optional<Credentials> credentialsResult = accessManager.enable(connectionPoint, preferences.getDomain());
         if (!credentialsResult.isPresent()) {
             logger.error("unable to enable remote access");
             return false;
         }
 
-        Credentials credentials = credentialsResult.get();
-
-        Key key = new Key(identification.mac_address, credentials.key());
+        Key key = new Key(identification.mac_address, credentialsResult.get().key());
         KeysStorage keysStorage = this.application.keysStorage();
         keysStorage.upsert(key);
 

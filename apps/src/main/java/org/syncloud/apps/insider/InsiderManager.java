@@ -39,14 +39,6 @@ public class InsiderManager {
         return Optional.absent();
     }
 
-    public boolean acquireDomain(ConnectionPointProvider connectionPoint, String email, String pass, String domain) {
-        return ssh.run(connectionPoint, format("%s acquire_domain %s %s %s", INSIDER_BIN, email, pass, domain)).isPresent();
-    }
-
-    public boolean setRedirectInfo(ConnectionPointProvider connectionPoint, String domain, String apiUl) {
-        return ssh.run(connectionPoint, format("%s set_redirect_info %s %s", INSIDER_BIN, domain, apiUl)).isPresent();
-    }
-
     public boolean dropDomain(ConnectionPointProvider connectionPoint) {
         Optional<String> execute = ssh.run(connectionPoint, format("%s drop_domain", INSIDER_BIN));
         if (!execute.isPresent())
