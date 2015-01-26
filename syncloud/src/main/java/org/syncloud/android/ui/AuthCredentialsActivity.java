@@ -25,9 +25,9 @@ import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.redirect.IUserService;
+import org.syncloud.redirect.RedirectError;
 import org.syncloud.redirect.UserResult;
 import org.syncloud.redirect.model.ParameterMessages;
-import org.syncloud.redirect.model.RestError;
 
 import java.util.regex.Pattern;
 
@@ -60,7 +60,7 @@ public class AuthCredentialsActivity extends Activity {
 
         SyncloudApplication application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
-        userService = application.userService();
+        userService = application.userServiceCached();
 
         emailLoginFormView = (LinearLayout) findViewById(R.id.email_login_form);
 
@@ -226,9 +226,9 @@ public class AuthCredentialsActivity extends Activity {
                 .show();
     }
 
-    private void showError(RestError error) {
+    private void showError(RedirectError error) {
         if (error.parameters_messages == null) {
-            showErrorDialog(error.message);
+            showErrorDialog(error.getMessage());
         } else {
             for (ParameterMessages pm: error.parameters_messages) {
                 EditText control = getControl(pm.parameter);

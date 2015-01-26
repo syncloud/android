@@ -84,10 +84,15 @@ public class SyncloudApplication extends Application {
 
     public KeysStorage keysStorage() { return keysStorage; }
 
-    public IUserService userService() {
+    public IUserService userServiceCached() {
         RedirectService redirectService = new RedirectService(preferences.getApiUrl());
         UserCachedService userService = new UserCachedService(redirectService, userStorage);
         return userService;
+    }
+
+    public RedirectService redirectService() {
+        RedirectService redirectService = new RedirectService(preferences.getApiUrl());
+        return redirectService;
     }
 
     public Preferences getPreferences() {

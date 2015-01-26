@@ -5,24 +5,23 @@ import org.syncloud.redirect.model.RestError;
 
 import java.util.List;
 
-public class Error extends RestError {
+public class RedirectError extends RuntimeException {
     public boolean expected;
-    public String message;
     public List<ParameterMessages> parameters_messages;
     public Throwable throwable;
 
-    public Error(String message) {
-        this.message = message;
+    public RedirectError(String message) {
+        super(message);
     }
 
-    public Error(String message, Throwable throwable) {
-        this.message = message;
+    public RedirectError(String message, Throwable throwable) {
+        super(message, throwable);
         this.throwable = throwable;
     }
 
-    public Error(boolean expected, RestError error) {
+    public RedirectError(boolean expected, RestError error) {
+        super(error.message);
         this.expected = expected;
-        this.message = error.message;
         this.parameters_messages = error.parameters_messages;
     }
 }

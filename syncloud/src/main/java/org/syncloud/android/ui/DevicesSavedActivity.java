@@ -113,7 +113,7 @@ public class DevicesSavedActivity extends Activity {
 
         public CheckCredentialsTask(SyncloudApplication application, Preferences preferences) {
             this.preferences = preferences;
-            this.userService = application.userService();
+            this.userService = application.userServiceCached();
         }
 
         @Override

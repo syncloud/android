@@ -25,6 +25,7 @@ import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Sam;
+import org.syncloud.redirect.RedirectService;
 import org.syncloud.ssh.ConnectionPointProvider;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.model.DomainModel;
@@ -46,6 +47,7 @@ public class DeviceAppsActivity extends Activity {
     private Preferences preferences;
     private SshRunner ssh;
     private ConnectionPointProvider connectionPoint;
+    private RedirectService redirectService;
 
     private TextView txtDeviceTitle;
     private TextView txtDomainName;
@@ -72,6 +74,7 @@ public class DeviceAppsActivity extends Activity {
 
         domain = (DomainModel) getIntent().getSerializableExtra(SyncloudApplication.DOMAIN);
         connectionPoint = application.connectionPoint(domain.device());
+        redirectService = application.redirectService();
 
         progress = new CommunicationDialog(this);
 
@@ -190,21 +193,21 @@ public class DeviceAppsActivity extends Activity {
     }
 
     public void deactivate() {
-        new ProgressAsyncTask<Void, Void>() {}
-                .setTitle("Deactivating device")
+        new ProgressAsyncTask<Void, String>() {}
+                .setTitle("Dropping device")
                 .setProgress(progress)
-                .doWork(new ProgressAsyncTask.Work<Void, Void>() {
+                .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public AsyncResult<Void> run(Void... args) {
-                        insider.dropDomain(connectionPoint);
-//                        if (insider.dropDomain(domain))
-//                            db.remove(domain);
-                        return null;
+                    public AsyncResult<String> run(Void... args) {
+                        String email = preferences.getEmail();
+                        String password = preferences.getPassword();
+                        redirectService.dropDevice(email, password, domain.userDomain());
+                        return AsyncResult.value("Success");
                     }
                 })
-                .onSuccess(new ProgressAsyncTask.Success<Void>() {
+                .onSuccess(new ProgressAsyncTask.Success<String>() {
                     @Override
-                    public void run(Void result) {
+                    public void run(String result) {
                         finish();
                     }
                 })

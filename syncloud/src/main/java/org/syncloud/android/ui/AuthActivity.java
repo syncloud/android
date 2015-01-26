@@ -34,7 +34,7 @@ public class AuthActivity extends Activity {
 
         SyncloudApplication application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
-        userService = application.userService();
+        userService = application.userServiceCached();
 
         progressBar = (ProgressBar) findViewById(R.id.progress_check_user);
         signInOrOut = (LinearLayout) findViewById(R.id.sign_in_or_up);

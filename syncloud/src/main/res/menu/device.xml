@@ -20,7 +20,7 @@
         />
 
     <item android:id="@+id/action_deactivate"
-          android:title="Deactivate device"
+          android:title="Drop device"
           android:orderInCategory="100"
           app:showAsAction="never" />
 </menu>

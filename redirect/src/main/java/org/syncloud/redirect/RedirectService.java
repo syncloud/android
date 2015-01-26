@@ -1,6 +1,7 @@
 package org.syncloud.redirect;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -10,6 +11,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.syncloud.redirect.model.RestError;
 import org.syncloud.redirect.model.RestUser;
 
 import java.io.BufferedReader;
@@ -68,6 +70,35 @@ public class RedirectService implements IUserService {
             return new UserResult(statusCode, restUser);
         } catch (Exception e) {
             return error("Failed to create user", e);
+        }
+    }
+
+    public void dropDevice(String email, String password, String user_domain) {
+        CloseableHttpClient http = HttpClients.createDefault();
+        HttpPost post = new HttpPost(apiUrl + "/domain/drop_device");
+
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("email", email));
+        nvps.add(new BasicNameValuePair("password", password));
+        nvps.add(new BasicNameValuePair("user_domain", user_domain));
+        try {
+            post.setEntity(new UrlEncodedFormEntity(nvps));
+            CloseableHttpResponse response = http.execute(post);
+            InputStream jsonResponse = response.getEntity().getContent();
+            String textJsonResponse = readText(jsonResponse);
+            int statusCode = response.getStatusLine().getStatusCode();
+            response.close();
+            RestError restResponse = mapper.readValue(textJsonResponse, RestError.class);
+            checkError(statusCode, restResponse);
+        } catch (Exception e) {
+            throw new RedirectError("Drop device failed", e);
+        }
+    }
+
+    private void checkError(int statusCode, RestError rest) {
+        if (statusCode != 200) {
+            boolean expected = statusCode == 400 && statusCode == 403;
+            throw new RedirectError(expected, rest);
         }
     }
 
