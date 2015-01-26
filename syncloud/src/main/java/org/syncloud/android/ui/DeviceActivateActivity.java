@@ -67,9 +67,9 @@ public class DeviceActivateActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_activate);
 
-        txtDeviceTitle = (TextView) findViewById(R.id.txt_device_title);
+        txtDeviceTitle = (TextView) findViewById(R.id.txt_bold_title);
         txtStatusValue = (TextView) findViewById(R.id.txt_status_value);
-        txtMacAddress = (TextView) findViewById(R.id.txt_mac_address);
+        txtMacAddress = (TextView) findViewById(R.id.txt_second_line);
         layoutMacAddress = (LinearLayout) findViewById(R.id.layout_activate_mac_address);
 
         btnActivate = (Button) findViewById(R.id.btn_activate);

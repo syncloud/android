@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
@@ -22,7 +21,6 @@ import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
-import org.syncloud.apps.insider.InsiderManager;
 import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Sam;
 import org.syncloud.redirect.RedirectService;
@@ -37,13 +35,10 @@ import static org.syncloud.android.SyncloudApplication.appRegistry;
 
 public class DeviceAppsActivity extends Activity {
 
-    private static Logger logger = Logger.getLogger(DeviceAppsActivity.class);
-
     private SyncloudApplication application;
     private DomainModel domain;
     private Sam sam;
     private CommunicationDialog progress;
-    private InsiderManager insider;
     private Preferences preferences;
     private SshRunner ssh;
     private ConnectionPointProvider connectionPoint;
@@ -61,8 +56,8 @@ public class DeviceAppsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_apps);
 
-        txtDeviceTitle = (TextView) findViewById(R.id.txt_device_title);
-        txtDomainName = (TextView) findViewById(R.id.txt_domain_name);
+        txtDeviceTitle = (TextView) findViewById(R.id.txt_bold_title);
+        txtDomainName = (TextView) findViewById(R.id.txt_first_line);
 
         application = (SyncloudApplication) getApplication();
 
@@ -70,7 +65,6 @@ public class DeviceAppsActivity extends Activity {
 
         ssh = new SshRunner();
         sam = new Sam(new SshRunner(), preferences);
-        insider = new InsiderManager();
 
         domain = (DomainModel) getIntent().getSerializableExtra(SyncloudApplication.DOMAIN);
         connectionPoint = application.connectionPoint(domain.device());

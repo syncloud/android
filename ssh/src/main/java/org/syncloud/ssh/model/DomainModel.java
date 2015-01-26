@@ -22,6 +22,14 @@ public class DomainModel implements Serializable {
         return "DomainModel{" + "userDomain='" + userDomain + '\'' + ", device=" + device + '}';
     }
 
+    public boolean hasDevice() {
+        return device != null;
+    }
+
+    public boolean hasKey() {
+        return device != null && device.credentials().key() != null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

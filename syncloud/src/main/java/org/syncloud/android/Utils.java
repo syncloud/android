@@ -25,28 +25,35 @@ public class Utils {
         List<DomainModel> devices = newArrayList();
         for (Domain domain: domains) {
             Key c = find(keys, domain.device_mac_address);
-            Service sshService = domain.service("ssh");
-            //TODO: We actually need to show these devices
-            if (sshService != null) {
-                devices.add(create(sshService, domain, c));
-            }
+            devices.add(create(domain, c));
         }
         return devices;
     }
 
-    private static DomainModel create(Service sshService, Domain domain, Key key) {
+    private static DomainModel create(Domain domain, Key key) {
+        Device device = null;
 
-        Endpoint localEndpoint = new Endpoint(domain.local_ip, sshService.local_port);
-        Endpoint remoteEndpoint = new Endpoint(domain.ip, sshService.port);
-        Identification identification = new Identification(domain.device_mac_address, domain.device_name, domain.device_title);
-        String keyValue = null;
-        if (key != null)
-            keyValue = key.key;
-        Credentials credentials = new Credentials("root", "syncloud", keyValue);
+        Service sshService = domain.service("ssh");
+        Identification id = deviceId(domain);
 
-        Device device = new Device(identification, localEndpoint, remoteEndpoint, credentials);
+        if (domain.local_ip != null && domain.ip != null && id != null && sshService != null) {
+            Endpoint localEndpoint = new Endpoint(domain.local_ip, sshService.local_port);
+            Endpoint remoteEndpoint = new Endpoint(domain.ip, sshService.port);
+            String keyValue = null;
+            if (key != null)
+                keyValue = key.key;
+            Credentials credentials = new Credentials("root", "syncloud", keyValue);
+
+            device = new Device(id, localEndpoint, remoteEndpoint, credentials);
+        }
 
         return new DomainModel(domain.user_domain, device);
+    }
+
+    private static Identification deviceId(Domain domain) {
+        if (domain.device_mac_address != null && domain.device_name != null && domain.device_title != null)
+            return new Identification(domain.device_mac_address, domain.device_name, domain.device_title);
+        return null;
     }
 
 }

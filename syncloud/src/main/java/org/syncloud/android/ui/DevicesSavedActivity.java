@@ -23,7 +23,10 @@ import org.syncloud.redirect.model.User;
 import org.syncloud.ssh.model.DomainModel;
 import org.syncloud.ssh.model.Key;
 
+import java.util.Comparator;
 import java.util.List;
+
+import static java.util.Collections.sort;
 
 public class DevicesSavedActivity extends Activity {
 
@@ -46,8 +49,9 @@ public class DevicesSavedActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Object obj = listview.getItemAtPosition(position);
-                DomainModel device = (DomainModel)obj;
-                open(device);
+                DomainModel domain = (DomainModel)obj;
+                if (domain.hasDevice())
+                    open(domain);
             }
         });
 
@@ -68,11 +72,24 @@ public class DevicesSavedActivity extends Activity {
 
     private void updateUser(User user) {
         List<Key> keys = keysStorage.list();
-        List<DomainModel> devices = Utils.toDevices(user.domains, keys);
+        List<DomainModel> domains = Utils.toDevices(user.domains, keys);
+
+        Comparator<DomainModel> noDevicesLast = new Comparator<DomainModel>() {
+            @Override
+            public int compare(DomainModel first, DomainModel second) {
+                if (!second.hasDevice() && first.hasDevice())
+                    return -1;
+                if (second.hasDevice() && !first.hasDevice())
+                    return 1;
+                return 0;
+            }
+        };
+
+        sort(domains, noDevicesLast);
 
         adapter.clear();
-        for (DomainModel device : devices)
-            adapter.add(device);
+        for (DomainModel domain : domains)
+            adapter.add(domain);
     }
 
 

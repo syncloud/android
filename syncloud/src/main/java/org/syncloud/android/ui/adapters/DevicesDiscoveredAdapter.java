@@ -30,7 +30,7 @@ public class DevicesDiscoveredAdapter extends ArrayAdapter<IdentifiedEndpoint> {
 
         TextView txtMain = (TextView) rowView.findViewById(R.id.txt_main_name);
         TextView txtHost = (TextView) rowView.findViewById(R.id.txt_host);
-        TextView txtMacAddress = (TextView) rowView.findViewById(R.id.txt_mac_address);
+        TextView txtMacAddress = (TextView) rowView.findViewById(R.id.txt_second_line);
 
         LinearLayout layoutHost = (LinearLayout) rowView.findViewById(R.id.layout_host);
         LinearLayout layoutMacAddress = (LinearLayout) rowView.findViewById(R.id.layout_mac_address);
