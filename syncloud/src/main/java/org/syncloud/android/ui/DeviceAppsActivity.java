@@ -14,26 +14,39 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.common.base.Optional;
+
+import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.sam.AppVersions;
 import org.syncloud.apps.sam.Sam;
+import org.syncloud.apps.server.Server;
 import org.syncloud.redirect.RedirectService;
 import org.syncloud.ssh.ConnectionPointProvider;
 import org.syncloud.ssh.SshRunner;
+import org.syncloud.ssh.model.ConnectionPoint;
+import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.DomainModel;
+import org.syncloud.ssh.model.Endpoint;
+import org.syncloud.ssh.model.Key;
 
 import java.util.List;
 
 import static android.os.AsyncTask.execute;
 import static org.syncloud.android.SyncloudApplication.appRegistry;
+import static org.syncloud.ssh.SimpleConnectionPointProvider.simple;
+import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 public class DeviceAppsActivity extends Activity {
+
+    private static Logger logger = Logger.getLogger(DeviceActivateActivity.class);
 
     private SyncloudApplication application;
     private DomainModel domain;
@@ -43,6 +56,8 @@ public class DeviceAppsActivity extends Activity {
     private SshRunner ssh;
     private ConnectionPointProvider connectionPoint;
     private RedirectService redirectService;
+    private Server server;
+
 
     private TextView txtDeviceTitle;
     private TextView txtDomainName;
@@ -69,6 +84,8 @@ public class DeviceAppsActivity extends Activity {
         domain = (DomainModel) getIntent().getSerializableExtra(SyncloudApplication.DOMAIN);
         connectionPoint = application.connectionPoint(domain.device());
         redirectService = application.redirectService();
+
+        server = new Server(ssh);
 
         progress = new CommunicationDialog(this);
 
@@ -169,6 +186,8 @@ public class DeviceAppsActivity extends Activity {
             reboot();
         } else if (id == R.id.action_deactivate) {
             deactivate();
+        } else if (id == R.id.action_get_access) {
+            getAccess();
         } else if (id == R.id.action_manage_apps) {
             Intent intent = new Intent(this, DeviceAppStoreActivity.class);
             intent.putExtra(SyncloudApplication.DOMAIN, domain);
@@ -203,6 +222,34 @@ public class DeviceAppsActivity extends Activity {
                     @Override
                     public void run(String result) {
                         finish();
+                    }
+                })
+                .execute();
+    }
+
+    private void onGetAccess(Credentials result) {
+        Key key = new Key(domain.device().id().mac_address, result.key());
+        KeysStorage keysStorage = this.application.keysStorage();
+        keysStorage.upsert(key);
+    }
+
+    public void getAccess() {
+        new ProgressAsyncTask<Void, Credentials>() {}
+                .setTitle("Getting access")
+                .setProgress(progress)
+                .doWork(new ProgressAsyncTask.Work<Void, Credentials>() {
+                    @Override
+                    public AsyncResult<Credentials> run(Void... args) {
+                        Endpoint endpoint = new Endpoint(domain.device().localEndpoint().host(), SshRunner.SSH_SERVER_PORT);
+                        ConnectionPoint localConnectionPoint = new ConnectionPoint(endpoint, getStandardCredentials());
+                        Optional<Credentials> credentialsResult = server.get_access(simple(localConnectionPoint));
+                        return AsyncResult.value(credentialsResult.get());
+                    }
+                })
+                .onSuccess(new ProgressAsyncTask.Success<Credentials>() {
+                    @Override
+                    public void run(Credentials result) {
+                        onGetAccess(result);
                     }
                 })
                 .execute();

@@ -23,4 +23,10 @@
           android:title="Drop device"
           android:orderInCategory="100"
           app:showAsAction="never" />
+
+    <item android:id="@+id/action_get_access"
+        android:title="Get Access"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
 </menu>

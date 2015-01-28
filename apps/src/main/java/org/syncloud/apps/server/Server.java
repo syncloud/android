@@ -55,4 +55,24 @@ public class Server {
 
         return Optional.absent();
     }
+
+    public Optional<Credentials> get_access(ConnectionPointProvider connectionPoint) {
+
+        logger.info("getting access");
+
+        Optional<String> run = ssh.run(connectionPoint, "syncloud-cli get_access");
+
+        if (run.isPresent()) {
+            try {
+                SshResult<Credentials> reference = JSON.readValue(run.get(), new TypeReference<SshResult<Credentials>>() {});
+                return Optional.of(reference.data);
+            } catch (IOException e) {
+                logger.error("unable to parse execute response", e);
+            }
+        } else {
+            logger.error("unable to execute command");
+        }
+
+        return Optional.absent();
+    }
 }

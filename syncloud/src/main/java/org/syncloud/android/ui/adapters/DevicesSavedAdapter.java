@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.syncloud.android.Preferences;
@@ -34,6 +35,7 @@ public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
         TextView txtBoldTitle = (TextView) rowView.findViewById(R.id.txt_bold_title);
         TextView txtFirstLine = (TextView) rowView.findViewById(R.id.txt_first_line);
         TextView txtSecondLine = (TextView) rowView.findViewById(R.id.txt_second_line);
+        ImageView imgKey = (ImageView) rowView.findViewById(R.id.img_key);
 
         final DomainModel domain = getItem(position);
 
@@ -44,6 +46,8 @@ public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
 
         txtFirstLine.setVisibility(domain.hasDevice() ? View.VISIBLE : View.INVISIBLE);
         txtSecondLine.setVisibility(domain.hasDevice() ? View.VISIBLE : View.INVISIBLE);
+        imgKey.setVisibility(domain.hasDevice() ? View.VISIBLE : View.INVISIBLE);
+
 
         if (domain.hasDevice()) {
             txtFirstLine.setText(domain.device().id().title());
@@ -52,6 +56,11 @@ public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
 
         if (!preferences.isDebug())
             txtSecondLine.setVisibility(View.GONE);
+
+        if (domain.hasKey())
+            imgKey.setImageResource(R.drawable.ic_action_accounts);
+        else
+            imgKey.setImageResource(R.drawable.ic_action_secure);
 
         return rowView;
     }
