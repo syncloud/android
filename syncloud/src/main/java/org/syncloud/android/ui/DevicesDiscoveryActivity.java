@@ -3,6 +3,7 @@ package org.syncloud.android.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -27,6 +28,7 @@ import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.discovery.DiscoveryManager;
+import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.ssh.SshRunner;
@@ -53,9 +55,6 @@ public class DevicesDiscoveryActivity extends Activity {
     private ProgressBar progressBar;
     private DevicesDiscoveredAdapter listAdapter;
 
-    private LinearLayout layoutResults;
-    private LinearLayout layoutNoWifi;
-
     private ListView resultsList;
 
     private Map<Endpoint, IdentifiedEndpoint> map;
@@ -71,8 +70,6 @@ public class DevicesDiscoveryActivity extends Activity {
         tools = new Tools(new SshRunner());
         setContentView(R.layout.activity_devices_discovery);
 
-        layoutResults = (LinearLayout) findViewById(R.id.layout_results);
-        layoutNoWifi = (LinearLayout) findViewById(R.id.layout_no_wifi);
         resultsList = (ListView) findViewById(R.id.devices_discovered);
         progressBar = (ProgressBar) findViewById(R.id.discovery_progress);
         refreshBtn = (Button) findViewById(R.id.discovery_refresh_btn);
@@ -94,7 +91,7 @@ public class DevicesDiscoveryActivity extends Activity {
                 (WifiManager) getSystemService(Context.WIFI_SERVICE),
                 (NsdManager) getSystemService(Context.NSD_SERVICE));
 
-        discoveryStart();
+        checkWiFiAndDiscover();
     }
 
     private boolean isWifiConnected() {
@@ -104,28 +101,53 @@ public class DevicesDiscoveryActivity extends Activity {
         return mWifi.isConnected();
     }
 
-    private void discoveryStart() {
+    private void noWiFiConnection() {
+        Context context = this;
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        alertDialogBuilder.setTitle("Wi-Fi Connection");
+        alertDialogBuilder
+                .setMessage("You are not connected to Wi-Fi network. Discovery is possible only in the same Wi-Fi network where you have Syncloud device connected.")
+                .setCancelable(false)
+                .setPositiveButton("Wi-Fi Settings", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        openWiFiSettings();
+                        finish();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        finish();
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.show();
+    }
+
+    public void openWiFiSettings() {
+        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+        startActivityForResult(intent, 0);
+    }
+
+    private void checkWiFiAndDiscover() {
         listAdapter.clear();
         if (isWifiConnected()) {
             new DiscoveryTask().execute(preferences.getDiscoveryLibrary());
         } else {
-            layoutResults.setVisibility(View.GONE);
-            layoutNoWifi.setVisibility(View.VISIBLE);
+            noWiFiConnection();
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.discovery, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             startActivityForResult(new Intent(this, SettingsActivity.class), 1);
@@ -150,11 +172,6 @@ public class DevicesDiscoveryActivity extends Activity {
         }
     }
 
-    public void openWiFiSettings(View view) {
-        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
-        startActivityForResult(intent, 0);
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -163,7 +180,7 @@ public class DevicesDiscoveryActivity extends Activity {
     }
 
     public void refresh(View view) {
-        discoveryStart();
+        checkWiFiAndDiscover();
     }
 
     public class DiscoveryTask extends AsyncTask<String, Progress, Void> {
@@ -191,8 +208,6 @@ public class DevicesDiscoveryActivity extends Activity {
         @Override
         protected void onPreExecute() {
             refreshBtn.setEnabled(false);
-            layoutResults.setVisibility(View.VISIBLE);
-            layoutNoWifi.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
             //use for testing without wi-fi
             //listAdapter.add(new DirectEndpoint("localhost", 22, "vsapronov", "somepassword", null));

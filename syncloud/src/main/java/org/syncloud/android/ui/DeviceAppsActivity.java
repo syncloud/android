@@ -2,9 +2,13 @@ package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -227,6 +231,37 @@ public class DeviceAppsActivity extends Activity {
                 .execute();
     }
 
+    private boolean isWifiConnected() {
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+        return mWifi.isConnected();
+    }
+
+    private void noWiFiConnection() {
+        Context context = this;
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        alertDialogBuilder.setTitle("Wi-Fi Connection");
+        alertDialogBuilder
+                .setMessage("You are not connected to Wi-Fi network. Getting access is possible only in the same Wi-Fi network where you have Syncloud device connected.")
+                .setCancelable(false)
+                .setPositiveButton("Wi-Fi Settings", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        openWiFiSettings();
+                    }
+                })
+                .setNegativeButton("Cancel", null);
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.show();
+    }
+
+    public void openWiFiSettings() {
+        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+        startActivityForResult(intent, 0);
+    }
     private void onGetAccess(Credentials result) {
         Key key = new Key(domain.device().id().mac_address, result.key());
         KeysStorage keysStorage = this.application.keysStorage();
@@ -234,25 +269,30 @@ public class DeviceAppsActivity extends Activity {
     }
 
     public void getAccess() {
-        new ProgressAsyncTask<Void, Credentials>() {}
-                .setTitle("Getting access")
-                .setProgress(progress)
-                .doWork(new ProgressAsyncTask.Work<Void, Credentials>() {
-                    @Override
-                    public AsyncResult<Credentials> run(Void... args) {
-                        Endpoint endpoint = new Endpoint(domain.device().localEndpoint().host(), SshRunner.SSH_SERVER_PORT);
-                        ConnectionPoint localConnectionPoint = new ConnectionPoint(endpoint, getStandardCredentials());
-                        Optional<Credentials> credentialsResult = server.get_access(simple(localConnectionPoint));
-                        return AsyncResult.value(credentialsResult.get());
-                    }
-                })
-                .onSuccess(new ProgressAsyncTask.Success<Credentials>() {
-                    @Override
-                    public void run(Credentials result) {
-                        onGetAccess(result);
-                    }
-                })
-                .execute();
+        if (isWifiConnected()) {
+            new ProgressAsyncTask<Void, Credentials>() {
+            }
+                    .setTitle("Getting access")
+                    .setProgress(progress)
+                    .doWork(new ProgressAsyncTask.Work<Void, Credentials>() {
+                        @Override
+                        public AsyncResult<Credentials> run(Void... args) {
+                            Endpoint endpoint = new Endpoint(domain.device().localEndpoint().host(), SshRunner.SSH_SERVER_PORT);
+                            ConnectionPoint localConnectionPoint = new ConnectionPoint(endpoint, getStandardCredentials());
+                            Optional<Credentials> credentialsResult = server.get_access(simple(localConnectionPoint));
+                            return AsyncResult.value(credentialsResult.get());
+                        }
+                    })
+                    .onSuccess(new ProgressAsyncTask.Success<Credentials>() {
+                        @Override
+                        public void run(Credentials result) {
+                            onGetAccess(result);
+                        }
+                    })
+                    .execute();
+        } else {
+            noWiFiConnection();
+        }
     }
 
     public void shareDevice() {
