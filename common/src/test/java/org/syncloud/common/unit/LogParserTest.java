@@ -1,9 +1,10 @@
-package org.syncloud.common;
+package org.syncloud.common.unit;
 
 import com.google.common.base.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.syncloud.common.LogParser;
 import org.syncloud.common.model.LogEvent;
 
 public class LogParserTest {

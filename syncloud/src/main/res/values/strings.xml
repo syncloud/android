@@ -57,5 +57,6 @@
     <string name="revoot_device">Reboot device</string>
     <string name="title_activity_logs">Logs</string>
     <string name="title_activity_git_bucket">GitBucket</string>
+    <string name="title_activity_environment_check">EnvironmentCheckActivity</string>
 
 </resources>

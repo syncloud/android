@@ -36,6 +36,16 @@
     </LinearLayout>
 
 
+    <Button android:id="@+id/check_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="check"
+        android:layout_weight="0"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="Check"
+        />
+
     <Button android:id="@+id/discovery_btn"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

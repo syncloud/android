@@ -99,6 +99,10 @@
             android:name=".ui.apps.GitBucket"
             android:label="@string/title_activity_git_bucket" >
         </activity>
+        <activity
+            android:name=".ui.EnvironmentCheckActivity"
+            android:label="@string/title_activity_environment_check" >
+        </activity>
     </application>
 
 </manifest>
