@@ -192,6 +192,8 @@ public class DeviceAppsActivity extends Activity {
             deactivate();
         } else if (id == R.id.action_get_access) {
             getAccess();
+        } else if (id == R.id.action_give_access) {
+            shareDevice();
         } else if (id == R.id.action_manage_apps) {
             Intent intent = new Intent(this, DeviceAppStoreActivity.class);
             intent.putExtra(SyncloudApplication.DOMAIN, domain);

@@ -38,7 +38,7 @@ public class Sam {
             try {
                 return Optional.of(JSON.<SshResult<TContent>>readValue(execute.get(), type).data);
             } catch (IOException e) {
-                logger.error("unable to parse command response");
+                logger.error("unable to parse command response", e);
                 return Optional.absent();
             }
         }
