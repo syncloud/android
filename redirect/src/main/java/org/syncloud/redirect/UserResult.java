@@ -20,7 +20,7 @@ public class UserResult {
         if (statusCode == 200)
             user = Optional.of(restUser.data);
         else {
-            boolean expected = statusCode == 400 && statusCode == 403;
+            boolean expected = statusCode == 400 || statusCode == 403;
             error = Optional.of(new RedirectError(expected, restUser));
         }
     }
@@ -40,7 +40,7 @@ public class UserResult {
     }
 
     public static UserResult error(String message, Throwable throwable) {
-        return new UserResult(new RedirectError(message));
+        return new UserResult(new RedirectError(message, throwable));
     }
 
     public static UserResult value(User user) {

@@ -11,6 +11,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.syncloud.redirect.model.RestError;
 import org.syncloud.redirect.model.RestUser;
 
@@ -25,6 +27,8 @@ import static org.syncloud.common.Jackson.createObjectMapper;
 import static org.syncloud.redirect.UserResult.error;
 
 public class RedirectService implements IUserService {
+
+    private static Logger logger = Logger.getLogger(RedirectService.class);
 
     private String apiUrl;
 
@@ -61,11 +65,14 @@ public class RedirectService implements IUserService {
         nvps.add(new BasicNameValuePair("password", password));
         try {
             post.setEntity(new UrlEncodedFormEntity(nvps));
+            logger.info("calling: " + post.getURI());
+            logger.info("entity: " + EntityUtils.toString(post.getEntity()));
             CloseableHttpResponse response = http.execute(post);
             InputStream jsonResponse = response.getEntity().getContent();
             String textJsonResponse = readText(jsonResponse);
             int statusCode = response.getStatusLine().getStatusCode();
             response.close();
+            logger.debug(textJsonResponse);
             RestUser restUser = mapper.readValue(textJsonResponse, RestUser.class);
             return new UserResult(statusCode, restUser);
         } catch (Exception e) {

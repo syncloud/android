@@ -14,6 +14,7 @@ import org.syncloud.ssh.model.Endpoint;
 
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.regex.Matcher;
 
 public class SshRunner {
     public static final int SSH_SERVER_PORT = 22;
@@ -24,11 +25,16 @@ public class SshRunner {
         return run(connectionPoint.get(), command);
     }
 
+    public static String shellEncoded(String command) {
+        return command.replaceAll("\\$", Matcher.quoteReplacement("\\$"));
+    }
+
     public Optional<String> run(ConnectionPoint connectionPoint, String command) {
         Endpoint endpoint = connectionPoint.endpoint();
         Credentials credentials = connectionPoint.credentials();
 
-        logger.info("executing: " + command);
+        String escapedCommand = shellEncoded(command);
+        logger.info("executing: " + escapedCommand);
         JSch jsch = new JSch();
 
         try {
@@ -70,7 +76,7 @@ public class SshRunner {
                     }
                 });
 
-                channel.setCommand(command);
+                channel.setCommand(escapedCommand);
                 InputStream inputStream = channel.getInputStream();
 
                 try {

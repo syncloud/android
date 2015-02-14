@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
@@ -34,6 +35,8 @@ import java.util.regex.Pattern;
 import static org.apache.commons.lang3.StringUtils.join;
 
 public class AuthCredentialsActivity extends Activity {
+
+    private static Logger logger = Logger.getLogger(AuthCredentialsActivity.class);
 
     public static final String PARAM_PURPOSE = "paramPurpose";
     public static final String PARAM_CHECK_EXISTING = "paramCheckExisting";
@@ -271,8 +274,12 @@ public class AuthCredentialsActivity extends Activity {
             } else {
                 result = userService.getUser(email, password);
             }
-            if (!result.hasError())
+            if (!result.hasError()) {
                 preferences.setCredentials(email, password);
+            } else {
+                RedirectError error = result.error();
+                logger.error(error.getMessage(), error);
+            }
             return result;
         }
 
