@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -29,7 +30,7 @@ import java.util.List;
 import static android.os.AsyncTask.execute;
 import static org.syncloud.apps.sam.Commands.upgrade_all;
 
-public class DeviceAppStoreActivity extends Activity {
+public class DeviceAppStoreActivity extends ActionBarActivity {
 
     private DeviceAppStoreAppsAdapter deviceAppsAdapter;
     private DomainModel domain;

@@ -38,9 +38,15 @@ android {
 
     buildTypes {
         release {
+//            minifyEnabled true
+//            proguardFile 'proguard-android.txt'
             debuggable false
             signingConfig signingConfigs.release
         }
+//        debug {
+//            minifyEnabled true
+//            proguardFile 'proguard-android.txt'
+//        }
     }
 
     packagingOptions {

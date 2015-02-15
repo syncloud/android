@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.KeyEvent;
@@ -34,7 +35,7 @@ import java.util.regex.Pattern;
 
 import static org.apache.commons.lang3.StringUtils.join;
 
-public class AuthCredentialsActivity extends Activity {
+public class AuthCredentialsActivity extends ActionBarActivity {
 
     private static Logger logger = Logger.getLogger(AuthCredentialsActivity.class);
 

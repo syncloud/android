@@ -12,6 +12,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,7 +45,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static org.syncloud.ssh.SimpleConnectionPointProvider.simple;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
-public class DevicesDiscoveryActivity extends Activity {
+public class DevicesDiscoveryActivity extends ActionBarActivity {
 
     private static Logger logger = Logger.getLogger(DevicesDiscoveryActivity.class.getName());
 

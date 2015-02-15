@@ -2,6 +2,7 @@ package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,7 +12,7 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.log.Logcat;
 import org.syncloud.android.ui.adapters.LogsAdapter;
 
-public class LogsActivity extends Activity {
+public class LogsActivity extends ActionBarActivity {
 
     private LogsAdapter adapter;
     private Logcat logcat;

@@ -27,10 +27,8 @@ import java.util.concurrent.TimeUnit;
 
 public class UPnP {
 
-
     private static Logger logger = Logger.getLogger(UPnP.class);
     CountDownLatch startSignal = new CountDownLatch(1);
-
 
     public static final DeviceType IGD_DEVICE_TYPE = new UDADeviceType("InternetGatewayDevice", 1);
     public static final DeviceType CONNECTION_DEVICE_TYPE = new UDADeviceType("WANConnectionDevice", 1);
@@ -44,18 +42,15 @@ public class UPnP {
 
     public Optional<UPnPStatus> checkStatus(long seconds, UpnpServiceConfiguration configuration) {
 
-
-//        return Optional.absent();
-
         StatusListener statusListener = new StatusListener();
         UpnpService upnpService = new UpnpServiceImpl(configuration, statusListener);
         upnpService.getControlPoint().search();
 
         try {
             startSignal.await(seconds, TimeUnit.SECONDS);
-            return Optional.of(statusListener.status);
+            return Optional.fromNullable(statusListener.status);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("interrupted", e);
             return Optional.absent();
         }
     }

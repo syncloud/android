@@ -9,6 +9,7 @@ import android.preference.PreferenceFragment;
 
 import com.google.common.collect.Sets;
 
+import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
@@ -22,6 +23,8 @@ import static org.syncloud.android.Preferences.KEY_PREF_RELEASE;
 import static org.syncloud.android.Preferences.KEY_PREF_SSH_MODE;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private static Logger logger = Logger.getLogger(SettingsFragment.class.getName());
 
     private Preference removeAccountPref;
     private Preference feedbackPref;
@@ -128,7 +131,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private void updateSummary(SharedPreferences sharedPreferences, String key) {
+        logger.debug("updating: " + key);
         String summary = getSummary(sharedPreferences, key);
+        logger.debug("summary: " + summary);
         findPreference(key).setSummary(summary);
     }
 
