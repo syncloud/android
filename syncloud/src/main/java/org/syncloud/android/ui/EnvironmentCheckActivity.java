@@ -17,10 +17,13 @@ import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
 import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;
+import org.fourthline.cling.support.model.PortMapping;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.common.check.UPnP;
-import org.syncloud.common.model.UPnPStatus;
+import org.syncloud.common.upnp.igd.Router;
+import org.syncloud.common.upnp.UPnP;
+
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -28,32 +31,63 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
 
     private static Logger logger = Logger.getLogger(EnvironmentCheckActivity.class.getName());
 
-    private TextView statusView;
-    private ProgressBar progressBar;
-    private Button checkBtn;
-    private ImageView statusGood;
-    private ImageView statusBad;
+    private UPnP upnp;
+
+    private int checksInFlight = 0;
+    private static final int TOTAL_CHECKS = 3;
+
     private SyncloudApplication application;
+
+    private Button checkBtn;
     private ImageButton sendbtn;
+
+    private TextView routerText;
+    private ProgressBar routerProgress;
+    private ImageView routerStatusGood;
+    private ImageView routerStatusBad;
+
+    private TextView ipText;
+    private ProgressBar ipProgress;
+    private ImageView ipStatusGood;
+    private ImageView ipStatusBad;
+
+    private TextView portsText;
+    private ProgressBar portsProgress;
+    private ImageView portsStatusGood;
+    private ImageView portsStatusBad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_environment_check);
 
+        upnp = new UPnP();
         application = (SyncloudApplication) getApplication();
-        statusView = (TextView) findViewById(R.id.check_status);
-        progressBar = (ProgressBar) findViewById(R.id.check_progress);
-        checkBtn = (Button) findViewById(R.id.environment_check_btn);
-        sendbtn = (ImageButton) findViewById(R.id.environment_status_send_btn);
-        statusGood = (ImageView) findViewById(R.id.status_good);
-        statusBad = (ImageView) findViewById(R.id.status_bad);
+
+        routerText = (TextView) findViewById(R.id.upnp_router_status);
+        routerProgress = (ProgressBar) findViewById(R.id.upnp_router_progress);
+        routerStatusGood = (ImageView) findViewById(R.id.upnp_router_good);
+        routerStatusBad = (ImageView) findViewById(R.id.upnp_router_bad);
+
+        ipText = (TextView) findViewById(R.id.upnp_ip_status);
+        ipProgress = (ProgressBar) findViewById(R.id.upnp_ip_progress);
+        ipStatusGood = (ImageView) findViewById(R.id.upnp_ip_good);
+        ipStatusBad = (ImageView) findViewById(R.id.upnp_ip_bad);
+
+        portsText = (TextView) findViewById(R.id.upnp_ports_status);
+        portsProgress = (ProgressBar) findViewById(R.id.upnp_ports_progress);
+        portsStatusGood = (ImageView) findViewById(R.id.upnp_ports_good);
+        portsStatusBad = (ImageView) findViewById(R.id.upnp_ports_bad);
+
+        checkBtn = (Button) findViewById(R.id.upnp_check_btn);
+        sendbtn = (ImageButton) findViewById(R.id.upnp_send_btn);
 
         check();
     }
 
     private void check() {
-        new CheckTask().execute((Void) null);
+        reset();
+        new RouterTask().execute(upnp);
     }
 
 
@@ -86,37 +120,141 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         check();
     }
 
-    public class CheckTask extends AsyncTask<Void, Void, Optional<UPnPStatus>> {
+    private void mainControllsEnabled(boolean enabled) {
+        checkBtn.setEnabled(enabled);
+        sendbtn.setEnabled(enabled);
+    }
+
+    private void reset() {
+
+        logger.info("reset");
+        checksInFlight = TOTAL_CHECKS;
+
+        routerText.setText("");
+        routerStatusBad.setVisibility(View.GONE);
+        routerStatusGood.setVisibility(View.GONE);
+        routerProgress.setVisibility(View.GONE);
+
+        ipText.setText("");
+        ipStatusBad.setVisibility(View.GONE);
+        ipStatusGood.setVisibility(View.GONE);
+        ipProgress.setVisibility(View.GONE);
+
+        portsText.setText("");
+        portsStatusBad.setVisibility(View.GONE);
+        portsStatusGood.setVisibility(View.GONE);
+        portsProgress.setVisibility(View.GONE);
+
+        mainControllsEnabled(false);
+
+    }
+
+    private void done(int checks) {
+        logger.info("done: " + checks + "/" + checksInFlight);
+        checksInFlight -= checks;
+        if (checksInFlight == 0) {
+            upnp.shutdown();
+            mainControllsEnabled(true);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        upnp.shutdown();
+    }
+
+    public class RouterTask extends AsyncTask<UPnP, Void, Optional<Router>> {
 
         @Override
         protected void onPreExecute() {
-            statusView.setText("Checking ...");
-            checkBtn.setEnabled(false);
-            sendbtn.setEnabled(false);
-            progressBar.setVisibility(View.VISIBLE);
-            statusBad.setVisibility(View.GONE);
-            statusGood.setVisibility(View.GONE);
+            routerText.setText("Checking ...");
+            routerStatusBad.setVisibility(View.GONE);
+            routerStatusGood.setVisibility(View.GONE);
+            routerProgress.setVisibility(View.VISIBLE);
         }
 
         @Override
-        protected Optional<UPnPStatus> doInBackground(Void... voids) {
-            return new UPnP().checkStatus(10, new AndroidUpnpServiceConfiguration());
+        protected Optional<Router> doInBackground(UPnP... upnps) {
+            UPnP upnp = upnps[0];
+            upnp.start(new AndroidUpnpServiceConfiguration());
+            return upnp.find(10);
         }
 
         @Override
-        protected void onPostExecute(Optional<UPnPStatus> result) {
+        protected void onPostExecute(Optional<Router> result) {
             if (result.isPresent()) {
-                UPnPStatus status = result.get();
-                logger.debug(status.toString());
-                statusView.setText(format("Name: %s\nExternal IP: %s", status.routerName, status.externalAddress));
-                statusGood.setVisibility(View.VISIBLE);
+                Router router = result.get();
+                routerText.setText(format("Name: %s", router.getName()));
+                routerStatusGood.setVisibility(View.VISIBLE);
+                done(1);
+                new IPTask().execute(router);
+                new PortsTask().execute(router);
             } else {
-                statusView.setText("UPnP is not available");
-                statusBad.setVisibility(View.VISIBLE);
+                routerText.setText("Not able to find UPnP router");
+                routerStatusBad.setVisibility(View.VISIBLE);
+                done(checksInFlight);
             }
-            progressBar.setVisibility(View.INVISIBLE);
-            checkBtn.setEnabled(true);
-            sendbtn.setEnabled(true);
+            routerProgress.setVisibility(View.GONE);
+        }
+    }
+
+    public class IPTask extends AsyncTask<Router, Void, Optional<String>> {
+
+        @Override
+        protected void onPreExecute() {
+            ipText.setText("Checking ...");
+            ipStatusBad.setVisibility(View.GONE);
+            ipStatusGood.setVisibility(View.GONE);
+            ipProgress.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Optional<String> doInBackground(Router... routers) {
+            return routers[0].getExternalIP(10);
+        }
+
+        @Override
+        protected void onPostExecute(Optional<String> ip) {
+            if (ip.isPresent()) {
+                ipText.setText(ip.get());
+                ipStatusGood.setVisibility(View.VISIBLE);
+            } else {
+                ipText.setText("Not able to find IP");
+                ipStatusBad.setVisibility(View.VISIBLE);
+            }
+            ipProgress.setVisibility(View.GONE);
+            done(1);
+        }
+    }
+
+    public class PortsTask extends AsyncTask<Router, Void, List<PortMapping>> {
+
+        @Override
+        protected void onPreExecute() {
+            portsText.setText("Checking ...");
+            portsStatusBad.setVisibility(View.GONE);
+            portsStatusGood.setVisibility(View.GONE);
+            portsProgress.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected List<PortMapping> doInBackground(Router... routers) {
+            return routers[0].getPortMappings(10);
+        }
+
+        @Override
+        protected void onPostExecute(List<PortMapping> ports) {
+            if (!ports.isEmpty()) {
+                portsText.setText(format("%s mapped ports", ports.size()));
+//                ipStatusGood.setVisibility(View.VISIBLE);
+            } else {
+                ipText.setText("No mapped ports, may be fine");
+//                ipStatusBad.setVisibility(View.VISIBLE);
+            }
+            portsStatusGood.setVisibility(View.VISIBLE);
+            portsProgress.setVisibility(View.GONE);
+            done(1);
         }
     }
 }
