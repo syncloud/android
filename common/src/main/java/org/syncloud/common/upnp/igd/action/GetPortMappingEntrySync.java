@@ -40,7 +40,7 @@ public class GetPortMappingEntrySync extends GetPortMappingEntry {
         try {
             countDownLatch.await(seconds, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.error("interrupted: " + e.getMessage(), e);
+            logger.error("interrupted: " + e.getMessage());
         }
 
         return portMapping;

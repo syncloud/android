@@ -48,18 +48,5 @@ public class MulticastLock {
         lock = null;
     }
 
-    public Optional<InetAddress> ip() {
-        WifiInfo connInfo = wifi.getConnectionInfo();
-        int ipAddress = connInfo.getIpAddress();
-        byte[] ip = ByteBuffer.allocate(4).putInt(ipAddress).array();
-        InetAddress myAddress;
-        try {
-            myAddress = InetAddress.getByAddress(ip);
-            logger.debug("address: " + myAddress);
-            return Optional.of(myAddress);
-        } catch (UnknownHostException e) {
-            logger.error("Failed to get address: " + e.toString());
-            return Optional.absent();
-        }
-    }
+
 }

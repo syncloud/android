@@ -13,7 +13,11 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="ProgressBarTheme" parent="Widget.AppCompat.ProgressBar.Horizontal">
+    <style name="ProgressBarHorisontalTheme" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="ProgressBarTheme" parent="Widget.AppCompat.ProgressBar">
         <!-- Customize your theme here. -->
     </style>
 

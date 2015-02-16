@@ -1,6 +1,8 @@
 package org.syncloud.android.ui;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -20,9 +22,11 @@ import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;
 import org.fourthline.cling.support.model.PortMapping;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.network.Network;
 import org.syncloud.common.upnp.igd.Router;
 import org.syncloud.common.upnp.UPnP;
 
+import java.net.InetAddress;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -34,7 +38,7 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
     private UPnP upnp;
 
     private int checksInFlight = 0;
-    private static final int TOTAL_CHECKS = 3;
+    private static final int TOTAL_CHECKS = 4;
 
     private SyncloudApplication application;
 
@@ -56,6 +60,12 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
     private ImageView portsStatusGood;
     private ImageView portsStatusBad;
 
+    private TextView manipulationText;
+    private ProgressBar manipulationProgress;
+    private ImageView manipulationStatusGood;
+    private ImageView manipulationStatusBad;
+    private Network network;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +73,7 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
 
         upnp = new UPnP();
         application = (SyncloudApplication) getApplication();
+        network = new Network((WifiManager) getSystemService(Context.WIFI_SERVICE));
 
         routerText = (TextView) findViewById(R.id.upnp_router_status);
         routerProgress = (ProgressBar) findViewById(R.id.upnp_router_progress);
@@ -78,6 +89,11 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         portsProgress = (ProgressBar) findViewById(R.id.upnp_ports_progress);
         portsStatusGood = (ImageView) findViewById(R.id.upnp_ports_good);
         portsStatusBad = (ImageView) findViewById(R.id.upnp_ports_bad);
+
+        manipulationText = (TextView) findViewById(R.id.upnp_manipulation_status);
+        manipulationProgress = (ProgressBar) findViewById(R.id.upnp_manipulation_progress);
+        manipulationStatusGood = (ImageView) findViewById(R.id.upnp_manipulation_good);
+        manipulationStatusBad = (ImageView) findViewById(R.id.upnp_manipulation_bad);
 
         checkBtn = (Button) findViewById(R.id.upnp_check_btn);
         sendbtn = (ImageButton) findViewById(R.id.upnp_send_btn);
@@ -145,6 +161,11 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         portsStatusGood.setVisibility(View.GONE);
         portsProgress.setVisibility(View.GONE);
 
+        manipulationText.setText("");
+        manipulationStatusBad.setVisibility(View.GONE);
+        manipulationStatusGood.setVisibility(View.GONE);
+        manipulationProgress.setVisibility(View.GONE);
+
         mainControllsEnabled(false);
 
     }
@@ -190,6 +211,7 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
                 done(1);
                 new IPTask().execute(router);
                 new PortsTask().execute(router);
+                new ManipulationTask().execute(router);
             } else {
                 routerText.setText("Not able to find UPnP router");
                 routerStatusBad.setVisibility(View.VISIBLE);
@@ -254,6 +276,47 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
             }
             portsStatusGood.setVisibility(View.VISIBLE);
             portsProgress.setVisibility(View.GONE);
+            done(1);
+        }
+    }
+
+    public class ManipulationTask extends AsyncTask<Router, Void, Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+            manipulationText.setText("Checking ...");
+            manipulationStatusBad.setVisibility(View.GONE);
+            manipulationStatusGood.setVisibility(View.GONE);
+            manipulationProgress.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Boolean doInBackground(Router... routers) {
+            Router router = routers[0];
+            Optional<Long> port = router.getAvailableExternalPort(10);
+            if (!port.isPresent()) {
+                logger.error("unable to get local IP");
+                return false;
+            }
+
+            Optional<String> ip = network.hostname();
+            if (!ip.isPresent()) {
+                return false;
+            }
+
+            return router.canToManipulatePorts(10, ip.get());
+        }
+
+        @Override
+        protected void onPostExecute(Boolean works) {
+            if (works) {
+                manipulationText.setText("Can modify port mappings");
+                manipulationStatusGood.setVisibility(View.VISIBLE);
+            } else {
+                manipulationText.setText("Unable to modify port mappings");
+                manipulationStatusBad.setVisibility(View.VISIBLE);
+            }
+            manipulationProgress.setVisibility(View.GONE);
             done(1);
         }
     }

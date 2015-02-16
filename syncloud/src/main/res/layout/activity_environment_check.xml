@@ -53,7 +53,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:scaleType="fitXY"
-                    android:background="@drawable/ic_action_good"
+                    android:src="@drawable/ic_action_good"
                     />
 
                 <ImageView
@@ -61,14 +61,15 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:scaleType="fitXY"
-                    android:background="@drawable/ic_action_bad"
+                    android:src="@drawable/ic_action_bad"
                     />
 
                 <ProgressBar
                     android:id="@+id/upnp_router_progress"
-                    style="@android:style/Widget.Holo.ProgressBar.Large"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/ProgressBarHorisontalTheme"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:scaleType="fitXY"
                     android:layout_weight="0"
                     android:indeterminate="true"
                     android:visibility="visible" />
@@ -124,14 +125,15 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:scaleType="fitXY"
-                    android:background="@drawable/ic_action_bad"
+                    android:src="@drawable/ic_action_bad"
                     />
 
                 <ProgressBar
                     android:id="@+id/upnp_ip_progress"
-                    style="@android:style/Widget.Holo.ProgressBar.Large"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/ProgressBarHorisontalTheme"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:scaleType="fitXY"
                     android:layout_weight="0"
                     android:indeterminate="true"
                     android:visibility="visible" />
@@ -186,15 +188,80 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:scaleType="fitXY"
-                    android:background="@drawable/ic_action_bad"
+                    android:src="@drawable/ic_action_bad"
                     />
 
                 <ProgressBar
                     android:id="@+id/upnp_ports_progress"
-                    style="@android:style/Widget.Holo.ProgressBar.Large"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/ProgressBarHorisontalTheme"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:scaleType="fitXY"
                     android:layout_weight="0"
+                    android:indeterminate="true"
+                    android:visibility="visible" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="20dp">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Port manipulations:" />
+
+                <TextView
+                    android:id="@+id/upnp_manipulation_status"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:gravity="center_vertical"
+                android:layout_weight="0"
+                android:paddingLeft="10dp">
+
+                <ImageView
+                    android:id="@+id/upnp_manipulation_good"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_action_good"
+                    />
+
+                <ImageView
+                    android:id="@+id/upnp_manipulation_bad"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_action_bad"
+                    />
+
+                <ProgressBar
+                    android:id="@+id/upnp_manipulation_progress"
+                    style="@style/ProgressBarHorisontalTheme"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:minHeight="50dp"
+                    android:minWidth="50dp"
+                    android:scaleType="fitXY"
                     android:indeterminate="true"
                     android:visibility="visible" />
 

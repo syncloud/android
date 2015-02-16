@@ -9,12 +9,14 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.nsd.NsdDiscovery;
 import org.syncloud.android.discovery.jmdns.JmdnsDiscovery;
+import org.syncloud.android.network.Network;
 
 import java.net.InetAddress;
 
 public class DiscoveryManager {
 
     private static Logger logger = Logger.getLogger(DiscoveryManager.class.getName());
+    private final Network network;
 
     private MulticastLock lock;
 
@@ -23,7 +25,8 @@ public class DiscoveryManager {
     private Boolean canceled = false;
 
     public DiscoveryManager(WifiManager wifi, NsdManager manager) {
-        this.lock = new MulticastLock(wifi);
+        lock = new MulticastLock(wifi);
+        network = new Network(wifi);
         this.manager = manager;
     }
 
@@ -35,7 +38,7 @@ public class DiscoveryManager {
             if ("Android NSD".equals(discoveryLibrary)) {
                 discovery = new NsdDiscovery(manager, deviceEndpointListener, "syncloud");
             } else {
-                Optional<InetAddress> ip = lock.ip();
+                Optional<InetAddress> ip = network.ip();
                 if (ip.isPresent()) {
                     discovery = new JmdnsDiscovery(ip.get(), deviceEndpointListener, "syncloud");
                 } else {

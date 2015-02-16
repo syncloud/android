@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:visibility="invisible"
         android:indeterminate="true"
-        style="@style/ProgressBarTheme"
+        style="@style/ProgressBarHorisontalTheme"
         />
 
 </LinearLayout>
