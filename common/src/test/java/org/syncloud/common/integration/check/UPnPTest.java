@@ -29,27 +29,26 @@ public class UPnPTest {
 
     @Test
     public void test() throws InterruptedException, SocketException {
-        UPnP upnp = new UPnP();
-        upnp.start(new DefaultUpnpServiceConfiguration());
-        Optional<Router> routerOptional = upnp.find(10);
+        UPnP upnp = new UPnP(new DefaultUpnpServiceConfiguration());
+        Optional<Router> routerOptional = upnp.start().find();
 
         assertTrue(routerOptional.isPresent());
         Router router = routerOptional.get();
         System.out.println(router.getName());
 
-        Optional<String> ipOpt = router.getExternalIP(10);
+        Optional<String> ipOpt = router.getExternalIP();
         assertTrue(ipOpt.isPresent());
         System.out.println(ipOpt.get());
 
-        List<PortMapping> mappings = router.getPortMappings(10);
+        List<PortMapping> mappings = router.getPortMappings();
         System.out.println(mappings);
 
-        assertTrue(router.canToManipulatePorts(10, MY_IP));
+        assertTrue(router.canToManipulatePorts(MY_IP));
 
         upnp.shutdown();
     }
 
-    private Optional<InetAddress> findMyIp() throws SocketException {
+    /*private Optional<InetAddress> findMyIp() throws SocketException {
         return FluentIterable.from(Collections.list(NetworkInterface.getNetworkInterfaces()))
                 .transformAndConcat(new Function<NetworkInterface, Iterable<InetAddress>>() {
                     @Override
@@ -63,7 +62,7 @@ public class UPnPTest {
                         return input.getHostAddress().startsWith("192");
                     }
                 });
-    }
+    }*/
 
 
 }

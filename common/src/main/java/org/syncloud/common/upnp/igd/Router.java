@@ -7,16 +7,15 @@ import com.google.common.collect.ImmutableList;
 
 import org.apache.log4j.Logger;
 import org.fourthline.cling.UpnpService;
-import org.fourthline.cling.model.action.ActionInvocation;
-import org.fourthline.cling.model.message.UpnpResponse;
+import org.fourthline.cling.controlpoint.ActionCallback;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
 import org.fourthline.cling.registry.Registry;
-import org.fourthline.cling.support.igd.callback.PortMappingAdd;
-import org.fourthline.cling.support.igd.callback.PortMappingDelete;
 import org.fourthline.cling.support.model.PortMapping;
-import org.syncloud.common.upnp.igd.action.GetExternalIPSync;
-import org.syncloud.common.upnp.igd.action.GetPortMappingEntrySync;
+import org.syncloud.common.upnp.igd.action.GetExternalIPImpl;
+import org.syncloud.common.upnp.igd.action.GetPortMappingEntryImpl;
+import org.syncloud.common.upnp.igd.action.PortMappingAddImpl;
+import org.syncloud.common.upnp.igd.action.PortMappingDeleteImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +27,7 @@ import static com.google.common.collect.FluentIterable.from;
 
 public class Router {
 
+    public int timeout;
     private Logger logger = Logger.getLogger(Router.class);
 
     private Registry registry;
@@ -35,46 +35,45 @@ public class Router {
     private Device device;
     public static final int LIMIT = 10000;
 
-    public Router(Registry registry, Device device, Service service) {
+    public Router(Registry registry, Device device, Service service, int timeout) {
         this.registry = registry;
         this.device = device;
         this.service = service;
+        this.timeout = timeout;
     }
 
     public String getName() {
         return device.getDisplayString();
     }
 
-    public Optional<String> getExternalIP(long seconds) {
-
-        UpnpService upnpService = registry.getUpnpService();
-        GetExternalIPSync callback = new GetExternalIPSync(service);
-        upnpService.getControlPoint().execute(callback);
-        return callback.await(seconds);
-
+    public Optional<String> getExternalIP() {
+        return sync(registry.getUpnpService(), new GetExternalIPImpl(service)).getIp();
     }
 
-    public List<PortMapping> getPortMappings(long seconds) {
+    public List<PortMapping> getPortMappings() {
 
         ArrayList<PortMapping> mappings = new ArrayList<>();
-        UpnpService upnpService = registry.getUpnpService();
         long i = 0;
         while (i < LIMIT) {
-            GetPortMappingEntrySync callback = new GetPortMappingEntrySync(service, i);
-            upnpService.getControlPoint().execute(callback);
-            Optional<PortMapping> mapping = callback.await(seconds);
+
+            Optional<PortMapping> mapping = sync(
+                    registry.getUpnpService(),
+                    new GetPortMappingEntryImpl(service, i)
+            ).getPortMapping();
+
             if (!mapping.isPresent())
                 break;
+
             mappings.add(mapping.get());
             i++;
         }
-
+        logger.info("Found: " + mappings.size() + " port mappings");
         return mappings;
 
     }
 
-    public Optional<Long> getAvailableExternalPort(long seconds) {
-        ImmutableList<Long> ports = from(getPortMappings(seconds))
+    private Optional<Long> getAvailableExternalPort() {
+        ImmutableList<Long> ports = from(getPortMappings())
                 .transform(new Function<PortMapping, Long>() {
                     @Override
                     public Long apply(PortMapping input) {
@@ -91,89 +90,32 @@ public class Router {
         return Optional.absent();
     }
 
-    public boolean addPortMapping(long seconds, PortMapping portMapping) {
+    public boolean addPortMapping(PortMapping portMapping) {
+        return sync(
+                registry.getUpnpService(),
+                new PortMappingAddImpl(portMapping, service)
+        ).isSuccessfull();
+    }
 
-        UpnpService upnpService = registry.getUpnpService();
-        logger.debug("adding: " + portMapping);
-        MyPortMappingAdd callback = new MyPortMappingAdd(portMapping, service);
+    public boolean removePortMapping(PortMapping portMapping) {
+        return sync(
+                registry.getUpnpService(),
+                new PortMappingDeleteImpl(portMapping, service)
+        ).isSuccessfull();
+    }
+
+    private <T extends ActionCallback> T sync(UpnpService upnpService, T callback) {
         try {
-            upnpService.getControlPoint().execute(callback).get(seconds, TimeUnit.SECONDS);
+            upnpService.getControlPoint().execute(callback).get(timeout, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("interrupted: " + e.getMessage());
         }
-
-        return callback.isSuccessfull();
+        return callback;
     }
 
-    private class MyPortMappingAdd extends PortMappingAdd {
-        private Logger logger = Logger.getLogger(MyPortMappingAdd.class);
+    public boolean canToManipulatePorts(String myIp) {
 
-        private boolean successfull = false;
-
-        public MyPortMappingAdd(PortMapping portMapping, Service service) {
-            super(service, portMapping);
-        }
-
-        @Override
-        public void success(ActionInvocation invocation) {
-            successfull = true;
-        }
-
-        @Override
-        public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-            logger.error("failed: " + operation.getResponseDetails());
-            logger.error("reason: " + defaultMsg);
-            successfull = false;
-        }
-
-        public boolean isSuccessfull() {
-            return successfull;
-        }
-    }
-
-    public boolean removePortMapping(long seconds, PortMapping portMapping) {
-
-        UpnpService upnpService = registry.getUpnpService();
-        logger.debug("removing: " + portMapping);
-        MyPortMappingDelete callback = new MyPortMappingDelete(portMapping, service);
-        try {
-            upnpService.getControlPoint().execute(callback).get(seconds, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            logger.error("interrupted: " + e.getMessage());
-        }
-
-        return callback.isSuccessfull();
-    }
-
-    private class MyPortMappingDelete extends PortMappingDelete {
-        private Logger logger = Logger.getLogger(MyPortMappingAdd.class);
-
-        private boolean successfull = false;
-
-        public MyPortMappingDelete(PortMapping portMapping, Service service) {
-            super(service, portMapping);
-        }
-
-        @Override
-        public void success(ActionInvocation invocation) {
-            successfull = true;
-        }
-
-        @Override
-        public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-            logger.error("failed: " + operation.getResponseDetails());
-            logger.error("reason: " + defaultMsg);
-            successfull = false;
-        }
-
-        public boolean isSuccessfull() {
-            return successfull;
-        }
-    }
-
-    public boolean canToManipulatePorts(int seconds, String myIp) {
-
-        final Optional<Long> availableExternalPort = getAvailableExternalPort(seconds);
+        final Optional<Long> availableExternalPort = getAvailableExternalPort();
         if(!availableExternalPort.isPresent())
             return false;
 
@@ -184,7 +126,7 @@ public class Router {
                 myIp,
                 PortMapping.Protocol.TCP);
 
-        if(!addPortMapping(10,portMapping))
+        if(!addPortMapping(portMapping))
             return false;
 
         Optional<PortMapping> foundAdded = findPortMapping(availableExternalPort);
@@ -193,7 +135,7 @@ public class Router {
 
         logger.debug("foundAdded: " + foundAdded.get());
 
-        if(!removePortMapping(10, portMapping))
+        if(!removePortMapping(portMapping))
             return false;
 
         return !findPortMapping(availableExternalPort).isPresent();
@@ -201,7 +143,7 @@ public class Router {
     }
 
     private Optional<PortMapping> findPortMapping(final Optional<Long> availableExternalPort) {
-        List<PortMapping> portMappings = getPortMappings(10);
+        List<PortMapping> portMappings = getPortMappings();
         return from(portMappings).firstMatch(new Predicate<PortMapping>() {
             @Override
             public boolean apply(PortMapping input) {

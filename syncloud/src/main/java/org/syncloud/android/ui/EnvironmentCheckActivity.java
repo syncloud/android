@@ -26,16 +26,16 @@ import org.syncloud.android.network.Network;
 import org.syncloud.common.upnp.igd.Router;
 import org.syncloud.common.upnp.UPnP;
 
-import java.net.InetAddress;
 import java.util.List;
 
+import static com.google.common.base.Optional.of;
 import static java.lang.String.format;
 
 public class EnvironmentCheckActivity extends ActionBarActivity {
 
     private static Logger logger = Logger.getLogger(EnvironmentCheckActivity.class.getName());
 
-    private UPnP upnp;
+    private Optional<UPnP> upnp = Optional.absent();
 
     private int checksInFlight = 0;
     private static final int TOTAL_CHECKS = 4;
@@ -45,21 +45,25 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
     private Button checkBtn;
     private ImageButton sendbtn;
 
+    //TODO: How do I do a widget?
     private TextView routerText;
     private ProgressBar routerProgress;
     private ImageView routerStatusGood;
     private ImageView routerStatusBad;
 
+    //TODO: Widget
     private TextView ipText;
     private ProgressBar ipProgress;
     private ImageView ipStatusGood;
     private ImageView ipStatusBad;
 
+    //TODO: Widget
     private TextView portsText;
     private ProgressBar portsProgress;
     private ImageView portsStatusGood;
     private ImageView portsStatusBad;
 
+    //TODO: Widget
     private TextView manipulationText;
     private ProgressBar manipulationProgress;
     private ImageView manipulationStatusGood;
@@ -71,7 +75,6 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_environment_check);
 
-        upnp = new UPnP();
         application = (SyncloudApplication) getApplication();
         network = new Network((WifiManager) getSystemService(Context.WIFI_SERVICE));
 
@@ -103,7 +106,7 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
 
     private void check() {
         reset();
-        new RouterTask().execute(upnp);
+        new RouterTask().execute((Void) null);
     }
 
 
@@ -174,7 +177,8 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         logger.info("done: " + checks + "/" + checksInFlight);
         checksInFlight -= checks;
         if (checksInFlight == 0) {
-            upnp.shutdown();
+            if (upnp.isPresent())
+                upnp.get().shutdown();
             mainControllsEnabled(true);
         }
     }
@@ -182,10 +186,11 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        upnp.shutdown();
+        if (upnp.isPresent())
+            upnp.get().shutdown();
     }
 
-    public class RouterTask extends AsyncTask<UPnP, Void, Optional<Router>> {
+    public class RouterTask extends AsyncTask<Void, Void, Optional<Router>> {
 
         @Override
         protected void onPreExecute() {
@@ -196,17 +201,16 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         }
 
         @Override
-        protected Optional<Router> doInBackground(UPnP... upnps) {
-            UPnP upnp = upnps[0];
-            upnp.start(new AndroidUpnpServiceConfiguration());
-            return upnp.find(10);
+        protected Optional<Router> doInBackground(Void... voids) {
+            upnp = of(new UPnP(new AndroidUpnpServiceConfiguration()));
+            return upnp.get().start().find();
         }
 
         @Override
         protected void onPostExecute(Optional<Router> result) {
             if (result.isPresent()) {
                 Router router = result.get();
-                routerText.setText(format("Name: %s", router.getName()));
+                routerText.setText(router.getName());
                 routerStatusGood.setVisibility(View.VISIBLE);
                 done(1);
                 new IPTask().execute(router);
@@ -233,7 +237,7 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
 
         @Override
         protected Optional<String> doInBackground(Router... routers) {
-            return routers[0].getExternalIP(10);
+            return routers[0].getExternalIP();
         }
 
         @Override
@@ -262,7 +266,7 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
 
         @Override
         protected List<PortMapping> doInBackground(Router... routers) {
-            return routers[0].getPortMappings(10);
+            return routers[0].getPortMappings();
         }
 
         @Override
@@ -293,18 +297,13 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         @Override
         protected Boolean doInBackground(Router... routers) {
             Router router = routers[0];
-            Optional<Long> port = router.getAvailableExternalPort(10);
-            if (!port.isPresent()) {
-                logger.error("unable to get local IP");
-                return false;
-            }
 
             Optional<String> ip = network.hostname();
-            if (!ip.isPresent()) {
+            if (!ip.isPresent())
                 return false;
-            }
 
-            return router.canToManipulatePorts(10, ip.get());
+
+            return router.canToManipulatePorts(ip.get());
         }
 
         @Override

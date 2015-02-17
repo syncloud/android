@@ -19,6 +19,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.google.common.base.Joiner.on;
+import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.of;
+import static java.util.Arrays.asList;
+import static java.util.Collections.reverse;
+
 public class Network {
 
     private static Logger logger = Logger.getLogger(Network.class.getName());
@@ -37,19 +43,19 @@ public class Network {
         try {
             myAddress = InetAddress.getByAddress(ip);
             logger.debug("address: " + myAddress);
-            return Optional.of(myAddress);
+            return of(myAddress);
         } catch (UnknownHostException e) {
             logger.error("Failed to get address: " + e.toString());
-            return Optional.absent();
+            return absent();
         }
     }
 
     public Optional<String> hostname() {
         Optional<InetAddress> ip = ip();
         if(!ip.isPresent())
-            return Optional.absent();
-        List<String> split = Arrays.asList(ip.get().getHostAddress().split("\\."));
-        Collections.reverse(split);
-        return Optional.of(Joiner.on(".").join(split));
+            return absent();
+        List<String> split = asList(ip.get().getHostAddress().split("\\."));
+        reverse(split);
+        return of(on(".").join(split));
     }
 }

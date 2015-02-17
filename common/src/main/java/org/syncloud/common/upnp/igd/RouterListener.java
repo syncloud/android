@@ -18,11 +18,13 @@ import java.util.concurrent.TimeUnit;
 public class RouterListener extends DefaultRegistryListener {
 
     private static Logger logger = Logger.getLogger(RouterListener.class);
-    private CountDownLatch countDownLatch;
+    private CountDownLatch countDownLatch = new CountDownLatch(1);
     private Optional<Router> router = Optional.absent();
+    private int timeout;
 
-    public RouterListener() {
-        reset();
+
+    public RouterListener(int timeout) {
+        this.timeout = timeout;
     }
 
     @Override
@@ -32,18 +34,14 @@ public class RouterListener extends DefaultRegistryListener {
         Optional<Service> service = discoverConnectionService(device);
         if (service.isPresent()) {
             logger.info("detected router service: " + service.get().getServiceId().getId());
-            router = Optional.of(new Router(registry, device, service.get()));
+            router = Optional.of(new Router(registry, device, service.get(), timeout));
             countDownLatch.countDown();
         }
     }
 
-    public void reset() {
-        countDownLatch = new CountDownLatch(1);
-    }
-
-    public Optional<Router> await(long seconds) {
+    public Optional<Router> await() {
         try {
-            countDownLatch.await(seconds, TimeUnit.SECONDS);
+            countDownLatch.await(timeout, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             logger.error("interrupted: " + e.getMessage(), e);
         }

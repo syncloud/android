@@ -9,23 +9,18 @@ import org.fourthline.cling.model.meta.Service;
 import org.fourthline.cling.support.model.PortMapping;
 import org.syncloud.common.upnp.igd.action.cling.GetPortMappingEntry;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+public class GetPortMappingEntryImpl extends GetPortMappingEntry {
 
-public class GetPortMappingEntrySync extends GetPortMappingEntry {
-
-    private Logger logger = Logger.getLogger(GetExternalIPSync.class);
-    private CountDownLatch countDownLatch = new CountDownLatch(1);
+    private Logger logger = Logger.getLogger(GetExternalIPImpl.class);
     private Optional<PortMapping> portMapping = Optional.absent();
 
-    public GetPortMappingEntrySync(Service service, long index) {
+    public GetPortMappingEntryImpl(Service service, long index) {
         super(service, index);
     }
 
     @Override
     protected void success(PortMapping portMapping) {
         this.portMapping = Optional.of(portMapping);
-        countDownLatch.countDown();
     }
 
     @Override
@@ -33,16 +28,9 @@ public class GetPortMappingEntrySync extends GetPortMappingEntry {
                         UpnpResponse operation,
                         String defaultMsg) {
         logger.error("operation response: " + operation.getResponseDetails());
-        countDownLatch.countDown();
     }
 
-    public Optional<PortMapping> await(long seconds) {
-        try {
-            countDownLatch.await(seconds, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            logger.error("interrupted: " + e.getMessage());
-        }
-
+    public Optional<PortMapping> getPortMapping() {
         return portMapping;
     }
 }
