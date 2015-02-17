@@ -1,23 +1,23 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+    <style name="DialogTheme" parent="@android:style/Theme.Holo.Light.Dialog">
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="NoActionBarTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="NoActionBarTheme" parent="@android:style/Theme.Holo.Light.NoActionBar">
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="ProgressBarHorisontalTheme" parent="Widget.AppCompat.ProgressBar.Horizontal">
+    <style name="ProgressBarHorisontalTheme" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="ProgressBarTheme" parent="Widget.AppCompat.ProgressBar">
+    <style name="ProgressBarTheme" parent="@android:style/Widget.Holo.ProgressBar">
         <!-- Customize your theme here. -->
     </style>
 
