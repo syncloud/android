@@ -109,13 +109,12 @@
     <orderEntry type="library" exported="" name="jetty-io-8.1.8.v20121106" level="project" />
     <orderEntry type="library" exported="" name="jackson-core-2.3.3" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
-    <orderEntry type="library" exported="" name="multidex-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="jetty-servlet-8.1.8.v20121106" level="project" />
     <orderEntry type="library" exported="" name="log4j-1.2.17" level="project" />
     <orderEntry type="library" exported="" name="acra-4.5.0" level="project" />
     <orderEntry type="library" exported="" name="seamless-swing-1.1.0" level="project" />
-    <orderEntry type="library" exported="" name="jetty-http-8.1.8.v20121106" level="project" />
     <orderEntry type="library" exported="" name="guava-18.0" level="project" />
+    <orderEntry type="library" exported="" name="jetty-http-8.1.8.v20121106" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="commons-exec-1.2" level="project" />
     <orderEntry type="library" exported="" name="cling-core-2.0.1" level="project" />
@@ -125,8 +124,6 @@
     <orderEntry type="library" exported="" name="seamless-xml-1.1.0" level="project" />
     <orderEntry type="library" exported="" name="seamless-http-1.1.0" level="project" />
     <orderEntry type="library" exported="" name="cling-support-2.0.1" level="project" />
-    <orderEntry type="library" exported="" name="ganymed-ssh2-262" level="project" />
-    <orderEntry type="library" exported="" name="dnsjava-2.1.6" level="project" />
     <orderEntry type="library" exported="" name="httpclient-android-4.3.3" level="project" />
     <orderEntry type="library" exported="" name="jackson-annotations-2.3.0" level="project" />
     <orderEntry type="library" exported="" name="jetty-security-8.1.8.v20121106" level="project" />
@@ -135,7 +132,6 @@
     <orderEntry type="library" exported="" name="jetty-continuation-8.1.8.v20121106" level="project" />
     <orderEntry type="library" exported="" name="jsch-0.1.51" level="project" />
     <orderEntry type="library" exported="" name="jetty-client-8.1.8.v20121106" level="project" />
-    <orderEntry type="library" exported="" name="play-services-4.2.42" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="seamless-util-1.1.0" level="project" />
     <orderEntry type="library" exported="" name="jmdns-3.4.1" level="project" />

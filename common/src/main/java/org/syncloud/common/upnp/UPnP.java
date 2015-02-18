@@ -11,7 +11,7 @@ import org.syncloud.common.upnp.igd.RouterListener;
 
 public class UPnP {
 
-    public static final int TIMEOUT = 30;
+    public static final int TIMEOUT = 60;
     private static Logger logger = Logger.getLogger(UPnP.class);
     private boolean started = false;
     private boolean used = false;

@@ -1,21 +1,13 @@
 package org.syncloud.common.integration.check;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 
 import org.fourthline.cling.DefaultUpnpServiceConfiguration;
-import org.fourthline.cling.support.model.PortMapping;
 import org.junit.Test;
 import org.syncloud.common.upnp.igd.Router;
 import org.syncloud.common.upnp.UPnP;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.Collections;
-import java.util.List;
 
 import static com.google.common.collect.FluentIterable.from;
 import static java.util.Collections.max;
@@ -40,8 +32,7 @@ public class UPnPTest {
         assertTrue(ipOpt.isPresent());
         System.out.println(ipOpt.get());
 
-        List<PortMapping> mappings = router.getPortMappings();
-        System.out.println(mappings);
+        System.out.println("mappings: " + router.getPortMappingsCount());
 
         assertTrue(router.canToManipulatePorts(MY_IP));
 

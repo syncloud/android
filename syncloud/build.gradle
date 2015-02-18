@@ -9,8 +9,6 @@ android {
         targetSdkVersion 21
         versionCode 131
         versionName "1.31"
-        // Enabling multidex support.
-        multiDexEnabled true
     }
 
     dexOptions {
@@ -38,15 +36,9 @@ android {
 
     buildTypes {
         release {
-//            minifyEnabled true
-//            proguardFile 'proguard-android.txt'
             debuggable false
             signingConfig signingConfigs.release
         }
-//        debug {
-//            minifyEnabled true
-//            proguardFile 'proguard-android.txt'
-//        }
     }
 
     packagingOptions {
@@ -87,15 +79,11 @@ dependencies {
     compile project(':redirect')
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'javax.jmdns:jmdns:3.4.1'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.3'
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.google.android.gms:play-services:4.2.42'
     compile 'de.mindpipe.android:android-logging-log4j:1.0.3'
     compile 'ch.acra:acra:4.5.0'
-    compile 'com.android.support:multidex:1.0.0'
-
 
     //cling UPnP android dependencies
     compile  'org.eclipse.jetty:jetty-server:8.1.8.v20121106'

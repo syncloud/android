@@ -5,7 +5,6 @@ import android.net.wifi.WifiManager;
 
 import com.google.common.base.Optional;
 
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.nsd.NsdDiscovery;
 import org.syncloud.android.discovery.jmdns.JmdnsDiscovery;
@@ -38,7 +37,7 @@ public class DiscoveryManager {
             if ("Android NSD".equals(discoveryLibrary)) {
                 discovery = new NsdDiscovery(manager, deviceEndpointListener, "syncloud");
             } else {
-                Optional<InetAddress> ip = network.ip();
+                Optional<InetAddress> ip = network.inetAddress();
                 if (ip.isPresent()) {
                     discovery = new JmdnsDiscovery(ip.get(), deviceEndpointListener, "syncloud");
                 } else {

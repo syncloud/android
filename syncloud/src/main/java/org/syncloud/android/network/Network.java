@@ -3,20 +3,13 @@ package org.syncloud.android.network;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.common.base.Strings;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.primitives.Primitives;
 
 import org.apache.log4j.Logger;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.Joiner.on;
@@ -35,7 +28,7 @@ public class Network {
         this.wifi = wifi;
     }
 
-    public Optional<InetAddress> ip() {
+    public Optional<InetAddress> inetAddress() {
         WifiInfo connInfo = wifi.getConnectionInfo();
         int ipAddress = connInfo.getIpAddress();
         byte[] ip = ByteBuffer.allocate(4).putInt(ipAddress).array();
@@ -50,8 +43,8 @@ public class Network {
         }
     }
 
-    public Optional<String> hostname() {
-        Optional<InetAddress> ip = ip();
+    public Optional<String> ip() {
+        Optional<InetAddress> ip = inetAddress();
         if(!ip.isPresent())
             return absent();
         List<String> split = asList(ip.get().getHostAddress().split("\\."));

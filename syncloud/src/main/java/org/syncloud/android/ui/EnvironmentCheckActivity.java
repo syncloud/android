@@ -19,14 +19,11 @@ import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
 import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;
-import org.fourthline.cling.support.model.PortMapping;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.network.Network;
 import org.syncloud.common.upnp.igd.Router;
 import org.syncloud.common.upnp.UPnP;
-
-import java.util.List;
 
 import static com.google.common.base.Optional.of;
 import static java.lang.String.format;
@@ -106,7 +103,7 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
 
     private void check() {
         reset();
-        new RouterTask().execute((Void) null);
+        new RouterTask().execute();
     }
 
 
@@ -213,9 +210,9 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
                 routerText.setText(router.getName());
                 routerStatusGood.setVisibility(View.VISIBLE);
                 done(1);
-                new IPTask().execute(router);
-                new PortsTask().execute(router);
-                new ManipulationTask().execute(router);
+                new IPTask(router).execute();
+                new PortsTask(router).execute();
+                new ManipulationTask(router).execute();
             } else {
                 routerText.setText("Not able to find UPnP router");
                 routerStatusBad.setVisibility(View.VISIBLE);
@@ -225,7 +222,13 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         }
     }
 
-    public class IPTask extends AsyncTask<Router, Void, Optional<String>> {
+    public class IPTask extends AsyncTask<Void, Void, Optional<String>> {
+
+        private Router router;
+
+        public IPTask(Router router) {
+            this.router = router;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -236,8 +239,8 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         }
 
         @Override
-        protected Optional<String> doInBackground(Router... routers) {
-            return routers[0].getExternalIP();
+        protected Optional<String> doInBackground(Void... voids) {
+            return router.getExternalIP();
         }
 
         @Override
@@ -254,7 +257,13 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         }
     }
 
-    public class PortsTask extends AsyncTask<Router, Void, List<PortMapping>> {
+    public class PortsTask extends AsyncTask<Void, Void, Integer> {
+
+        private Router router;
+
+        public PortsTask(Router router) {
+            this.router = router;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -265,18 +274,16 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         }
 
         @Override
-        protected List<PortMapping> doInBackground(Router... routers) {
-            return routers[0].getPortMappings();
+        protected Integer doInBackground(Void... voids) {
+            return router.getPortMappingsCount();
         }
 
         @Override
-        protected void onPostExecute(List<PortMapping> ports) {
-            if (!ports.isEmpty()) {
-                portsText.setText(format("%s mapped ports", ports.size()));
-//                ipStatusGood.setVisibility(View.VISIBLE);
+        protected void onPostExecute(Integer ports) {
+            if (ports > 0) {
+                portsText.setText(format("%s mapped ports", ports));
             } else {
-                ipText.setText("No mapped ports, may be fine");
-//                ipStatusBad.setVisibility(View.VISIBLE);
+                portsText.setText("No mapped ports, may be fine");
             }
             portsStatusGood.setVisibility(View.VISIBLE);
             portsProgress.setVisibility(View.GONE);
@@ -284,7 +291,14 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         }
     }
 
-    public class ManipulationTask extends AsyncTask<Router, Void, Boolean> {
+    public class ManipulationTask extends AsyncTask<Void, Void, Boolean> {
+
+        private Router router;
+        private Optional<String> ip;
+
+        public ManipulationTask(Router router) {
+            this.router = router;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -295,24 +309,22 @@ public class EnvironmentCheckActivity extends ActionBarActivity {
         }
 
         @Override
-        protected Boolean doInBackground(Router... routers) {
-            Router router = routers[0];
-
-            Optional<String> ip = network.hostname();
+        protected Boolean doInBackground(Void... voids) {
+            ip = network.ip();
             if (!ip.isPresent())
                 return false;
-
 
             return router.canToManipulatePorts(ip.get());
         }
 
         @Override
         protected void onPostExecute(Boolean works) {
+            String ipText = " to local ip: " + ip.get();
             if (works) {
-                manipulationText.setText("Can modify port mappings");
+                manipulationText.setText("Can modify port mappings" + ipText);
                 manipulationStatusGood.setVisibility(View.VISIBLE);
             } else {
-                manipulationText.setText("Unable to modify port mappings");
+                manipulationText.setText("Unable to modify port mappings" + ipText);
                 manipulationStatusBad.setVisibility(View.VISIBLE);
             }
             manipulationProgress.setVisibility(View.GONE);

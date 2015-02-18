@@ -50,7 +50,11 @@ public class Router {
         return sync(registry.getUpnpService(), new GetExternalIPImpl(service)).getIp();
     }
 
-    public List<PortMapping> getPortMappings() {
+    public int getPortMappingsCount() {
+        return getPortMappings().size();
+    }
+
+    private List<PortMapping> getPortMappings() {
 
         ArrayList<PortMapping> mappings = new ArrayList<>();
         long i = 0;
@@ -90,14 +94,14 @@ public class Router {
         return Optional.absent();
     }
 
-    public boolean addPortMapping(PortMapping portMapping) {
+    private boolean addPortMapping(PortMapping portMapping) {
         return sync(
                 registry.getUpnpService(),
                 new PortMappingAddImpl(portMapping, service)
         ).isSuccessfull();
     }
 
-    public boolean removePortMapping(PortMapping portMapping) {
+    private boolean removePortMapping(PortMapping portMapping) {
         return sync(
                 registry.getUpnpService(),
                 new PortMappingDeleteImpl(portMapping, service)
