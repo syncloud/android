@@ -7,12 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 131
-        versionName "1.31"
-    }
-
-    dexOptions {
-        javaMaxHeapSize "4g"
+        versionCode 132
+        versionName "1.32"
     }
 
     productFlavors {
