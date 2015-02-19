@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +18,7 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.redirect.IUserService;
 import org.syncloud.redirect.UserResult;
 
-public class AuthActivity extends ActionBarActivity {
+public class AuthActivity extends Activity {
 
     private Preferences preferences;
 

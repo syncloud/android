@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +28,7 @@ import java.util.List;
 
 import static java.util.Collections.sort;
 
-public class DevicesSavedActivity extends ActionBarActivity {
+public class DevicesSavedActivity extends Activity {
 
     private KeysStorage keysStorage;
     private DevicesSavedAdapter adapter;

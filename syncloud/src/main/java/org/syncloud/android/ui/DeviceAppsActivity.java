@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,7 +48,7 @@ import static org.syncloud.android.SyncloudApplication.appRegistry;
 import static org.syncloud.ssh.SimpleConnectionPointProvider.simple;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
-public class DeviceAppsActivity extends ActionBarActivity {
+public class DeviceAppsActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(DeviceActivateActivity.class);
 

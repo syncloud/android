@@ -66,7 +66,7 @@
 
                 <ProgressBar
                     android:id="@+id/upnp_router_progress"
-                    style="@style/ProgressBarHorisontalTheme"
+                    style="@style/ProgressBarTheme"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:scaleType="fitXY"
@@ -130,7 +130,7 @@
 
                 <ProgressBar
                     android:id="@+id/upnp_ip_progress"
-                    style="@style/ProgressBarHorisontalTheme"
+                    style="@style/ProgressBarTheme"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:scaleType="fitXY"
@@ -193,7 +193,7 @@
 
                 <ProgressBar
                     android:id="@+id/upnp_ports_progress"
-                    style="@style/ProgressBarHorisontalTheme"
+                    style="@style/ProgressBarTheme"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:scaleType="fitXY"
@@ -256,7 +256,7 @@
 
                 <ProgressBar
                     android:id="@+id/upnp_manipulation_progress"
-                    style="@style/ProgressBarHorisontalTheme"
+                    style="@style/ProgressBarTheme"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:minHeight="50dp"

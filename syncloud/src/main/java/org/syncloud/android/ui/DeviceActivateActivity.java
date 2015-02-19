@@ -2,7 +2,6 @@ package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,7 +36,7 @@ import static org.syncloud.ssh.SimpleConnectionPointProvider.simple;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
 
-public class DeviceActivateActivity extends ActionBarActivity {
+public class DeviceActivateActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(DeviceActivateActivity.class);
 

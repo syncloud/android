@@ -12,13 +12,11 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -28,10 +26,9 @@ import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.discovery.DiscoveryManager;
-import org.syncloud.android.tasks.ProgressAsyncTask;
-import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.discovery.DeviceEndpointListener;
+import org.syncloud.android.discovery.DiscoveryManager;
+import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.Tools;
 import org.syncloud.ssh.model.ConnectionPoint;
@@ -45,7 +42,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static org.syncloud.ssh.SimpleConnectionPointProvider.simple;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
-public class DevicesDiscoveryActivity extends ActionBarActivity {
+public class DevicesDiscoveryActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(DevicesDiscoveryActivity.class.getName());
 

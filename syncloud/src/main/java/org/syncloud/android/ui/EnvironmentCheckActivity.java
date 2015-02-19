@@ -1,10 +1,10 @@
 package org.syncloud.android.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,7 +28,7 @@ import org.syncloud.common.upnp.UPnP;
 import static com.google.common.base.Optional.of;
 import static java.lang.String.format;
 
-public class EnvironmentCheckActivity extends ActionBarActivity {
+public class EnvironmentCheckActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(EnvironmentCheckActivity.class.getName());
 
