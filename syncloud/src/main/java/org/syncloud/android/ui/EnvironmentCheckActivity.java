@@ -18,21 +18,21 @@ import android.widget.TextView;
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
-import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.network.Network;
-import org.syncloud.common.upnp.cling.ClingUPnP;
-import org.syncloud.common.upnp.cling.ClingRouter;
+import org.syncloud.common.upnp.Router;
+import org.syncloud.common.upnp.UPnP;
 
 import static com.google.common.base.Optional.of;
 import static java.lang.String.format;
+import static org.syncloud.common.upnp.UPnPFactory.createUPnP;
 
 public class EnvironmentCheckActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(EnvironmentCheckActivity.class.getName());
 
-    private Optional<ClingUPnP> upnp = Optional.absent();
+    private Optional<? extends UPnP> upnp = Optional.absent();
 
     private int checksInFlight = 0;
     private static final int TOTAL_CHECKS = 4;
@@ -187,7 +187,11 @@ public class EnvironmentCheckActivity extends Activity {
             upnp.get().shutdown();
     }
 
-    public class RouterTask extends AsyncTask<Void, Void, Optional<ClingRouter>> {
+    private UPnP getUPnP() {
+        return createUPnP("cling");
+    }
+
+    public class RouterTask extends AsyncTask<Void, Void, Optional<? extends Router>> {
 
         @Override
         protected void onPreExecute() {
@@ -198,15 +202,16 @@ public class EnvironmentCheckActivity extends Activity {
         }
 
         @Override
-        protected Optional<ClingRouter> doInBackground(Void... voids) {
-            upnp = of(new ClingUPnP(new AndroidUpnpServiceConfiguration()));
-            return upnp.get().start().find();
+        protected Optional<? extends Router> doInBackground(Void... voids) {
+            upnp = of(getUPnP());
+            upnp.get().start();
+            return upnp.get().find();
         }
 
         @Override
-        protected void onPostExecute(Optional<ClingRouter> result) {
+        protected void onPostExecute(Optional<? extends Router> result) {
             if (result.isPresent()) {
-                ClingRouter router = result.get();
+                Router router = result.get();
                 routerText.setText(router.getName());
                 routerStatusGood.setVisibility(View.VISIBLE);
                 done(1);
@@ -224,9 +229,9 @@ public class EnvironmentCheckActivity extends Activity {
 
     public class IPTask extends AsyncTask<Void, Void, Optional<String>> {
 
-        private ClingRouter router;
+        private Router router;
 
-        public IPTask(ClingRouter router) {
+        public IPTask(Router router) {
             this.router = router;
         }
 
@@ -259,9 +264,9 @@ public class EnvironmentCheckActivity extends Activity {
 
     public class PortsTask extends AsyncTask<Void, Void, Integer> {
 
-        private ClingRouter router;
+        private Router router;
 
-        public PortsTask(ClingRouter router) {
+        public PortsTask(Router router) {
             this.router = router;
         }
 
@@ -293,10 +298,10 @@ public class EnvironmentCheckActivity extends Activity {
 
     public class ManipulationTask extends AsyncTask<Void, Void, Boolean> {
 
-        private ClingRouter router;
+        private Router router;
         private Optional<String> ip;
 
-        public ManipulationTask(ClingRouter router) {
+        public ManipulationTask(Router router) {
             this.router = router;
         }
 

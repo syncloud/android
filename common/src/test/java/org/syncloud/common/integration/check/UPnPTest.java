@@ -9,10 +9,6 @@ import org.syncloud.common.upnp.cling.ClingRouter;
 
 import java.net.SocketException;
 
-import static com.google.common.collect.FluentIterable.from;
-import static java.util.Collections.max;
-import static java.util.Collections.sort;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UPnPTest {
@@ -22,7 +18,8 @@ public class UPnPTest {
     @Test
     public void test() throws InterruptedException, SocketException {
         ClingUPnP upnp = new ClingUPnP(new DefaultUpnpServiceConfiguration());
-        Optional<ClingRouter> routerOptional = upnp.start().find();
+        upnp.start();
+        Optional<ClingRouter> routerOptional = upnp.find();
 
         assertTrue(routerOptional.isPresent());
         ClingRouter router = routerOptional.get();

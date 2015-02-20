@@ -7,7 +7,7 @@ import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.UpnpServiceImpl;
 
-public class ClingUPnP {
+public class ClingUPnP implements org.syncloud.common.upnp.UPnP {
 
     public static final int TIMEOUT = 60;
     private static Logger logger = Logger.getLogger(ClingUPnP.class);
@@ -22,17 +22,17 @@ public class ClingUPnP {
         routerListener = new RouterListener(TIMEOUT);
     }
 
-    public synchronized ClingUPnP start() {
+    public synchronized void start() {
         if (used)
             throw new RuntimeException("cannot use me two times");
         logger.info("starting upnp service");
         upnpService = new UpnpServiceImpl(configuration, routerListener);
         started = true;
         used = true;
-        return this;
     }
 
 
+    @Override
     public Optional<ClingRouter> find() {
         if (!started) {
             logger.error("not started");
