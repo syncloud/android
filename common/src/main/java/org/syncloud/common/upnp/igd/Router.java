@@ -56,7 +56,7 @@ public class Router {
 
     private List<PortMapping> getPortMappings() {
 
-        ArrayList<PortMapping> mappings = new ArrayList<>();
+        ArrayList<PortMapping> mappings = new ArrayList<PortMapping>();
         long i = 0;
         while (i < LIMIT) {
 
@@ -111,7 +111,7 @@ public class Router {
     private <T extends ActionCallback> T sync(UpnpService upnpService, T callback) {
         try {
             upnpService.getControlPoint().execute(callback).get(timeout, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+        } catch (Exception e) {
             logger.error("interrupted: " + e.getMessage());
         }
         return callback;

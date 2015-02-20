@@ -10,8 +10,7 @@ import org.fourthline.cling.support.model.PortMapping;
 
 import java.util.Map;
 
-//TODO: Modeled after org.fourthline.cling.support.igd.callback.GetExternalIP
-//TODO: Ideally has to be moved upstream
+//TODO: Remover after this is merged https://github.com/4thline/cling/pull/116
 public abstract class GetPortMappingEntry extends ActionCallback {
 
     public GetPortMappingEntry(Service service, long index) {
