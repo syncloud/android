@@ -1,4 +1,4 @@
-package org.syncloud.common.upnp.igd.action.cling;
+package org.syncloud.common.upnp.cling.action.cling;
 
 import org.fourthline.cling.controlpoint.ActionCallback;
 import org.fourthline.cling.controlpoint.ControlPoint;

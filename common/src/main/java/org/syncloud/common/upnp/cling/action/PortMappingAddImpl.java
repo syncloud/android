@@ -1,4 +1,4 @@
-package org.syncloud.common.upnp.igd.action;
+package org.syncloud.common.upnp.cling.action;
 
 import org.apache.log4j.Logger;
 import org.fourthline.cling.model.action.ActionInvocation;

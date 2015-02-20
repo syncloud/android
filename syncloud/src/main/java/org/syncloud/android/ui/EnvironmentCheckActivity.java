@@ -22,8 +22,8 @@ import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.network.Network;
-import org.syncloud.common.upnp.igd.Router;
-import org.syncloud.common.upnp.UPnP;
+import org.syncloud.common.upnp.cling.ClingUPnP;
+import org.syncloud.common.upnp.cling.ClingRouter;
 
 import static com.google.common.base.Optional.of;
 import static java.lang.String.format;
@@ -32,7 +32,7 @@ public class EnvironmentCheckActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(EnvironmentCheckActivity.class.getName());
 
-    private Optional<UPnP> upnp = Optional.absent();
+    private Optional<ClingUPnP> upnp = Optional.absent();
 
     private int checksInFlight = 0;
     private static final int TOTAL_CHECKS = 4;
@@ -187,7 +187,7 @@ public class EnvironmentCheckActivity extends Activity {
             upnp.get().shutdown();
     }
 
-    public class RouterTask extends AsyncTask<Void, Void, Optional<Router>> {
+    public class RouterTask extends AsyncTask<Void, Void, Optional<ClingRouter>> {
 
         @Override
         protected void onPreExecute() {
@@ -198,15 +198,15 @@ public class EnvironmentCheckActivity extends Activity {
         }
 
         @Override
-        protected Optional<Router> doInBackground(Void... voids) {
-            upnp = of(new UPnP(new AndroidUpnpServiceConfiguration()));
+        protected Optional<ClingRouter> doInBackground(Void... voids) {
+            upnp = of(new ClingUPnP(new AndroidUpnpServiceConfiguration()));
             return upnp.get().start().find();
         }
 
         @Override
-        protected void onPostExecute(Optional<Router> result) {
+        protected void onPostExecute(Optional<ClingRouter> result) {
             if (result.isPresent()) {
-                Router router = result.get();
+                ClingRouter router = result.get();
                 routerText.setText(router.getName());
                 routerStatusGood.setVisibility(View.VISIBLE);
                 done(1);
@@ -224,9 +224,9 @@ public class EnvironmentCheckActivity extends Activity {
 
     public class IPTask extends AsyncTask<Void, Void, Optional<String>> {
 
-        private Router router;
+        private ClingRouter router;
 
-        public IPTask(Router router) {
+        public IPTask(ClingRouter router) {
             this.router = router;
         }
 
@@ -259,9 +259,9 @@ public class EnvironmentCheckActivity extends Activity {
 
     public class PortsTask extends AsyncTask<Void, Void, Integer> {
 
-        private Router router;
+        private ClingRouter router;
 
-        public PortsTask(Router router) {
+        public PortsTask(ClingRouter router) {
             this.router = router;
         }
 
@@ -293,10 +293,10 @@ public class EnvironmentCheckActivity extends Activity {
 
     public class ManipulationTask extends AsyncTask<Void, Void, Boolean> {
 
-        private Router router;
+        private ClingRouter router;
         private Optional<String> ip;
 
-        public ManipulationTask(Router router) {
+        public ManipulationTask(ClingRouter router) {
             this.router = router;
         }
 

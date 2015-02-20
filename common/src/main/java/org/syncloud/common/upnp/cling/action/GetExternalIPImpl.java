@@ -1,4 +1,4 @@
-package org.syncloud.common.upnp.igd.action;
+package org.syncloud.common.upnp.cling.action;
 
 import com.google.common.base.Optional;
 
@@ -6,21 +6,20 @@ import org.apache.log4j.Logger;
 import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.model.meta.Service;
-import org.fourthline.cling.support.model.PortMapping;
-import org.syncloud.common.upnp.igd.action.cling.GetPortMappingEntry;
+import org.fourthline.cling.support.igd.callback.GetExternalIP;
 
-public class GetPortMappingEntryImpl extends GetPortMappingEntry {
+public class GetExternalIPImpl extends GetExternalIP {
 
     private Logger logger = Logger.getLogger(GetExternalIPImpl.class);
-    private Optional<PortMapping> portMapping = Optional.absent();
+    private Optional<String> ip = Optional.absent();
 
-    public GetPortMappingEntryImpl(Service service, long index) {
-        super(service, index);
+    public GetExternalIPImpl(Service service) {
+        super(service);
     }
 
     @Override
-    protected void success(PortMapping portMapping) {
-        this.portMapping = Optional.of(portMapping);
+    protected void success(String externalIPAddress) {
+        ip = Optional.of(externalIPAddress);
     }
 
     @Override
@@ -30,7 +29,7 @@ public class GetPortMappingEntryImpl extends GetPortMappingEntry {
         logger.error("operation response: " + operation.getResponseDetails());
     }
 
-    public Optional<PortMapping> getPortMapping() {
-        return portMapping;
+    public Optional<String> getIp() {
+        return ip;
     }
 }

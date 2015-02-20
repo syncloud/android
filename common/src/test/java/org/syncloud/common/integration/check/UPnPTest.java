@@ -4,8 +4,8 @@ import com.google.common.base.Optional;
 
 import org.fourthline.cling.DefaultUpnpServiceConfiguration;
 import org.junit.Test;
-import org.syncloud.common.upnp.igd.Router;
-import org.syncloud.common.upnp.UPnP;
+import org.syncloud.common.upnp.cling.ClingUPnP;
+import org.syncloud.common.upnp.cling.ClingRouter;
 
 import java.net.SocketException;
 
@@ -21,11 +21,11 @@ public class UPnPTest {
 
     @Test
     public void test() throws InterruptedException, SocketException {
-        UPnP upnp = new UPnP(new DefaultUpnpServiceConfiguration());
-        Optional<Router> routerOptional = upnp.start().find();
+        ClingUPnP upnp = new ClingUPnP(new DefaultUpnpServiceConfiguration());
+        Optional<ClingRouter> routerOptional = upnp.start().find();
 
         assertTrue(routerOptional.isPresent());
-        Router router = routerOptional.get();
+        ClingRouter router = routerOptional.get();
         System.out.println(router.getName());
 
         Optional<String> ipOpt = router.getExternalIP();

@@ -1,4 +1,4 @@
-package org.syncloud.common.upnp.igd;
+package org.syncloud.common.upnp.cling;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -12,44 +12,45 @@ import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
 import org.fourthline.cling.registry.Registry;
 import org.fourthline.cling.support.model.PortMapping;
-import org.syncloud.common.upnp.igd.action.GetExternalIPImpl;
-import org.syncloud.common.upnp.igd.action.GetPortMappingEntryImpl;
-import org.syncloud.common.upnp.igd.action.PortMappingAddImpl;
-import org.syncloud.common.upnp.igd.action.PortMappingDeleteImpl;
+import org.syncloud.common.upnp.cling.action.GetExternalIPImpl;
+import org.syncloud.common.upnp.cling.action.GetPortMappingEntryImpl;
+import org.syncloud.common.upnp.cling.action.PortMappingAddImpl;
+import org.syncloud.common.upnp.cling.action.PortMappingDeleteImpl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static com.google.common.collect.FluentIterable.from;
 
-public class Router {
+public class ClingRouter implements org.syncloud.common.upnp.Router {
 
     public int timeout;
-    private Logger logger = Logger.getLogger(Router.class);
+    private Logger logger = Logger.getLogger(ClingRouter.class);
 
     private Registry registry;
     private Service service;
     private Device device;
     public static final int LIMIT = 10000;
 
-    public Router(Registry registry, Device device, Service service, int timeout) {
+    public ClingRouter(Registry registry, Device device, Service service, int timeout) {
         this.registry = registry;
         this.device = device;
         this.service = service;
         this.timeout = timeout;
     }
 
+    @Override
     public String getName() {
         return device.getDisplayString();
     }
 
+    @Override
     public Optional<String> getExternalIP() {
         return sync(registry.getUpnpService(), new GetExternalIPImpl(service)).getIp();
     }
 
+    @Override
     public int getPortMappingsCount() {
         return getPortMappings().size();
     }
@@ -117,6 +118,7 @@ public class Router {
         return callback;
     }
 
+    @Override
     public boolean canToManipulatePorts(String myIp) {
 
         final Optional<Long> availableExternalPort = getAvailableExternalPort();

@@ -1,4 +1,4 @@
-package org.syncloud.common.upnp.igd;
+package org.syncloud.common.upnp.cling;
 
 import com.google.common.base.Optional;
 
@@ -19,7 +19,7 @@ public class RouterListener extends DefaultRegistryListener {
 
     private static Logger logger = Logger.getLogger(RouterListener.class);
     private CountDownLatch countDownLatch = new CountDownLatch(1);
-    private Optional<Router> router = Optional.absent();
+    private Optional<ClingRouter> router = Optional.absent();
     private int timeout;
 
 
@@ -34,12 +34,12 @@ public class RouterListener extends DefaultRegistryListener {
         Optional<Service> service = discoverConnectionService(device);
         if (service.isPresent()) {
             logger.info("detected router service: " + service.get().getServiceId().getId());
-            router = Optional.of(new Router(registry, device, service.get(), timeout));
+            router = Optional.of(new ClingRouter(registry, device, service.get(), timeout));
             countDownLatch.countDown();
         }
     }
 
-    public Optional<Router> await() {
+    public Optional<ClingRouter> await() {
         try {
             countDownLatch.await(timeout, TimeUnit.SECONDS);
         } catch (InterruptedException e) {

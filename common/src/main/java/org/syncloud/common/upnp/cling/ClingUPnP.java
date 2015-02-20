@@ -1,4 +1,4 @@
-package org.syncloud.common.upnp;
+package org.syncloud.common.upnp.cling;
 
 import com.google.common.base.Optional;
 
@@ -6,25 +6,23 @@ import org.apache.log4j.Logger;
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.UpnpServiceImpl;
-import org.syncloud.common.upnp.igd.Router;
-import org.syncloud.common.upnp.igd.RouterListener;
 
-public class UPnP {
+public class ClingUPnP {
 
     public static final int TIMEOUT = 60;
-    private static Logger logger = Logger.getLogger(UPnP.class);
+    private static Logger logger = Logger.getLogger(ClingUPnP.class);
     private boolean started = false;
     private boolean used = false;
     private UpnpService upnpService;
     private final RouterListener routerListener;
     private UpnpServiceConfiguration configuration;
 
-    public UPnP(UpnpServiceConfiguration configuration) {
+    public ClingUPnP(UpnpServiceConfiguration configuration) {
         this.configuration = configuration;
         routerListener = new RouterListener(TIMEOUT);
     }
 
-    public synchronized UPnP start() {
+    public synchronized ClingUPnP start() {
         if (used)
             throw new RuntimeException("cannot use me two times");
         logger.info("starting upnp service");
@@ -35,7 +33,7 @@ public class UPnP {
     }
 
 
-    public Optional<Router> find() {
+    public Optional<ClingRouter> find() {
         if (!started) {
             logger.error("not started");
             return Optional.absent();
