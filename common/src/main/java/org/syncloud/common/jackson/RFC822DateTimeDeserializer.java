@@ -1,4 +1,4 @@
-package org.syncloud.common;
+package org.syncloud.common.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

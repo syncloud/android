@@ -1,4 +1,4 @@
-package org.syncloud.common.model;
+package org.syncloud.common.log;
 
 public class LogEvent {
     private String timestamp;

@@ -1,8 +1,8 @@
-package org.syncloud.common;
+package org.syncloud.common.log;
 
 import com.google.common.base.Optional;
 
-import org.syncloud.common.model.LogEvent;
+import org.syncloud.common.log.LogEvent;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

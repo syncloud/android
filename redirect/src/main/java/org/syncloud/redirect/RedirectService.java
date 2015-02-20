@@ -1,7 +1,6 @@
 package org.syncloud.redirect;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -23,7 +22,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.syncloud.common.Jackson.createObjectMapper;
+import static org.syncloud.common.jackson.Jackson.createObjectMapper;
 import static org.syncloud.redirect.UserResult.error;
 
 public class RedirectService implements IUserService {

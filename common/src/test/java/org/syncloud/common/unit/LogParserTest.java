@@ -4,8 +4,8 @@ import com.google.common.base.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.syncloud.common.LogParser;
-import org.syncloud.common.model.LogEvent;
+import org.syncloud.common.log.LogParser;
+import org.syncloud.common.log.LogEvent;
 
 public class LogParserTest {
 
