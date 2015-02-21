@@ -119,7 +119,7 @@ public class ClingRouter implements org.syncloud.common.upnp.Router {
     }
 
     @Override
-    public boolean canToManipulatePorts(String myIp) {
+    public boolean canManipulatePorts(String myIp) {
 
         final Optional<Long> availableExternalPort = getAvailableExternalPort();
         if(!availableExternalPort.isPresent())

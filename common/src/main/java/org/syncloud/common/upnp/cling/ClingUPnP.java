@@ -6,8 +6,9 @@ import org.apache.log4j.Logger;
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.UpnpServiceImpl;
+import org.syncloud.common.upnp.UPnP;
 
-public class ClingUPnP implements org.syncloud.common.upnp.UPnP {
+public class ClingUPnP implements UPnP {
 
     public static final int TIMEOUT = 60;
     private static Logger logger = Logger.getLogger(ClingUPnP.class);

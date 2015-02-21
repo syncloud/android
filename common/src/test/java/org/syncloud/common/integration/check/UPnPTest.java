@@ -4,8 +4,11 @@ import com.google.common.base.Optional;
 
 import org.fourthline.cling.DefaultUpnpServiceConfiguration;
 import org.junit.Test;
+import org.syncloud.common.upnp.Router;
+import org.syncloud.common.upnp.UPnP;
 import org.syncloud.common.upnp.cling.ClingUPnP;
 import org.syncloud.common.upnp.cling.ClingRouter;
+import org.syncloud.common.upnp.weupnp.WeUPnP;
 
 import java.net.SocketException;
 
@@ -17,12 +20,16 @@ public class UPnPTest {
 
     @Test
     public void test() throws InterruptedException, SocketException {
-        ClingUPnP upnp = new ClingUPnP(new DefaultUpnpServiceConfiguration());
+//        testUpnp(new ClingUPnP(new DefaultUpnpServiceConfiguration()));
+        testUpnp(new WeUPnP());
+    }
+
+    private void testUpnp(UPnP upnp) {
         upnp.start();
-        Optional<ClingRouter> routerOptional = upnp.find();
+        Optional<? extends Router> routerOptional = upnp.find();
 
         assertTrue(routerOptional.isPresent());
-        ClingRouter router = routerOptional.get();
+        Router router = routerOptional.get();
         System.out.println(router.getName());
 
         Optional<String> ipOpt = router.getExternalIP();
@@ -31,7 +38,7 @@ public class UPnPTest {
 
         System.out.println("mappings: " + router.getPortMappingsCount());
 
-        assertTrue(router.canToManipulatePorts(MY_IP));
+        assertTrue(router.canManipulatePorts(MY_IP));
 
         upnp.shutdown();
     }

@@ -9,5 +9,5 @@ public interface Router {
 
     int getPortMappingsCount();
 
-    boolean canToManipulatePorts(String myIp);
+    boolean canManipulatePorts(String myIp);
 }

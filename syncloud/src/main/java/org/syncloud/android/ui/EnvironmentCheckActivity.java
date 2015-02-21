@@ -20,9 +20,11 @@ import com.google.common.base.Optional;
 import org.apache.log4j.Logger;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.discovery.MulticastLock;
 import org.syncloud.android.network.Network;
 import org.syncloud.common.upnp.Router;
 import org.syncloud.common.upnp.UPnP;
+import org.syncloud.common.upnp.UPnPFactory;
 
 import static com.google.common.base.Optional.of;
 import static java.lang.String.format;
@@ -66,6 +68,8 @@ public class EnvironmentCheckActivity extends Activity {
     private ImageView manipulationStatusGood;
     private ImageView manipulationStatusBad;
     private Network network;
+//    private WifiManager wifiManager;
+//    private MulticastLock lock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,11 +102,16 @@ public class EnvironmentCheckActivity extends Activity {
         checkBtn = (Button) findViewById(R.id.upnp_check_btn);
         sendbtn = (ImageButton) findViewById(R.id.upnp_send_btn);
 
+//        wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+//        lock = new MulticastLock(wifiManager);
+        System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
+
         check();
     }
 
     private void check() {
         reset();
+//        lock.acquire();
         new RouterTask().execute();
     }
 
@@ -174,6 +183,7 @@ public class EnvironmentCheckActivity extends Activity {
         logger.info("done: " + checks + "/" + checksInFlight);
         checksInFlight -= checks;
         if (checksInFlight == 0) {
+//            lock.release();
             if (upnp.isPresent())
                 upnp.get().shutdown();
             mainControllsEnabled(true);
@@ -188,7 +198,7 @@ public class EnvironmentCheckActivity extends Activity {
     }
 
     private UPnP getUPnP() {
-        return createUPnP("cling");
+        return createUPnP(UPnPFactory.TYPE.WEUPNP);
     }
 
     public class RouterTask extends AsyncTask<Void, Void, Optional<? extends Router>> {
@@ -319,7 +329,7 @@ public class EnvironmentCheckActivity extends Activity {
             if (!ip.isPresent())
                 return false;
 
-            return router.canToManipulatePorts(ip.get());
+            return router.canManipulatePorts(ip.get());
         }
 
         @Override
