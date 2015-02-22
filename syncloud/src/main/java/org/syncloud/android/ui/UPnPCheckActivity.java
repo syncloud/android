@@ -1,11 +1,11 @@
 package org.syncloud.android.ui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,21 +20,19 @@ import com.google.common.base.Optional;
 import org.apache.log4j.Logger;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.discovery.MulticastLock;
 import org.syncloud.android.network.Network;
+import org.syncloud.android.ui.dialog.WifiDialog;
 import org.syncloud.common.upnp.Router;
 import org.syncloud.common.upnp.UPnP;
-import org.syncloud.common.upnp.UPnPFactory;
 
 import static com.google.common.base.Optional.of;
 import static java.lang.String.format;
-import static org.syncloud.common.upnp.UPnPFactory.createUPnP;
 
-public class EnvironmentCheckActivity extends Activity {
+public class UPnPCheckActivity extends FragmentActivity {
 
-    private static Logger logger = Logger.getLogger(EnvironmentCheckActivity.class.getName());
+    private static Logger logger = Logger.getLogger(UPnPCheckActivity.class.getName());
 
-    private Optional<? extends UPnP> upnp = Optional.absent();
+    private Optional<UPnP> upnp = Optional.absent();
 
     private int checksInFlight = 0;
     private static final int TOTAL_CHECKS = 4;
@@ -68,13 +66,11 @@ public class EnvironmentCheckActivity extends Activity {
     private ImageView manipulationStatusGood;
     private ImageView manipulationStatusBad;
     private Network network;
-//    private WifiManager wifiManager;
-//    private MulticastLock lock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_environment_check);
+        setContentView(R.layout.activity_upnp_check);
 
         application = (SyncloudApplication) getApplication();
         network = new Network((WifiManager) getSystemService(Context.WIFI_SERVICE));
@@ -102,24 +98,25 @@ public class EnvironmentCheckActivity extends Activity {
         checkBtn = (Button) findViewById(R.id.upnp_check_btn);
         sendbtn = (ImageButton) findViewById(R.id.upnp_send_btn);
 
-//        wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-//        lock = new MulticastLock(wifiManager);
-        System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
-
         check();
     }
 
     private void check() {
         reset();
-//        lock.acquire();
-        new RouterTask().execute();
+        if (application.isWifiConnected()) {
+            new RouterTask().execute();
+        } else {
+            WifiDialog dialog = new WifiDialog();
+            dialog.setMessage("UPnP check requires WiFi.");
+            dialog.show(getSupportFragmentManager(), "upnp_check");
+        }
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_environment_check, menu);
+        getMenuInflater().inflate(R.menu.menu_upnp_check, menu);
         return true;
     }
 
@@ -183,9 +180,6 @@ public class EnvironmentCheckActivity extends Activity {
         logger.info("done: " + checks + "/" + checksInFlight);
         checksInFlight -= checks;
         if (checksInFlight == 0) {
-//            lock.release();
-            if (upnp.isPresent())
-                upnp.get().shutdown();
             mainControllsEnabled(true);
         }
     }
@@ -193,15 +187,13 @@ public class EnvironmentCheckActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (upnp.isPresent())
-            upnp.get().shutdown();
     }
 
     private UPnP getUPnP() {
-        return createUPnP(UPnPFactory.TYPE.WEUPNP);
+        return new UPnP();
     }
 
-    public class RouterTask extends AsyncTask<Void, Void, Optional<? extends Router>> {
+    public class RouterTask extends AsyncTask<Void, Void, Optional<Router>> {
 
         @Override
         protected void onPreExecute() {
@@ -212,14 +204,13 @@ public class EnvironmentCheckActivity extends Activity {
         }
 
         @Override
-        protected Optional<? extends Router> doInBackground(Void... voids) {
+        protected Optional<Router> doInBackground(Void... voids) {
             upnp = of(getUPnP());
-            upnp.get().start();
             return upnp.get().find();
         }
 
         @Override
-        protected void onPostExecute(Optional<? extends Router> result) {
+        protected void onPostExecute(Optional<Router> result) {
             if (result.isPresent()) {
                 Router router = result.get();
                 routerText.setText(router.getName());

@@ -32,6 +32,12 @@
             android:summary="Shows application logs"
             />
 
+        <Preference
+            android:key="pref_upnp"
+            android:title="UPnP"
+            android:summary="Shows UPnP check screen"
+            />
+
         <ListPreference
             android:key="pref_release"
             android:title="Release"

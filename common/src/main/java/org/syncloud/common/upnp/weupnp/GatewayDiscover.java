@@ -1,29 +1,5 @@
 package org.syncloud.common.upnp.weupnp;
-/*
- *              weupnp - Trivial upnp java library
- *
- * Copyright (C) 2008 Alessandro Bahgat Shehata, Daniele Castagna
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- * Alessandro Bahgat Shehata - ale dot bahgat at gmail dot com
- * Daniele Castagna - daniele dot castagna at gmail dot com
- *
- */
 
-//import org.bitlet.weupnp.GatewayDevice;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
@@ -49,10 +25,7 @@ import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-
-/**
- * Handles the discovery of GatewayDevices, via the {@link org.bitlet.weupnp.GatewayDiscover#discover()} method.
- */
+//TODO: Remove after this is merged: https://github.com/bitletorg/weupnp/pull/13
 public class GatewayDiscover {
 
     private Logger logger = Logger.getLogger(GatewayDiscover.class);
@@ -151,7 +124,6 @@ public class GatewayDiscover {
 
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                // e.printStackTrace();
             } finally {
                 if (null != ssdp) {
                     ssdp.close();
@@ -299,7 +271,7 @@ public class GatewayDiscover {
                     return device;
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error(e.getMessage(), e);
             }
         }
 

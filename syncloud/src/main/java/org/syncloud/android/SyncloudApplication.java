@@ -1,7 +1,11 @@
 package org.syncloud.android;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -42,7 +46,7 @@ import static org.acra.ReportField.*;
         resDialogIcon = R.drawable.ic_launcher, //optional. default is a warning sign
         resDialogTitle = R.string.crash_dialog_title, // optional. default is your application name
         resDialogOkToast = R.string.crash_dialog_ok_toast, // optional. displays a Toast message when the user accepts to send a report.
-        logcatArguments = { "-t", "200", "-v", "long", "*:D"},
+        logcatArguments = { "-t", "500", "-v", "long", "*:D"},
         logcatFilterByPid = false
 )
 public class SyncloudApplication extends Application {
@@ -109,5 +113,11 @@ public class SyncloudApplication extends Application {
 
     public void reportError() {
         ACRA.getErrorReporter().handleSilentException(null);
+    }
+
+    public boolean isWifiConnected() {
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return mWifi.isConnected();
     }
 }

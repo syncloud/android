@@ -4,8 +4,6 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
     compile 'com.google.guava:guava:18.0'
     compile 'log4j:log4j:1.2.17'
-    compile 'org.fourthline.cling:cling-core:2.0.1'
-    compile 'org.fourthline.cling:cling-support:2.0.1'
     compile 'org.bitlet:weupnp:0.1.2'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.10'

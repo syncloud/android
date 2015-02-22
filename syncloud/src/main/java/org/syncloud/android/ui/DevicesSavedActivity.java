@@ -124,10 +124,6 @@ public class DevicesSavedActivity extends Activity {
         startActivityForResult(new Intent(this, DevicesDiscoveryActivity.class), 1);
     }
 
-    public void check(View view) {
-        startActivityForResult(new Intent(this, EnvironmentCheckActivity.class), 3);
-    }
-
     public class CheckCredentialsTask extends AsyncTask<Void, Void, UserResult> {
         private Preferences preferences;
         private IUserService userService;

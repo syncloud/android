@@ -3,15 +3,12 @@ package org.syncloud.android.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +26,7 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.android.discovery.DiscoveryManager;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
+import org.syncloud.android.ui.dialog.WifiDialog;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.Tools;
 import org.syncloud.ssh.model.ConnectionPoint;
@@ -42,7 +40,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static org.syncloud.ssh.SimpleConnectionPointProvider.simple;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
-public class DevicesDiscoveryActivity extends Activity {
+public class DevicesDiscoveryActivity extends FragmentActivity {
 
     private static Logger logger = Logger.getLogger(DevicesDiscoveryActivity.class.getName());
 
@@ -57,13 +55,14 @@ public class DevicesDiscoveryActivity extends Activity {
 
     private Map<Endpoint, IdentifiedEndpoint> map;
     private Tools tools;
+    private SyncloudApplication application;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SyncloudApplication application = (SyncloudApplication) getApplication();
+        application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
         tools = new Tools(new SshRunner());
         setContentView(R.layout.activity_devices_discovery);
@@ -92,49 +91,14 @@ public class DevicesDiscoveryActivity extends Activity {
         checkWiFiAndDiscover();
     }
 
-    private boolean isWifiConnected() {
-        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-        return mWifi.isConnected();
-    }
-
-    private void noWiFiConnection() {
-        Context context = this;
-
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-        alertDialogBuilder.setTitle("Wi-Fi Connection");
-        alertDialogBuilder
-                .setMessage("You are not connected to Wi-Fi network. Discovery is possible only in the same Wi-Fi network where you have Syncloud device connected.")
-                .setCancelable(false)
-                .setPositiveButton("Wi-Fi Settings", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
-                        openWiFiSettings();
-                        finish();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
-                        finish();
-                    }
-                });
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-
-        alertDialog.show();
-    }
-
-    public void openWiFiSettings() {
-        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
-        startActivityForResult(intent, 0);
-    }
-
     private void checkWiFiAndDiscover() {
         listAdapter.clear();
-        if (isWifiConnected()) {
+        if (application.isWifiConnected()) {
             new DiscoveryTask().execute(preferences.getDiscoveryLibrary());
         } else {
-            noWiFiConnection();
+            WifiDialog dialog = new WifiDialog();
+            dialog.setMessage("Discovery is possible only in the same Wi-Fi network where you have Syncloud device connected.");
+            dialog.show(getSupportFragmentManager(), "discovery_wifi_dialog");
         }
     }
 

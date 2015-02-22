@@ -100,9 +100,9 @@
             android:label="@string/title_activity_git_bucket" >
         </activity>
         <activity
-            android:name=".ui.EnvironmentCheckActivity"
+            android:name=".ui.UPnPCheckActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_environment_check" >
+            android:label="@string/title_activity_upnp_check" >
         </activity>
     </application>
 

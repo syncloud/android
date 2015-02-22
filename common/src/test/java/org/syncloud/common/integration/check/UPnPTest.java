@@ -2,13 +2,9 @@ package org.syncloud.common.integration.check;
 
 import com.google.common.base.Optional;
 
-import org.fourthline.cling.DefaultUpnpServiceConfiguration;
 import org.junit.Test;
 import org.syncloud.common.upnp.Router;
 import org.syncloud.common.upnp.UPnP;
-import org.syncloud.common.upnp.cling.ClingUPnP;
-import org.syncloud.common.upnp.cling.ClingRouter;
-import org.syncloud.common.upnp.weupnp.WeUPnP;
 
 import java.net.SocketException;
 
@@ -20,13 +16,7 @@ public class UPnPTest {
 
     @Test
     public void test() throws InterruptedException, SocketException {
-//        testUpnp(new ClingUPnP(new DefaultUpnpServiceConfiguration()));
-        testUpnp(new WeUPnP());
-    }
-
-    private void testUpnp(UPnP upnp) {
-        upnp.start();
-        Optional<? extends Router> routerOptional = upnp.find();
+        Optional<Router> routerOptional = new UPnP().find();
 
         assertTrue(routerOptional.isPresent());
         Router router = routerOptional.get();
@@ -40,7 +30,6 @@ public class UPnPTest {
 
         assertTrue(router.canManipulatePorts(MY_IP));
 
-        upnp.shutdown();
     }
 
     /*private Optional<InetAddress> findMyIp() throws SocketException {

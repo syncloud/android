@@ -81,9 +81,4 @@ dependencies {
     compile 'de.mindpipe.android:android-logging-log4j:1.0.3'
     compile 'ch.acra:acra:4.5.0'
 
-    //cling UPnP android dependencies
-    compile  'org.eclipse.jetty:jetty-server:8.1.8.v20121106'
-    compile  'org.eclipse.jetty:jetty-servlet:8.1.8.v20121106'
-    compile  'org.eclipse.jetty:jetty-client:8.1.8.v20121106'
-
 }

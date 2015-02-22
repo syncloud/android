@@ -1,33 +1,17 @@
 package org.syncloud.common.upnp.weupnp;
-/*
- *              weupnp - Trivial upnp java library
- *
- * Copyright (C) 2008 Alessandro Bahgat Shehata, Daniele Castagna
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- * Alessandro Bahgat Shehata - ale dot bahgat at gmail dot com
- * Daniele Castagna - daniele dot castagna at gmail dot com
- *
- */
+import com.google.common.base.Charsets;
+import com.google.common.io.ByteSource;
+import com.google.common.io.CharStreams;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -40,14 +24,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-/**
- * A <tt>GatewayDevice</tt> is a class that abstracts UPnP-compliant gateways
- * <p/>
- * It holds all the information that comes back as UPnP responses, and
- * provides methods to issue UPnP commands to a gateway.
- *
- * @author casta
- */
+//TODO: Remove after this is merged: https://github.com/bitletorg/weupnp/pull/13
 public class GatewayDevice extends org.bitlet.weupnp.GatewayDevice {
 
     private static Logger logger = Logger.getLogger(GatewayDevice.class);
@@ -133,8 +110,9 @@ public class GatewayDevice extends org.bitlet.weupnp.GatewayDevice {
 
         XMLReader parser = XMLReaderFactory.createXMLReader();
         parser.setContentHandler(new GatewayDeviceHandler(this));
-        parser.parse(new InputSource(urlConn.getInputStream()));
-
+        String reply = CharStreams.toString(new InputStreamReader(urlConn.getInputStream(), Charsets.UTF_8));
+        logger.debug("router reply: " + reply);
+        parser.parse(new InputSource(new ByteArrayInputStream(reply.getBytes(Charsets.UTF_8))));
 
         /* fix urls */
         String ipConDescURL;

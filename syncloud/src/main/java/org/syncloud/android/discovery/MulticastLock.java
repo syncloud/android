@@ -1,16 +1,8 @@
 package org.syncloud.android.discovery;
 
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
-import com.google.common.base.Optional;
-
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 
 public class MulticastLock {
     private static Logger logger = Logger.getLogger(MulticastLock.class.getName());

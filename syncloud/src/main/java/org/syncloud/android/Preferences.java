@@ -23,6 +23,7 @@ public class Preferences implements EndpointPreference, Release{
     public static final String KEY_PREF_FEEDBACK_SEND= "pref_feedback_send";
     public static final String KEY_PREF_DISCOVERY_LIBRARY = "pref_discovery_library";
     public static final String KEY_PREF_LOGS = "pref_logs";
+    public static final String KEY_PREF_UPNP = "pref_upnp";
     public static final String KEY_PREF_SSH_MODE = "pref_ssh_mode";
     public static final String KEY_PREF_RELEASE = "pref_release";
 
