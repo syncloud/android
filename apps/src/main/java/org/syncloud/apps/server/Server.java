@@ -12,7 +12,7 @@ import org.syncloud.ssh.model.SshResult;
 
 import java.io.IOException;
 
-import static java.lang.String.format;
+import static org.syncloud.ssh.SshRunner.cmd;
 
 public class Server {
 
@@ -38,9 +38,9 @@ public class Server {
 
         logger.info("activating " + userDomain);
 
-        Optional<String> run = ssh.run(connectionPoint,
-                format("syncloud-cli activate %s %s %s %s %s %s",
-                        version, topLevelDomain, apiUrl, email, pass, userDomain));
+        String[] activateCmd = cmd("syncloud-cli", "activate", version, topLevelDomain, apiUrl, email, pass, userDomain);
+
+        Optional<String> run = ssh.run(connectionPoint, activateCmd);
 
         if (run.isPresent()) {
             try {
@@ -60,7 +60,7 @@ public class Server {
 
         logger.info("getting access");
 
-        Optional<String> run = ssh.run(connectionPoint, "syncloud-cli get_access");
+        Optional<String> run = ssh.run(connectionPoint, cmd("syncloud-cli", "get_access"));
 
         if (run.isPresent()) {
             try {

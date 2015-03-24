@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.net.URLEncoder.encode;
 import static org.syncloud.common.jackson.Jackson.createObjectMapper;
 import static org.syncloud.redirect.UserResult.error;
 
@@ -39,10 +40,10 @@ public class RedirectService implements IUserService {
 
     public UserResult getUser(String email, String password) {
 
-        CloseableHttpClient http = HttpClients.createDefault();
-        HttpGet get = new HttpGet(apiUrl + "/user/get?email=" + email + "&password=" + password);
-
         try {
+            CloseableHttpClient http = HttpClients.createDefault();
+            String urlString = "/user/get?email=" + encode(email, "utf-8") + "&password=" + encode(password, "utf-8");
+            HttpGet get = new HttpGet(apiUrl + urlString);
             CloseableHttpResponse response = http.execute(get);
             InputStream jsonResponse = response.getEntity().getContent();
             String textJsonResponse = readText(jsonResponse);

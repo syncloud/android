@@ -48,6 +48,9 @@ import static org.syncloud.android.SyncloudApplication.appRegistry;
 import static org.syncloud.ssh.SimpleConnectionPointProvider.simple;
 import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
 
+import static org.syncloud.ssh.SshRunner.cmd;
+
+
 public class DeviceAppsActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(DeviceActivateActivity.class);
@@ -122,7 +125,7 @@ public class DeviceAppsActivity extends Activity {
                         execute(new Runnable() {
                             @Override
                             public void run() {
-                                ssh.run(connectionPoint, "reboot");
+                                ssh.run(connectionPoint, cmd("reboot"));
                             }
                         });
                     }

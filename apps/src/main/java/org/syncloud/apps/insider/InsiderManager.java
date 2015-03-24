@@ -10,7 +10,7 @@ import org.syncloud.ssh.model.StringResult;
 
 import java.io.IOException;
 
-import static java.lang.String.format;
+import static org.syncloud.ssh.SshRunner.cmd;
 
 public class InsiderManager {
 
@@ -26,7 +26,7 @@ public class InsiderManager {
     }
 
     public Optional<String> userDomain(ConnectionPointProvider connectionPoint) {
-        Optional<String> execute = ssh.run(connectionPoint, format("%s user_domain", INSIDER_BIN));
+        Optional<String> execute = ssh.run(connectionPoint, cmd(INSIDER_BIN, "user_domain"));
         if (execute.isPresent()) {
             try {
                 return Optional.of(JSON.readValue(execute.get(), StringResult.class).data);
@@ -40,7 +40,7 @@ public class InsiderManager {
     }
 
     public boolean dropDomain(ConnectionPointProvider connectionPoint) {
-        Optional<String> execute = ssh.run(connectionPoint, format("%s drop_domain", INSIDER_BIN));
+        Optional<String> execute = ssh.run(connectionPoint, cmd(INSIDER_BIN, "drop_domain"));
         if (!execute.isPresent())
             logger.error("unable to drop domain");
         return execute.isPresent();

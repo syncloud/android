@@ -10,6 +10,8 @@ import org.syncloud.ssh.model.StringResult;
 
 import java.io.IOException;
 
+import static org.syncloud.ssh.SshRunner.cmd;
+
 public class OwncloudManager {
 
     private static Logger logger = Logger.getLogger(OwncloudManager.class);
@@ -23,12 +25,12 @@ public class OwncloudManager {
     }
 
     public Optional<String> finishSetup(ConnectionPointProvider connectionPoint, String login, String password, String protocol) {
-        return ssh.run(connectionPoint, String.format("%s finish %s %s %s", OWNCLOUD_CTL_BIN, login, password, protocol));
+        return ssh.run(connectionPoint, cmd(OWNCLOUD_CTL_BIN, "finish", login, password, protocol));
     }
 
     public Optional<String> owncloudUrl(ConnectionPointProvider connectionPoint) {
 
-        Optional<String> execute = ssh.run(connectionPoint, String.format("%s url", OWNCLOUD_CTL_BIN));
+        Optional<String> execute = ssh.run(connectionPoint, cmd(OWNCLOUD_CTL_BIN, "url"));
         if (execute.isPresent())
             try {
                 return Optional.of(JSON.readValue(execute.get(), StringResult.class).data);

@@ -12,8 +12,7 @@ import org.syncloud.ssh.model.SshResult;
 import java.io.IOException;
 import java.util.List;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.StringUtils.join;
+import static com.google.common.collect.Lists.newArrayList;
 
 public class Sam {
     private static Logger logger = Logger.getLogger(Sam.class);
@@ -27,12 +26,13 @@ public class Sam {
         this.release = release;
     }
 
-    public static String cmd(String... arguments) {
-        List<String> cmd = asList(arguments);
-        return "sam "+ join(cmd, " ");
+    public static String[] cmd(String[] arguments) {
+        List<String> allArguments = newArrayList(arguments);
+        allArguments.add(0, "sam");
+        return allArguments.toArray(new String[] {});
     }
 
-    private <TContent> Optional<TContent> runTyped(final TypeReference type, ConnectionPointProvider connectionPoint, String... arguments) {
+    private <TContent> Optional<TContent> runTyped(final TypeReference type, ConnectionPointProvider connectionPoint, String[] arguments) {
         Optional<String> execute = ssh.run(connectionPoint, cmd(arguments));
         if (execute.isPresent()) {
             try {
@@ -46,7 +46,7 @@ public class Sam {
         return Optional.absent();
     }
 
-    private Optional<List<AppVersions>> appsVersions(ConnectionPointProvider connectionPoint, String... arguments) {
+    private Optional<List<AppVersions>> appsVersions(ConnectionPointProvider connectionPoint, String[] arguments) {
         return runTyped(new TypeReference<SshResult<List<AppVersions>>>() {}, connectionPoint, arguments);
     }
 
@@ -72,10 +72,10 @@ public class Sam {
     }
 
     public Optional<List<AppVersions>> update(ConnectionPointProvider connectionPoint) {
-        return appsVersions(connectionPoint, Commands.update, "--release", release.getVersion());
+        return appsVersions(connectionPoint, new String[] {Commands.update, "--release", release.getVersion()});
     }
 
     public Optional<List<AppVersions>> list(ConnectionPointProvider connectionPoint) {
-        return appsVersions(connectionPoint, Commands.list);
+        return appsVersions(connectionPoint, new String[] {Commands.list});
     }
 }

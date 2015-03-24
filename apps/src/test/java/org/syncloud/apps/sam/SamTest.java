@@ -30,14 +30,14 @@ public class SamTest {
     public void testRunNoArgs() {
 
         SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), anyString())).thenReturn(Optional.of(""));
+        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(Optional.of(""));
 
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
 
         Sam sam = new Sam(ssh, testRelease);
         sam.run(device, Commands.update);
 
-        verify(ssh).run(device, "sam update");
+        verify(ssh).run(device, new String[]{"sam", "update"});
     }
 
     @Test
@@ -49,7 +49,7 @@ public class SamTest {
                 "    }";
 
         SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), anyString())).thenReturn(Optional.of(json));
+        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(Optional.of(json));
 
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
 
@@ -69,7 +69,7 @@ public class SamTest {
                 "    }";
 
         SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), anyString())).thenReturn(Optional.of(json));
+        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(Optional.of(json));
 
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
 
@@ -84,14 +84,14 @@ public class SamTest {
     public void testRunWithArgs() {
 
         SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), anyString())).thenReturn(Optional.of(""));
+        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(Optional.of(""));
 
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
 
         Sam sam = new Sam(ssh, testRelease);
         sam.run(device, Commands.update, "--release", "0.1");
 
-        verify(ssh).run(device, "sam update --release 0.1");
+        verify(ssh).run(device, new String[] {"sam", "update", "--release", "0.1"});
     }
 
     @Test
@@ -100,7 +100,7 @@ public class SamTest {
         SshRunner ssh = mock(SshRunner.class);
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
         String json = Resources.toString(getResource("app.list.json"), UTF_8);
-        String command = cmd(Commands.list);
+        String[] command = cmd(new String[] {Commands.list});
         when(ssh.run(device, command)).thenReturn(Optional.of(json));
 
         Sam sam = new Sam(ssh, testRelease);
@@ -117,7 +117,7 @@ public class SamTest {
         SshRunner ssh = mock(SshRunner.class);
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
         String json = Resources.toString(getResource("app.list.empty.json"), UTF_8);
-        String command = cmd(Commands.list);
+        String[] command = cmd(new String[] {Commands.list});
         when(ssh.run(device, command)).thenReturn(Optional.of(json));
 
         Sam sam = new Sam(ssh, testRelease);
@@ -135,7 +135,7 @@ public class SamTest {
         SshRunner ssh = mock(SshRunner.class);
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
         String json = "";
-        String command = cmd(Commands.list);
+        String[] command = cmd(new String[] {Commands.list});
         when(ssh.run(device, command)).thenReturn(Optional.of(json));
 
         Sam sam = new Sam(ssh, testRelease);
@@ -152,7 +152,7 @@ public class SamTest {
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
         String json = Resources.toString(getResource("app.list.error.json"), UTF_8);
 
-        String command = cmd(Commands.list);
+        String[] command = cmd(new String[] {Commands.list});
         when(ssh.run(device, command)).thenReturn(Optional.of(json));
 
         Sam sam = new Sam(ssh, testRelease);
@@ -176,7 +176,7 @@ public class SamTest {
         SshRunner ssh = mock(SshRunner.class);
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
         String json = Resources.toString(getResource(response), UTF_8);
-        String command = cmd(Commands.update, "--release", testRelease.getVersion());
+        String[] command = cmd(new String[] {Commands.update, "--release", testRelease.getVersion()});
         when(ssh.run(device, command)).thenReturn(Optional.of(json));
 
         Sam sam = new Sam(ssh, testRelease);

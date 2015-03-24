@@ -29,6 +29,9 @@ import java.util.List;
 import static android.os.AsyncTask.execute;
 import static org.syncloud.apps.sam.Commands.upgrade_all;
 
+import static org.syncloud.ssh.SshRunner.cmd;
+
+
 public class DeviceAppStoreActivity extends Activity {
 
     private DeviceAppStoreAppsAdapter deviceAppsAdapter;
@@ -178,7 +181,7 @@ public class DeviceAppStoreActivity extends Activity {
                         execute(new Runnable() {
                             @Override
                             public void run() {
-                                ssh.run(connectionPoint, "reboot");
+                                ssh.run(connectionPoint, cmd("reboot"));
                             }
                         });
                     }

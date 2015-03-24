@@ -10,6 +10,8 @@ import org.syncloud.ssh.model.StringResult;
 
 import java.io.IOException;
 
+import static org.syncloud.ssh.SshRunner.cmd;
+
 public class GitBucketManager {
     private static Logger logger = Logger.getLogger(GitBucketManager.class);
 
@@ -22,16 +24,16 @@ public class GitBucketManager {
     }
 
     public Optional<String> enable(ConnectionPointProvider connectionPoint, String login, String password) {
-        return ssh.run(connectionPoint, String.format("%s enable %s %s", CTL_BIN, login, password));
+        return ssh.run(connectionPoint, cmd(CTL_BIN, "enable", login, password));
     }
 
     public Optional<String> disable(ConnectionPointProvider connectionPoint) {
-        return ssh.run(connectionPoint, String.format("%s disable", CTL_BIN));
+        return ssh.run(connectionPoint, cmd(CTL_BIN, "disable"));
     }
 
     public Optional<String> url(ConnectionPointProvider connectionPoint) {
 
-        Optional<String> execute = ssh.run(connectionPoint, String.format("%s url", CTL_BIN));
+        Optional<String> execute = ssh.run(connectionPoint, cmd(CTL_BIN, "url"));
         if (execute.isPresent())
             try {
                 return Optional.of(JSON.readValue(execute.get(), StringResult.class).data);

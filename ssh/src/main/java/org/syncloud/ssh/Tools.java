@@ -22,7 +22,7 @@ public class Tools {
     }
 
     public Optional<Identification> getId(ConnectionPointProvider provider) {
-        Optional<String> result = ssh.run(provider, "syncloud-id id");
+        Optional<String> result = ssh.run(provider, new String[] {"syncloud-id", "id"});
         if (result.isPresent()) {
             String data = result.get();
 //            logger.debug("identification response: " + data);

@@ -6,8 +6,7 @@ import org.syncloud.ssh.SshRunner;
 
 public class SshRunnerTest {
     @Test
-    public void testShellEncoded() {
-        Assert.assertEquals("\\$password", SshRunner.shellEncoded("$password"));
-        Assert.assertEquals("\\$\\$password", SshRunner.shellEncoded("$$password"));
+    public void testCmdQuoted() {
+        Assert.assertEquals("'password'", SshRunner.quotedCmd(new String[]{"password"}));
     }
 }

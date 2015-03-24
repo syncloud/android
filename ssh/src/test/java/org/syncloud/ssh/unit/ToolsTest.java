@@ -7,8 +7,6 @@ import org.junit.Test;
 import org.syncloud.ssh.ConnectionPointProvider;
 import org.syncloud.ssh.SshRunner;
 import org.syncloud.ssh.Tools;
-import org.syncloud.ssh.model.Credentials;
-import org.syncloud.ssh.model.Endpoint;
 import org.syncloud.ssh.model.Identification;
 
 import static org.junit.Assert.assertEquals;
@@ -24,7 +22,7 @@ public class ToolsTest {
     public void testGetId() {
         SshRunner sshRunner = mock(SshRunner.class);
 
-        when(sshRunner.run(any(ConnectionPointProvider.class), anyString()))
+        when(sshRunner.run(any(ConnectionPointProvider.class), any(String[].class)))
                 .thenReturn(Optional.of("{\"data\":{" +
                         "\"name\": \"test\"," +
                         "\"title\": \"test_title\"," +

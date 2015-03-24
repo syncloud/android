@@ -7,34 +7,45 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
 import org.apache.commons.exec.LogOutputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.syncloud.ssh.model.ConnectionPoint;
 import org.syncloud.ssh.model.Credentials;
 import org.syncloud.ssh.model.Endpoint;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 public class SshRunner {
     public static final int SSH_SERVER_PORT = 22;
 
     private static Logger logger = Logger.getLogger(SshRunner.class);
 
-    public Optional<String> run(ConnectionPointProvider connectionPoint, String command) {
+    public static String[] cmd(String... arguments) {
+        return arguments;
+    }
+
+    public static String quotedCmd(String[] arguments) {
+        List<String> quotedParams = newArrayList();
+        for (String p: arguments)
+            quotedParams.add("'"+p+"'");
+        String quotedCommand = StringUtils.join(quotedParams, " ");
+        return quotedCommand;
+    }
+
+    public Optional<String> run(ConnectionPointProvider connectionPoint, String[] command) {
         return run(connectionPoint.get(), command);
     }
 
-    public static String shellEncoded(String command) {
-        return command.replaceAll("\\$", Matcher.quoteReplacement("\\$"));
-    }
-
-    public Optional<String> run(ConnectionPoint connectionPoint, String command) {
+    public Optional<String> run(ConnectionPoint connectionPoint, String[] command) {
         Endpoint endpoint = connectionPoint.endpoint();
         Credentials credentials = connectionPoint.credentials();
 
-        String escapedCommand = shellEncoded(command);
-        logger.info("executing: " + escapedCommand);
+        String quotedCommand = quotedCmd(command);
+        logger.info("executing: " + quotedCommand);
         JSch jsch = new JSch();
 
         try {
@@ -76,7 +87,7 @@ public class SshRunner {
                     }
                 });
 
-                channel.setCommand(escapedCommand);
+                channel.setCommand(quotedCommand);
                 InputStream inputStream = channel.getInputStream();
 
                 try {

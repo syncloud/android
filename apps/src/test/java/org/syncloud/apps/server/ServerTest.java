@@ -17,7 +17,7 @@ public class ServerTest {
     @Test
     public void testActivate() {
         SshRunner runner = mock(SshRunner.class);
-        when(runner.run(any(ConnectionPointProvider.class), anyString())).thenReturn(Optional.of("" +
+        when(runner.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(Optional.of("" +
                 "{\n" +
                 "  \"message\": null, \n" +
                 "  \"data\": {\n" +
