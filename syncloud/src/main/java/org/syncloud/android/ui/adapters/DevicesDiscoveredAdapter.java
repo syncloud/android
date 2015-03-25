@@ -9,8 +9,8 @@ import android.widget.TextView;
 
 import org.syncloud.android.R;
 import org.syncloud.android.ui.DevicesDiscoveryActivity;
-import org.syncloud.ssh.model.Identification;
-import org.syncloud.ssh.model.IdentifiedEndpoint;
+import org.syncloud.platform.ssh.model.Identification;
+import org.syncloud.platform.ssh.model.IdentifiedEndpoint;
 
 public class DevicesDiscoveredAdapter extends ArrayAdapter<IdentifiedEndpoint> {
     private DevicesDiscoveryActivity activity;

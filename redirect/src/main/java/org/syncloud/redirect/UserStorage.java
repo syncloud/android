@@ -8,7 +8,7 @@ import org.syncloud.redirect.model.User;
 import java.io.File;
 import java.io.IOException;
 
-import static org.syncloud.common.jackson.Jackson.createObjectMapper;
+import static org.syncloud.redirect.jackson.Jackson.createObjectMapper;
 
 public class UserStorage {
     private static Logger logger = Logger.getLogger(UserStorage.class);

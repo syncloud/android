@@ -22,8 +22,8 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.network.Network;
 import org.syncloud.android.ui.dialog.WifiDialog;
-import org.syncloud.common.upnp.Router;
-import org.syncloud.common.upnp.UPnP;
+import org.syncloud.android.upnp.Router;
+import org.syncloud.android.upnp.UPnP;
 
 import static com.google.common.base.Optional.of;
 import static java.lang.String.format;

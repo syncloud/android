@@ -3,8 +3,8 @@ package org.syncloud.android;
 import android.content.SharedPreferences;
 
 import org.apache.log4j.Logger;
-import org.syncloud.apps.sam.Release;
-import org.syncloud.ssh.EndpointPreference;
+import org.syncloud.platform.sam.Release;
+import org.syncloud.platform.ssh.EndpointPreference;
 
 import java.net.MalformedURLException;
 import java.net.URL;

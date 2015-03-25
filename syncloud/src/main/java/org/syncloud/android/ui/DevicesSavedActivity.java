@@ -20,8 +20,8 @@ import org.syncloud.android.ui.adapters.DevicesSavedAdapter;
 import org.syncloud.redirect.IUserService;
 import org.syncloud.redirect.UserResult;
 import org.syncloud.redirect.model.User;
-import org.syncloud.ssh.model.DomainModel;
-import org.syncloud.ssh.model.Key;
+import org.syncloud.platform.ssh.model.DomainModel;
+import org.syncloud.platform.ssh.model.Key;
 
 import java.util.Comparator;
 import java.util.List;

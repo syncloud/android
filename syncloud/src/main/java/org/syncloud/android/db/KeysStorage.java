@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 
 import org.apache.log4j.Logger;
-import org.syncloud.ssh.model.Key;
+import org.syncloud.platform.ssh.model.Key;
 
 import java.util.List;
 

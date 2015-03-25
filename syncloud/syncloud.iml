@@ -122,9 +122,8 @@
     <orderEntry type="library" exported="" name="jackson-databind-2.3.3" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-20.0.0" level="project" />
     <orderEntry type="module" module-name="redirect" exported="" />
-    <orderEntry type="module" module-name="common" exported="" />
     <orderEntry type="module" module-name="apps" exported="" />
-    <orderEntry type="module" module-name="ssh" exported="" />
+    <orderEntry type="module" module-name="platform" exported="" />
   </component>
 </module>
 

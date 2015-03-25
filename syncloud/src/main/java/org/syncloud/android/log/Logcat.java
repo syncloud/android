@@ -6,8 +6,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 
 import org.syncloud.android.ui.adapters.LogsAdapter;
-import org.syncloud.common.log.LogParser;
-import org.syncloud.common.log.LogEvent;
 
 import java.io.BufferedReader;
 import java.io.IOException;

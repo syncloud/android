@@ -9,9 +9,8 @@ import android.widget.TextView;
 
 import org.syncloud.android.R;
 import org.syncloud.android.ui.DeviceAppStoreActivity;
-import org.syncloud.apps.sam.App;
-import org.syncloud.apps.sam.AppVersions;
-import org.syncloud.apps.sam.Commands;
+import org.syncloud.platform.sam.AppVersions;
+import org.syncloud.platform.sam.Commands;
 
 public class DeviceAppStoreAppsAdapter extends ArrayAdapter<AppVersions> {
     private DeviceAppStoreActivity activity;

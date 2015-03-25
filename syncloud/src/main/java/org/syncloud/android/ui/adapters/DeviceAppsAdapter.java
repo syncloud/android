@@ -4,14 +4,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.syncloud.android.R;
 import org.syncloud.android.ui.DeviceAppsActivity;
-import org.syncloud.apps.sam.App;
-import org.syncloud.apps.sam.AppVersions;
+import org.syncloud.platform.sam.AppVersions;
 
 public class DeviceAppsAdapter extends ArrayAdapter<AppVersions> {
     private DeviceAppsActivity activity;

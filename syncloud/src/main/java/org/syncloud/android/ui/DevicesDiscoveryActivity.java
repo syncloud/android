@@ -27,18 +27,18 @@ import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.android.discovery.DiscoveryManager;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.ui.dialog.WifiDialog;
-import org.syncloud.ssh.SshRunner;
-import org.syncloud.ssh.Tools;
-import org.syncloud.ssh.model.ConnectionPoint;
-import org.syncloud.ssh.model.Endpoint;
-import org.syncloud.ssh.model.Identification;
-import org.syncloud.ssh.model.IdentifiedEndpoint;
+import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.platform.ssh.Tools;
+import org.syncloud.platform.ssh.model.ConnectionPoint;
+import org.syncloud.platform.ssh.model.Endpoint;
+import org.syncloud.platform.ssh.model.Identification;
+import org.syncloud.platform.ssh.model.IdentifiedEndpoint;
 
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
-import static org.syncloud.ssh.SimpleConnectionPointProvider.simple;
-import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
+import static org.syncloud.platform.ssh.SimpleConnectionPointProvider.simple;
+import static org.syncloud.platform.ssh.model.Credentials.getStandardCredentials;
 
 public class DevicesDiscoveryActivity extends FragmentActivity {
 

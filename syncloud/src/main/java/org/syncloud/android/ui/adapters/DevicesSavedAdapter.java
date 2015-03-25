@@ -12,7 +12,7 @@ import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.DevicesSavedActivity;
-import org.syncloud.ssh.model.DomainModel;
+import org.syncloud.platform.ssh.model.DomainModel;
 
 public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
     private final Preferences preferences;

@@ -18,18 +18,18 @@ import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppStoreAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
-import org.syncloud.apps.sam.AppVersions;
-import org.syncloud.apps.sam.Sam;
-import org.syncloud.ssh.ConnectionPointProvider;
-import org.syncloud.ssh.SshRunner;
-import org.syncloud.ssh.model.DomainModel;
+import org.syncloud.platform.sam.AppVersions;
+import org.syncloud.platform.sam.Sam;
+import org.syncloud.platform.ssh.ConnectionPointProvider;
+import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.platform.ssh.model.DomainModel;
 
 import java.util.List;
 
 import static android.os.AsyncTask.execute;
-import static org.syncloud.apps.sam.Commands.upgrade_all;
+import static org.syncloud.platform.sam.Commands.upgrade_all;
 
-import static org.syncloud.ssh.SshRunner.cmd;
+import static org.syncloud.platform.ssh.SshRunner.cmd;
 
 
 public class DeviceAppStoreActivity extends Activity {

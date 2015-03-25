@@ -1,6 +1,5 @@
 package org.syncloud.android;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -23,12 +22,11 @@ import org.syncloud.redirect.IUserService;
 import org.syncloud.redirect.RedirectService;
 import org.syncloud.redirect.UserCachedService;
 import org.syncloud.redirect.UserStorage;
-import org.syncloud.ssh.ConnectionPointProvider;
-import org.syncloud.ssh.EndpointSelector;
-import org.syncloud.ssh.SelectorConnectionPointProvider;
-import org.syncloud.ssh.SshRunner;
-import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.DomainModel;
+import org.syncloud.platform.ssh.ConnectionPointProvider;
+import org.syncloud.platform.ssh.EndpointSelector;
+import org.syncloud.platform.ssh.SelectorConnectionPointProvider;
+import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.platform.ssh.model.Device;
 
 import java.io.File;
 import java.util.HashMap;

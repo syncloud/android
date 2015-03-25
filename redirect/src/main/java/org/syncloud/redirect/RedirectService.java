@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.net.URLEncoder.encode;
-import static org.syncloud.common.jackson.Jackson.createObjectMapper;
+import static org.syncloud.redirect.jackson.Jackson.createObjectMapper;
 import static org.syncloud.redirect.UserResult.error;
 
 public class RedirectService implements IUserService {

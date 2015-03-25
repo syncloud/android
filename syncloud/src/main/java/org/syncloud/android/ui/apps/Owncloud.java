@@ -20,8 +20,8 @@ import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
 import org.syncloud.apps.owncloud.OwncloudManager;
-import org.syncloud.ssh.ConnectionPointProvider;
-import org.syncloud.ssh.model.DomainModel;
+import org.syncloud.platform.ssh.ConnectionPointProvider;
+import org.syncloud.platform.ssh.model.DomainModel;
 
 
 public class Owncloud extends Activity {

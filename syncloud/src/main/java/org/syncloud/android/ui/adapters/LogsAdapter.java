@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.syncloud.android.R;
-import org.syncloud.common.log.LogEvent;
+import org.syncloud.android.log.LogEvent;
 import org.syncloud.android.ui.LogsActivity;
 
 public class LogsAdapter extends ArrayAdapter<LogEvent> {

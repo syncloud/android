@@ -29,26 +29,26 @@ import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
-import org.syncloud.apps.sam.AppVersions;
-import org.syncloud.apps.sam.Sam;
-import org.syncloud.apps.server.Server;
+import org.syncloud.platform.sam.AppVersions;
+import org.syncloud.platform.sam.Sam;
+import org.syncloud.platform.server.Server;
 import org.syncloud.redirect.RedirectService;
-import org.syncloud.ssh.ConnectionPointProvider;
-import org.syncloud.ssh.SshRunner;
-import org.syncloud.ssh.model.ConnectionPoint;
-import org.syncloud.ssh.model.Credentials;
-import org.syncloud.ssh.model.DomainModel;
-import org.syncloud.ssh.model.Endpoint;
-import org.syncloud.ssh.model.Key;
+import org.syncloud.platform.ssh.ConnectionPointProvider;
+import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.platform.ssh.model.ConnectionPoint;
+import org.syncloud.platform.ssh.model.Credentials;
+import org.syncloud.platform.ssh.model.DomainModel;
+import org.syncloud.platform.ssh.model.Endpoint;
+import org.syncloud.platform.ssh.model.Key;
 
 import java.util.List;
 
 import static android.os.AsyncTask.execute;
 import static org.syncloud.android.SyncloudApplication.appRegistry;
-import static org.syncloud.ssh.SimpleConnectionPointProvider.simple;
-import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
+import static org.syncloud.platform.ssh.SimpleConnectionPointProvider.simple;
+import static org.syncloud.platform.ssh.model.Credentials.getStandardCredentials;
 
-import static org.syncloud.ssh.SshRunner.cmd;
+import static org.syncloud.platform.ssh.SshRunner.cmd;
 
 
 public class DeviceAppsActivity extends Activity {
