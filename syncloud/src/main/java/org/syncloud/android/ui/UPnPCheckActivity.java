@@ -32,8 +32,6 @@ public class UPnPCheckActivity extends FragmentActivity {
 
     private static Logger logger = Logger.getLogger(UPnPCheckActivity.class.getName());
 
-    private Optional<UPnP> upnp = Optional.absent();
-
     private int checksInFlight = 0;
     private static final int TOTAL_CHECKS = 4;
 
@@ -205,8 +203,8 @@ public class UPnPCheckActivity extends FragmentActivity {
 
         @Override
         protected Optional<Router> doInBackground(Void... voids) {
-            upnp = of(getUPnP());
-            return upnp.get().find();
+            UPnP upnp = getUPnP();
+            return upnp.find();
         }
 
         @Override
