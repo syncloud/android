@@ -38,11 +38,4 @@ public class InsiderManager {
         logger.error("unable to get user domain reply");
         return Optional.absent();
     }
-
-    public boolean dropDomain(ConnectionPointProvider connectionPoint) {
-        Optional<String> execute = ssh.run(connectionPoint, cmd(INSIDER_BIN, "drop_domain"));
-        if (!execute.isPresent())
-            logger.error("unable to drop domain");
-        return execute.isPresent();
-    }
 }
