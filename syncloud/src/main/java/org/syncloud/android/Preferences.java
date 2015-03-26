@@ -26,6 +26,7 @@ public class Preferences implements EndpointPreference, Release{
     public static final String KEY_PREF_UPNP = "pref_upnp";
     public static final String KEY_PREF_SSH_MODE = "pref_ssh_mode";
     public static final String KEY_PREF_RELEASE = "pref_release";
+    public static final String KEY_PREF_CHECK_NEEDED = "pref_check_needed";
 
     private SharedPreferences preferences;
 
@@ -86,6 +87,14 @@ public class Preferences implements EndpointPreference, Release{
         logger.info("swapping ssh mode preference");
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(KEY_PREF_SSH_MODE, isRemote() ? "Local" : "Remote");
+        editor.apply();
+    }
+
+    public boolean isCheckNeeded() { return preferences.getBoolean(KEY_PREF_CHECK_NEEDED, true); }
+
+    public void setCheckNeeded(boolean value) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(KEY_PREF_CHECK_NEEDED, value);
         editor.apply();
     }
 }

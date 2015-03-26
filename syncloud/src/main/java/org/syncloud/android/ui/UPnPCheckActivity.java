@@ -9,9 +9,10 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -25,20 +26,23 @@ import org.syncloud.android.ui.dialog.WifiDialog;
 import org.syncloud.android.upnp.Router;
 import org.syncloud.android.upnp.UPnP;
 
-import static com.google.common.base.Optional.of;
 import static java.lang.String.format;
 
 public class UPnPCheckActivity extends FragmentActivity {
 
-    private static Logger logger = Logger.getLogger(UPnPCheckActivity.class.getName());
-
-    private int checksInFlight = 0;
-    private static final int TOTAL_CHECKS = 4;
+    public static String PARAM_FIRST_TIME = "paramFirstTime";
 
     private SyncloudApplication application;
 
-    private Button checkBtn;
-    private ImageButton sendbtn;
+    private int checksInFlight = 0;
+    private boolean checkSuccess = false;
+
+    private LinearLayout layoutIntro;
+    private LinearLayout layoutTasks;
+    private LinearLayout layoutSuccess;
+    private LinearLayout layoutFail;
+    private LinearLayout layoutButtonsStart;
+
 
     //TODO: How do I do a widget?
     private TextView routerText;
@@ -93,15 +97,38 @@ public class UPnPCheckActivity extends FragmentActivity {
         manipulationStatusGood = (ImageView) findViewById(R.id.upnp_manipulation_good);
         manipulationStatusBad = (ImageView) findViewById(R.id.upnp_manipulation_bad);
 
-        checkBtn = (Button) findViewById(R.id.upnp_check_btn);
-        sendbtn = (ImageButton) findViewById(R.id.upnp_send_btn);
+        Button btnSkip = (Button) findViewById(R.id.btn_skip);
 
-        check();
+        layoutIntro = (LinearLayout) findViewById(R.id.layout_intro);
+        layoutTasks = (LinearLayout) findViewById(R.id.layout_tasks);
+        layoutSuccess = (LinearLayout) findViewById(R.id.layout_success);
+        layoutFail = (LinearLayout) findViewById(R.id.layout_fail);
+        layoutButtonsStart = (LinearLayout) findViewById(R.id.layout_buttons);
+
+        Intent intent = getIntent();
+        boolean firstTime = intent.getBooleanExtra(PARAM_FIRST_TIME, false);
+
+        if (firstTime) {
+            btnSkip.setVisibility(View.VISIBLE);
+        } else {
+            btnSkip.setVisibility(View.GONE);
+            check();
+        }
+    }
+
+    private void setLayoutEnabled(ViewGroup layout, boolean enabled) {
+        for (int i = 0; i < layout.getChildCount(); i++) {
+            View view = layout.getChildAt(i);
+            view.setEnabled(enabled);
+        }
     }
 
     private void check() {
-        reset();
+        resetTasks();
         if (application.isWifiConnected()) {
+            checksInFlight = 0;
+            checkSuccess = true;
+            setLayoutEnabled(layoutButtonsStart, false);
             new RouterTask().execute();
         } else {
             WifiDialog dialog = new WifiDialog();
@@ -110,6 +137,32 @@ public class UPnPCheckActivity extends FragmentActivity {
         }
     }
 
+    private void resetTasks() {
+        routerText.setText("");
+        routerStatusBad.setVisibility(View.GONE);
+        routerStatusGood.setVisibility(View.GONE);
+        routerProgress.setVisibility(View.GONE);
+
+        ipText.setText("");
+        ipStatusBad.setVisibility(View.GONE);
+        ipStatusGood.setVisibility(View.GONE);
+        ipProgress.setVisibility(View.GONE);
+
+        portsText.setText("");
+        portsStatusBad.setVisibility(View.GONE);
+        portsStatusGood.setVisibility(View.GONE);
+        portsProgress.setVisibility(View.GONE);
+
+        manipulationText.setText("");
+        manipulationStatusBad.setVisibility(View.GONE);
+        manipulationStatusGood.setVisibility(View.GONE);
+        manipulationProgress.setVisibility(View.GONE);
+
+        layoutIntro.setVisibility(View.GONE);
+        layoutTasks.setVisibility(View.VISIBLE);
+        layoutSuccess.setVisibility(View.GONE);
+        layoutFail.setVisibility(View.GONE);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -140,51 +193,40 @@ public class UPnPCheckActivity extends FragmentActivity {
         check();
     }
 
-    private void mainControllsEnabled(boolean enabled) {
-        checkBtn.setEnabled(enabled);
-        sendbtn.setEnabled(enabled);
+    public void onSkip(View view) {
+        application.getPreferences().setCheckNeeded(false);
+        finish();
     }
 
-    private void reset() {
-
-        logger.info("reset");
-        checksInFlight = TOTAL_CHECKS;
-
-        routerText.setText("");
-        routerStatusBad.setVisibility(View.GONE);
-        routerStatusGood.setVisibility(View.GONE);
-        routerProgress.setVisibility(View.GONE);
-
-        ipText.setText("");
-        ipStatusBad.setVisibility(View.GONE);
-        ipStatusGood.setVisibility(View.GONE);
-        ipProgress.setVisibility(View.GONE);
-
-        portsText.setText("");
-        portsStatusBad.setVisibility(View.GONE);
-        portsStatusGood.setVisibility(View.GONE);
-        portsProgress.setVisibility(View.GONE);
-
-        manipulationText.setText("");
-        manipulationStatusBad.setVisibility(View.GONE);
-        manipulationStatusGood.setVisibility(View.GONE);
-        manipulationProgress.setVisibility(View.GONE);
-
-        mainControllsEnabled(false);
-
+    public void onClose(View view) {
+        finish();
     }
 
-    private void done(int checks) {
-        logger.info("done: " + checks + "/" + checksInFlight);
-        checksInFlight -= checks;
+    private void startTask() {
+        checksInFlight++;
+    }
+
+    private void finishTask(boolean success) {
+        checksInFlight--;
+        checkSuccess &= success;
         if (checksInFlight == 0) {
-            mainControllsEnabled(true);
+            allTasksFinished();
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    private void allTasksFinished() {
+        setLayoutEnabled(layoutButtonsStart, true);
+        if (checkSuccess) {
+            application.getPreferences().setCheckNeeded(false);
+        }
+
+        if (checkSuccess) {
+            layoutButtonsStart.setVisibility(View.GONE);
+            layoutSuccess.setVisibility(View.VISIBLE);
+        } else {
+            layoutFail.setVisibility(View.VISIBLE);
+        }
+
     }
 
     private UPnP getUPnP() {
@@ -195,6 +237,7 @@ public class UPnPCheckActivity extends FragmentActivity {
 
         @Override
         protected void onPreExecute() {
+            startTask();
             routerText.setText("Checking ...");
             routerStatusBad.setVisibility(View.GONE);
             routerStatusGood.setVisibility(View.GONE);
@@ -213,16 +256,15 @@ public class UPnPCheckActivity extends FragmentActivity {
                 Router router = result.get();
                 routerText.setText(router.getName());
                 routerStatusGood.setVisibility(View.VISIBLE);
-                done(1);
                 new IPTask(router).execute();
                 new PortsTask(router).execute();
                 new ManipulationTask(router).execute();
             } else {
                 routerText.setText("Not able to find UPnP router");
                 routerStatusBad.setVisibility(View.VISIBLE);
-                done(checksInFlight);
             }
             routerProgress.setVisibility(View.GONE);
+            finishTask(result.isPresent());
         }
     }
 
@@ -236,6 +278,7 @@ public class UPnPCheckActivity extends FragmentActivity {
 
         @Override
         protected void onPreExecute() {
+            startTask();
             ipText.setText("Checking ...");
             ipStatusBad.setVisibility(View.GONE);
             ipStatusGood.setVisibility(View.GONE);
@@ -257,7 +300,7 @@ public class UPnPCheckActivity extends FragmentActivity {
                 ipStatusBad.setVisibility(View.VISIBLE);
             }
             ipProgress.setVisibility(View.GONE);
-            done(1);
+            finishTask(ip.isPresent());
         }
     }
 
@@ -271,6 +314,7 @@ public class UPnPCheckActivity extends FragmentActivity {
 
         @Override
         protected void onPreExecute() {
+            startTask();
             portsText.setText("Checking ...");
             portsStatusBad.setVisibility(View.GONE);
             portsStatusGood.setVisibility(View.GONE);
@@ -291,7 +335,7 @@ public class UPnPCheckActivity extends FragmentActivity {
             }
             portsStatusGood.setVisibility(View.VISIBLE);
             portsProgress.setVisibility(View.GONE);
-            done(1);
+            finishTask(ports > 0);
         }
     }
 
@@ -306,6 +350,7 @@ public class UPnPCheckActivity extends FragmentActivity {
 
         @Override
         protected void onPreExecute() {
+            startTask();
             manipulationText.setText("Checking ...");
             manipulationStatusBad.setVisibility(View.GONE);
             manipulationStatusGood.setVisibility(View.GONE);
@@ -332,7 +377,7 @@ public class UPnPCheckActivity extends FragmentActivity {
                 manipulationStatusBad.setVisibility(View.VISIBLE);
             }
             manipulationProgress.setVisibility(View.GONE);
-            done(1);
+            finishTask(works);
         }
     }
 }

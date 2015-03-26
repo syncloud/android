@@ -10,10 +10,27 @@
     tools:context="org.syncloud.android.ui.UPnPCheckActivity">
 
     <LinearLayout
+        android:id="@+id/layout_intro"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_margin="10dp"
+            android:text="We need to check your Wi-Fi router. Unfortunately not all W-Fi routers are compatible with Syncloud. Please make sure you connected to your Wi-Fi router and let's check it." />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_tasks"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -274,30 +291,94 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        >
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_fail"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_margin="10dp"
+            android:text="Sorry, your router is incompatible with Syncloud or it's not configured properly. Share these results with Syncloud team and we will try to help you." />
+
+        <ImageButton
+            android:id="@+id/btn_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="25dp"
+            android:onClick="sendReport"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_action_share"
+            android:text="Send"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_success"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_margin="10dp"
+            android:text="Congratulations! All the checks are passed.\nYour router is compatible with Syncloud." />
+
+
+        <Button
+            android:id="@+id/btn_close"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:onClick="onClose"
+            android:text="Close"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_buttons"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/upnp_check_btn"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_weight="1"
-        android:onClick="onCheck"
-        android:text="Check"
-        />
+        <Button
+            android:id="@+id/btn_check"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:onClick="onCheck"
+            android:text="Check"
+            />
 
-    <ImageButton
-        android:id="@+id/upnp_send_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="25dp"
-        android:onClick="sendReport"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/ic_action_share"
-        android:text="Send"
-        />
+        <Button
+            android:id="@+id/btn_skip"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:onClick="onSkip"
+            android:text="Skip"
+            />
 
     </LinearLayout>
 

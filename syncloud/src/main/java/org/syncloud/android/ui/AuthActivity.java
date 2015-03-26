@@ -42,17 +42,38 @@ public class AuthActivity extends Activity {
         TextView learnMoreText = (TextView) findViewById(R.id.auth_learn_more);
         learnMoreText.setMovementMethod(LinkMovementMethod.getInstance());
 
-        if (preferences.hasCredentials()) {
-            new CheckCredentialsTask(preferences).execute();
+        if (preferences.isCheckNeeded()) {
+            Intent intent = new Intent(AuthActivity.this, UPnPCheckActivity.class);
+            intent.putExtra(UPnPCheckActivity.PARAM_FIRST_TIME, true);
+            startActivityForResult(intent, REQUEST_CHECK);
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==REQUEST_CHECK)
+        {
+            proceedWithLogin();
+        }
+    }
+
+    private void proceedWithLogin() {
+        if (preferences.hasCredentials()) {
+            new CheckCredentialsTask(preferences).execute();
+        }
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.auth, menu);
         return true;
     }
+
+    public static int REQUEST_AUTHENTICATE = 1;
+    public static int REQUEST_CHECK = 2;
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -66,13 +87,13 @@ public class AuthActivity extends Activity {
     public void signIn(View view) {
         Intent credentialsIntent = new Intent(this, AuthCredentialsActivity.class);
         credentialsIntent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_SIGN_IN);
-        startActivityForResult(credentialsIntent, 1);
+        startActivityForResult(credentialsIntent, REQUEST_AUTHENTICATE);
     }
 
     public void signUp(View view) {
         Intent credentialsIntent = new Intent(this, AuthCredentialsActivity.class);
         credentialsIntent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_REGISTER);
-        startActivityForResult(credentialsIntent, 1);
+        startActivityForResult(credentialsIntent, REQUEST_AUTHENTICATE);
     }
 
     public class CheckCredentialsTask extends AsyncTask<Void, Void, UserResult> {
@@ -105,7 +126,7 @@ public class AuthActivity extends Activity {
                 Intent intent = new Intent(AuthActivity.this, AuthCredentialsActivity.class);
                 intent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_SIGN_IN);
                 intent.putExtra(AuthCredentialsActivity.PARAM_CHECK_EXISTING, true);
-                startActivityForResult(intent, 1);
+                startActivityForResult(intent, REQUEST_AUTHENTICATE);
             } else {
                 Intent intent = new Intent(AuthActivity.this, DevicesSavedActivity.class);
                 startActivity(intent);
