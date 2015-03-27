@@ -20,7 +20,6 @@ import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
-import org.syncloud.platform.insider.InsiderManager;
 import org.syncloud.platform.sam.Sam;
 import org.syncloud.platform.server.Server;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
@@ -52,7 +51,6 @@ public class DeviceActivateActivity extends Activity {
     private TextView txtMainDomain;
 
     private Sam sam;
-    private InsiderManager insider;
     private LinearLayout layoutMacAddress;
 
     private SyncloudApplication application;
@@ -91,7 +89,6 @@ public class DeviceActivateActivity extends Activity {
         ssh = new SshRunner();
         sam = new Sam(ssh, preferences);
         server = new Server(ssh);
-        insider = new InsiderManager();
 
         txtDeviceTitle.setText(this.identification.title);
         txtMacAddress.setText(this.identification.mac_address);
@@ -135,7 +132,7 @@ public class DeviceActivateActivity extends Activity {
                     @Override
                     public AsyncResult<String> run(Void... args) {
                         return new AsyncResult<String>(
-                                insider.userDomain(connectionPoint),
+                                server.userDomain(connectionPoint),
                                 "unable to get user domain");
                     }
                 })

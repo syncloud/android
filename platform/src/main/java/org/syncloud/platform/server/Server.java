@@ -9,6 +9,7 @@ import org.syncloud.platform.ssh.ConnectionPointProvider;
 import org.syncloud.platform.ssh.SshRunner;
 import org.syncloud.platform.ssh.model.Credentials;
 import org.syncloud.platform.ssh.model.SshResult;
+import org.syncloud.platform.ssh.model.StringResult;
 
 import java.io.IOException;
 
@@ -16,6 +17,7 @@ import static org.syncloud.platform.ssh.SshRunner.cmd;
 
 public class Server {
 
+    public static final String SYNCLOUD_CLI = "syncloud-cli";
     private static Logger logger = Logger.getLogger(Server.class);
 
     public static final ObjectMapper JSON = new ObjectMapper();
@@ -38,7 +40,7 @@ public class Server {
 
         logger.info("activating " + userDomain);
 
-        String[] activateCmd = cmd("syncloud-cli", "activate", version, topLevelDomain, apiUrl, email, pass, userDomain);
+        String[] activateCmd = cmd(SYNCLOUD_CLI, "activate", version, topLevelDomain, apiUrl, email, pass, userDomain);
 
         Optional<String> run = ssh.run(connectionPoint, activateCmd);
 
@@ -60,7 +62,7 @@ public class Server {
 
         logger.info("getting access");
 
-        Optional<String> run = ssh.run(connectionPoint, cmd("syncloud-cli", "get_access"));
+        Optional<String> run = ssh.run(connectionPoint, cmd(SYNCLOUD_CLI, "get_access"));
 
         if (run.isPresent()) {
             try {
@@ -73,6 +75,20 @@ public class Server {
             logger.error("unable to execute command");
         }
 
+        return Optional.absent();
+    }
+
+    public Optional<String> userDomain(ConnectionPointProvider connectionPoint) {
+        Optional<String> execute = ssh.run(connectionPoint, cmd(SYNCLOUD_CLI, "user_domain"));
+        if (execute.isPresent()) {
+            try {
+                return Optional.of(JSON.readValue(execute.get(), StringResult.class).data);
+            } catch (IOException e) {
+                logger.error("unable to parse user domain reply");
+            }
+        }
+
+        logger.error("unable to get user domain reply");
         return Optional.absent();
     }
 }
