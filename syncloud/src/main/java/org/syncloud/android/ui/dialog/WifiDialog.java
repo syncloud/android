@@ -13,6 +13,8 @@ import android.support.v4.app.DialogFragment;
 
 public class WifiDialog extends DialogFragment {
 
+    public static int WIFI_SETTINGS = 3;
+
     private String message = "";
 
     public void setMessage(String message) {
@@ -31,7 +33,6 @@ public class WifiDialog extends DialogFragment {
                 .setPositiveButton("Wi-Fi Settings", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
                         openWiFiSettings();
-                        context.finish();
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -44,8 +45,9 @@ public class WifiDialog extends DialogFragment {
     }
 
     public void openWiFiSettings() {
+        final Activity context = getActivity();
         Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
-        startActivityForResult(intent, 0);
+        context.startActivityForResult(intent, WIFI_SETTINGS);
     }
 
 }

@@ -103,6 +103,15 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==WifiDialog.WIFI_SETTINGS)
+        {
+            checkWiFiAndDiscover();
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.discovery, menu);
         return true;
