@@ -12,373 +12,394 @@
     <LinearLayout
         android:id="@+id/layout_intro"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
             android:layout_margin="10dp"
-            android:text="We need to check your Wi-Fi router. Unfortunately not all W-Fi routers are compatible with Syncloud. Please make sure you connected to your Wi-Fi router and let's check it." />
+            android:textSize="18sp"
+            android:text="We need to check your Wi-Fi router. Unfortunately not all W-Fi routers are compatible with Syncloud. Please make sure you connected to your Wi-Fi router and let's check it.\n\nIf your Wi-Fi network is not available now, then do not worry - Router Check is always available in Settings menu." />
 
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_tasks"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="10dp">
+            android:orientation="horizontal">
 
-            <LinearLayout
+            <Button
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:onClick="onCheck"
+                android:text="Check"
+                />
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:text="Router info:" />
-
-                <TextView
-                    android:id="@+id/upnp_router_status"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/status_icons"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:gravity="center_vertical"
-                android:layout_weight="0"
-                android:paddingLeft="10dp">
-
-                <ImageView
-                    android:id="@+id/upnp_router_good"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/ic_action_good"
-                    />
-
-                <ImageView
-                    android:id="@+id/upnp_router_bad"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/ic_action_bad"
-                    />
-
-                <ProgressBar
-                    android:id="@+id/upnp_router_progress"
-                    style="@style/ProgressBarTheme"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:scaleType="fitXY"
-                    android:layout_weight="0"
-                    android:indeterminate="true"
-                    android:visibility="visible" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="20dp">
-
-            <LinearLayout
+            <Button
+                android:id="@+id/btn_skip"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:text="External address:" />
-
-                <TextView
-                    android:id="@+id/upnp_ip_status"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/upnp_ip_icons"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:gravity="center_vertical"
-                android:layout_weight="0"
-                android:paddingLeft="10dp">
-
-                <ImageView
-                    android:id="@+id/upnp_ip_good"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/ic_action_good"
-                    />
-
-                <ImageView
-                    android:id="@+id/upnp_ip_bad"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/ic_action_bad"
-                    />
-
-                <ProgressBar
-                    android:id="@+id/upnp_ip_progress"
-                    style="@style/ProgressBarTheme"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:scaleType="fitXY"
-                    android:layout_weight="0"
-                    android:indeterminate="true"
-                    android:visibility="visible" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="20dp">
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:text="Port mappings:" />
-
-                <TextView
-                    android:id="@+id/upnp_ports_status"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:gravity="center_vertical"
-                android:layout_weight="0"
-                android:paddingLeft="10dp">
-
-                <ImageView
-                    android:id="@+id/upnp_ports_good"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/ic_action_good"
-                    />
-
-                <ImageView
-                    android:id="@+id/upnp_ports_bad"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/ic_action_bad"
-                    />
-
-                <ProgressBar
-                    android:id="@+id/upnp_ports_progress"
-                    style="@style/ProgressBarTheme"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:scaleType="fitXY"
-                    android:layout_weight="0"
-                    android:indeterminate="true"
-                    android:visibility="visible" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="20dp">
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:text="Port manipulations:" />
-
-                <TextView
-                    android:id="@+id/upnp_manipulation_status"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:gravity="center_vertical"
-                android:layout_weight="0"
-                android:paddingLeft="10dp">
-
-                <ImageView
-                    android:id="@+id/upnp_manipulation_good"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/ic_action_good"
-                    />
-
-                <ImageView
-                    android:id="@+id/upnp_manipulation_bad"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/ic_action_bad"
-                    />
-
-                <ProgressBar
-                    android:id="@+id/upnp_manipulation_progress"
-                    style="@style/ProgressBarTheme"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:minHeight="50dp"
-                    android:minWidth="50dp"
-                    android:scaleType="fitXY"
-                    android:indeterminate="true"
-                    android:visibility="visible" />
-
-            </LinearLayout>
-
+                android:onClick="onSkip"
+                android:text="Skip"
+                />
 
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_check"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
-        >
+        android:orientation="vertical">
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_fail"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <TextView
+        <LinearLayout
+            android:id="@+id/layout_tasks"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:layout_margin="10dp"
-            android:text="Sorry, your router is incompatible with Syncloud or it's not configured properly. Share these results with Syncloud team and we will try to help you." />
+            android:orientation="vertical"
+            >
 
-        <ImageButton
-            android:id="@+id/btn_share"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="25dp"
-            android:onClick="sendReport"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/ic_action_share"
-            android:text="Send"
-            />
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="10dp">
 
-    </LinearLayout>
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/layout_success"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:text="Router info:" />
 
-        <TextView
+                    <TextView
+                        android:id="@+id/upnp_router_status"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/status_icons"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:gravity="center_vertical"
+                    android:layout_weight="0"
+                    android:paddingLeft="10dp">
+
+                    <ImageView
+                        android:id="@+id/upnp_router_good"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ic_action_good"
+                        />
+
+                    <ImageView
+                        android:id="@+id/upnp_router_bad"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ic_action_bad"
+                        />
+
+                    <ProgressBar
+                        android:id="@+id/upnp_router_progress"
+                        style="@style/ProgressBarTheme"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="fitXY"
+                        android:layout_weight="0"
+                        android:indeterminate="true"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="20dp">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:text="External address:"
+                        />
+
+                    <TextView
+                        android:id="@+id/upnp_ip_status"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/upnp_ip_icons"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:gravity="center_vertical"
+                    android:layout_weight="0"
+                    android:paddingLeft="10dp">
+
+                    <ImageView
+                        android:id="@+id/upnp_ip_good"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ic_action_good"
+                        />
+
+                    <ImageView
+                        android:id="@+id/upnp_ip_bad"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ic_action_bad"
+                        />
+
+                    <ProgressBar
+                        android:id="@+id/upnp_ip_progress"
+                        style="@style/ProgressBarTheme"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="fitXY"
+                        android:layout_weight="0"
+                        android:indeterminate="true"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="20dp">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:text="Port mappings:" />
+
+                    <TextView
+                        android:id="@+id/upnp_ports_status"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:gravity="center_vertical"
+                    android:layout_weight="0"
+                    android:paddingLeft="10dp">
+
+                    <ImageView
+                        android:id="@+id/upnp_ports_good"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ic_action_good"
+                        />
+
+                    <ImageView
+                        android:id="@+id/upnp_ports_bad"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ic_action_bad"
+                        />
+
+                    <ProgressBar
+                        android:id="@+id/upnp_ports_progress"
+                        style="@style/ProgressBarTheme"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="fitXY"
+                        android:layout_weight="0"
+                        android:indeterminate="true"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="20dp">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:text="Port manipulations:" />
+
+                    <TextView
+                        android:id="@+id/upnp_manipulation_status"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:gravity="center_vertical"
+                    android:layout_weight="0"
+                    android:paddingLeft="10dp">
+
+                    <ImageView
+                        android:id="@+id/upnp_manipulation_good"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ic_action_good"
+                        />
+
+                    <ImageView
+                        android:id="@+id/upnp_manipulation_bad"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ic_action_bad"
+                        />
+
+                    <ProgressBar
+                        android:id="@+id/upnp_manipulation_progress"
+                        style="@style/ProgressBarTheme"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:minHeight="50dp"
+                        android:minWidth="50dp"
+                        android:scaleType="fitXY"
+                        android:indeterminate="true"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_placeholder"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:layout_margin="10dp"
-            android:text="Congratulations! All the checks are passed.\nYour router is compatible with Syncloud." />
-
-
-        <Button
-            android:id="@+id/btn_close"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:onClick="onClose"
-            android:text="Close"
-            android:visibility="visible" />
+            android:orientation="horizontal">
 
-    </LinearLayout>
+        </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/layout_buttons"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btn_check"
+        <LinearLayout
+            android:id="@+id/layout_fail"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            android:onClick="onCheck"
-            android:text="Check"
-            />
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            >
 
-        <Button
-            android:id="@+id/btn_skip"
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Sorry, your router is incompatible with Syncloud or it's not configured properly. Share these results with Syncloud team and we will try to help you." />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_buttons"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            android:onClick="onSkip"
-            android:text="Skip"
-            />
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_share"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:onClick="onShare"
+                android:text="Share"
+                />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:onClick="onClose"
+                android:text="Close"
+                />
+
+        </LinearLayout>
 
     </LinearLayout>
 

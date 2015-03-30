@@ -34,8 +34,8 @@
 
         <Preference
             android:key="pref_upnp"
-            android:title="UPnP"
-            android:summary="Shows UPnP check screen"
+            android:title="Check Router"
+            android:summary="Checks router compatibility"
             />
 
         <ListPreference

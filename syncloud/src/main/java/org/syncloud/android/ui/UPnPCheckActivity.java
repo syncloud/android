@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import com.google.common.base.Optional;
 
-import org.apache.log4j.Logger;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.network.Network;
@@ -38,11 +37,9 @@ public class UPnPCheckActivity extends FragmentActivity {
     private boolean checkSuccess = false;
 
     private LinearLayout layoutIntro;
-    private LinearLayout layoutTasks;
-    private LinearLayout layoutSuccess;
     private LinearLayout layoutFail;
-    private LinearLayout layoutButtonsStart;
-
+    private LinearLayout layoutButtons;
+    private Button btnShare;
 
     //TODO: How do I do a widget?
     private TextView routerText;
@@ -97,21 +94,27 @@ public class UPnPCheckActivity extends FragmentActivity {
         manipulationStatusGood = (ImageView) findViewById(R.id.upnp_manipulation_good);
         manipulationStatusBad = (ImageView) findViewById(R.id.upnp_manipulation_bad);
 
-        Button btnSkip = (Button) findViewById(R.id.btn_skip);
-
         layoutIntro = (LinearLayout) findViewById(R.id.layout_intro);
-        layoutTasks = (LinearLayout) findViewById(R.id.layout_tasks);
-        layoutSuccess = (LinearLayout) findViewById(R.id.layout_success);
         layoutFail = (LinearLayout) findViewById(R.id.layout_fail);
-        layoutButtonsStart = (LinearLayout) findViewById(R.id.layout_buttons);
+        layoutButtons = (LinearLayout) findViewById(R.id.layout_buttons);
+        btnShare = (Button) findViewById(R.id.btn_share);
 
         Intent intent = getIntent();
         boolean firstTime = intent.getBooleanExtra(PARAM_FIRST_TIME, false);
 
         if (firstTime) {
-            btnSkip.setVisibility(View.VISIBLE);
+            layoutIntro.setVisibility(View.VISIBLE);
         } else {
-            btnSkip.setVisibility(View.GONE);
+            layoutIntro.setVisibility(View.GONE);
+            check();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==WifiDialog.WIFI_SETTINGS)
+        {
             check();
         }
     }
@@ -128,11 +131,10 @@ public class UPnPCheckActivity extends FragmentActivity {
         if (application.isWifiConnected()) {
             checksInFlight = 0;
             checkSuccess = true;
-            setLayoutEnabled(layoutButtonsStart, false);
             new RouterTask().execute();
         } else {
             WifiDialog dialog = new WifiDialog();
-            dialog.setMessage("UPnP check requires WiFi.");
+            dialog.setMessage("Router check requires Wi-Fi.");
             dialog.show(getSupportFragmentManager(), "upnp_check");
         }
     }
@@ -159,9 +161,8 @@ public class UPnPCheckActivity extends FragmentActivity {
         manipulationProgress.setVisibility(View.GONE);
 
         layoutIntro.setVisibility(View.GONE);
-        layoutTasks.setVisibility(View.VISIBLE);
-        layoutSuccess.setVisibility(View.GONE);
         layoutFail.setVisibility(View.GONE);
+        layoutButtons.setVisibility(View.GONE);
     }
 
     @Override
@@ -185,7 +186,7 @@ public class UPnPCheckActivity extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void sendReport(View view) {
+    public void onShare(View view) {
         application.reportError();
     }
 
@@ -215,18 +216,14 @@ public class UPnPCheckActivity extends FragmentActivity {
     }
 
     private void allTasksFinished() {
-        setLayoutEnabled(layoutButtonsStart, true);
         if (checkSuccess) {
             application.getPreferences().setCheckNeeded(false);
-        }
-
-        if (checkSuccess) {
-            layoutButtonsStart.setVisibility(View.GONE);
-            layoutSuccess.setVisibility(View.VISIBLE);
+            btnShare.setVisibility(View.GONE);
         } else {
             layoutFail.setVisibility(View.VISIBLE);
+            btnShare.setVisibility(View.VISIBLE);
         }
-
+        layoutButtons.setVisibility(View.VISIBLE);
     }
 
     private UPnP getUPnP() {

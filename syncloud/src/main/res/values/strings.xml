@@ -57,7 +57,7 @@
     <string name="revoot_device">Reboot device</string>
     <string name="title_activity_logs">Logs</string>
     <string name="title_activity_git_bucket">GitBucket</string>
-    <string name="title_activity_upnp_check">UPnP Check</string>
+    <string name="title_activity_upnp_check">Router Check</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
