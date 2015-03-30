@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:textSize="18sp"
-            android:text="We need to check your Wi-Fi router. Unfortunately not all W-Fi routers are compatible with Syncloud. Please make sure you connected to your Wi-Fi router and let's check it.\n\nIf your Wi-Fi network is not available now, then do not worry - Router Check is always available in Settings menu." />
+            android:text="We need to check your Wi-Fi router. Unfortunately not all W-Fi routers are compatible with Syncloud. Please make sure you are connected to your Wi-Fi router and let's check it.\n\nIf your Wi-Fi network is not available now, then do not worry - Router Check is always available in Settings menu." />
 
         <LinearLayout
             android:layout_width="fill_parent"
