@@ -46,6 +46,8 @@ public class AuthActivity extends Activity {
             Intent intent = new Intent(AuthActivity.this, UPnPCheckActivity.class);
             intent.putExtra(UPnPCheckActivity.PARAM_FIRST_TIME, true);
             startActivityForResult(intent, REQUEST_CHECK);
+        } else {
+            proceedWithLogin();
         }
     }
 
