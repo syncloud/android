@@ -127,7 +127,6 @@ public class DeviceActivateActivity extends Activity {
         new ProgressAsyncTask<Void, String>()
                 .setTitle("Checking status")
                 .setProgress(progress)
-                .showError(false)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
                     public AsyncResult<String> run(Void... args) {
@@ -139,8 +138,8 @@ public class DeviceActivateActivity extends Activity {
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {
                     @Override
                     public void run(AsyncResult<String> result) {
-                        if (result.hasError()) {
-                            txtStatusValue.setText("not yet");
+                        if (!result.hasValue()) {
+                            txtStatusValue.setText("Unable to get user domain");
                         } else {
                             String domainName = result.getValue();
                             String fullDomainName = domainName + "." + preferences.getDomain();
@@ -164,6 +163,7 @@ public class DeviceActivateActivity extends Activity {
 
         new ProgressAsyncTask<Void, String>()
                 .setTitle("Activating device")
+                .setErrorMessage("Unable to activate")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override

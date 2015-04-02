@@ -65,7 +65,6 @@ public class GitBucket extends ActionBarActivity {
         new ProgressAsyncTask<Void, String>()
                 .setTitle("Checking status")
                 .setProgress(progress)
-                .showError(false)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
                     public AsyncResult<String> run(Void... args) {
@@ -77,7 +76,7 @@ public class GitBucket extends ActionBarActivity {
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {
                     @Override
                     public void run(AsyncResult<String> result) {
-                        if (!result.hasError()) {
+                        if (result.hasValue()) {
                             txtUrl.setText(result.getValue());
                             setActive(true);
                         } else {
@@ -112,6 +111,7 @@ public class GitBucket extends ActionBarActivity {
 
         new ProgressAsyncTask<String, String>()
                 .setTitle("Activating ...")
+                .setErrorMessage("Unable to activate")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<String, String>() {
                     @Override
@@ -133,6 +133,7 @@ public class GitBucket extends ActionBarActivity {
     public void deactivate(View view) {
         new ProgressAsyncTask<String, String>()
                 .setTitle("Deactivating ...")
+                .setErrorMessage("Unable to deactivate")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<String, String>() {
                     @Override

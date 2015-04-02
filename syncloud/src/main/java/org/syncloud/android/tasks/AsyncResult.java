@@ -26,16 +26,11 @@ public class AsyncResult<T> {
         return new AsyncResult<T>(Optional.of(value), Optional.<String>absent());
     }
 
-    public boolean hasError() {
-        return error.isPresent();
-    }
-
-    public String getError() {
-        return error.get();
+    public boolean hasValue() {
+        return value.isPresent();
     }
 
     public T getValue() {
         return value.get();
     }
-
 }

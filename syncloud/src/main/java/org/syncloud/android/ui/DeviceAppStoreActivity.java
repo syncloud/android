@@ -78,6 +78,7 @@ public class DeviceAppStoreActivity extends Activity {
     private void listApps() {
         new ProgressAsyncTask<Void, List<AppVersions>>()
                 .setTitle("Refreshing app list")
+                .setErrorMessage("Unable to get list of apps")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
@@ -99,6 +100,7 @@ public class DeviceAppStoreActivity extends Activity {
     private void updateSam() {
         new ProgressAsyncTask<Void, List<AppVersions>>()
                 .setTitle("Checking for updates")
+                .setErrorMessage("Unable to update sam")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
@@ -121,6 +123,7 @@ public class DeviceAppStoreActivity extends Activity {
     private void upgradeAll() {
         new ProgressAsyncTask<Void, List<AppVersions>>()
                 .setTitle("Upgrading all apps")
+                .setErrorMessage("Unable to ugrade apps")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
@@ -148,6 +151,7 @@ public class DeviceAppStoreActivity extends Activity {
     public void runSam(String... arguments) {
         new ProgressAsyncTask<String, List<AppVersions>>()
                 .setTitle("Executing command")
+                .setErrorMessage("Command execution failed")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<String, List<AppVersions>>() {
                     @Override

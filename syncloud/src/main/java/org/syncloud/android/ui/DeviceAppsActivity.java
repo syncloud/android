@@ -137,7 +137,6 @@ public class DeviceAppsActivity extends Activity {
         new ProgressAsyncTask<Void, List<AppVersions>>()
                 .setTitle("Refreshing app list")
                 .setProgress(progress)
-                .showError(false)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
                     public AsyncResult<List<AppVersions>> run(Void... args) {
@@ -156,10 +155,10 @@ public class DeviceAppsActivity extends Activity {
     }
 
     private void onAppsLoaded(AsyncResult<List<AppVersions>> result) {
-        if (result.hasError()) {
+        if (!result.hasValue()) {
             listApplications.setVisibility(View.GONE);
             txtAppsError.setVisibility(View.VISIBLE);
-            txtAppsError.setText(result.getError());
+            txtAppsError.setText("Unable to get list of apps");
         } else {
             listApplications.setVisibility(View.VISIBLE);
             txtAppsError.setVisibility(View.GONE);
@@ -217,6 +216,7 @@ public class DeviceAppsActivity extends Activity {
     public void deactivate() {
         new ProgressAsyncTask<Void, String>() {}
                 .setTitle("Dropping device")
+                .setErrorMessage("Failed to drop device")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
@@ -278,6 +278,7 @@ public class DeviceAppsActivity extends Activity {
             new ProgressAsyncTask<Void, Credentials>() {
             }
                     .setTitle("Getting access")
+                    .setErrorMessage("Failed to get access")
                     .setProgress(progress)
                     .doWork(new ProgressAsyncTask.Work<Void, Credentials>() {
                         @Override

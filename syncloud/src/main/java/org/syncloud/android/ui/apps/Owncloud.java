@@ -76,6 +76,7 @@ public class Owncloud extends Activity {
 
         new ProgressAsyncTask<String, String>()
                 .setTitle("Activating ...")
+                .setErrorMessage("Unable to activate")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<String, String>() {
                     @Override
@@ -98,7 +99,6 @@ public class Owncloud extends Activity {
         new ProgressAsyncTask<Void, String>()
                 .setTitle("Checking status")
                 .setProgress(progress)
-                .showError(false)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
                     public AsyncResult<String> run(Void... args) {
@@ -110,7 +110,7 @@ public class Owncloud extends Activity {
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {
                     @Override
                     public void run(AsyncResult<String> result) {
-                        if (!result.hasError()) {
+                        if (result.hasValue()) {
                             url.setText(result.getValue());
                             setVisibility(View.VISIBLE, View.GONE);
                         } else {

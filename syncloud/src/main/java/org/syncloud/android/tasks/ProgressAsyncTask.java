@@ -21,7 +21,7 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
     private String title;
     private Progress progress;
     private Work<TParams, TResult> work;
-    private boolean showError = true;
+    private String errorMessage;
     private Success<TResult> success;
     private Completed<TResult> completed;
 
@@ -48,8 +48,8 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
         }
     }
 
-    public ProgressAsyncTask<TParams, TResult> showError(boolean value) {
-        this.showError = value;
+    public ProgressAsyncTask<TParams, TResult> setErrorMessage(String message) {
+        this.errorMessage = message;
         return this;
     }
 
@@ -90,15 +90,15 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
     @Override
     protected void onPostExecute(AsyncResult<TResult> result) {
         if (progress != null) {
-            if (result != null && result.hasError() && showError)
-                progress.error(result.getError());
+            if (result != null && !result.hasValue() && errorMessage != null)
+                progress.error(errorMessage);
             else
                 progress.stop();
         }
         if (result == null)
             success.run(null);
         else
-            if (!result.hasError() && success != null)
+            if (result.hasValue() && success != null)
                 success.run(result.getValue());
 
         if (completed != null)
