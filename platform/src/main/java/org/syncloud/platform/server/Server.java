@@ -2,7 +2,6 @@ package org.syncloud.platform.server;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
@@ -10,6 +9,7 @@ import org.syncloud.platform.ssh.SshRunner;
 import org.syncloud.platform.ssh.model.Credentials;
 import org.syncloud.platform.ssh.model.SshResult;
 import org.syncloud.platform.ssh.model.StringResult;
+import org.syncloud.platform.ssh.model.SyncloudException;
 
 import java.io.IOException;
 
@@ -29,7 +29,7 @@ public class Server {
         this.ssh = ssh;
     }
 
-    public Optional<Credentials> activate(
+    public Credentials activate(
             ConnectionPointProvider connectionPoint,
             String version,
             String topLevelDomain,
@@ -42,53 +42,42 @@ public class Server {
 
         String[] activateCmd = cmd(SYNCLOUD_CLI, "activate", version, topLevelDomain, apiUrl, email, pass, userDomain);
 
-        Optional<String> run = ssh.run(connectionPoint, activateCmd);
+        String json = ssh.run(connectionPoint, activateCmd);
 
-        if (run.isPresent()) {
-            try {
-                SshResult<Credentials> reference = JSON.readValue(run.get(), new TypeReference<SshResult<Credentials>>() {});
-                return Optional.of(reference.data);
-            } catch (IOException e) {
-                logger.error("unable to parse execute response", e);
-            }
-        } else {
-            logger.error("unable to execute command");
+        try {
+            SshResult<Credentials> reference = JSON.readValue(json, new TypeReference<SshResult<Credentials>>() {});
+            return reference.data;
+        } catch (IOException e) {
+            String message = "Unable to parse execute response";
+            logger.error(message+" "+json, e);
+            throw new SyncloudException(message);
         }
-
-        return Optional.absent();
     }
 
-    public Optional<Credentials> get_access(ConnectionPointProvider connectionPoint) {
+    public Credentials get_access(ConnectionPointProvider connectionPoint) {
 
         logger.info("getting access");
 
-        Optional<String> run = ssh.run(connectionPoint, cmd(SYNCLOUD_CLI, "get_access"));
+        String json = ssh.run(connectionPoint, cmd(SYNCLOUD_CLI, "get_access"));
 
-        if (run.isPresent()) {
-            try {
-                SshResult<Credentials> reference = JSON.readValue(run.get(), new TypeReference<SshResult<Credentials>>() {});
-                return Optional.of(reference.data);
-            } catch (IOException e) {
-                logger.error("unable to parse execute response", e);
-            }
-        } else {
-            logger.error("unable to execute command");
+        try {
+            SshResult<Credentials> reference = JSON.readValue(json, new TypeReference<SshResult<Credentials>>() {});
+            return reference.data;
+        } catch (IOException e) {
+            String message = "Unable to parse execute response";
+            logger.error(message+" "+json, e);
+            throw new SyncloudException(message);
         }
-
-        return Optional.absent();
     }
 
-    public Optional<String> userDomain(ConnectionPointProvider connectionPoint) {
-        Optional<String> execute = ssh.run(connectionPoint, cmd(SYNCLOUD_CLI, "user_domain"));
-        if (execute.isPresent()) {
-            try {
-                return Optional.of(JSON.readValue(execute.get(), StringResult.class).data);
-            } catch (IOException e) {
-                logger.error("unable to parse user domain reply");
-            }
+    public String userDomain(ConnectionPointProvider connectionPoint) {
+        String json = ssh.run(connectionPoint, cmd(SYNCLOUD_CLI, "user_domain"));
+        try {
+            return JSON.readValue(json, StringResult.class).data;
+        } catch (IOException e) {
+            String message = "Unable to parse execute response";
+            logger.error(message+" "+json, e);
+            throw new SyncloudException(message);
         }
-
-        logger.error("unable to get user domain reply");
-        return Optional.absent();
     }
 }

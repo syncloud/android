@@ -1,12 +1,12 @@
 package org.syncloud.apps.owncloud;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
 import org.syncloud.platform.ssh.SshRunner;
 import org.syncloud.platform.ssh.model.StringResult;
+import org.syncloud.platform.ssh.model.SyncloudException;
 
 import java.io.IOException;
 
@@ -24,22 +24,19 @@ public class OwncloudManager {
         this.ssh = new SshRunner();
     }
 
-    public Optional<String> finishSetup(ConnectionPointProvider connectionPoint, String login, String password, String protocol) {
+    public String finishSetup(ConnectionPointProvider connectionPoint, String login, String password, String protocol) {
         return ssh.run(connectionPoint, cmd(OWNCLOUD_CTL_BIN, "finish", login, password, protocol));
     }
 
-    public Optional<String> owncloudUrl(ConnectionPointProvider connectionPoint) {
-
-        Optional<String> execute = ssh.run(connectionPoint, cmd(OWNCLOUD_CTL_BIN, "url"));
-        if (execute.isPresent())
-            try {
-                return Optional.of(JSON.readValue(execute.get(), StringResult.class).data);
-            } catch (IOException e) {
-                logger.error("unable to parse ownCloud url response");
-            }
-
-        return Optional.absent();
-
+    public String url(ConnectionPointProvider connectionPoint) {
+        String json = ssh.run(connectionPoint, cmd(OWNCLOUD_CTL_BIN, "url"));
+        try {
+            return JSON.readValue(json, StringResult.class).data;
+        } catch (IOException e) {
+            String message = "Unable to parse ownCloud url response";
+            logger.error(message+" "+json, e);
+            throw new SyncloudException(message);
+        }
     }
 
 }

@@ -4,26 +4,19 @@ import com.google.common.base.Optional;
 
 public class AsyncResult<T> {
     private Optional<T> value = Optional.absent();
-    private Optional<String> error = Optional.absent();
+    private Optional<Throwable> exception = Optional.absent();
 
-    public AsyncResult(Optional<T> value, String ifError) {
-        if (value.isPresent())
-            this.value = Optional.fromNullable(value.get());
-        else
-            this.error = Optional.fromNullable(ifError);
-    }
-
-    public AsyncResult(Optional<T> value, Optional<String> error) {
+    public AsyncResult(Optional<T> value, Optional<Throwable> exception) {
         this.value = value;
-        this.error = error;
+        this.exception = exception;
     }
 
-    static public <T> AsyncResult<T> error(String error) {
-        return new AsyncResult<T>(Optional.<T>absent(), Optional.of(error));
+    static public <T> AsyncResult<T> exception(Throwable exception) {
+        return new AsyncResult<T>(Optional.<T>absent(), Optional.of(exception));
     }
 
     static public <T> AsyncResult<T> value(T value) {
-        return new AsyncResult<T>(Optional.of(value), Optional.<String>absent());
+        return new AsyncResult<T>(Optional.of(value), Optional.<Throwable>absent());
     }
 
     public boolean hasValue() {

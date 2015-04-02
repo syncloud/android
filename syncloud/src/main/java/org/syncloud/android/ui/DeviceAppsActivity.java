@@ -139,10 +139,8 @@ public class DeviceAppsActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public AsyncResult<List<AppVersions>> run(Void... args) {
-                        return new AsyncResult<List<AppVersions>>(
-                                sam.list(connectionPoint),
-                                "unable to get list of apps");
+                    public List<AppVersions> run(Void... args) {
+                        return sam.list(connectionPoint);
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<List<AppVersions>>() {
@@ -220,11 +218,11 @@ public class DeviceAppsActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public AsyncResult<String> run(Void... args) {
+                    public String run(Void... args) {
                         String email = preferences.getEmail();
                         String password = preferences.getPassword();
                         redirectService.dropDevice(email, password, domain.userDomain());
-                        return AsyncResult.value("Success");
+                        return "placeholder";
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<String>() {
@@ -282,11 +280,10 @@ public class DeviceAppsActivity extends Activity {
                     .setProgress(progress)
                     .doWork(new ProgressAsyncTask.Work<Void, Credentials>() {
                         @Override
-                        public AsyncResult<Credentials> run(Void... args) {
+                        public Credentials run(Void... args) {
                             Endpoint endpoint = new Endpoint(domain.device().localEndpoint().host(), SshRunner.SSH_SERVER_PORT);
                             ConnectionPoint localConnectionPoint = new ConnectionPoint(endpoint, getStandardCredentials());
-                            Optional<Credentials> credentialsResult = server.get_access(simple(localConnectionPoint));
-                            return AsyncResult.value(credentialsResult.get());
+                            return server.get_access(simple(localConnectionPoint));
                         }
                     })
                     .onSuccess(new ProgressAsyncTask.Success<Credentials>() {

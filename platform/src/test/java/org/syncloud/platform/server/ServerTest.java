@@ -16,7 +16,7 @@ public class ServerTest {
     @Test
     public void testActivate() {
         SshRunner runner = mock(SshRunner.class);
-        when(runner.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(Optional.of("" +
+        when(runner.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn("" +
                 "{\n" +
                 "  \"message\": null, \n" +
                 "  \"data\": {\n" +
@@ -25,12 +25,12 @@ public class ServerTest {
                 "    \"key\": \"PRIVATE KEY\"\n" +
                 "  }, \n" +
                 "  \"success\": true\n" +
-                "}"));
+                "}");
         Server server = new Server(runner);
 
-        Optional<Credentials> credentials= server.activate(null, null, null, null, null, null, null);
+        Credentials credentials= server.activate(null, null, null, null, null, null, null);
 
-        assertEquals("PRIVATE KEY", credentials.get().key());
+        assertEquals("PRIVATE KEY", credentials.key());
     }
 
 

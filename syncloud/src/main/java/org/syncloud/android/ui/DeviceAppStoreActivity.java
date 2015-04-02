@@ -82,10 +82,8 @@ public class DeviceAppStoreActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public AsyncResult<List<AppVersions>> run(Void... args) {
-                        return new AsyncResult<List<AppVersions>>(
-                                sam.list(connectionPoint),
-                                "unable to get list of apps");
+                    public List<AppVersions> run(Void... args) {
+                        return sam.list(connectionPoint);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
@@ -104,10 +102,8 @@ public class DeviceAppStoreActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public AsyncResult<List<AppVersions>> run(Void... args) {
-                        return new AsyncResult<List<AppVersions>>(
-                                sam.update(connectionPoint),
-                                "unable to update sam");
+                    public List<AppVersions> run(Void... args) {
+                        return sam.update(connectionPoint);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
@@ -127,16 +123,9 @@ public class DeviceAppStoreActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public AsyncResult<List<AppVersions>> run(Void... args) {
-                        if (!sam.run(connectionPoint, upgrade_all)) {
-                            return new AsyncResult<List<AppVersions>>(
-                                    Optional.<List<AppVersions>>absent(),
-                                    "unable to upgrade apps");
-                        } else {
-                            return new AsyncResult<List<AppVersions>>(
-                                    sam.list(connectionPoint),
-                                    "unable to get list of apps");
-                        }
+                    public List<AppVersions> run(Void... args) {
+                        sam.run(connectionPoint, upgrade_all);
+                        return sam.list(connectionPoint);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
@@ -155,16 +144,9 @@ public class DeviceAppStoreActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<String, List<AppVersions>>() {
                     @Override
-                    public AsyncResult<List<AppVersions>> run(String... args) {
-                        if (!sam.run(connectionPoint, args)) {
-                            return new AsyncResult<List<AppVersions>>(
-                                    Optional.<List<AppVersions>>absent(),
-                                    "unable to execute command");
-                        } else {
-                            return new AsyncResult<List<AppVersions>>(
-                                    sam.list(connectionPoint),
-                                    "unable to get list of apps");
-                        }
+                    public List<AppVersions> run(String... args) {
+                        sam.run(connectionPoint, args);
+                        return sam.list(connectionPoint);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {

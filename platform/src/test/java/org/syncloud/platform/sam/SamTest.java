@@ -6,6 +6,7 @@ import com.google.common.io.Resources;
 import org.junit.Test;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
 import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.platform.ssh.model.SyncloudException;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,7 +30,7 @@ public class SamTest {
     public void testRunNoArgs() {
 
         SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(Optional.of(""));
+        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn("");
 
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
 
@@ -48,7 +49,7 @@ public class SamTest {
                 "    }";
 
         SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(Optional.of(json));
+        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(json);
 
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
 
@@ -68,7 +69,7 @@ public class SamTest {
                 "    }";
 
         SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(Optional.of(json));
+        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(json);
 
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
 
@@ -83,7 +84,7 @@ public class SamTest {
     public void testRunWithArgs() {
 
         SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(Optional.of(""));
+        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn("");
 
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
 
@@ -100,12 +101,12 @@ public class SamTest {
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
         String json = Resources.toString(getResource("app.list.json"), UTF_8);
         String[] command = cmd(new String[] {Commands.list});
-        when(ssh.run(device, command)).thenReturn(Optional.of(json));
+        when(ssh.run(device, command)).thenReturn(json);
 
         Sam sam = new Sam(ssh, testRelease);
 
-        Optional<List<AppVersions>> result = sam.list(device);
-        assertEquals(9, result.get().size());
+        List<AppVersions> result = sam.list(device);
+        assertEquals(9, result.size());
 
         verify(ssh).run(device, command);
     }
@@ -117,34 +118,33 @@ public class SamTest {
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
         String json = Resources.toString(getResource("app.list.empty.json"), UTF_8);
         String[] command = cmd(new String[] {Commands.list});
-        when(ssh.run(device, command)).thenReturn(Optional.of(json));
+        when(ssh.run(device, command)).thenReturn(json);
 
         Sam sam = new Sam(ssh, testRelease);
 
-        Optional<List<AppVersions>> result = sam.list(device);
-        assertTrue(result.isPresent());
-        assertEquals(0, result.get().size());
+        List<AppVersions> result = sam.list(device);
+        assertEquals(0, result.size());
 
         verify(ssh).run(device, command);
     }
 
-    @Test
+    @Test(expected=SyncloudException.class)
     public void testListEmptyReply() throws IOException {
 
         SshRunner ssh = mock(SshRunner.class);
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
         String json = "";
         String[] command = cmd(new String[] {Commands.list});
-        when(ssh.run(device, command)).thenReturn(Optional.of(json));
+        when(ssh.run(device, command)).thenReturn(json);
 
         Sam sam = new Sam(ssh, testRelease);
 
-        assertFalse(sam.list(device).isPresent());
+        sam.list(device);
 
         verify(ssh).run(device, command);
     }
 
-    @Test
+    @Test(expected=SyncloudException.class)
     public void testListCorrupted() throws IOException {
 
         SshRunner ssh = mock(SshRunner.class);
@@ -152,11 +152,11 @@ public class SamTest {
         String json = Resources.toString(getResource("app.list.error.json"), UTF_8);
 
         String[] command = cmd(new String[] {Commands.list});
-        when(ssh.run(device, command)).thenReturn(Optional.of(json));
+        when(ssh.run(device, command)).thenReturn(json);
 
         Sam sam = new Sam(ssh, testRelease);
 
-        assertFalse(sam.list(device).isPresent());
+        sam.list(device);
 
         verify(ssh).run(device, command);
     }
@@ -176,11 +176,11 @@ public class SamTest {
         ConnectionPointProvider device = mock(ConnectionPointProvider.class);
         String json = Resources.toString(getResource(response), UTF_8);
         String[] command = cmd(new String[] {Commands.update, "--release", testRelease.getVersion()});
-        when(ssh.run(device, command)).thenReturn(Optional.of(json));
+        when(ssh.run(device, command)).thenReturn(json);
 
         Sam sam = new Sam(ssh, testRelease);
 
-        assertEquals(sam.update(device).get().size(), expectedUpdates);
+        assertEquals(sam.update(device).size(), expectedUpdates);
 
         verify(ssh).run(device, command);
     }

@@ -15,7 +15,7 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
     }
 
     public interface Work<TParams, TResult> {
-        AsyncResult<TResult> run(TParams... args);
+        TResult run(TParams... args);
     }
 
     private String title;
@@ -39,9 +39,9 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
     protected AsyncResult<TResult> doInBackground(TParams... args) {
         if (work != null) {
             try {
-                return work.run(args);
+                return AsyncResult.value(work.run(args));
             } catch (Throwable th) {
-                return AsyncResult.error(th.getMessage());
+                return AsyncResult.exception(th);
             }
         } else {
             return null;

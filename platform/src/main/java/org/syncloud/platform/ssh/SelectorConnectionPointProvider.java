@@ -1,9 +1,8 @@
 package org.syncloud.platform.ssh;
 
-import com.google.common.base.Optional;
-
 import org.syncloud.platform.ssh.model.ConnectionPoint;
 import org.syncloud.platform.ssh.model.Device;
+import org.syncloud.platform.ssh.model.SyncloudException;
 
 import static org.syncloud.platform.ssh.SshRunner.cmd;
 
@@ -25,20 +24,18 @@ public class SelectorConnectionPointProvider implements ConnectionPointProvider 
 
     @Override
     public ConnectionPoint get() {
-        Optional<ConnectionPoint> firstPoint = selector.select(device, true);
-        if (firstPoint.isPresent()){
-            if (sshRunner.run(firstPoint.get(), cmd(VERIFY_COMMAND)).isPresent())
-                return firstPoint.get();
-        }
+        ConnectionPoint firstPoint = selector.select(device, true);
+        try {
+            sshRunner.run(firstPoint, cmd(VERIFY_COMMAND));
+            return firstPoint;
+        } catch (Throwable th) {}
 
-        Optional<ConnectionPoint> secondPoint = selector.select(device, false);
-        if (secondPoint.isPresent()) {
-            if (sshRunner.run(secondPoint.get(), cmd(VERIFY_COMMAND)).isPresent()) {
-                preference.swap();
-                return secondPoint.get();
-            }
-        }
+        ConnectionPoint secondPoint = selector.select(device, false);
+        try {
+            sshRunner.run(secondPoint, cmd(VERIFY_COMMAND));
+            return secondPoint;
+        } catch (Throwable th) {}
 
-        throw new RuntimeException("Can't run command, unable to get working connection point");
+        throw new SyncloudException("Can't run command, unable to get working connection point");
     }
 }

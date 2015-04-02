@@ -67,10 +67,8 @@ public class GitBucket extends ActionBarActivity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public AsyncResult<String> run(Void... args) {
-                        return new AsyncResult<String>(
-                                manager.url(connectionPoint),
-                                "unable to get GitBucket txtUrl");
+                    public String run(Void... args) {
+                        return manager.url(connectionPoint);
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {
@@ -115,10 +113,8 @@ public class GitBucket extends ActionBarActivity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<String, String>() {
                     @Override
-                    public AsyncResult<String> run(String... args) {
-                        return new AsyncResult<String>(
-                                manager.enable(connectionPoint, login, pass),
-                                "unable to activate");
+                    public String run(String... args) {
+                        return manager.enable(connectionPoint, login, pass);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<String>() {
@@ -137,10 +133,8 @@ public class GitBucket extends ActionBarActivity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<String, String>() {
                     @Override
-                    public AsyncResult<String> run(String... args) {
-                        return new AsyncResult<String>(
-                                manager.disable(connectionPoint),
-                                "unable to deactivate");
+                    public String run(String... args) {
+                        return manager.disable(connectionPoint);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<String>() {

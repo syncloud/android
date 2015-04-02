@@ -1,7 +1,6 @@
 package org.syncloud.platform.ssh;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -15,6 +14,7 @@ import org.syncloud.platform.ssh.model.Credentials;
 import org.syncloud.platform.ssh.model.Endpoint;
 import org.syncloud.platform.ssh.model.JsonApiException;
 import org.syncloud.platform.ssh.model.SshShortResult;
+import org.syncloud.platform.ssh.model.SyncloudException;
 
 import java.io.InputStream;
 import java.util.List;
@@ -41,31 +41,29 @@ public class SshRunner {
         return quotedCommand;
     }
 
-    public Optional<String> run(ConnectionPointProvider connectionPoint, String[] command) {
+    public String run(ConnectionPointProvider connectionPoint, String[] command) {
         return run(connectionPoint.get(), command);
     }
 
-    public Optional<String> run(ConnectionPoint connectionPoint, String[] command) {
+    public String run(ConnectionPoint connectionPoint, String[] command) {
         SessionResult sessionResult = execute(connectionPoint, command);
 
-        if (sessionResult == null)
-            return Optional.absent();
+        if (sessionResult.exitCode != 0)
+            throw new SyncloudException("Command finished with non-zero exit code");
 
-        if (sessionResult.exitCode == 0) {
-            SshShortResult jsonResult = null;
-            try {
-                jsonResult = JSON.readValue(sessionResult.output, SshShortResult.class);
-            } catch (Throwable th) {
-                logger.error("Failed to deserialize json "+sessionResult.output, th);
-                return Optional.absent();
-            }
-            if (!jsonResult.success) {
-                throw new JsonApiException("Returned JSON indicates a error", jsonResult);
-            }
-            return Optional.of(sessionResult.output);
-        } else {
-            return Optional.absent();
+        SshShortResult jsonResult = null;
+        try {
+            jsonResult = JSON.readValue(sessionResult.output, SshShortResult.class);
+        } catch (Throwable th) {
+            logger.error("Failed to deserialize json "+sessionResult.output, th);
+            throw new SyncloudException("Failed to deserialize json");
         }
+        if (!jsonResult.success) {
+            String message = "Returned JSON indicates a error";
+            logger.error(message+" "+sessionResult.output);
+            throw new JsonApiException(message, jsonResult);
+        }
+        return sessionResult.output;
     }
 
     public class SessionResult {
@@ -156,6 +154,7 @@ public class SshRunner {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        return null;
+
+        throw new SyncloudException("Failed to execute command");
     }
 }

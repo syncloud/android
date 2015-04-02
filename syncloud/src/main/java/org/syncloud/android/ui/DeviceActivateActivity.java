@@ -129,10 +129,8 @@ public class DeviceActivateActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public AsyncResult<String> run(Void... args) {
-                        return new AsyncResult<String>(
-                                server.userDomain(connectionPoint),
-                                "unable to get user domain");
+                    public String run(Void... args) {
+                        return server.userDomain(connectionPoint);
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {
@@ -167,10 +165,9 @@ public class DeviceActivateActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public AsyncResult<String> run(Void... args) {
-                        return doActivate(email, pass, domain) ?
-                                value("Activated") :
-                                AsyncResult.<String>error("Unable to activate");
+                    public String run(Void... args) {
+                        doActivate(email, pass, domain);
+                        return "placeholder";
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<String>() {
@@ -182,10 +179,10 @@ public class DeviceActivateActivity extends Activity {
                 .execute();
     }
 
-    private boolean doActivate(final String email, final String pass, final String domain) {
+    private void doActivate(final String email, final String pass, final String domain) {
         logger.info("activate " + domain);
 
-        Optional<Credentials> credentialsResult = server.activate(
+        Credentials credentials = server.activate(
                 connectionPoint,
                 preferences.getVersion(),
                 preferences.getDomain(),
@@ -194,16 +191,9 @@ public class DeviceActivateActivity extends Activity {
                 pass,
                 domain);
 
-        if (!credentialsResult.isPresent()) {
-            logger.error("unable to enable remote access");
-            return false;
-        }
-
-        Key key = new Key(identification.mac_address, credentialsResult.get().key());
+        Key key = new Key(identification.mac_address, credentials.key());
         KeysStorage keysStorage = this.application.keysStorage();
         keysStorage.upsert(key);
-
-        return true;
     }
 
     @Override

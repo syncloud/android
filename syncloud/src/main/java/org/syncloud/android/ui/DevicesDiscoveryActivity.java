@@ -163,8 +163,11 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
                 @Override
                 public void added(final Endpoint endpoint) {
                     ConnectionPoint connectionPoint = new ConnectionPoint(endpoint, getStandardCredentials());
-                    Optional<Identification> id = tools.getId(simple(connectionPoint));
-                    final IdentifiedEndpoint ie = new IdentifiedEndpoint(endpoint, id);
+                    Optional<Identification> idNullable = Optional.absent();
+                    try {
+                        idNullable = Optional.of(tools.getId(simple(connectionPoint)));
+                    } catch (Throwable th) { }
+                    final IdentifiedEndpoint ie = new IdentifiedEndpoint(endpoint, idNullable);
                     publishProgress(new Progress(true, endpoint, ie));
                 }
 

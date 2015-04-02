@@ -80,10 +80,8 @@ public class Owncloud extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<String, String>() {
                     @Override
-                    public AsyncResult<String> run(String... args) {
-                        return new AsyncResult<String>(
-                                owncloudManager.finishSetup(connectionPoint, login, pass, protocol),
-                                "unable to finish setup");
+                    public String run(String... args) {
+                        return owncloudManager.finishSetup(connectionPoint, login, pass, protocol);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<String>() {
@@ -101,10 +99,8 @@ public class Owncloud extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public AsyncResult<String> run(Void... args) {
-                        return new AsyncResult<String>(
-                                owncloudManager.owncloudUrl(connectionPoint),
-                                "unable to get ownCloud url");
+                    public String run(Void... args) {
+                        return owncloudManager.url(connectionPoint);
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {

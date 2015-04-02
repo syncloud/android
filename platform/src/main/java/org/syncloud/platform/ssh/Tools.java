@@ -2,11 +2,11 @@ package org.syncloud.platform.ssh;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
 import org.syncloud.platform.ssh.model.Identification;
 import org.syncloud.platform.ssh.model.SshResult;
+import org.syncloud.platform.ssh.model.SyncloudException;
 
 import java.io.IOException;
 
@@ -21,21 +21,15 @@ public class Tools {
         this.ssh = ssh;
     }
 
-    public Optional<Identification> getId(ConnectionPointProvider provider) {
-        Optional<String> result = ssh.run(provider, new String[] {"syncloud-id", "id"});
-        if (result.isPresent()) {
-            String data = result.get();
-//            logger.debug("identification response: " + data);
-            try {
-                SshResult<Identification> sshResult = JSON.readValue(data, new TypeReference<SshResult<Identification>>() {});
-                return Optional.of(sshResult.data);
-            } catch (IOException e) {
-                logger.error("unable to parse identification response: " + e.getMessage());
-            }
-        } else {
-            logger.error("unable to get identification");
+    public Identification getId(ConnectionPointProvider provider) {
+        String json = ssh.run(provider, new String[] {"syncloud-id", "id"});
+        try {
+            SshResult<Identification> sshResult = JSON.readValue(json, new TypeReference<SshResult<Identification>>() {});
+            return sshResult.data;
+        } catch (IOException e) {
+            String message = "Unable to parse identification response";
+            logger.error(message+" "+json, e);
+            throw new SyncloudException(message);
         }
-
-        return Optional.absent();
     }
 }
