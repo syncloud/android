@@ -1,6 +1,8 @@
 package org.syncloud.redirect;
 
+import org.syncloud.redirect.model.User;
+
 public interface IUserService {
-    UserResult getUser(String email, String password);
-    UserResult createUser(String email, String password);
+    User getUser(String email, String password);
+    User createUser(String email, String password);
 }

@@ -2,7 +2,6 @@ package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
@@ -13,10 +12,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.syncloud.android.Preferences;
+import org.syncloud.android.Progress;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.tasks.AsyncResult;
+import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.redirect.IUserService;
-import org.syncloud.redirect.UserResult;
+import org.syncloud.redirect.model.User;
 
 public class AuthActivity extends Activity {
 
@@ -51,6 +53,22 @@ public class AuthActivity extends Activity {
         }
     }
 
+    private Progress progress = new ProgressImpl();
+
+    public class ProgressImpl extends Progress.Empty {
+        @Override
+        public void start() {
+            signInOrOut.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void stop() {
+            signInOrOut.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -62,9 +80,41 @@ public class AuthActivity extends Activity {
 
     private void proceedWithLogin() {
         if (preferences.hasCredentials()) {
-            new CheckCredentialsTask(preferences).execute();
+            login();
         }
 
+    }
+
+    private void login() {
+        final String email = preferences.getEmail();
+        final String password = preferences.getPassword();
+
+        new ProgressAsyncTask<Void, User>()
+                .setProgress(progress)
+                .doWork(new ProgressAsyncTask.Work<Void, User>() {
+                    @Override
+                    public User run(Void... args) { return userService.getUser(email, password); }
+                })
+                .onCompleted(new ProgressAsyncTask.Completed<User>() {
+                    @Override
+                    public void run(AsyncResult<User> result) {
+                        onLoginCompleted(result);
+                    }
+                })
+                .execute();
+    }
+
+    private void onLoginCompleted(AsyncResult<User> result) {
+        if (result.hasValue()) {
+            Intent intent = new Intent(AuthActivity.this, DevicesSavedActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            Intent intent = new Intent(AuthActivity.this, AuthCredentialsActivity.class);
+            intent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_SIGN_IN);
+            intent.putExtra(AuthCredentialsActivity.PARAM_CHECK_EXISTING, true);
+            startActivityForResult(intent, REQUEST_AUTHENTICATE);
+        }
     }
 
     @Override
@@ -96,45 +146,6 @@ public class AuthActivity extends Activity {
         Intent credentialsIntent = new Intent(this, AuthCredentialsActivity.class);
         credentialsIntent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_REGISTER);
         startActivityForResult(credentialsIntent, REQUEST_AUTHENTICATE);
-    }
-
-    public class CheckCredentialsTask extends AsyncTask<Void, Void, UserResult> {
-        private Preferences preferences;
-
-        public CheckCredentialsTask(Preferences preferences) {
-            this.preferences = preferences;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            signInOrOut.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected UserResult doInBackground(Void... voids) {
-            String email = preferences.getEmail();
-            String password = preferences.getPassword();
-            UserResult result = userService.getUser(email, password);
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(UserResult result) {
-            progressBar.setVisibility(View.INVISIBLE);
-            if (result.hasError()) {
-                signInOrOut.setVisibility(View.VISIBLE);
-
-                Intent intent = new Intent(AuthActivity.this, AuthCredentialsActivity.class);
-                intent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_SIGN_IN);
-                intent.putExtra(AuthCredentialsActivity.PARAM_CHECK_EXISTING, true);
-                startActivityForResult(intent, REQUEST_AUTHENTICATE);
-            } else {
-                Intent intent = new Intent(AuthActivity.this, DevicesSavedActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        }
     }
 
 }

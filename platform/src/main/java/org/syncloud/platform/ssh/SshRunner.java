@@ -55,7 +55,8 @@ public class SshRunner {
         try {
             jsonResult = JSON.readValue(sessionResult.output, SshShortResult.class);
         } catch (Throwable th) {
-            logger.error("Failed to deserialize json "+sessionResult.output, th);
+            String message = "Failed to deserialize json";
+            logger.error(message+" "+sessionResult.output, th);
             throw new SyncloudException("Failed to deserialize json");
         }
         if (!jsonResult.success) {

@@ -1,6 +1,5 @@
 package org.syncloud.platform.sam;
 
-import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 
 import org.junit.Test;

@@ -1,5 +1,5 @@
 package org.syncloud.redirect.model;
 
-public class RestUser extends RestError {
+public class RestUser extends RestResult {
     public User data;
 }

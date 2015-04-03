@@ -104,4 +104,24 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
         if (completed != null)
             completed.run(result);
     }
+
+    @Override
+    protected void onCancelled() {
+        if (progress != null) {
+            progress.stop();
+        }
+    }
+
+    public static void execute(final Runnable runnable) {
+        new ProgressAsyncTask<Void, Void>()
+                .doWork(new Work<Void, Void>() {
+                    @Override
+                    public Void run(Void... args) {
+                        runnable.run();
+                        return null;
+                    }
+                })
+                .execute();
+
+    }
 }

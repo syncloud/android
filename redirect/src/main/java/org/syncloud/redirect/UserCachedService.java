@@ -1,8 +1,7 @@
 package org.syncloud.redirect;
 
+import org.syncloud.redirect.model.RedirectApiException;
 import org.syncloud.redirect.model.User;
-
-import static org.syncloud.redirect.UserResult.value;
 
 public class UserCachedService implements IUserService {
     private IUserService service;
@@ -14,25 +13,27 @@ public class UserCachedService implements IUserService {
     }
 
     @Override
-    public UserResult getUser(String email, String password) {
-        UserResult result = service.getUser(email, password);
-        if (result.hasError()) {
-            if (!result.error().expected) {
+    public User getUser(String email, String password) {
+        try {
+            User user = service.getUser(email, password);
+            storage.save(user);
+            return user;
+        } catch (RedirectApiException e) {
+            int statusCode = e.result.statusCode;
+            boolean unexpectedError = statusCode != 400 && statusCode != 403;
+            if (unexpectedError) {
                 User user = storage.load();
                 if (user != null && user.email.equals(email))
-                    result = value(user);
+                    return user;
             }
-        } else {
-            storage.save(result.user());
+            throw e;
         }
-        return result;
     }
 
     @Override
-    public UserResult createUser(String email, String password) {
-        UserResult result = service.createUser(email, password);
-        if (!result.hasError())
-            storage.save(result.user());
-        return result;
+    public User createUser(String email, String password) {
+        User user = service.createUser(email, password);
+        storage.save(user);
+        return user;
     }
 }

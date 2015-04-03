@@ -26,4 +26,9 @@ public class AsyncResult<T> {
     public T getValue() {
         return value.get();
     }
+
+    public Throwable getException() {
+        return exception.get();
+    }
+
 }

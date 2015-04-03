@@ -10,8 +10,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.common.base.Optional;
-
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;

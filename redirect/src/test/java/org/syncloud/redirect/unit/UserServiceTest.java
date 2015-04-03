@@ -5,11 +5,10 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.syncloud.redirect.RedirectService;
-import org.syncloud.redirect.UserResult;
+import org.syncloud.redirect.model.RedirectApiException;
+import org.syncloud.redirect.model.User;
 import org.syncloud.redirect.unit.server.Rest;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class UserServiceTest {
 
@@ -29,35 +28,27 @@ public class UserServiceTest {
     @Test
     public void testGetUserExisting() {
         Rest.start(Rest.ExistingUser.class);
-        UserResult result = this.redirectService.getUser("test", "test");
-
-        assertFalse(result.hasError());
-        assertNotNull(result.user());
+        User user = this.redirectService.getUser("test", "test");
+        assertNotNull(user);
     }
 
-    @Test
+    @Test(expected=RedirectApiException.class)
     public void testGetUserMissing() {
         Rest.start(Rest.MissingUser.class);
-        UserResult result = this.redirectService.getUser("test", "test");
-
-        assertTrue(result.hasError());
+        this.redirectService.getUser("test", "test");
     }
 
     @Ignore
     @Test
     public void testCreateUserNew() {
         Rest.start(Rest.MissingUser.class);
-        UserResult result = this.redirectService.createUser("test", "test");
-
-        assertFalse(result.hasError());
-        assertNotNull(result.user());
+        User user = this.redirectService.createUser("test", "test");
+        assertNotNull(user);
     }
 
-    @Test
+    @Test(expected=RedirectApiException.class)
     public void testCreateUserExisting() {
         Rest.start(Rest.ExistingUser.class);
-        UserResult result = this.redirectService.createUser("test", "test");
-
-        assertTrue(result.hasError());
+        this.redirectService.createUser("test", "test");
     }
 }

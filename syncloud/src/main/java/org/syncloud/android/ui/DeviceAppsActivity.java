@@ -17,9 +17,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-import com.google.common.base.Optional;
-
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
@@ -43,8 +40,8 @@ import org.syncloud.platform.ssh.model.Key;
 
 import java.util.List;
 
-import static android.os.AsyncTask.execute;
 import static org.syncloud.android.SyncloudApplication.appRegistry;
+import static org.syncloud.android.tasks.ProgressAsyncTask.execute;
 import static org.syncloud.platform.ssh.SimpleConnectionPointProvider.simple;
 import static org.syncloud.platform.ssh.model.Credentials.getStandardCredentials;
 

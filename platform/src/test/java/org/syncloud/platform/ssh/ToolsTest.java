@@ -1,11 +1,6 @@
 package org.syncloud.platform.ssh;
 
-import com.google.common.base.Optional;
-
 import org.junit.Test;
-import org.syncloud.platform.ssh.ConnectionPointProvider;
-import org.syncloud.platform.ssh.SshRunner;
-import org.syncloud.platform.ssh.Tools;
 import org.syncloud.platform.ssh.model.Identification;
 
 import static org.junit.Assert.assertEquals;

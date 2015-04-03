@@ -9,12 +9,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import com.google.common.base.Optional;
-
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppStoreAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
@@ -26,7 +23,7 @@ import org.syncloud.platform.ssh.model.DomainModel;
 
 import java.util.List;
 
-import static android.os.AsyncTask.execute;
+import static org.syncloud.android.tasks.ProgressAsyncTask.execute;
 import static org.syncloud.platform.sam.Commands.upgrade_all;
 
 import static org.syncloud.platform.ssh.SshRunner.cmd;

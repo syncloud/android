@@ -2,7 +2,6 @@ package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -16,9 +15,9 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.Utils;
 import org.syncloud.android.db.KeysStorage;
+import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DevicesSavedAdapter;
 import org.syncloud.redirect.IUserService;
-import org.syncloud.redirect.UserResult;
 import org.syncloud.redirect.model.User;
 import org.syncloud.platform.ssh.model.DomainModel;
 import org.syncloud.platform.ssh.model.Key;
@@ -67,7 +66,24 @@ public class DevicesSavedActivity extends Activity {
     }
 
     private void refreshDevices() {
-        new CheckCredentialsTask(application, preferences).execute();
+        final IUserService userService = application.userServiceCached();
+        final String email = preferences.getEmail();
+        final String password = preferences.getPassword();
+
+        new ProgressAsyncTask<Void, User>()
+                .doWork(new ProgressAsyncTask.Work<Void, User>() {
+                    @Override
+                    public User run(Void... args) {
+                        return userService.getUser(email, password);
+                    }
+                })
+                .onSuccess(new ProgressAsyncTask.Success<User>() {
+                    @Override
+                    public void run(User user) {
+                        updateUser(user);
+                    }
+                })
+                .execute();
     }
 
     private void updateUser(User user) {
@@ -122,35 +138,6 @@ public class DevicesSavedActivity extends Activity {
 
     public void discover(View view) {
         startActivityForResult(new Intent(this, DevicesDiscoveryActivity.class), 1);
-    }
-
-    public class CheckCredentialsTask extends AsyncTask<Void, Void, UserResult> {
-        private Preferences preferences;
-        private IUserService userService;
-
-        public CheckCredentialsTask(SyncloudApplication application, Preferences preferences) {
-            this.preferences = preferences;
-            this.userService = application.userServiceCached();
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected UserResult doInBackground(Void... voids) {
-            String email = preferences.getEmail();
-            String password = preferences.getPassword();
-            UserResult result = userService.getUser(email, password);
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(UserResult result) {
-            if (!result.hasError()) {
-                updateUser(result.user());
-            }
-        }
     }
 
 }
