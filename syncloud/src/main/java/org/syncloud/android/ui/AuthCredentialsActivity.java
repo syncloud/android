@@ -183,7 +183,7 @@ public class AuthCredentialsActivity extends Activity {
         return password.length() > 4;
     }
 
-    private boolean doValidate() {
+    private boolean validate() {
         emailView.setError(null);
         passwordView.setError(null);
 
@@ -222,7 +222,7 @@ public class AuthCredentialsActivity extends Activity {
     }
 
     private void attemptLogin() {
-        if (!doValidate()) return;
+        if (!validate()) return;
 
         final String email = emailView.getText().toString();
         final String password = passwordView.getText().toString();

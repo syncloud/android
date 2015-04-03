@@ -1,11 +1,11 @@
 package org.syncloud.android.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,7 +18,6 @@ import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
-import org.syncloud.platform.sam.Sam;
 import org.syncloud.platform.server.Server;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
 import org.syncloud.platform.ssh.SshRunner;
@@ -26,9 +25,13 @@ import org.syncloud.platform.ssh.model.ConnectionPoint;
 import org.syncloud.platform.ssh.model.Credentials;
 import org.syncloud.platform.ssh.model.Endpoint;
 import org.syncloud.platform.ssh.model.Identification;
+import org.syncloud.platform.ssh.model.JsonApiException;
 import org.syncloud.platform.ssh.model.Key;
+import org.syncloud.platform.ssh.model.ParameterMessages;
 
-import static org.syncloud.android.tasks.AsyncResult.value;
+import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.syncloud.platform.ssh.SimpleConnectionPointProvider.simple;
 import static org.syncloud.platform.ssh.model.Credentials.getStandardCredentials;
 
@@ -44,11 +47,9 @@ public class DeviceActivateActivity extends Activity {
     private TextView txtMacAddress;
     private TextView txtStatusValue;
 
-    private Button btnActivate;
     private EditText editUserDomain;
     private TextView txtMainDomain;
 
-    private Sam sam;
     private LinearLayout layoutMacAddress;
 
     private SyncloudApplication application;
@@ -68,8 +69,6 @@ public class DeviceActivateActivity extends Activity {
         txtMacAddress = (TextView) findViewById(R.id.txt_second_line);
         layoutMacAddress = (LinearLayout) findViewById(R.id.layout_activate_mac_address);
 
-        btnActivate = (Button) findViewById(R.id.btn_activate);
-
         txtMainDomain = (TextView) findViewById(R.id.txt_main_domain);
         editUserDomain = (EditText) findViewById(R.id.edit_user_domain);
 
@@ -85,7 +84,6 @@ public class DeviceActivateActivity extends Activity {
         preferences = application.getPreferences();
 
         ssh = new SshRunner();
-        sam = new Sam(ssh, preferences);
         server = new Server(ssh);
 
         txtDeviceTitle.setText(this.identification.title);
@@ -100,11 +98,25 @@ public class DeviceActivateActivity extends Activity {
         status();
     }
 
-    private void showDomainError(String message) {
-        editUserDomain.setError(message);
-        editUserDomain.requestFocus();
+    private EditText getControl(String parameter) {
+        if (parameter.equals("user_domain"))
+            return editUserDomain;
+        return null;
     }
 
+    private boolean validate() {
+        editUserDomain.setError(null);
+
+        final String domain = editUserDomain.getText().toString();
+
+        if (domain == null || domain.isEmpty()) {
+            editUserDomain.setError("Enter domain");
+            editUserDomain.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -148,18 +160,14 @@ public class DeviceActivateActivity extends Activity {
     }
 
     public void activate(View view) {
+        if (!validate()) return;
+
         final String email = preferences.getEmail();
         final String pass = preferences.getPassword();
         final String domain = editUserDomain.getText().toString();
 
-        if (domain == null || domain.isEmpty()) {
-            showDomainError("Enter domain");
-            return;
-        }
-
         new ProgressAsyncTask<Void, String>()
                 .setTitle("Activating device")
-                .setErrorMessage("Unable to activate")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
@@ -168,13 +176,41 @@ public class DeviceActivateActivity extends Activity {
                         return "placeholder";
                     }
                 })
-                .onSuccess(new ProgressAsyncTask.Success<String>() {
+                .onCompleted(new ProgressAsyncTask.Completed<String>() {
                     @Override
-                    public void run(String result) {
-                        finish();
+                    public void run(AsyncResult<String> result) {
+                        onActivate(result);
                     }
                 })
                 .execute();
+    }
+
+    private void onActivate(AsyncResult<String> result) {
+        if (result.hasValue()) {
+            finish();
+        } else {
+            if (result.getException() instanceof JsonApiException) {
+                JsonApiException apiError = (JsonApiException)result.getException();
+                List<ParameterMessages> messages = apiError.result.parameters_messages;
+                if (messages != null && messages.size() > 0) {
+                    for (ParameterMessages pm: messages) {
+                        EditText control = getControl(pm.parameter);
+                        if (control != null) {
+                            String message = join(pm.messages, '\n');
+                            control.setError(message);
+                            control.requestFocus();
+                        }
+                    }
+
+                    return;
+                }
+            }
+            new AlertDialog.Builder(this)
+                    .setTitle("Failed")
+                    .setMessage("Unable to activate")
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+        }
     }
 
     private void doActivate(final String email, final String pass, final String domain) {
