@@ -8,7 +8,7 @@ import static org.syncloud.platform.ssh.SshRunner.cmd;
 
 
 public class SelectorConnectionPointProvider implements ConnectionPointProvider {
-    public static final String VERIFY_COMMAND = "date";
+    public static final String VERIFY_COMMAND = "syncloud-ping";
 
     private SshRunner sshRunner;
     private EndpointSelector selector;
