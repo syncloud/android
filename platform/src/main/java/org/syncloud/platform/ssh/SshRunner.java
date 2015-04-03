@@ -59,7 +59,7 @@ public class SshRunner {
             throw new SyncloudException("Failed to deserialize json");
         }
         if (!jsonResult.success) {
-            String message = "Returned JSON indicates a error";
+            String message = "Returned JSON indicates an error";
             logger.error(message+" "+sessionResult.output);
             throw new JsonApiException(message, jsonResult);
         }
