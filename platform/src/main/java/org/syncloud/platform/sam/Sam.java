@@ -47,18 +47,8 @@ public class Sam {
         return runTyped(new TypeReference<SshResult<List<AppVersions>>>() {}, connectionPoint, arguments);
     }
 
-    public Boolean run(ConnectionPointProvider connectionPoint, String... arguments) {
-        String execute = ssh.run(connectionPoint, cmd(arguments));
-        try {
-            SshResult result = JSON.readValue(execute, SshResult.class);
-            if (result.success)
-                return true;
-
-            logger.error(result.message);
-        } catch (IOException e) {
-            logger.error("unable to parse execute response");
-        }
-        return false;
+    public void run(ConnectionPointProvider connectionPoint, String... arguments) {
+        ssh.run(connectionPoint, cmd(arguments));
     }
 
     public List<AppVersions> update(ConnectionPointProvider connectionPoint) {

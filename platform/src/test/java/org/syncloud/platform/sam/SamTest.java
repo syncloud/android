@@ -6,6 +6,7 @@ import com.google.common.io.Resources;
 import org.junit.Test;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
 import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.platform.ssh.model.JsonApiException;
 import org.syncloud.platform.ssh.model.SyncloudException;
 
 import java.io.IOException;
@@ -25,74 +26,6 @@ import static org.syncloud.platform.sam.Sam.cmd;
 public class SamTest {
 
     private Release testRelease = new TestRelease();
-
-    @Test
-    public void testRunNoArgs() {
-
-        SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn("");
-
-        ConnectionPointProvider device = mock(ConnectionPointProvider.class);
-
-        Sam sam = new Sam(ssh, testRelease);
-        sam.run(device, Commands.update);
-
-        verify(ssh).run(device, new String[]{"sam", "update"});
-    }
-
-    @Test
-    public void testRunSuccess() throws IOException {
-        String json = "{\n" +
-                "    \"message\": \"installed app\",\n" +
-                "    \"data\": {},\n" +
-                "    \"success\": true\n" +
-                "    }";
-
-        SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(json);
-
-        ConnectionPointProvider device = mock(ConnectionPointProvider.class);
-
-        Sam sam = new Sam(ssh, testRelease);
-        Boolean result = sam.run(device, Commands.update);
-
-        assertTrue(result);
-
-    }
-
-    @Test
-    public void testRunError() throws IOException {
-        String json = "{\n" +
-                "    \"message\": \"unable to install app\",\n" +
-                "    \"data\": {},\n" +
-                "    \"success\": false\n" +
-                "    }";
-
-        SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn(json);
-
-        ConnectionPointProvider device = mock(ConnectionPointProvider.class);
-
-        Sam sam = new Sam(ssh, testRelease);
-        Boolean result = sam.run(device, Commands.update);
-
-        assertFalse(result);
-
-    }
-
-    @Test
-    public void testRunWithArgs() {
-
-        SshRunner ssh = mock(SshRunner.class);
-        when(ssh.run(any(ConnectionPointProvider.class), any(String[].class))).thenReturn("");
-
-        ConnectionPointProvider device = mock(ConnectionPointProvider.class);
-
-        Sam sam = new Sam(ssh, testRelease);
-        sam.run(device, Commands.update, "--release", "0.1");
-
-        verify(ssh).run(device, new String[] {"sam", "update", "--release", "0.1"});
-    }
 
     @Test
     public void testList() throws IOException {
