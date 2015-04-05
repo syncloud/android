@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
-import org.syncloud.redirect.model.RedirectException;
+import org.syncloud.common.SyncloudException;
 import org.syncloud.redirect.model.RestUser;
 import org.syncloud.redirect.model.User;
 
@@ -40,7 +40,7 @@ public class RedirectService implements IUserService {
         } catch (IOException e) {
             String message = "Failed to deserialize json";
             logger.error(message+" "+json, e);
-            throw new RedirectException(message);
+            throw new SyncloudException(message);
         }
     }
 
@@ -57,7 +57,7 @@ public class RedirectService implements IUserService {
         } catch (IOException e) {
             String message = "Failed to deserialize json";
             logger.error(message+" "+json, e);
-            throw new RedirectException(message);
+            throw new SyncloudException(message);
         }
     }
 

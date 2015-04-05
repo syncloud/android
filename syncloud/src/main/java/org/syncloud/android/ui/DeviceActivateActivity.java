@@ -27,7 +27,7 @@ import org.syncloud.platform.ssh.model.Endpoint;
 import org.syncloud.platform.ssh.model.Identification;
 import org.syncloud.platform.ssh.model.JsonApiException;
 import org.syncloud.platform.ssh.model.Key;
-import org.syncloud.platform.ssh.model.ParameterMessages;
+import org.syncloud.common.ParameterMessages;
 
 import java.util.List;
 

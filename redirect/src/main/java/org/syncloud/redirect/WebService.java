@@ -11,8 +11,8 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
+import org.syncloud.common.SyncloudException;
 import org.syncloud.redirect.model.RedirectApiException;
-import org.syncloud.redirect.model.RedirectException;
 import org.syncloud.redirect.model.RestResult;
 
 import java.io.BufferedReader;
@@ -46,7 +46,7 @@ public class WebService {
         } catch (IOException e) {
             String message = "Failed to deserialize json";
             logger.error(message+" "+response.output, e);
-            throw new RedirectException(message);
+            throw new SyncloudException(message);
         }
         restResponse.statusCode = response.statusCode;
         checkStatusCode(restResponse);
@@ -83,7 +83,7 @@ public class WebService {
         } catch (IOException e) {
             String message = "Failed to get response";
             logger.error("Failed to get response", e);
-            throw new RedirectException(message);
+            throw new SyncloudException(message);
         } finally {
             if (response != null)
                 try { response.close(); } catch (IOException e) {}
@@ -116,11 +116,11 @@ public class WebService {
         } catch (UnsupportedEncodingException e) {
             String message = "Failed to form request";
             logger.error(message, e);
-            throw new RedirectException(message);
+            throw new SyncloudException(message);
         }
         String message = "Unknown request type "+type;
         logger.error(message);
-        throw new RedirectException(message);
+        throw new SyncloudException(message);
     }
 
     private static String readText(InputStream inputStream) throws IOException {

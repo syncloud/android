@@ -1,4 +1,4 @@
-package org.syncloud.platform.ssh.model;
+package org.syncloud.common;
 
 import java.util.List;
 

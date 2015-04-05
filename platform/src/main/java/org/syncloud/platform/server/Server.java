@@ -9,7 +9,7 @@ import org.syncloud.platform.ssh.SshRunner;
 import org.syncloud.platform.ssh.model.Credentials;
 import org.syncloud.platform.ssh.model.SshResult;
 import org.syncloud.platform.ssh.model.StringResult;
-import org.syncloud.platform.ssh.model.SyncloudException;
+import org.syncloud.common.SyncloudException;
 
 import java.io.IOException;
 

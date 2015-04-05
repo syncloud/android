@@ -27,8 +27,8 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
+import org.syncloud.common.ParameterMessages;
 import org.syncloud.redirect.IUserService;
-import org.syncloud.redirect.model.ParameterMessages;
 import org.syncloud.redirect.model.RedirectApiException;
 import org.syncloud.redirect.model.User;
 

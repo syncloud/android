@@ -1,6 +1,7 @@
 apply plugin: 'java'
 
 dependencies {
+    compile project (':common')
     compile 'com.jcraft:jsch:0.1.51'
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'org.apache.commons:commons-exec:1.2'

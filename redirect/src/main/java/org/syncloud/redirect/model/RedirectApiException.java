@@ -1,6 +1,8 @@
 package org.syncloud.redirect.model;
 
-public class RedirectApiException extends RedirectException {
+import org.syncloud.common.SyncloudException;
+
+public class RedirectApiException extends SyncloudException {
     public RestResult result;
 
     public RedirectApiException(String message, RestResult result) {

@@ -1,1 +1,1 @@
-include ':syncloud', ':redirect', ':platform', ':apps'
+include ':syncloud', ':redirect', ':platform', ':apps', ':common'

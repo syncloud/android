@@ -2,7 +2,7 @@ package org.syncloud.platform.ssh;
 
 import org.syncloud.platform.ssh.model.ConnectionPoint;
 import org.syncloud.platform.ssh.model.Device;
-import org.syncloud.platform.ssh.model.SyncloudException;
+import org.syncloud.common.SyncloudException;
 
 import static org.syncloud.platform.ssh.SshRunner.cmd;
 

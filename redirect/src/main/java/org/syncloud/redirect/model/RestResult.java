@@ -2,6 +2,8 @@ package org.syncloud.redirect.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import org.syncloud.common.ParameterMessages;
+
 import java.util.List;
 
 //@JsonIgnoreProperties(ignoreUnknown = true)

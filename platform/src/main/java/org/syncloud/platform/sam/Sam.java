@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
 import org.syncloud.platform.ssh.SshRunner;
 import org.syncloud.platform.ssh.model.SshResult;
-import org.syncloud.platform.ssh.model.SyncloudException;
+import org.syncloud.common.SyncloudException;
 
 import java.io.IOException;
 import java.util.List;
