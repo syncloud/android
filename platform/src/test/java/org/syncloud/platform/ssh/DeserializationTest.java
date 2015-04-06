@@ -2,9 +2,8 @@ package org.syncloud.platform.ssh;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.junit.Assert;
 import org.junit.Test;
-import org.syncloud.platform.ssh.model.SshShortResult;
+import org.syncloud.common.BaseResult;
 
 import java.io.IOException;
 
@@ -25,7 +24,7 @@ public class DeserializationTest {
                 "\t\"success\": false\n" +
                 "}";
 
-        SshShortResult result = JSON.readValue(json, SshShortResult.class);
+        BaseResult result = JSON.readValue(json, BaseResult.class);
         assertFalse(result.success);
         assertEquals("There's a error in parameters", result.message);
         assertEquals(1, result.parameters_messages.size());

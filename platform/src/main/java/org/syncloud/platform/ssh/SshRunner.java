@@ -9,11 +9,11 @@ import com.jcraft.jsch.Session;
 import org.apache.commons.exec.LogOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.syncloud.common.BaseResult;
+import org.syncloud.common.SyncloudResultException;
 import org.syncloud.platform.ssh.model.ConnectionPoint;
 import org.syncloud.platform.ssh.model.Credentials;
 import org.syncloud.platform.ssh.model.Endpoint;
-import org.syncloud.platform.ssh.model.JsonApiException;
-import org.syncloud.platform.ssh.model.SshShortResult;
 import org.syncloud.common.SyncloudException;
 
 import java.io.InputStream;
@@ -46,28 +46,31 @@ public class SshRunner {
     }
 
     public String run(ConnectionPoint connectionPoint, String[] command) {
-        SessionResult sessionResult = execute(connectionPoint, command);
+        SessionResult response = execute(connectionPoint, command);
 
-        if (sessionResult.exitCode != 0)
-            throw new SyncloudException("Command finished with non-zero exit code");
+        if (response.exitCode != 0) {
+            String message = "Command finished with non-zero exit code: "+response.exitCode;
+            logger.error(message);
+            throw new SyncloudException(message);
+        }
 
-        SshShortResult jsonResult = null;
+        BaseResult jsonBaseResponse = null;
         try {
-            jsonResult = JSON.readValue(sessionResult.output, SshShortResult.class);
+            jsonBaseResponse = JSON.readValue(response.output, BaseResult.class);
         } catch (Throwable th) {
             String message = "Failed to deserialize json";
-            logger.error(message+" "+sessionResult.output, th);
+            logger.error(message+" "+response.output, th);
             throw new SyncloudException("Failed to deserialize json");
         }
-        if (!jsonResult.success) {
+        if (!jsonBaseResponse.success) {
             String message = "Returned JSON indicates an error";
-            logger.error(message+" "+sessionResult.output);
-            throw new JsonApiException(message, jsonResult);
+            logger.error(message+" "+response.output);
+            throw new SyncloudResultException(message, jsonBaseResponse);
         }
-        return sessionResult.output;
+        return response.output;
     }
 
-    public class SessionResult {
+    private class SessionResult {
         public String output;
         public int exitCode;
 

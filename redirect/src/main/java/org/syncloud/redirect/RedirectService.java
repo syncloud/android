@@ -6,7 +6,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.syncloud.common.SyncloudException;
-import org.syncloud.redirect.model.RestUser;
+import org.syncloud.redirect.model.UserResult;
 import org.syncloud.redirect.model.User;
 
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class RedirectService implements IUserService {
         String json = webService.execute("GET", "/user/get", parameters);
 
         try {
-            RestUser restUser = mapper.readValue(json, RestUser.class);
+            UserResult restUser = mapper.readValue(json, UserResult.class);
             return restUser.data;
         } catch (IOException e) {
             String message = "Failed to deserialize json";
@@ -52,7 +52,7 @@ public class RedirectService implements IUserService {
         String json = webService.execute("POST", "/user/create", parameters);
 
         try {
-            RestUser restUser = mapper.readValue(json, RestUser.class);
+            UserResult restUser = mapper.readValue(json, UserResult.class);
             return restUser.data;
         } catch (IOException e) {
             String message = "Failed to deserialize json";

@@ -18,6 +18,7 @@ import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
+import org.syncloud.common.SyncloudResultException;
 import org.syncloud.platform.server.Server;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
 import org.syncloud.platform.ssh.SshRunner;
@@ -25,7 +26,6 @@ import org.syncloud.platform.ssh.model.ConnectionPoint;
 import org.syncloud.platform.ssh.model.Credentials;
 import org.syncloud.platform.ssh.model.Endpoint;
 import org.syncloud.platform.ssh.model.Identification;
-import org.syncloud.platform.ssh.model.JsonApiException;
 import org.syncloud.platform.ssh.model.Key;
 import org.syncloud.common.ParameterMessages;
 
@@ -189,8 +189,8 @@ public class DeviceActivateActivity extends Activity {
         if (result.hasValue()) {
             finish();
         } else {
-            if (result.getException() instanceof JsonApiException) {
-                JsonApiException apiError = (JsonApiException)result.getException();
+            if (result.getException() instanceof SyncloudResultException) {
+                SyncloudResultException apiError = (SyncloudResultException)result.getException();
                 List<ParameterMessages> messages = apiError.result.parameters_messages;
                 if (messages != null && messages.size() > 0) {
                     for (ParameterMessages pm: messages) {

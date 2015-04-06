@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
 import org.syncloud.platform.ssh.SshRunner;
-import org.syncloud.platform.ssh.model.SshResult;
+import org.syncloud.common.Result;
 import org.syncloud.common.SyncloudException;
 
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class Sam {
     private <TContent> TContent runTyped(final TypeReference type, ConnectionPointProvider connectionPoint, String[] arguments) {
         String execute = ssh.run(connectionPoint, cmd(arguments));
         try {
-            return JSON.<SshResult<TContent>>readValue(execute, type).data;
+            return JSON.<Result<TContent>>readValue(execute, type).data;
         } catch (IOException e) {
             String message = "Unable to parse command response";
             logger.error(message+" "+execute, e);
@@ -44,7 +44,7 @@ public class Sam {
     }
 
     private List<AppVersions> appsVersions(ConnectionPointProvider connectionPoint, String[] arguments) {
-        return runTyped(new TypeReference<SshResult<List<AppVersions>>>() {}, connectionPoint, arguments);
+        return runTyped(new TypeReference<Result<List<AppVersions>>>() {}, connectionPoint, arguments);
     }
 
     public void run(ConnectionPointProvider connectionPoint, String... arguments) {

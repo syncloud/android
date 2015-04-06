@@ -55,9 +55,10 @@ public class Rest {
         @POST
         @Path("/user/create")
         public Response create() {
-            return Response.status(409).entity(
+            return Response.status(400).entity(
                     "{\n" +
                     "  \"message\": \"Email is already registered\"\n" +
+                    "  \"success\": false\n" +
                     "}"
             ).build();
         }
@@ -70,9 +71,10 @@ public class Rest {
         @GET
         @Path("/user/get")
         public Response get() {
-            return Response.status(403).entity(
+            return Response.status(400).entity(
                     "{\n" +
                     "  \"message\": \"Authentication failed\"\n" +
+                    "  \"success\": false\n" +
                     "}"
             ).build();
         }
@@ -82,8 +84,9 @@ public class Rest {
         public Response create() {
             return Response.ok().entity(
                     "{\n" +
-                            "  \"message\": \"User was created\"\n" +
-                            "}"
+                    "  \"message\": \"User was created\"\n" +
+                    "  \"success\": true\n" +
+                    "}"
             ).build();
         }
     }

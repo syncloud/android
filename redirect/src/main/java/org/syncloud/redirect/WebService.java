@@ -11,9 +11,9 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
+import org.syncloud.common.BaseResult;
 import org.syncloud.common.SyncloudException;
-import org.syncloud.redirect.model.RedirectApiException;
-import org.syncloud.redirect.model.RestResult;
+import org.syncloud.common.SyncloudResultException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,25 +40,27 @@ public class WebService {
     public String execute(String type, String url, List<NameValuePair> parameters) {
         HttpUriRequest request = request(type, apiUrl + url, parameters);
         Response response = getResponse(request);
-        RestResult restResponse = null;
+
+        if (response.statusCode != 200) {
+            String message = "Response has bad status code: "+response.statusCode;
+            logger.error(message);
+            throw new SyncloudException(message);
+        }
+
+        BaseResult jsonBaseResponse = null;
         try {
-            restResponse = mapper.readValue(response.output, RestResult.class);
+            jsonBaseResponse = mapper.readValue(response.output, BaseResult.class);
         } catch (IOException e) {
             String message = "Failed to deserialize json";
             logger.error(message+" "+response.output, e);
             throw new SyncloudException(message);
         }
-        restResponse.statusCode = response.statusCode;
-        checkStatusCode(restResponse);
-        return response.output;
-    }
-
-    private void checkStatusCode(RestResult rest) {
-        if (rest.statusCode != 200) {
-            String message = "Response has bad status code: "+rest.statusCode;
-            logger.error(message);
-            throw new RedirectApiException(message, rest);
+        if (!jsonBaseResponse.success) {
+            String message = "Returned JSON indicates an error";
+            logger.error(message+" "+response.output);
+            throw new SyncloudResultException(message, jsonBaseResponse);
         }
+        return response.output;
     }
 
     private class Response {

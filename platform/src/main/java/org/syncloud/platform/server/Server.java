@@ -7,8 +7,8 @@ import org.apache.log4j.Logger;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
 import org.syncloud.platform.ssh.SshRunner;
 import org.syncloud.platform.ssh.model.Credentials;
-import org.syncloud.platform.ssh.model.SshResult;
-import org.syncloud.platform.ssh.model.StringResult;
+import org.syncloud.common.Result;
+import org.syncloud.common.StringResult;
 import org.syncloud.common.SyncloudException;
 
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class Server {
         String json = ssh.run(connectionPoint, activateCmd);
 
         try {
-            SshResult<Credentials> reference = JSON.readValue(json, new TypeReference<SshResult<Credentials>>() {});
+            Result<Credentials> reference = JSON.readValue(json, new TypeReference<Result<Credentials>>() {});
             return reference.data;
         } catch (IOException e) {
             String message = "Unable to parse execute response";
@@ -61,7 +61,7 @@ public class Server {
         String json = ssh.run(connectionPoint, cmd(SYNCLOUD_CLI, "get_access"));
 
         try {
-            SshResult<Credentials> reference = JSON.readValue(json, new TypeReference<SshResult<Credentials>>() {});
+            Result<Credentials> reference = JSON.readValue(json, new TypeReference<Result<Credentials>>() {});
             return reference.data;
         } catch (IOException e) {
             String message = "Unable to parse execute response";

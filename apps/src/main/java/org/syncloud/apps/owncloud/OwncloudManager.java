@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
 import org.syncloud.platform.ssh.SshRunner;
-import org.syncloud.platform.ssh.model.StringResult;
+import org.syncloud.common.StringResult;
 import org.syncloud.common.SyncloudException;
 
 import java.io.IOException;

@@ -4,8 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.syncloud.common.SyncloudException;
+import org.syncloud.common.SyncloudResultException;
 import org.syncloud.redirect.RedirectService;
-import org.syncloud.redirect.model.RedirectApiException;
 import org.syncloud.redirect.model.User;
 import org.syncloud.redirect.unit.server.Rest;
 import static org.junit.Assert.assertNotNull;
@@ -32,7 +33,7 @@ public class UserServiceTest {
         assertNotNull(user);
     }
 
-    @Test(expected=RedirectApiException.class)
+    @Test(expected=SyncloudException.class)
     public void testGetUserMissing() {
         Rest.start(Rest.MissingUser.class);
         this.redirectService.getUser("test", "test");
@@ -46,7 +47,7 @@ public class UserServiceTest {
         assertNotNull(user);
     }
 
-    @Test(expected=RedirectApiException.class)
+    @Test(expected=SyncloudException.class)
     public void testCreateUserExisting() {
         Rest.start(Rest.ExistingUser.class);
         this.redirectService.createUser("test", "test");

@@ -28,8 +28,8 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.common.ParameterMessages;
+import org.syncloud.common.SyncloudResultException;
 import org.syncloud.redirect.IUserService;
-import org.syncloud.redirect.model.RedirectApiException;
 import org.syncloud.redirect.model.User;
 
 import java.util.regex.Pattern;
@@ -289,8 +289,8 @@ public class AuthCredentialsActivity extends Activity {
     }
 
     private void showError(Throwable error) {
-        if (error instanceof RedirectApiException) {
-            RedirectApiException apiError = (RedirectApiException)error;
+        if (error instanceof SyncloudResultException) {
+            SyncloudResultException apiError = (SyncloudResultException)error;
             if (apiError.result.parameters_messages != null) {
                 for (ParameterMessages pm: apiError.result.parameters_messages) {
                     EditText control = getControl(pm.parameter);
