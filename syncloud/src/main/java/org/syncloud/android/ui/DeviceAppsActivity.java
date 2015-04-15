@@ -2,53 +2,70 @@ package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-
+import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.db.KeysStorage;
+import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppsAdapter;
-import org.syncloud.android.db.Db;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
-import org.syncloud.apps.insider.InsiderManager;
-import org.syncloud.apps.sam.AppVersions;
-import org.syncloud.apps.sam.Commands;
-import org.syncloud.apps.sam.Sam;
-import org.syncloud.common.model.Result;
-import org.syncloud.apps.sam.App;
-import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.platform.sam.AppVersions;
+import org.syncloud.platform.sam.Sam;
+import org.syncloud.platform.server.Server;
+import org.syncloud.redirect.RedirectService;
+import org.syncloud.platform.ssh.ConnectionPointProvider;
+import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.platform.ssh.model.ConnectionPoint;
+import org.syncloud.platform.ssh.model.Credentials;
+import org.syncloud.platform.ssh.model.DomainModel;
+import org.syncloud.platform.ssh.model.Endpoint;
+import org.syncloud.platform.ssh.model.Key;
 
 import java.util.List;
 
-import static android.os.AsyncTask.execute;
 import static org.syncloud.android.SyncloudApplication.appRegistry;
+import static org.syncloud.android.tasks.ProgressAsyncTask.execute;
+import static org.syncloud.platform.ssh.SimpleConnectionPointProvider.simple;
+import static org.syncloud.platform.ssh.model.Credentials.getStandardCredentials;
+
+import static org.syncloud.platform.ssh.SshRunner.cmd;
+
 
 public class DeviceAppsActivity extends Activity {
 
-    private Device device;
-    private Db db;
-    private boolean connected = false;
-    private boolean showAdminApps = false;
+    private static Logger logger = Logger.getLogger(DeviceActivateActivity.class);
+
+    private SyncloudApplication application;
+    private DomainModel domain;
     private Sam sam;
     private CommunicationDialog progress;
-    private Ssh ssh;
-    private InsiderManager insider;
     private Preferences preferences;
+    private SshRunner ssh;
+    private ConnectionPointProvider connectionPoint;
+    private RedirectService redirectService;
+    private Server server;
 
 
     private TextView txtDeviceTitle;
     private TextView txtDomainName;
+    private TextView txtAppsError;
     private ListView listApplications;
 
     private DeviceAppsAdapter deviceAppsAdapter;
@@ -58,34 +75,28 @@ public class DeviceAppsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_apps);
 
-        txtDeviceTitle = (TextView) findViewById(R.id.txt_device_title);
-        txtDomainName = (TextView) findViewById(R.id.txt_domain_name);
+        txtDeviceTitle = (TextView) findViewById(R.id.txt_bold_title);
+        txtDomainName = (TextView) findViewById(R.id.txt_first_line);
 
-        SyncloudApplication application = (SyncloudApplication) getApplication();
+        application = (SyncloudApplication) getApplication();
 
-        db = application.getDb();
         preferences = application.getPreferences();
 
-        ssh = application.createSsh();
-        sam = new Sam(ssh);
+        ssh = new SshRunner();
+        sam = new Sam(new SshRunner(), preferences);
 
-        insider = new InsiderManager(ssh);
+        domain = (DomainModel) getIntent().getSerializableExtra(SyncloudApplication.DOMAIN);
+        connectionPoint = application.connectionPoint(domain.device());
+        redirectService = application.redirectService();
 
-        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
+        server = new Server(ssh);
 
         progress = new CommunicationDialog(this);
-        progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                if (!connected)
-                    finish();
-            }
-        });
 
-        txtDeviceTitle.setText(device.id().title);
-        txtDomainName.setText(device.userDomain());
+        txtDomainName.setText(domain.userDomain());
+        txtDeviceTitle.setText(domain.device().id().title());
 
-        listApplications = (ListView) findViewById(R.id.app_list);
+        listApplications = (ListView) findViewById(R.id.list_apps);
         deviceAppsAdapter = new DeviceAppsAdapter(this);
         listApplications.setAdapter(deviceAppsAdapter);
         listApplications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -96,6 +107,8 @@ public class DeviceAppsActivity extends Activity {
                 openApp(appVersions.app.id);
             }
         });
+
+        txtAppsError = (TextView) findViewById(R.id.txt_apps_error);
 
         listApps();
     }
@@ -109,7 +122,7 @@ public class DeviceAppsActivity extends Activity {
                         execute(new Runnable() {
                             @Override
                             public void run() {
-                                ssh.execute(device, "reboot");
+                                ssh.run(connectionPoint, cmd("reboot"));
                             }
                         });
                     }
@@ -123,48 +136,64 @@ public class DeviceAppsActivity extends Activity {
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public Result<List<AppVersions>> run(Void... args) {
-                        return sam.list(device);
+                    public List<AppVersions> run(Void... args) {
+                        return sam.list(connectionPoint);
                     }
                 })
-                .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
+                .onCompleted(new ProgressAsyncTask.Completed<List<AppVersions>>() {
                     @Override
-                    public void run(List<AppVersions> appsVersions) {
-                        onAppsLoaded(appsVersions);
+                    public void run(AsyncResult<List<AppVersions>> result) {
+                        onAppsLoaded(result);
                     }
                 })
                 .execute();
     }
 
-    private void onAppsLoaded(List<AppVersions> appsVersions) {
-        connected = true;
-        deviceAppsAdapter.clear();
-        for (AppVersions app : appsVersions) {
-            if (showAdminApps || app.app.appType() == App.Type.user)
-                deviceAppsAdapter.add(app);
+    private void onAppsLoaded(AsyncResult<List<AppVersions>> result) {
+        if (!result.hasValue()) {
+            listApplications.setVisibility(View.GONE);
+            txtAppsError.setVisibility(View.VISIBLE);
+            txtAppsError.setText("Unable to get list of apps");
+        } else {
+            listApplications.setVisibility(View.VISIBLE);
+            txtAppsError.setVisibility(View.GONE);
+            List<AppVersions> appsVersions = result.getValue();
+            deviceAppsAdapter.clear();
+            for (AppVersions app : appsVersions) {
+                if (app.app.ui && app.installed())
+                    deviceAppsAdapter.add(app);
+            }
         }
+    }
+
+    private void onAppsLoadedError(String error) {
+        listApplications.setVisibility(View.GONE);
+        txtAppsError.setVisibility(View.VISIBLE);
+        txtAppsError.setText(error);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.device, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_reboot_device) {
+        if (id == R.id.action_settings) {
+            startActivityForResult(new Intent(this, SettingsActivity.class), 2);
+        } else if (id == R.id.action_reboot_device) {
             reboot();
         } else if (id == R.id.action_deactivate) {
             deactivate();
+        } else if (id == R.id.action_get_access) {
+            getAccess();
+        } else if (id == R.id.action_give_access) {
+            shareDevice();
         } else if (id == R.id.action_manage_apps) {
             Intent intent = new Intent(this, DeviceAppStoreActivity.class);
-            intent.putExtra(SyncloudApplication.DEVICE, device);
+            intent.putExtra(SyncloudApplication.DOMAIN, domain);
             startActivityForResult(intent, 1);
         }
 
@@ -174,34 +203,111 @@ public class DeviceAppsActivity extends Activity {
     private void openApp(String appId) {
         if (appRegistry.containsKey(appId)) {
             Intent intent = new Intent(this, appRegistry.get(appId));
-            intent.putExtra(SyncloudApplication.DEVICE, device);
+            intent.putExtra(SyncloudApplication.DOMAIN, domain);
             startActivity(intent);
         }
     }
 
     public void deactivate() {
-        new ProgressAsyncTask<Void, Result.Void>()
-                .setTitle("Deactivating device")
+        new ProgressAsyncTask<Void, String>() {}
+                .setTitle("Dropping device")
+                .setErrorMessage("Failed to drop device")
                 .setProgress(progress)
-                .doWork(new ProgressAsyncTask.Work<Void, Result.Void>() {
+                .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public Result<Result.Void> run(Void... args) {
-                        return insider.dropDomain(device).flatMap(new Result.Function<String,Result<Result.Void>>() {
-                            @Override
-                            public Result<Result.Void> apply(String input) throws Exception {
-                                db.remove(device);
-                                return Result.VOID;
-                            }
-                        });
+                    public String run(Void... args) {
+                        String email = preferences.getEmail();
+                        String password = preferences.getPassword();
+                        redirectService.dropDevice(email, password, domain.userDomain());
+                        return "placeholder";
                     }
                 })
-                .onSuccess(new ProgressAsyncTask.Success<Result.Void>() {
+                .onSuccess(new ProgressAsyncTask.Success<String>() {
                     @Override
-                    public void run(Result.Void result) {
+                    public void run(String result) {
                         finish();
                     }
                 })
                 .execute();
+    }
+
+    private boolean isWifiConnected() {
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+        return mWifi.isConnected();
+    }
+
+    private void noWiFiConnection() {
+        Context context = this;
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        alertDialogBuilder.setTitle("Wi-Fi Connection");
+        alertDialogBuilder
+                .setMessage("You are not connected to Wi-Fi network. Getting access is possible only in the same Wi-Fi network where you have Syncloud device connected.")
+                .setCancelable(false)
+                .setPositiveButton("Wi-Fi Settings", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        openWiFiSettings();
+                    }
+                })
+                .setNegativeButton("Cancel", null);
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.show();
+    }
+
+    public void openWiFiSettings() {
+        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+        startActivityForResult(intent, 0);
+    }
+    private void onGetAccess(Credentials result) {
+        Key key = new Key(domain.device().id().mac_address, result.key());
+        KeysStorage keysStorage = this.application.keysStorage();
+        keysStorage.upsert(key);
+    }
+
+    public void getAccess() {
+        if (isWifiConnected()) {
+            new ProgressAsyncTask<Void, Credentials>() {
+            }
+                    .setTitle("Getting access")
+                    .setErrorMessage("Failed to get access")
+                    .setProgress(progress)
+                    .doWork(new ProgressAsyncTask.Work<Void, Credentials>() {
+                        @Override
+                        public Credentials run(Void... args) {
+                            Endpoint endpoint = new Endpoint(domain.device().localEndpoint().host(), SshRunner.SSH_SERVER_PORT);
+                            ConnectionPoint localConnectionPoint = new ConnectionPoint(endpoint, getStandardCredentials());
+                            return server.get_access(simple(localConnectionPoint));
+                        }
+                    })
+                    .onSuccess(new ProgressAsyncTask.Success<Credentials>() {
+                        @Override
+                        public void run(Credentials result) {
+                            onGetAccess(result);
+                        }
+                    })
+                    .execute();
+        } else {
+            noWiFiConnection();
+        }
+    }
+
+    public void shareDevice() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("message/rfc822");
+        i.putExtra(Intent.EXTRA_SUBJECT, domain.userDomain());
+        String body = "";
+        body += "Host: " + domain.userDomain() + "\n";
+        body += "KEY:\n\n" + domain.device().credentials().key() + "\n";
+        i.putExtra(Intent.EXTRA_TEXT, body);
+        try {
+            startActivity(Intent.createChooser(i, "Send mail..."));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

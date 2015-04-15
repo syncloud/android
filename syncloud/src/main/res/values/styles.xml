@@ -5,4 +5,20 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="DialogTheme" parent="@android:style/Theme.Holo.Light.Dialog">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="NoActionBarTheme" parent="@android:style/Theme.Holo.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="ProgressBarHorisontalTheme" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="ProgressBarTheme" parent="@android:style/Widget.Holo.ProgressBar">
+        <!-- Customize your theme here. -->
+    </style>
+
 </resources>

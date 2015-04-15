@@ -6,10 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -19,17 +16,17 @@ import android.widget.TextView;
 
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
-import org.syncloud.common.model.Result;
 import org.syncloud.apps.owncloud.OwncloudManager;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.platform.ssh.ConnectionPointProvider;
+import org.syncloud.platform.ssh.model.DomainModel;
 
 
 public class Owncloud extends Activity {
 
     public static final String COM_OWNCLOUD_ANDROID = "com.owncloud.android";
-    private Device device;
     private CommunicationDialog progress;
     private TextView url;
     private Button activateBtn;
@@ -41,6 +38,7 @@ public class Owncloud extends Activity {
     private EditText passText;
     private CheckBox chkHttps;
     private OwncloudManager owncloudManager;
+    private ConnectionPointProvider connectionPoint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,44 +49,24 @@ public class Owncloud extends Activity {
 
         progress = new CommunicationDialog(this);
 
-        owncloudManager = new OwncloudManager(application.createSsh());
-        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
+        owncloudManager = new OwncloudManager();
+        DomainModel domain = (DomainModel) getIntent().getSerializableExtra(SyncloudApplication.DOMAIN);
+        connectionPoint = application.connectionPoint(domain.device());
 
         activatedControls = (LinearLayout) findViewById(R.id.owncloud_activated_controls);
-        notActivatedControls = (LinearLayout) findViewById(R.id.owncloud_not_activated_controls);
         url = (TextView) findViewById(R.id.owncloud_url);
-        activateBtn = (Button) findViewById(R.id.owncloud_activate);
-
         webBtn = (Button) findViewById(R.id.owncloud_web_btn);
         mobileBtn = (Button) findViewById(R.id.owncloud_mobile_btn);
 
+        notActivatedControls = (LinearLayout) findViewById(R.id.owncloud_not_activated_controls);
         loginText = (EditText) findViewById(R.id.txtLogin);
         passText = (EditText) findViewById(R.id.txtPassword);
         chkHttps = (CheckBox) findViewById(R.id.chkHttps);
+        activateBtn = (Button) findViewById(R.id.owncloud_activate);
 
         setVisibility(View.GONE, View.GONE);
 
         status();
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.owncloud, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public void activate(View view) {
@@ -98,12 +76,12 @@ public class Owncloud extends Activity {
 
         new ProgressAsyncTask<String, String>()
                 .setTitle("Activating ...")
+                .setErrorMessage("Unable to activate")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<String, String>() {
                     @Override
-                    public Result<String> run(String... args) {
-                        Result<String> finishResult = owncloudManager.finishSetup(device, login, pass, protocol);
-                        return finishResult;
+                    public String run(String... args) {
+                        return owncloudManager.finishSetup(connectionPoint, login, pass, protocol);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<String>() {
@@ -119,18 +97,16 @@ public class Owncloud extends Activity {
         new ProgressAsyncTask<Void, String>()
                 .setTitle("Checking status")
                 .setProgress(progress)
-                .showError(false)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public Result<String> run(Void... args) {
-                        Result<String> result = owncloudManager.owncloudUrl(device);
-                        return result;
+                    public String run(Void... args) {
+                        return owncloudManager.url(connectionPoint);
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {
                     @Override
-                    public void run(Result<String> result) {
-                        if (!result.hasError()) {
+                    public void run(AsyncResult<String> result) {
+                        if (result.hasValue()) {
                             url.setText(result.getValue());
                             setVisibility(View.VISIBLE, View.GONE);
                         } else {

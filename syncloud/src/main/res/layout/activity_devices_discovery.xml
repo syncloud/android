@@ -3,9 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="org.syncloud.android.ui.DevicesDiscoveryActivity">
 
@@ -24,14 +21,12 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
-        android:visibility="gone">
+        android:layout_weight="1">
 
         <ListView
             android:id="@+id/devices_discovered"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible"/>
+            android:layout_height="match_parent"/>
 
         <TextView
             android:id="@android:id/empty"
@@ -45,58 +40,6 @@
             />
 
     </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_no_wifi"
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        >
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            >
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_action_network_wifi"
-                android:padding="10dp"
-                android:minHeight="100dp"
-                android:minWidth="100dp"
-                />
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="10dp"
-                android:textSize="18sp"
-                android:text="Connect to Wi-Fi network and try to discover again."
-                android:layout_weight="1"
-                />
-
-            <TextView
-                android:text="Open Wi-Fi settings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:padding="10dp"
-                android:gravity="center"
-                android:textSize="18sp"
-                android:clickable="true"
-                android:onClick="openWiFiSettings"
-                android:textColor="#ff33b5e5"
-                />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
 
     <Button
         android:id="@+id/discovery_refresh_btn"

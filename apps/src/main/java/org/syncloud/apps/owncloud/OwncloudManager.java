@@ -2,35 +2,41 @@ package org.syncloud.apps.owncloud;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.syncloud.common.model.Result;
-import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.StringResult;
+import org.apache.log4j.Logger;
+import org.syncloud.platform.ssh.ConnectionPointProvider;
+import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.common.StringResult;
+import org.syncloud.common.SyncloudException;
+
+import java.io.IOException;
+
+import static org.syncloud.platform.ssh.SshRunner.cmd;
 
 public class OwncloudManager {
 
+    private static Logger logger = Logger.getLogger(OwncloudManager.class);
+
     private static String OWNCLOUD_CTL_BIN = "owncloud-ctl";
     public static final ObjectMapper JSON = new ObjectMapper();
-    private Ssh ssh;
+    private SshRunner ssh;
 
-    public OwncloudManager(Ssh ssh) {
-        this.ssh = ssh;
+    public OwncloudManager() {
+        this.ssh = new SshRunner();
     }
 
-    public Result<String> finishSetup(Device device, String login, String password, String protocol) {
-        return ssh.execute(device, String.format("%s finish %s %s %s", OWNCLOUD_CTL_BIN, login, password, protocol));
+    public String finishSetup(ConnectionPointProvider connectionPoint, String login, String password, String protocol) {
+        return ssh.run(connectionPoint, cmd(OWNCLOUD_CTL_BIN, "finish", login, password, protocol));
     }
 
-    public Result<String> owncloudUrl(Device device) {
-
-        Result<String> execute = ssh.execute(device, String.format("%s url", OWNCLOUD_CTL_BIN));
-        return execute.map(new Result.Function<String, String>() {
-            @Override
-            public String  apply(String input) throws Exception {
-                return JSON.readValue(input, StringResult.class).data;
-            }
-        });
-
+    public String url(ConnectionPointProvider connectionPoint) {
+        String json = ssh.run(connectionPoint, cmd(OWNCLOUD_CTL_BIN, "url"));
+        try {
+            return JSON.readValue(json, StringResult.class).data;
+        } catch (IOException e) {
+            String message = "Unable to parse ownCloud url response";
+            logger.error(message+" "+json, e);
+            throw new SyncloudException(message);
+        }
     }
 
 }

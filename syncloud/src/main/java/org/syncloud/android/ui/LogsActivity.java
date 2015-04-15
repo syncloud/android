@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.log.Logcat;

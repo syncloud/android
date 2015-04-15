@@ -1,19 +1,11 @@
 package org.syncloud.android.discovery;
 
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
-import com.google.common.base.Optional;
-
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-
 public class MulticastLock {
-    private static Logger logger = LogManager.getLogger(MulticastLock.class.getName());
+    private static Logger logger = Logger.getLogger(MulticastLock.class.getName());
 
     public final static String MULTICAST_LOCK_TAG = MulticastLock.class.toString();
 
@@ -48,18 +40,5 @@ public class MulticastLock {
         lock = null;
     }
 
-    public Optional<InetAddress> ip() {
-        WifiInfo connInfo = wifi.getConnectionInfo();
-        int ipAddress = connInfo.getIpAddress();
-        byte[] ip = ByteBuffer.allocate(4).putInt(ipAddress).array();
-        InetAddress myAddress;
-        try {
-            myAddress = InetAddress.getByAddress(ip);
-            logger.debug("address: " + myAddress);
-            return Optional.of(myAddress);
-        } catch (UnknownHostException e) {
-            logger.error("Failed to get address: " + e.toString());
-            return Optional.absent();
-        }
-    }
+
 }

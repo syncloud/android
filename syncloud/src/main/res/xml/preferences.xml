@@ -1,6 +1,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="System">
+    <PreferenceCategory android:title="System" android:key="system">
 
         <ListPreference
             android:key="pref_api_url"
@@ -31,6 +31,20 @@
             android:title="Logs"
             android:summary="Shows application logs"
             />
+
+        <Preference
+            android:key="pref_upnp"
+            android:title="Check Router"
+            android:summary="Checks router compatibility"
+            />
+
+        <ListPreference
+            android:key="pref_release"
+            android:title="Release"
+            android:dialogTitle="Release"
+            android:entries="@array/pref_release_titles"
+            android:entryValues="@array/pref_release_values"
+            android:defaultValue="0.8" />
 
         <ListPreference
             android:key="pref_ssh_mode"

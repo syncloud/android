@@ -3,14 +3,17 @@ package org.syncloud.android;
 import android.content.SharedPreferences;
 
 import org.apache.log4j.Logger;
-import org.syncloud.ssh.EndpointPreference;
+import org.syncloud.platform.sam.Release;
+import org.syncloud.platform.ssh.EndpointPreference;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Preferences implements EndpointPreference {
+public class Preferences implements EndpointPreference, Release{
 
     private static Logger logger = Logger.getLogger(Preferences.class);
+
+    public static final String KEY_CATEGORY_SYSTEM = "system";
 
     public static final String KEY_PREF_API_URL = "pref_api_url";
     public static final String KEY_PREF_DEBUG_MODE = "pref_debug_mode";
@@ -20,7 +23,10 @@ public class Preferences implements EndpointPreference {
     public static final String KEY_PREF_FEEDBACK_SEND= "pref_feedback_send";
     public static final String KEY_PREF_DISCOVERY_LIBRARY = "pref_discovery_library";
     public static final String KEY_PREF_LOGS = "pref_logs";
+    public static final String KEY_PREF_UPNP = "pref_upnp";
     public static final String KEY_PREF_SSH_MODE = "pref_ssh_mode";
+    public static final String KEY_PREF_RELEASE = "pref_release";
+    public static final String KEY_PREF_CHECK_NEEDED = "pref_check_needed";
 
     private SharedPreferences preferences;
 
@@ -67,6 +73,10 @@ public class Preferences implements EndpointPreference {
         return preferences.getString(KEY_PREF_DISCOVERY_LIBRARY, "JmDNS");
     }
 
+    public String getVersion() {
+        return preferences.getString(KEY_PREF_RELEASE, null);
+    }
+
     @Override
     public boolean isRemote() {
         return preferences.getString(KEY_PREF_SSH_MODE, "Local").equals("Remote");
@@ -77,6 +87,14 @@ public class Preferences implements EndpointPreference {
         logger.info("swapping ssh mode preference");
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(KEY_PREF_SSH_MODE, isRemote() ? "Local" : "Remote");
+        editor.apply();
+    }
+
+    public boolean isCheckNeeded() { return preferences.getBoolean(KEY_PREF_CHECK_NEEDED, true); }
+
+    public void setCheckNeeded(boolean value) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(KEY_PREF_CHECK_NEEDED, value);
         editor.apply();
     }
 }

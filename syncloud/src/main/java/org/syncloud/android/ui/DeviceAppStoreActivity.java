@@ -3,6 +3,7 @@ package org.syncloud.android.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,27 +15,30 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DeviceAppStoreAppsAdapter;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
-import org.syncloud.apps.sam.AppVersions;
-import org.syncloud.apps.sam.Commands;
-import org.syncloud.apps.sam.Sam;
-import org.syncloud.common.model.Result;
-import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.Device;
+import org.syncloud.platform.sam.AppVersions;
+import org.syncloud.platform.sam.Sam;
+import org.syncloud.platform.ssh.ConnectionPointProvider;
+import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.platform.ssh.model.DomainModel;
 
 import java.util.List;
 
-import static android.os.AsyncTask.execute;
-import static org.syncloud.common.model.Result.error;
+import static org.syncloud.android.tasks.ProgressAsyncTask.execute;
+import static org.syncloud.platform.sam.Commands.upgrade_all;
+
+import static org.syncloud.platform.ssh.SshRunner.cmd;
+
 
 public class DeviceAppStoreActivity extends Activity {
 
     private DeviceAppStoreAppsAdapter deviceAppsAdapter;
-    private Device device;
+    private DomainModel domain;
     private boolean connected = false;
     private Sam sam;
     private CommunicationDialog progress;
-    private Ssh ssh;
     private Preferences preferences;
+    private SshRunner ssh;
+    private ConnectionPointProvider connectionPoint;
 
 
     @Override
@@ -55,13 +59,15 @@ public class DeviceAppStoreActivity extends Activity {
 
         preferences = application.getPreferences();
 
-        device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE);
+        ssh = new SshRunner();
+
+        domain = (DomainModel) getIntent().getSerializableExtra(SyncloudApplication.DOMAIN);
+        connectionPoint = application.connectionPoint(domain.device());
 
         final ListView listview = (ListView) findViewById(R.id.app_list);
         deviceAppsAdapter = new DeviceAppStoreAppsAdapter(this);
         listview.setAdapter(deviceAppsAdapter);
-        ssh = application.createSsh();
-        sam = new Sam(ssh);
+        sam = new Sam(new SshRunner(), preferences);
 
         listApps();
     }
@@ -69,11 +75,12 @@ public class DeviceAppStoreActivity extends Activity {
     private void listApps() {
         new ProgressAsyncTask<Void, List<AppVersions>>()
                 .setTitle("Refreshing app list")
+                .setErrorMessage("Unable to get list of apps")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public Result<List<AppVersions>> run(Void... args) {
-                        return sam.list(device);
+                    public List<AppVersions> run(Void... args) {
+                        return sam.list(connectionPoint);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
@@ -88,11 +95,12 @@ public class DeviceAppStoreActivity extends Activity {
     private void updateSam() {
         new ProgressAsyncTask<Void, List<AppVersions>>()
                 .setTitle("Checking for updates")
+                .setErrorMessage("Unable to update sam")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public Result<List<AppVersions>> run(Void... args) {
-                        return sam.update(device);
+                    public List<AppVersions> run(Void... args) {
+                        return sam.update(connectionPoint);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
@@ -108,16 +116,13 @@ public class DeviceAppStoreActivity extends Activity {
     private void upgradeAll() {
         new ProgressAsyncTask<Void, List<AppVersions>>()
                 .setTitle("Upgrading all apps")
+                .setErrorMessage("Unable to ugrade apps")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, List<AppVersions>>() {
                     @Override
-                    public Result<List<AppVersions>> run(Void... args) {
-                        Result<String> upgradeResult = sam.run(device, Commands.upgrade_all);
-                        if (upgradeResult.hasError()) {
-                            return error(upgradeResult.getError());
-                        } else {
-                            return sam.list(device);
-                        }
+                    public List<AppVersions> run(Void... args) {
+                        sam.run(connectionPoint, upgrade_all);
+                        return sam.list(connectionPoint);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
@@ -132,16 +137,13 @@ public class DeviceAppStoreActivity extends Activity {
     public void runSam(String... arguments) {
         new ProgressAsyncTask<String, List<AppVersions>>()
                 .setTitle("Executing command")
+                .setErrorMessage("Command execution failed")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<String, List<AppVersions>>() {
                     @Override
-                    public Result run(String... args) {
-                        Result<String> commandResult = sam.run(device, args);
-                        if (commandResult.hasError()) {
-                            return error(commandResult.getError());
-                        } else {
-                            return sam.list(device);
-                        }
+                    public List<AppVersions> run(String... args) {
+                        sam.run(connectionPoint, args);
+                        return sam.list(connectionPoint);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<List<AppVersions>>() {
@@ -162,7 +164,7 @@ public class DeviceAppStoreActivity extends Activity {
                         execute(new Runnable() {
                             @Override
                             public void run() {
-                                ssh.execute(device, "reboot");
+                                ssh.run(connectionPoint, cmd("reboot"));
                             }
                         });
                     }
@@ -194,7 +196,12 @@ public class DeviceAppStoreActivity extends Activity {
                         upgradeAll();
                     }
                 })
-                .setNegativeButton("Not now", null)
+                .setNegativeButton("Not now", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        listApps();
+                    }
+                })
                 .show();
     }
 
@@ -211,7 +218,9 @@ public class DeviceAppStoreActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_update_apps) {
+        if (id == R.id.action_settings) {
+            startActivityForResult(new Intent(this, SettingsActivity.class), 2);
+        } else if (id == R.id.action_update_apps) {
             updateSam();
         } else if (id == R.id.action_reboot_device) {
           reboot();

@@ -2,7 +2,6 @@ package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
@@ -13,10 +12,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.syncloud.android.Preferences;
+import org.syncloud.android.Progress;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.redirect.UserService;
-import org.syncloud.redirect.model.RestResult;
+import org.syncloud.android.tasks.AsyncResult;
+import org.syncloud.android.tasks.ProgressAsyncTask;
+import org.syncloud.redirect.IUserService;
+import org.syncloud.redirect.model.User;
 
 public class AuthActivity extends Activity {
 
@@ -25,12 +27,16 @@ public class AuthActivity extends Activity {
     private ProgressBar progressBar;
     private LinearLayout signInOrOut;
 
+    private IUserService userService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
 
-        preferences = ((SyncloudApplication) getApplication()).getPreferences();
+        SyncloudApplication application = (SyncloudApplication) getApplication();
+        preferences = application.getPreferences();
+        userService = application.userServiceCached();
 
         progressBar = (ProgressBar) findViewById(R.id.progress_check_user);
         signInOrOut = (LinearLayout) findViewById(R.id.sign_in_or_up);
@@ -38,24 +44,91 @@ public class AuthActivity extends Activity {
         TextView learnMoreText = (TextView) findViewById(R.id.auth_learn_more);
         learnMoreText.setMovementMethod(LinkMovementMethod.getInstance());
 
-        if (preferences.hasCredentials()) {
-            new CheckCredentialsTask(preferences).execute();
+        if (preferences.isCheckNeeded()) {
+            Intent intent = new Intent(AuthActivity.this, UPnPCheckActivity.class);
+            intent.putExtra(UPnPCheckActivity.PARAM_FIRST_TIME, true);
+            startActivityForResult(intent, REQUEST_CHECK);
+        } else {
+            proceedWithLogin();
         }
     }
 
+    private Progress progress = new ProgressImpl();
+
+    public class ProgressImpl extends Progress.Empty {
+        @Override
+        public void start() {
+            signInOrOut.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void stop() {
+            signInOrOut.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==REQUEST_CHECK)
+        {
+            proceedWithLogin();
+        }
+    }
+
+    private void proceedWithLogin() {
+        if (preferences.hasCredentials()) {
+            login();
+        }
+
+    }
+
+    private void login() {
+        final String email = preferences.getEmail();
+        final String password = preferences.getPassword();
+
+        new ProgressAsyncTask<Void, User>()
+                .setProgress(progress)
+                .doWork(new ProgressAsyncTask.Work<Void, User>() {
+                    @Override
+                    public User run(Void... args) { return userService.getUser(email, password); }
+                })
+                .onCompleted(new ProgressAsyncTask.Completed<User>() {
+                    @Override
+                    public void run(AsyncResult<User> result) {
+                        onLoginCompleted(result);
+                    }
+                })
+                .execute();
+    }
+
+    private void onLoginCompleted(AsyncResult<User> result) {
+        if (result.hasValue()) {
+            Intent intent = new Intent(AuthActivity.this, DevicesSavedActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            Intent intent = new Intent(AuthActivity.this, AuthCredentialsActivity.class);
+            intent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_SIGN_IN);
+            intent.putExtra(AuthCredentialsActivity.PARAM_CHECK_EXISTING, true);
+            startActivityForResult(intent, REQUEST_AUTHENTICATE);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.auth, menu);
         return true;
     }
 
+    public static int REQUEST_AUTHENTICATE = 1;
+    public static int REQUEST_CHECK = 2;
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
@@ -66,52 +139,13 @@ public class AuthActivity extends Activity {
     public void signIn(View view) {
         Intent credentialsIntent = new Intent(this, AuthCredentialsActivity.class);
         credentialsIntent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_SIGN_IN);
-        startActivityForResult(credentialsIntent, 1);
+        startActivityForResult(credentialsIntent, REQUEST_AUTHENTICATE);
     }
 
     public void signUp(View view) {
         Intent credentialsIntent = new Intent(this, AuthCredentialsActivity.class);
         credentialsIntent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_REGISTER);
-        startActivityForResult(credentialsIntent, 1);
-    }
-
-    public class CheckCredentialsTask extends AsyncTask<Void, Void, RestResult<String>> {
-        private Preferences preferences;
-
-        public CheckCredentialsTask(Preferences preferences) {
-            this.preferences = preferences;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            signInOrOut.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected RestResult<String> doInBackground(Void... voids) {
-            String email = preferences.getEmail();
-            String password = preferences.getPassword();
-            RestResult<String> result = UserService.getUser(email, password, preferences.getApiUrl());
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(RestResult<String> result) {
-            progressBar.setVisibility(View.INVISIBLE);
-            if (result.hasError()) {
-                signInOrOut.setVisibility(View.VISIBLE);
-
-                Intent intent = new Intent(AuthActivity.this, AuthCredentialsActivity.class);
-                intent.putExtra(AuthCredentialsActivity.PARAM_PURPOSE, AuthCredentialsActivity.PURPOSE_SIGN_IN);
-                intent.putExtra(AuthCredentialsActivity.PARAM_CHECK_EXISTING, true);
-                startActivityForResult(intent, 1);
-            } else {
-                Intent intent = new Intent(AuthActivity.this, DevicesSavedActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        }
+        startActivityForResult(credentialsIntent, REQUEST_AUTHENTICATE);
     }
 
 }

@@ -18,7 +18,7 @@
         >
 
         <TextView
-            android:id="@+id/txt_device_title"
+            android:id="@+id/txt_bold_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Title of device"
@@ -41,7 +41,7 @@
                 />
 
             <TextView
-                android:id="@+id/txt_mac_address"
+                android:id="@+id/txt_second_line"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="00:00:00:00"

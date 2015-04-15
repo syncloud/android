@@ -1,10 +1,9 @@
 package org.syncloud.android.discovery.jmdns;
 
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.DeviceEndpointListener;
-import org.syncloud.ssh.model.Endpoint;
-import org.syncloud.ssh.Ssh;
+import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.platform.ssh.model.Endpoint;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +14,7 @@ import javax.jmdns.ServiceListener;
 
 public class EventToDeviceConverter implements ServiceListener {
 
-    private static Logger logger = LogManager.getLogger(EventToDeviceConverter.class.getName());
+    private static Logger logger = Logger.getLogger(EventToDeviceConverter.class.getName());
 
     private String serviceName;
     private DeviceEndpointListener deviceEndpointListener;
@@ -75,7 +74,7 @@ public class EventToDeviceConverter implements ServiceListener {
                 address = server.substring(0, server.length() - local.length());
         }
 
-        return new Endpoint(address, Ssh.SSH_SERVER_PORT);
+        return new Endpoint(address, SshRunner.SSH_SERVER_PORT);
     }
 
     @Override

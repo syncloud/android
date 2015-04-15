@@ -9,7 +9,7 @@ import org.syncloud.android.discovery.Discovery;
 
 public class NsdDiscovery implements Discovery {
 
-    private static Logger logger = LogManager.getLogger(NsdDiscovery.class.getName());
+    private static Logger logger = Logger.getLogger(NsdDiscovery.class.getName());
 
     public static final String TYPE = "_ssh._tcp.";
 

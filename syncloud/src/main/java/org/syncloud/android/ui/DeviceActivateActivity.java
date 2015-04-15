@@ -1,14 +1,12 @@
 package org.syncloud.android.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,83 +14,80 @@ import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.db.Db;
+import org.syncloud.android.db.KeysStorage;
+import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
-import org.syncloud.apps.insider.InsiderManager;
-import org.syncloud.apps.remote.RemoteAccessManager;
-import org.syncloud.apps.sam.AppVersions;
-import org.syncloud.apps.sam.Commands;
-import org.syncloud.apps.sam.Sam;
-import org.syncloud.common.model.Result;
-import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.Device;
-import org.syncloud.ssh.model.IdentifiedEndpoint;
+import org.syncloud.common.SyncloudResultException;
+import org.syncloud.platform.server.Server;
+import org.syncloud.platform.ssh.ConnectionPointProvider;
+import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.platform.ssh.model.ConnectionPoint;
+import org.syncloud.platform.ssh.model.Credentials;
+import org.syncloud.platform.ssh.model.Endpoint;
+import org.syncloud.platform.ssh.model.Identification;
+import org.syncloud.platform.ssh.model.Key;
+import org.syncloud.common.ParameterMessages;
 
 import java.util.List;
 
-import static org.syncloud.common.model.Result.VOID;
-import static org.syncloud.ssh.model.Credentials.getStandardCredentials;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.syncloud.platform.ssh.SimpleConnectionPointProvider.simple;
+import static org.syncloud.platform.ssh.model.Credentials.getStandardCredentials;
 
 
 public class DeviceActivateActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(DeviceActivateActivity.class);
 
-    private IdentifiedEndpoint endpoint;
     private Preferences preferences;
-    private Device device;
 
     private CommunicationDialog progress;
     private TextView txtDeviceTitle;
     private TextView txtMacAddress;
     private TextView txtStatusValue;
 
-    private Button btnActivate;
     private EditText editUserDomain;
     private TextView txtMainDomain;
 
-    private Sam sam;
-    private InsiderManager insider;
-    private RemoteAccessManager accessManager;
     private LinearLayout layoutMacAddress;
+
+    private SyncloudApplication application;
+
+    private Identification identification;
+    private ConnectionPointProvider connectionPoint;
+    private SshRunner ssh;
+    private Server server;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_activate);
 
-        txtDeviceTitle = (TextView) findViewById(R.id.txt_device_title);
+        txtDeviceTitle = (TextView) findViewById(R.id.txt_bold_title);
         txtStatusValue = (TextView) findViewById(R.id.txt_status_value);
-        txtMacAddress = (TextView) findViewById(R.id.txt_mac_address);
+        txtMacAddress = (TextView) findViewById(R.id.txt_second_line);
         layoutMacAddress = (LinearLayout) findViewById(R.id.layout_activate_mac_address);
-
-        btnActivate = (Button) findViewById(R.id.btn_activate);
 
         txtMainDomain = (TextView) findViewById(R.id.txt_main_domain);
         editUserDomain = (EditText) findViewById(R.id.edit_user_domain);
 
         progress = new CommunicationDialog(this);
 
-        SyncloudApplication application = (SyncloudApplication) getApplication();
+        this.application = (SyncloudApplication) getApplication();
 
-        endpoint = (IdentifiedEndpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
-        device = new Device(
-                endpoint.id().mac_address,
-                endpoint.id(),
-                null,
-                endpoint.endpoint(),
-                getStandardCredentials());
+        Endpoint endpoint = (Endpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
+        identification = (Identification) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ID);
+
+        connectionPoint = simple(new ConnectionPoint(endpoint, getStandardCredentials()));
 
         preferences = application.getPreferences();
 
-        Ssh ssh = application.createSsh();
-        sam = new Sam(ssh);
-        insider = new InsiderManager(ssh);
-        accessManager = new RemoteAccessManager(insider, ssh);
+        ssh = new SshRunner();
+        server = new Server(ssh);
 
-        txtDeviceTitle.setText(device.id().title);
-        txtMacAddress.setText(device.id().mac_address);
+        txtDeviceTitle.setText(this.identification.title);
+        txtMacAddress.setText(this.identification.mac_address);
 
         layoutMacAddress.setVisibility(preferences.isDebug() ? View.VISIBLE : View.GONE);
 
@@ -103,24 +98,33 @@ public class DeviceActivateActivity extends Activity {
         status();
     }
 
-    private void showDomainError(String message) {
-        editUserDomain.setError(message);
-        editUserDomain.requestFocus();
+    private EditText getControl(String parameter) {
+        if (parameter.equals("user_domain"))
+            return editUserDomain;
+        return null;
     }
 
+    private boolean validate() {
+        editUserDomain.setError(null);
+
+        final String domain = editUserDomain.getText().toString();
+
+        if (domain == null || domain.isEmpty()) {
+            editUserDomain.setError("Enter domain");
+            editUserDomain.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.dns, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
@@ -133,21 +137,20 @@ public class DeviceActivateActivity extends Activity {
         new ProgressAsyncTask<Void, String>()
                 .setTitle("Checking status")
                 .setProgress(progress)
-                .showError(false)
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public Result<String> run(Void... args) {
-                        return insider.userDomain(device);
+                    public String run(Void... args) {
+                        return server.userDomain(connectionPoint);
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {
                     @Override
-                    public void run(Result<String> result) {
-                        if (result.hasError()) {
-                            txtStatusValue.setText("not yet");
+                    public void run(AsyncResult<String> result) {
+                        if (!result.hasValue()) {
+                            txtStatusValue.setText("Unable to get user domain");
                         } else {
                             String domainName = result.getValue();
-                            String fullDomainName = domainName+"."+preferences.getDomain();
+                            String fullDomainName = domainName + "." + preferences.getDomain();
                             txtStatusValue.setText(fullDomainName);
                             editUserDomain.setText(domainName);
                         }
@@ -157,63 +160,74 @@ public class DeviceActivateActivity extends Activity {
     }
 
     public void activate(View view) {
+        if (!validate()) return;
+
         final String email = preferences.getEmail();
         final String pass = preferences.getPassword();
         final String domain = editUserDomain.getText().toString();
 
-        if (domain == null || domain.isEmpty()) {
-            showDomainError("Enter domain");
-            return;
-        }
-
-        new ProgressAsyncTask<Void, Result.Void>()
+        new ProgressAsyncTask<Void, String>()
                 .setTitle("Activating device")
                 .setProgress(progress)
-                .doWork(new ProgressAsyncTask.Work<Void, Result.Void>() {
+                .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
-                    public Result<Result.Void> run(Void... args) {
-                        return doActivate(email, pass, domain);
+                    public String run(Void... args) {
+                        doActivate(email, pass, domain);
+                        return "placeholder";
                     }
                 })
-                .onSuccess(new ProgressAsyncTask.Success<Result.Void>() {
+                .onCompleted(new ProgressAsyncTask.Completed<String>() {
                     @Override
-                    public void run(Result.Void result) {
-                        finish();
+                    public void run(AsyncResult<String> result) {
+                        onActivate(result);
                     }
                 })
                 .execute();
     }
 
-    private Result<Result.Void> doActivate(final String email, final String pass, final String domain) {
-        logger.info("activate");
-        return sam.update(device).flatMap(new Result.Function<List<AppVersions>, Result<String>>() {
-            @Override
-            public Result<String> apply(List<AppVersions> input) throws Exception {
-                return sam.run(device, Commands.upgrade_all);
+    private void onActivate(AsyncResult<String> result) {
+        if (result.hasValue()) {
+            finish();
+        } else {
+            if (result.getException() instanceof SyncloudResultException) {
+                SyncloudResultException apiError = (SyncloudResultException)result.getException();
+                List<ParameterMessages> messages = apiError.result.parameters_messages;
+                if (messages != null && messages.size() > 0) {
+                    for (ParameterMessages pm: messages) {
+                        EditText control = getControl(pm.parameter);
+                        if (control != null) {
+                            String message = join(pm.messages, '\n');
+                            control.setError(message);
+                            control.requestFocus();
+                        }
+                    }
+
+                    return;
+                }
             }
-        }).flatMap(new Result.Function<String, Result<String>>() {
-            @Override
-            public Result<String> apply(String input) throws Exception {
-                return insider.setRedirectInfo(device, preferences.getDomain(), preferences.getApiUrl());
-            }
-        }).flatMap(new Result.Function<String, Result<String>>() {
-            @Override
-            public Result<String> apply(String input) throws Exception {
-                return insider.acquireDomain(device, email, pass, domain);
-            }
-        }).flatMap(new Result.Function<String, Result<Device>>() {
-            @Override
-            public Result<Device> apply(String input) throws Exception {
-                return accessManager.enable(device, preferences.getDomain());
-            }
-        }).flatMap(new Result.Function<Device, Result<Result.Void>>() {
-            @Override
-            public Result<Result.Void> apply(Device input) throws Exception {
-                Db db = ((SyncloudApplication) getApplication()).getDb();
-                db.upsert(input);
-                return VOID;
-            }
-        });
+            new AlertDialog.Builder(this)
+                    .setTitle("Failed")
+                    .setMessage("Unable to activate")
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+        }
+    }
+
+    private void doActivate(final String email, final String pass, final String domain) {
+        logger.info("activate " + domain);
+
+        Credentials credentials = server.activate(
+                connectionPoint,
+                preferences.getVersion(),
+                preferences.getDomain(),
+                preferences.getApiUrl(),
+                email,
+                pass,
+                domain);
+
+        Key key = new Key(identification.mac_address, credentials.key());
+        KeysStorage keysStorage = this.application.keysStorage();
+        keysStorage.upsert(key);
     }
 
     @Override

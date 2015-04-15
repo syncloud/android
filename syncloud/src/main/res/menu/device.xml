@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="org.syncloud.android.ui.DeviceAppsActivity" >
 
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
     <item android:id="@+id/action_manage_apps"
           android:title="Manage Apps"
           android:orderInCategory="100"
@@ -15,7 +20,18 @@
         />
 
     <item android:id="@+id/action_deactivate"
-          android:title="Deactivate device"
+          android:title="Drop device"
           android:orderInCategory="100"
           app:showAsAction="never" />
+
+    <item android:id="@+id/action_get_access"
+        android:title="Get Access"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_give_access"
+        android:title="Share access key"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
 </menu>

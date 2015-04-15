@@ -9,6 +9,15 @@
         <item>http://api.syncloud.info:81</item>
     </string-array>
 
+    <string-array name="pref_release_titles">
+        <item>Stable: 0.8</item>
+        <item>Next: 0.9</item>
+    </string-array>
+    <string-array name="pref_release_values">
+        <item>0.8</item>
+        <item>0.9</item>
+    </string-array>
+
     <string-array name="pref_discovery_titles">
         <item>JmDNS</item>
         <item>Android NSD</item>

@@ -6,14 +6,11 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 
 import org.syncloud.android.ui.adapters.LogsAdapter;
-import org.syncloud.common.LogParser;
-import org.syncloud.common.model.LogEvent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Logcat {

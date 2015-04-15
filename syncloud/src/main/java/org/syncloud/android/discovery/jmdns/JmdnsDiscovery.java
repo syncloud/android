@@ -1,15 +1,10 @@
 package org.syncloud.android.discovery.jmdns;
 
-import com.google.common.base.Optional;
-
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.android.discovery.Discovery;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 
 import javax.jmdns.JmDNS;
 

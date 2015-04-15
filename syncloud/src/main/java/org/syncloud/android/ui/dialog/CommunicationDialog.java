@@ -70,7 +70,11 @@ public class CommunicationDialog extends AlertDialog implements Progress {
     }
 
     public void start() {
-        setMessage("Connecting to the device");
+        start("Connecting to the device");
+    }
+
+    public void start(String title) {
+        setMessage(title);
         setCancelable(false);
         show();
         progress.setVisibility(View.VISIBLE);
@@ -88,7 +92,4 @@ public class CommunicationDialog extends AlertDialog implements Progress {
         setMessage(message);
     }
 
-    public void progress(final String progress) {
-        setMessage(message + "\n" + progress);
-    }
 }

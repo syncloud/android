@@ -3,18 +3,17 @@ package org.syncloud.android.discovery.nsd;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.DeviceEndpointListener;
-import org.syncloud.ssh.Ssh;
-import org.syncloud.ssh.model.Endpoint;
+import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.platform.ssh.model.Endpoint;
 
 import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class Resolver {
-    private static Logger logger = LogManager.getLogger(Resolver.class.getName());
+    private static Logger logger = Logger.getLogger(Resolver.class.getName());
 
     private DeviceEndpointListener deviceEndpointListener;
     private NsdManager manager;
@@ -83,7 +82,7 @@ public class Resolver {
                 String address = host.getHostAddress();
                 if (!address.contains(":")) {
                     int port = serviceInfo.getPort();
-                    Endpoint device = new Endpoint(address, Ssh.SSH_SERVER_PORT);
+                    Endpoint device = new Endpoint(address, SshRunner.SSH_SERVER_PORT);
                     deviceFound(device);
                 }
             }
