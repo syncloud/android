@@ -18,6 +18,7 @@ import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.dialog.CommunicationDialog;
+import org.syncloud.android.ui.dialog.ErrorDialog;
 import org.syncloud.common.SyncloudResultException;
 import org.syncloud.platform.server.Server;
 import org.syncloud.platform.ssh.ConnectionPointProvider;
@@ -172,8 +173,9 @@ public class DeviceActivateActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
                     public String run(Void... args) {
-                        doActivate(email, pass, domain);
-                        return "placeholder";
+                        throw new RuntimeException("Problem");
+//                        doActivate(email, pass, domain);
+//                        return "placeholder";
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {
@@ -205,11 +207,8 @@ public class DeviceActivateActivity extends Activity {
                     return;
                 }
             }
-            new AlertDialog.Builder(this)
-                    .setTitle("Failed")
-                    .setMessage("Unable to activate")
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show();
+
+            new ErrorDialog(this, "Unable to activate").show();
         }
     }
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView android:id="@+id/view_message"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:height="60dp"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:text="Error message"
+        />
+
+    <Button
+        android:id="@+id/btn_report"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_report_error"/>
+
+</LinearLayout>
