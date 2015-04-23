@@ -173,9 +173,8 @@ public class DeviceActivateActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
                     public String run(Void... args) {
-                        throw new RuntimeException("Problem");
-//                        doActivate(email, pass, domain);
-//                        return "placeholder";
+                        doActivate(email, pass, domain);
+                        return "placeholder";
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<String>() {
