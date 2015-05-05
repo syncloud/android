@@ -41,11 +41,11 @@ public class WebService {
         HttpUriRequest request = request(type, apiUrl + url, parameters);
         Response response = getResponse(request);
 
-        if (response.statusCode != 200) {
-            String message = "Response has bad status code: "+response.statusCode;
-            logger.error(message);
-            throw new SyncloudException(message);
-        }
+//        if (response.statusCode != 200) {
+//            String message = "Response has bad status code: "+response.statusCode;
+//            logger.error(message);
+//            throw new SyncloudException(message);
+//        }
 
         BaseResult jsonBaseResponse = null;
         try {
