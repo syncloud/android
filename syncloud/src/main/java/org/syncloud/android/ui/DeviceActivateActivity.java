@@ -3,6 +3,7 @@ package org.syncloud.android.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -108,7 +109,7 @@ public class DeviceActivateActivity extends Activity {
     private boolean validate() {
         editUserDomain.setError(null);
 
-        final String domain = editUserDomain.getText().toString();
+        final String domain = editUserDomain.getText().toString().toLowerCase();
 
         if (domain == null || domain.isEmpty()) {
             editUserDomain.setError("Enter domain");
@@ -165,7 +166,7 @@ public class DeviceActivateActivity extends Activity {
 
         final String email = preferences.getEmail();
         final String pass = preferences.getPassword();
-        final String domain = editUserDomain.getText().toString();
+        final String domain = editUserDomain.getText().toString().toLowerCase();
 
         new ProgressAsyncTask<Void, String>()
                 .setTitle("Activating device")
