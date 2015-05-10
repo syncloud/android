@@ -51,7 +51,7 @@ android {
         afterEvaluate { project ->
 
             def props = new Properties()
-            def keystoreProperies = 'keystore.properties'
+            def keystoreProperies = System.properties['user.home'] + 'keystore.properties'
             def keyProps = rootProject.file(keystoreProperies)
             if (keyProps.exists()) {
                 props.load(new FileInputStream(keyProps))
