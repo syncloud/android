@@ -332,7 +332,7 @@ public class UPnPCheckActivity extends FragmentActivity {
             }
             portsStatusGood.setVisibility(View.VISIBLE);
             portsProgress.setVisibility(View.GONE);
-            finishTask(ports > 0);
+            finishTask(true);
         }
     }
 
