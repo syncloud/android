@@ -10,3 +10,17 @@ dependencies {
     testCompile 'junit:junit:4.10'
     testCompile 'org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:2.10.1'
 }
+
+jacocoTestReport() {
+    reports {
+        xml.enabled false
+        csv.enabled true
+    }
+}
+
+task copyTestResources(type: Copy) {
+    from "${projectDir}/src/test/resources"
+    into "${buildDir}/classes/test"
+}
+
+processTestResources.dependsOn copyTestResources

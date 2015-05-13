@@ -4,3 +4,10 @@ dependencies {
     compile project(':platform')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+jacocoTestReport() {
+    reports {
+        xml.enabled false
+        csv.enabled true
+    }
+}

@@ -19,3 +19,10 @@ task copyTestResources(type: Copy) {
 }
 
 processTestResources.dependsOn copyTestResources
+
+jacocoTestReport() {
+    reports {
+        xml.enabled false
+        csv.enabled true
+    }
+}

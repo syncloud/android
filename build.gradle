@@ -19,6 +19,7 @@ allprojects {
 subprojects {
 
     task printCoverage << {
+
         ext {
             missed = 0
             covered = 0
@@ -59,6 +60,9 @@ subprojects {
             println("#############################^^^ COVERAGE (${project.name}) ^^^#############################")
             println()
 
+        } else {
+            println(coverageFile)
+            println("coverage file does not exist")
         }
     }
 }

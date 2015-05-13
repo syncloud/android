@@ -33,6 +33,7 @@ public class SelectorConnectionPointProvider implements ConnectionPointProvider 
         ConnectionPoint secondPoint = selector.select(device, false);
         try {
             sshRunner.run(secondPoint, cmd(VERIFY_COMMAND));
+            preference.swap();
             return secondPoint;
         } catch (Throwable th) {}
 
