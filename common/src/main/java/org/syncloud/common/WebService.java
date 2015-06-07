@@ -1,4 +1,4 @@
-package org.syncloud.redirect;
+package org.syncloud.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -11,43 +11,41 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
-import org.syncloud.common.BaseResult;
-import org.syncloud.common.SyncloudException;
-import org.syncloud.common.SyncloudResultException;
+import org.syncloud.common.jackson.Jackson;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.net.URLEncoder.encode;
-import static org.syncloud.redirect.jackson.Jackson.createObjectMapper;
 
 public class WebService {
 
-    private static Logger logger = Logger.getLogger(RedirectService.class);
+    private static Logger logger = Logger.getLogger(WebService.class);
 
-    private String apiUrl;
+    private String apiUrl = "";
+
+    public WebService() {}
 
     public WebService(String apiUrl) {
         this.apiUrl = apiUrl;
     }
 
-    private static ObjectMapper mapper = createObjectMapper();
+    private static ObjectMapper mapper = Jackson.createObjectMapper();
+
+    public String execute(String type, String url) {
+        return execute(type, url, new ArrayList<NameValuePair>());
+    }
 
     public String execute(String type, String url, List<NameValuePair> parameters) {
         HttpUriRequest request = request(type, apiUrl + url, parameters);
         Response response = getResponse(request);
 
-//        if (response.statusCode != 200) {
-//            String message = "Response has bad status code: "+response.statusCode;
-//            logger.error(message);
-//            throw new SyncloudException(message);
-//        }
-
-        BaseResult jsonBaseResponse = null;
+        BaseResult jsonBaseResponse;
         try {
             jsonBaseResponse = mapper.readValue(response.output, BaseResult.class);
         } catch (IOException e) {
@@ -88,7 +86,7 @@ public class WebService {
             throw new SyncloudException(message);
         } finally {
             if (response != null)
-                try { response.close(); } catch (IOException e) {}
+                try { response.close(); } catch (IOException ignore) {}
         }
     }
 
@@ -112,8 +110,7 @@ public class WebService {
                     urlFull += "=";
                     urlFull += encode(pair.getValue(), "utf-8");
                 }
-                HttpGet get = new HttpGet(urlFull);
-                return get;
+                return new HttpGet(urlFull);
             }
         } catch (UnsupportedEncodingException e) {
             String message = "Failed to form request";

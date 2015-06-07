@@ -1,4 +1,4 @@
-package org.syncloud.redirect.jackson;
+package org.syncloud.common.jackson;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.DeserializationFeature;

@@ -6,6 +6,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.syncloud.common.SyncloudException;
+import org.syncloud.common.WebService;
 import org.syncloud.redirect.model.UserResult;
 import org.syncloud.redirect.model.User;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.syncloud.redirect.jackson.Jackson.createObjectMapper;
+import static org.syncloud.common.jackson.Jackson.createObjectMapper;
 
 public class RedirectService implements IUserService {
 

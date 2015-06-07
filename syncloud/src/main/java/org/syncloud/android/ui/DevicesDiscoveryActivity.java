@@ -27,7 +27,7 @@ import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.android.discovery.DiscoveryManager;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.ui.dialog.WifiDialog;
-import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.common.WebService;
 import org.syncloud.platform.ssh.Tools;
 import org.syncloud.platform.ssh.model.ConnectionPoint;
 import org.syncloud.platform.ssh.model.Endpoint;
@@ -64,7 +64,7 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
 
         application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
-        tools = new Tools(new SshRunner());
+        tools = new Tools(new WebService());
         setContentView(R.layout.activity_devices_discovery);
 
         resultsList = (ListView) findViewById(R.id.devices_discovered);
@@ -165,8 +165,9 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
                     ConnectionPoint connectionPoint = new ConnectionPoint(endpoint, getStandardCredentials());
                     Optional<Identification> idNullable = Optional.absent();
                     try {
-                        idNullable = Optional.of(tools.getId(simple(connectionPoint)));
-                    } catch (Throwable th) { }
+                        String host = simple(connectionPoint).get().endpoint().host();
+                        idNullable = Optional.of(tools.getId(host));
+                    } catch (Throwable ignore) { }
                     final IdentifiedEndpoint ie = new IdentifiedEndpoint(endpoint, idNullable);
                     publishProgress(new Progress(true, endpoint, ie));
                 }

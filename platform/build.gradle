@@ -7,7 +7,6 @@ dependencies {
     compile 'org.apache.commons:commons-exec:1.2'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
     compile 'com.google.guava:guava:18.0'
-    compile 'log4j:log4j:1.2.17'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.10'
     testCompile 'org.mockito:mockito-all:1.9.5'
