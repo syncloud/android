@@ -25,7 +25,7 @@ public class Tools {
     }
 
     public Identification getId(String host) {
-        String json = webService.execute("GET", format("http://%s:81/id", host));
+        String json = webService.execute("GET", format("http://%s:81/server/rest/id", host));
 
         try {
             Result<Identification> result = JSON.readValue(json, new TypeReference<Result<Identification>>() {});
