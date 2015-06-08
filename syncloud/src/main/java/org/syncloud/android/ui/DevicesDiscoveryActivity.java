@@ -134,11 +134,18 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
                     .setPositiveButton("OK", null)
                     .show();
         } else {
-            Intent intent = new Intent(this, DeviceActivateActivity.class);
+
+            /*Intent intent = new Intent(this, DeviceActivateActivity.class);
             intent.putExtra(SyncloudApplication.DEVICE_ENDPOINT, endpoint.endpoint());
             intent.putExtra(SyncloudApplication.DEVICE_ID, endpoint.id().get());
             startActivity(intent);
-            setResult(Activity.RESULT_OK, new Intent(this, DevicesSavedActivity.class));
+            setResult(Activity.RESULT_OK, new Intent(this, DevicesSavedActivity.class));*/
+
+            Intent intent = new Intent(this, DeviceWebView.class);
+            intent.putExtra(SyncloudApplication.DEVICE_HOST, endpoint.endpoint().host());
+            startActivity(intent);
+            setResult(Activity.RESULT_OK, new Intent(this, DeviceWebView.class));
+
             finish();
         }
     }

@@ -54,6 +54,7 @@ public class SyncloudApplication extends Application {
 
     public static String DEVICE_ENDPOINT = "device_endpoint";
     public static final String DEVICE_ID = "device_id";
+    public static final String DEVICE_HOST = "device_host";
 
     public static Map<String, Class> appRegistry = new HashMap<String, Class>() {{
         put("syncloud-owncloud", Owncloud.class);

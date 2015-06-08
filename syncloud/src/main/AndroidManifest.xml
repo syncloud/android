@@ -104,6 +104,10 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_upnp_check" >
         </activity>
+        <activity
+            android:name=".ui.DeviceWebView"
+            android:label="@string/title_activity_device_web_view" >
+        </activity>
     </application>
 
 </manifest>
