@@ -52,8 +52,14 @@ public class DeviceWebView extends ActionBarActivity {
 
 
         String url = format(
-                "http://%s:81/server/html/activate.html?redirect-email=%s&redirect-password=%s",
-                host, preferences.getEmail(), preferences.getPassword());
+                "http://%s:81/server/html/activate.html?" +
+                        "redirect-email=%s&" +
+                        "redirect-password=%s&" +
+                        "release=%s",
+                host,
+                preferences.getEmail(),
+                preferences.getPassword(),
+                preferences.getVersion());
         webview.loadUrl(url);
     }
 
