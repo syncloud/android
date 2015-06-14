@@ -42,7 +42,9 @@ public class WebService {
     }
 
     public String execute(String type, String url, List<NameValuePair> parameters) {
-        HttpUriRequest request = request(type, apiUrl + url, parameters);
+        String fullUrl = apiUrl + url;
+        logger.info("calling: " + fullUrl);
+        HttpUriRequest request = request(type, fullUrl, parameters);
         Response response = getResponse(request);
 
         BaseResult jsonBaseResponse;

@@ -38,6 +38,7 @@ public class EventToDeviceConverter implements ServiceListener {
                 waitForIpv4(info);
 
                 Endpoint device = extractDevice(info);
+                logger.info(device);
                 serviceToUrl.put(eventName, device);
                 if (deviceEndpointListener != null)
                     deviceEndpointListener.added(device);

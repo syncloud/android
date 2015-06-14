@@ -4,16 +4,21 @@ import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Window;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import org.apache.log4j.Logger;
+import org.syncloud.android.Preferences;
 import org.syncloud.android.SyncloudApplication;
 
 import static java.lang.String.format;
 
 public class DeviceWebView extends ActionBarActivity {
+
+    private static Logger logger = Logger.getLogger(DeviceWebView.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +46,21 @@ public class DeviceWebView extends ActionBarActivity {
             }
         });
         webview.clearCache(true);
-        webview.loadUrl(format("http:%s:81/server/html/activate.html", host));
+        webview.addJavascriptInterface(this, "Android");
+
+        Preferences preferences = ((SyncloudApplication) getApplication()).getPreferences();
+
+
+        String url = format(
+                "http://%s:81/server/html/activate.html?redirect-email=%s&redirect-password=%s",
+                host, preferences.getEmail(), preferences.getPassword());
+        webview.loadUrl(url);
     }
 
+
+
+    @JavascriptInterface
+    public void saveCredentials(String user, String password) {
+        logger.info("user: " + user);
+    }
 }
