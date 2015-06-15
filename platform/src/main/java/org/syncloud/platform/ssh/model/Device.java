@@ -1,5 +1,7 @@
 package org.syncloud.platform.ssh.model;
 
+import com.google.common.base.Optional;
+
 import java.io.Serializable;
 
 public class Device implements Serializable {
@@ -37,14 +39,14 @@ public class Device implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Device device = (Device) o;
+        Device other = (Device) o;
 
-        if (credentials != null ? !credentials.equals(device.credentials) : device.credentials != null)
+        if (!credentials.equals(other.credentials))
             return false;
-        if (id != null ? !id.equals(device.id) : device.id != null) return false;
-        if (localEndpoint != null ? !localEndpoint.equals(device.localEndpoint) : device.localEndpoint != null)
+        if (id != null ? !id.equals(other.id) : other.id != null) return false;
+        if (localEndpoint != null ? !localEndpoint.equals(other.localEndpoint) : other.localEndpoint != null)
             return false;
-        if (remoteEndpoint != null ? !remoteEndpoint.equals(device.remoteEndpoint) : device.remoteEndpoint != null)
+        if (remoteEndpoint != null ? !remoteEndpoint.equals(other.remoteEndpoint) : other.remoteEndpoint != null)
             return false;
 
         return true;

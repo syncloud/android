@@ -17,8 +17,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import com.google.common.base.Optional;
-
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
@@ -29,16 +27,13 @@ import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.ui.dialog.WifiDialog;
 import org.syncloud.common.WebService;
 import org.syncloud.platform.ssh.Tools;
-import org.syncloud.platform.ssh.model.ConnectionPoint;
 import org.syncloud.platform.ssh.model.Endpoint;
-import org.syncloud.platform.ssh.model.Identification;
 import org.syncloud.platform.ssh.model.IdentifiedEndpoint;
 
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
-import static org.syncloud.platform.ssh.SimpleConnectionPointProvider.simple;
-import static org.syncloud.platform.ssh.model.Credentials.getStandardCredentials;
+import static java.lang.String.format;
 
 public class DevicesDiscoveryActivity extends FragmentActivity {
 
@@ -142,7 +137,18 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
             setResult(Activity.RESULT_OK, new Intent(this, DevicesSavedActivity.class));*/
 
             Intent intent = new Intent(this, DeviceWebView.class);
-            intent.putExtra(SyncloudApplication.DEVICE_HOST, endpoint.endpoint().host());
+            intent.putExtra(SyncloudApplication.DEVICE_ID, endpoint.id().get());
+            String url = format(
+                    "http://%s:81/server/html/activate.html?" +
+                            "redirect-email=%s&" +
+                            "redirect-password=%s&" +
+                            "release=%s",
+                    endpoint.endpoint().host(),
+                    preferences.getEmail(),
+                    preferences.getPassword(),
+                    preferences.getVersion());
+            intent.putExtra(SyncloudApplication.DEVICE_URL, url);
+
             startActivity(intent);
             setResult(Activity.RESULT_OK, new Intent(this, DeviceWebView.class));
 
@@ -169,19 +175,13 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
             deviceEndpointListener = new DeviceEndpointListener() {
                 @Override
                 public void added(final Endpoint endpoint) {
-                    ConnectionPoint connectionPoint = new ConnectionPoint(endpoint, getStandardCredentials());
-                    Optional<Identification> idNullable = Optional.absent();
-                    try {
-                        String host = simple(connectionPoint).get().endpoint().host();
-                        idNullable = Optional.of(tools.getId(host));
-                    } catch (Throwable ignore) { }
-                    final IdentifiedEndpoint ie = new IdentifiedEndpoint(endpoint, idNullable);
+                    IdentifiedEndpoint ie = new IdentifiedEndpoint(endpoint, tools.getId(endpoint.host()));
                     publishProgress(new Progress(true, endpoint, ie));
                 }
 
                 @Override
                 public void removed(final Endpoint endpoint) {
-                    final IdentifiedEndpoint ie = map.remove(endpoint);
+                    IdentifiedEndpoint ie = map.remove(endpoint);
                     publishProgress(new Progress(false, endpoint, ie));
                 }
             };

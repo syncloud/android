@@ -2,6 +2,7 @@ package org.syncloud.platform.ssh;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
 import org.syncloud.common.Result;
@@ -24,16 +25,16 @@ public class Tools {
         this.webService = webService;
     }
 
-    public Identification getId(String host) {
+    public Optional<Identification> getId(String host) {
         String json = webService.execute("GET", format("http://%s:81/server/rest/id", host));
 
         try {
             Result<Identification> result = JSON.readValue(json, new TypeReference<Result<Identification>>() {});
-            return result.data;
+            return Optional.of(result.data);
         } catch (IOException e) {
             String message = "Unable to parse identification response";
             logger.error(message+" "+json, e);
-            throw new SyncloudException(message);
+            return Optional.absent();
         }
     }
 }

@@ -23,7 +23,7 @@ public class ToolsTest {
                         "}}, \"message\":\"good\", \"true\"");
 
         Tools tools = new Tools(webService);
-        Identification id = tools.getId("host");
+        Identification id = tools.getId("host").get();
 
         assertEquals("test", id.name);
         assertEquals("test_title", id.title);

@@ -18,7 +18,7 @@ public class EndpointSelectorTest {
     private final String remoteHost = "domain." + user_domain;
     private Endpoint remoteEndpoint = new Endpoint(remoteHost, remotePort);
     private Endpoint localEndpoint = new Endpoint("localhost", 0);
-    private Credentials credentials = new Credentials("login", "password", "key");
+    private Credentials credentials = new Credentials("login", "password");
 
     private final String userDomain = "testdomain1.syncloud.info";
     private final Device device = new Device(null, localEndpoint, remoteEndpoint, credentials);

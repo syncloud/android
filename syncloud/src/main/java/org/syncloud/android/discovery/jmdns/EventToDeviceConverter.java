@@ -2,7 +2,7 @@ package org.syncloud.android.discovery.jmdns;
 
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.DeviceEndpointListener;
-import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.android.discovery.DiscoveryManager;
 import org.syncloud.platform.ssh.model.Endpoint;
 
 import java.util.HashMap;
@@ -75,7 +75,7 @@ public class EventToDeviceConverter implements ServiceListener {
                 address = server.substring(0, server.length() - local.length());
         }
 
-        return new Endpoint(address, SshRunner.SSH_SERVER_PORT);
+        return new Endpoint(address, DiscoveryManager.ACTIVATION_PORT);
     }
 
     @Override

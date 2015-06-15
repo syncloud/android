@@ -33,30 +33,6 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".ui.DeviceAppsActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_device"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".ui.DeviceAppStoreActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_app_store"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".ui.apps.Owncloud"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_owncloud"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".ui.DeviceActivateActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_insider"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
             android:name=".ui.DevicesDiscoveryActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_discovery"
@@ -94,10 +70,6 @@
         <activity
             android:name=".ui.LogsActivity"
             android:label="@string/title_activity_logs" >
-        </activity>
-        <activity
-            android:name=".ui.apps.GitBucket"
-            android:label="@string/title_activity_git_bucket" >
         </activity>
         <activity
             android:name=".ui.UPnPCheckActivity"

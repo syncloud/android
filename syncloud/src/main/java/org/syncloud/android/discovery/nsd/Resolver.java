@@ -5,7 +5,7 @@ import android.net.nsd.NsdServiceInfo;
 
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.DeviceEndpointListener;
-import org.syncloud.platform.ssh.SshRunner;
+import org.syncloud.android.discovery.DiscoveryManager;
 import org.syncloud.platform.ssh.model.Endpoint;
 
 import java.net.InetAddress;
@@ -82,7 +82,7 @@ public class Resolver {
                 String address = host.getHostAddress();
                 if (!address.contains(":")) {
                     int port = serviceInfo.getPort();
-                    Endpoint device = new Endpoint(address, SshRunner.SSH_SERVER_PORT);
+                    Endpoint device = new Endpoint(address, DiscoveryManager.ACTIVATION_PORT);
                     deviceFound(device);
                 }
             }

@@ -26,9 +26,9 @@ public class DomainModel implements Serializable {
         return device != null;
     }
 
-    public boolean hasKey() {
-        return device != null && device.credentials().key() != null;
-    }
+//    public boolean hasKey() {
+//        return device != null && device.credentials().key() != null;
+//    }
 
     @Override
     public boolean equals(Object o) {

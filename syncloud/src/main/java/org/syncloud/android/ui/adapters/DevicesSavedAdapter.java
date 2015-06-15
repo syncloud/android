@@ -57,10 +57,10 @@ public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
         if (!preferences.isDebug())
             txtSecondLine.setVisibility(View.GONE);
 
-        if (domain.hasKey())
-            imgKey.setImageResource(R.drawable.ic_action_accounts);
-        else
-            imgKey.setImageResource(R.drawable.ic_action_secure);
+//        if (domain.hasKey())
+//            imgKey.setImageResource(R.drawable.ic_action_accounts);
+//        else
+//            imgKey.setImageResource(R.drawable.ic_action_secure);
 
         return rowView;
     }

@@ -16,17 +16,10 @@ import org.acra.sender.ReportSender;
 import org.acra.sender.ReportSenderException;
 import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.log.ConfigureLog4J;
-import org.syncloud.android.ui.apps.GitBucket;
-import org.syncloud.android.ui.apps.Owncloud;
 import org.syncloud.redirect.IUserService;
 import org.syncloud.redirect.RedirectService;
 import org.syncloud.redirect.UserCachedService;
 import org.syncloud.redirect.UserStorage;
-import org.syncloud.platform.ssh.ConnectionPointProvider;
-import org.syncloud.platform.ssh.EndpointSelector;
-import org.syncloud.platform.ssh.SelectorConnectionPointProvider;
-import org.syncloud.platform.ssh.SshRunner;
-import org.syncloud.platform.ssh.model.Device;
 
 import java.io.File;
 import java.util.HashMap;
@@ -55,11 +48,9 @@ public class SyncloudApplication extends Application {
     public static String DEVICE_ENDPOINT = "device_endpoint";
     public static final String DEVICE_ID = "device_id";
     public static final String DEVICE_HOST = "device_host";
+    public static final String DEVICE_URL = "device_url";
+    public static final String DEVICE_CREDENTIALS = "device_credentials";
 
-    public static Map<String, Class> appRegistry = new HashMap<String, Class>() {{
-        put("syncloud-owncloud", Owncloud.class);
-        put("syncloud-gitbucket", GitBucket.class);
-    }};
     private KeysStorage keysStorage;
     private Preferences preferences;
     private UserStorage userStorage;
@@ -100,14 +91,6 @@ public class SyncloudApplication extends Application {
 
     public Preferences getPreferences() {
         return preferences;
-    }
-
-    public ConnectionPointProvider connectionPoint(Device device) {
-        return new SelectorConnectionPointProvider(
-                new SshRunner(),
-                new EndpointSelector(preferences),
-                getPreferences(),
-                device);
     }
 
     public void reportError() {

@@ -23,6 +23,8 @@ public class DiscoveryManager {
     private NsdManager manager;
     private Boolean canceled = false;
 
+    public static int ACTIVATION_PORT = 81;
+
     public DiscoveryManager(WifiManager wifi, NsdManager manager) {
         lock = new MulticastLock(wifi);
         network = new Network(wifi);

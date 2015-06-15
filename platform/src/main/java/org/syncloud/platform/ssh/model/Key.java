@@ -2,11 +2,10 @@ package org.syncloud.platform.ssh.model;
 
 public class Key {
     public String macAddress;
-    public String key;
+    public Credentials credentials;
 
-    public Key(String macAddress, String key) {
+    public Key(String macAddress, Credentials credentials) {
         this.macAddress = macAddress;
-        this.key = key;
+        this.credentials = credentials;
     }
-
 }

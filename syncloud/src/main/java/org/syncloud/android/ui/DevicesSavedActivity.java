@@ -25,6 +25,7 @@ import org.syncloud.platform.ssh.model.Key;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.lang.String.format;
 import static java.util.Collections.sort;
 
 public class DevicesSavedActivity extends Activity {
@@ -110,8 +111,21 @@ public class DevicesSavedActivity extends Activity {
 
 
     private void open(DomainModel device) {
-        Intent intent = new Intent(this, DeviceAppsActivity.class);
-        intent.putExtra(SyncloudApplication.DOMAIN, device);
+//        Intent intent = new Intent(this, DeviceAppsActivity.class);
+//        intent.putExtra(SyncloudApplication.DOMAIN, device);
+
+        Intent intent = new Intent(this, DeviceWebView.class);
+
+        //TODO: We need remote/local selector here
+        String url = format(
+                "http://%s/server/rest/login?" +
+                        "name=%s&" +
+                        "password=%s",
+                device.device().localEndpoint().host(),
+                device.device().credentials().login(),
+                device.device().credentials().password());
+        intent.putExtra(SyncloudApplication.DEVICE_URL, url);
+        intent.putExtra(SyncloudApplication.DEVICE_CREDENTIALS, device.device().credentials());
         startActivityForResult(intent, 1);
     }
 
