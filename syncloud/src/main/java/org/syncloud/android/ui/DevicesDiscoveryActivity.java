@@ -137,17 +137,7 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
             setResult(Activity.RESULT_OK, new Intent(this, DevicesSavedActivity.class));*/
 
             Intent intent = new Intent(this, DeviceWebView.class);
-            intent.putExtra(SyncloudApplication.DEVICE_ID, endpoint.id().get());
-            String url = format(
-                    "http://%s:81/server/html/activate.html?" +
-                            "redirect-email=%s&" +
-                            "redirect-password=%s&" +
-                            "release=%s",
-                    endpoint.endpoint().host(),
-                    preferences.getEmail(),
-                    preferences.getPassword(),
-                    preferences.getVersion());
-            intent.putExtra(SyncloudApplication.DEVICE_URL, url);
+            intent.putExtra(SyncloudApplication.DEVICE_DISCOVERY, endpoint.endpoint());
 
             startActivity(intent);
             setResult(Activity.RESULT_OK, new Intent(this, DeviceWebView.class));

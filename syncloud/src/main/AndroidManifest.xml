@@ -78,6 +78,7 @@
         </activity>
         <activity
             android:name=".ui.DeviceWebView"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_device_web_view" >
         </activity>
     </application>

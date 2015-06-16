@@ -47,9 +47,8 @@ public class SyncloudApplication extends Application {
 
     public static String DEVICE_ENDPOINT = "device_endpoint";
     public static final String DEVICE_ID = "device_id";
-    public static final String DEVICE_HOST = "device_host";
-    public static final String DEVICE_URL = "device_url";
-    public static final String DEVICE_CREDENTIALS = "device_credentials";
+    public static final String DEVICE_DISCOVERY = "device_discovery";
+    public static final String DEVICE_OPEN = "device_open";
 
     private KeysStorage keysStorage;
     private Preferences preferences;

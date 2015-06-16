@@ -116,16 +116,7 @@ public class DevicesSavedActivity extends Activity {
 
         Intent intent = new Intent(this, DeviceWebView.class);
 
-        //TODO: We need remote/local selector here
-        String url = format(
-                "http://%s/server/rest/login?" +
-                        "name=%s&" +
-                        "password=%s",
-                device.device().localEndpoint().host(),
-                device.device().credentials().login(),
-                device.device().credentials().password());
-        intent.putExtra(SyncloudApplication.DEVICE_URL, url);
-        intent.putExtra(SyncloudApplication.DEVICE_CREDENTIALS, device.device().credentials());
+        intent.putExtra(SyncloudApplication.DEVICE_OPEN, device.device());
         startActivityForResult(intent, 1);
     }
 
