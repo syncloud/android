@@ -72,28 +72,8 @@ public class DeviceWebView extends ActionBarActivity {
         if (getIntent().hasExtra(SyncloudApplication.DEVICE_OPEN)) {
             Device device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_OPEN);
 
-            UrlSelectorAsync urlSelectorAsync = new UrlSelectorAsync();
+            new UrlSelectorAsync(this, device, webview).execute();
 
-            Optional<String> baseUrl = Optional.absent();
-            try {
-                baseUrl = urlSelectorAsync.execute(device).get(10, TimeUnit.SECONDS);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
-
-            if (!baseUrl.isPresent()) {
-                logger.error("unable to connect ");
-                finish();
-                return;
-            }
-
-            String url = format("%s/server/rest/login", baseUrl.get());
-            String postData =
-                    "name=" + device.credentials().login() + "&" +
-                            "password=" + device.credentials().password();
-            logger.info("POST: " + url);
-            logger.info("data: " + postData.replace(device.credentials().password(), "***"));
-            webview.postUrl(url, EncodingUtils.getBytes(postData, "BASE64"));
         } else {
             Endpoint endpoint = (Endpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_DISCOVERY);
 
@@ -149,10 +129,39 @@ public class DeviceWebView extends ActionBarActivity {
         }
     }
 
-    public static class UrlSelectorAsync extends AsyncTask<Device, Void, Optional<String>> {
+    public static class UrlSelectorAsync extends AsyncTask<Void, Void, Optional<String>> {
+        private Activity activity;
+        private Device device;
+        private WebView webview;
+
+        public UrlSelectorAsync(Activity activity, Device device, WebView webview) {
+            this.activity = activity;
+            this.device = device;
+            this.webview = webview;
+        }
+
         @Override
-        protected Optional<String> doInBackground(Device... devices) {
-            return findAccessibleUrl(devices[0]);
+        protected Optional<String> doInBackground(Void... voids) {
+            return findAccessibleUrl(device);
+        }
+
+        @Override
+        protected void onPostExecute(Optional<String> baseUrl) {
+
+            if (!baseUrl.isPresent()) {
+                logger.error("unable to connect ");
+                activity.finish();
+                return;
+            }
+
+            String url = format("%s/server/rest/login", baseUrl.get());
+            String postData =
+                    "name=" + device.credentials().login() + "&" +
+                    "password=" + device.credentials().password();
+            logger.info("POST: " + url);
+            logger.info("data: " + postData.replace("=" + device.credentials().password(), "***"));
+            webview.postUrl(url, EncodingUtils.getBytes(postData, "BASE64"));
+
         }
 
         private Optional<String> findAccessibleUrl(Device device) {
