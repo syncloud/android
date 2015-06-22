@@ -1,6 +1,7 @@
 package org.syncloud.android.ui;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.webkit.JavascriptInterface;
@@ -9,6 +10,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import com.google.common.base.Optional;
+
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EncodingUtils;
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
@@ -17,9 +25,11 @@ import org.syncloud.android.db.KeysStorage;
 import org.syncloud.platform.ssh.model.Credentials;
 import org.syncloud.platform.ssh.model.Device;
 import org.syncloud.platform.ssh.model.Endpoint;
-import org.syncloud.platform.ssh.model.Identification;
-import org.syncloud.platform.ssh.model.IdentifiedEndpoint;
 import org.syncloud.platform.ssh.model.Key;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 
@@ -61,11 +71,26 @@ public class DeviceWebView extends ActionBarActivity {
 
         if (getIntent().hasExtra(SyncloudApplication.DEVICE_OPEN)) {
             Device device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_OPEN);
-            String url = format(
-                    "http://%s/server/rest/login", device.localEndpoint().host());
+
+            UrlSelectorAsync urlSelectorAsync = new UrlSelectorAsync();
+
+            Optional<String> baseUrl = Optional.absent();
+            try {
+                baseUrl = urlSelectorAsync.execute(device).get(10, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
+
+            if (!baseUrl.isPresent()) {
+                logger.error("unable to connect ");
+                finish();
+                return;
+            }
+
+            String url = format("%s/server/rest/login", baseUrl.get());
             String postData =
-                    "name=" + device.credentials().login() +  "&" +
-                    "password=" + device.credentials().password();
+                    "name=" + device.credentials().login() + "&" +
+                            "password=" + device.credentials().password();
             logger.info("POST: " + url);
             logger.info("data: " + postData.replace(device.credentials().password(), "***"));
             webview.postUrl(url, EncodingUtils.getBytes(postData, "BASE64"));
@@ -81,6 +106,8 @@ public class DeviceWebView extends ActionBarActivity {
             webview.loadUrl(url);
         }
     }
+
+
 
     @JavascriptInterface
     public void saveCredentials(String mac_address, String user, String password) {
@@ -103,12 +130,60 @@ public class DeviceWebView extends ActionBarActivity {
         return preferences.getVersion();
     }
 
+    @JavascriptInterface
+    public String getApiUrl() {
+        return preferences.getApiUrl();
+    }
+
+    @JavascriptInterface
+    public String getDomain() {
+        return preferences.getDomain();
+    }
+
     @Override
     public void onBackPressed() {
         if (webview.canGoBack()) {
             webview.goBack();
         } else {
             super.onBackPressed();
+        }
+    }
+
+    public static class UrlSelectorAsync extends AsyncTask<Device, Void, Optional<String>> {
+        @Override
+        protected Optional<String> doInBackground(Device... devices) {
+            return findAccessibleUrl(devices[0]);
+        }
+
+        private Optional<String> findAccessibleUrl(Device device) {
+
+            String url1 = format("http://%s:%s", device.localEndpoint().host(), device.localEndpoint().port());
+            if (checkUrl(url1))
+                return Optional.of(url1);
+
+            String url2 = format("http://%s:%s", device.remoteEndpoint().host(), device.remoteEndpoint().port());
+            if (checkUrl(url2))
+                return Optional.of(url2);
+
+            return Optional.absent();
+        }
+
+        private boolean checkUrl(String baseUrl) {
+            try {
+                logger.info("trying " + baseUrl);
+                CloseableHttpClient httpClient = HttpClients.createDefault();
+                HttpGet httpGet = new HttpGet(baseUrl);
+                HttpParams params = httpGet.getParams();
+                params.setParameter(ClientPNames.HANDLE_REDIRECTS, Boolean.FALSE);
+                httpGet.setParams(params);
+                int statusCode = httpClient.execute(httpGet).getStatusLine().getStatusCode();
+                logger.info("status code: " + statusCode);
+                if (statusCode == 302)
+                    return true;
+            } catch (IOException e) {
+                logger.info(baseUrl + " failed with " + e.getMessage() + ", trying another endpoint");
+            }
+            return false;
         }
     }
 }
