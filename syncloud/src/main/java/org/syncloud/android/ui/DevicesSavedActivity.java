@@ -116,7 +116,7 @@ public class DevicesSavedActivity extends Activity {
 
         Intent intent = new Intent(this, DeviceWebView.class);
 
-        intent.putExtra(SyncloudApplication.DEVICE_OPEN, device.device());
+        intent.putExtra(SyncloudApplication.DEVICE_OPEN, device);
         startActivityForResult(intent, 1);
     }
 

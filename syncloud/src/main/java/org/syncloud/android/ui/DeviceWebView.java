@@ -24,12 +24,11 @@ import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.KeysStorage;
 import org.syncloud.platform.ssh.model.Credentials;
 import org.syncloud.platform.ssh.model.Device;
+import org.syncloud.platform.ssh.model.DomainModel;
 import org.syncloud.platform.ssh.model.Endpoint;
 import org.syncloud.platform.ssh.model.Key;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 
@@ -46,7 +45,6 @@ public class DeviceWebView extends ActionBarActivity {
         webview = new WebView(this);
         setContentView(webview);
 
-
         webview.getSettings().setJavaScriptEnabled(true);
 
         final Activity activity = this;
@@ -59,6 +57,7 @@ public class DeviceWebView extends ActionBarActivity {
         });
         webview.setWebViewClient(new WebViewClient() {
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                logger.error("url: " + failingUrl + ", error: " + description);
                 Toast.makeText(activity, "Oh no! " + description, Toast.LENGTH_SHORT).show();
             }
         });
@@ -70,7 +69,7 @@ public class DeviceWebView extends ActionBarActivity {
         preferences = application.getPreferences();
 
         if (getIntent().hasExtra(SyncloudApplication.DEVICE_OPEN)) {
-            Device device = (Device) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_OPEN);
+            DomainModel device = (DomainModel) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_OPEN);
 
             new UrlSelectorAsync(this, device, webview).execute();
 
@@ -86,8 +85,6 @@ public class DeviceWebView extends ActionBarActivity {
             webview.loadUrl(url);
         }
     }
-
-
 
     @JavascriptInterface
     public void saveCredentials(String mac_address, String user, String password) {
@@ -130,11 +127,11 @@ public class DeviceWebView extends ActionBarActivity {
     }
 
     public static class UrlSelectorAsync extends AsyncTask<Void, Void, Optional<String>> {
-        private Activity activity;
-        private Device device;
+        private DeviceWebView activity;
+        private DomainModel device;
         private WebView webview;
 
-        public UrlSelectorAsync(Activity activity, Device device, WebView webview) {
+        public UrlSelectorAsync(DeviceWebView activity, DomainModel device, WebView webview) {
             this.activity = activity;
             this.device = device;
             this.webview = webview;
@@ -153,24 +150,32 @@ public class DeviceWebView extends ActionBarActivity {
                 activity.finish();
                 return;
             }
-
+            String title = (baseUrl.get().contains(device.device().remoteEndpoint().host()) ?
+                    device.userDomain() + "." + activity.getDomain() :
+                    device.device().localEndpoint().host()
+            );
+            activity.setTitle(title);
             String url = format("%s/server/rest/login", baseUrl.get());
             String postData =
-                    "name=" + device.credentials().login() + "&" +
-                    "password=" + device.credentials().password();
+                    "name=" + device.device().credentials().login() + "&" +
+                    "password=" + device.device().credentials().password();
             logger.info("POST: " + url);
-            logger.info("data: " + postData.replace("=" + device.credentials().password(), "***"));
+            logger.info("data: " + postData.replace("=" + device.device().credentials().password(), "***"));
             webview.postUrl(url, EncodingUtils.getBytes(postData, "BASE64"));
 
         }
 
-        private Optional<String> findAccessibleUrl(Device device) {
+        private Optional<String> findAccessibleUrl(DomainModel device) {
 
-            String url1 = format("http://%s:%s", device.localEndpoint().host(), device.localEndpoint().port());
+            String url1 = format("http://%s:%s",
+                    device.device().localEndpoint().host(),
+                    device.device().localEndpoint().port());
             if (checkUrl(url1))
                 return Optional.of(url1);
 
-            String url2 = format("http://%s:%s", device.remoteEndpoint().host(), device.remoteEndpoint().port());
+            String url2 = format("http://%s:%s",
+                    device.device().remoteEndpoint().host(),
+                    device.device().remoteEndpoint().port());
             if (checkUrl(url2))
                 return Optional.of(url2);
 
