@@ -49,18 +49,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         addPreferencesFromResource(R.xml.preferences);
 
-        systemCategory = (PreferenceCategory) findPreference(Preferences.KEY_CATEGORY_SYSTEM);
         preferenceSshMode = findPreference(KEY_PREF_SSH_MODE);
         preferenceRelease = findPreference(KEY_PREF_RELEASE);
-
-        Preference debugPreference = findPreference(Preferences.KEY_PREF_DEBUG_MODE);
-        debugPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
-                debugMode((Boolean)o);
-                return true;
-            }
-        });
 
         removeAccountPref = findPreference(Preferences.KEY_PREF_ACCOUNT_REMOVE);
         removeAccountPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -112,17 +102,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateSummary(preferences, Preferences.KEY_PREF_EMAIL);
         updateRemoveAccountPref(preferences);
 
-        debugMode(application.getPreferences().isDebug());
-    }
-
-    private void debugMode(boolean isDebug) {
-        if (isDebug) {
-            systemCategory.addPreference(preferenceSshMode);
-            systemCategory.addPreference(preferenceRelease);
-        } else {
-            systemCategory.removePreference(preferenceSshMode);
-            systemCategory.removePreference(preferenceRelease);
-        }
+//        systemCategory = (PreferenceCategory) findPreference(Preferences.KEY_CATEGORY_SYSTEM);
+//        systemCategory.addPreference(preferenceSshMode);
+//        systemCategory.addPreference(preferenceRelease);
     }
 
     private void updateRemoveAccountPref(SharedPreferences sharedPreferences) {

@@ -33,9 +33,7 @@ public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
         View rowView = inflater.inflate(R.layout.layout_device_saved, null);
 
         TextView txtBoldTitle = (TextView) rowView.findViewById(R.id.txt_bold_title);
-        TextView txtFirstLine = (TextView) rowView.findViewById(R.id.txt_first_line);
-        TextView txtSecondLine = (TextView) rowView.findViewById(R.id.txt_second_line);
-        ImageView imgKey = (ImageView) rowView.findViewById(R.id.img_key);
+        TextView txtAdditionalLine = (TextView) rowView.findViewById(R.id.txt_additional_line);
 
         final DomainModel domain = getItem(position);
 
@@ -44,23 +42,12 @@ public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
 
         txtBoldTitle.setTextColor(domain.hasDevice() ? Color.BLACK : Color.GRAY);
 
-        txtFirstLine.setVisibility(domain.hasDevice() ? View.VISIBLE : View.INVISIBLE);
-        txtSecondLine.setVisibility(domain.hasDevice() ? View.VISIBLE : View.INVISIBLE);
-        imgKey.setVisibility(domain.hasDevice() ? View.VISIBLE : View.INVISIBLE);
+        txtAdditionalLine.setVisibility(domain.hasDevice() ? View.VISIBLE : View.INVISIBLE);
 
 
         if (domain.hasDevice()) {
-            txtFirstLine.setText(domain.device().id().title());
-            txtSecondLine.setText(domain.device().id().macAddress());
+            txtAdditionalLine.setText(domain.device().id().title());
         }
-
-        if (!preferences.isDebug())
-            txtSecondLine.setVisibility(View.GONE);
-
-//        if (domain.hasKey())
-//            imgKey.setImageResource(R.drawable.ic_action_accounts);
-//        else
-//            imgKey.setImageResource(R.drawable.ic_action_secure);
 
         return rowView;
     }

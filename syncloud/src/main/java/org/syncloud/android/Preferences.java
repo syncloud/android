@@ -16,7 +16,6 @@ public class Preferences implements EndpointPreference, Release{
     public static final String KEY_CATEGORY_SYSTEM = "system";
 
     public static final String KEY_PREF_API_URL = "pref_api_url";
-    public static final String KEY_PREF_DEBUG_MODE = "pref_debug_mode";
     public static final String KEY_PREF_ACCOUNT_REMOVE = "pref_account_remove";
     public static final String KEY_PREF_EMAIL = "pref_email";
     public static final String KEY_PREF_PASSWORD = "pref_password";
@@ -44,10 +43,6 @@ public class Preferences implements EndpointPreference, Release{
         } catch (MalformedURLException e) {
             return "syncloud.it";
         }
-    }
-
-    public Boolean isDebug() {
-        return preferences.getBoolean(KEY_PREF_DEBUG_MODE, false);
     }
 
     public void setCredentials(String email, String password) {

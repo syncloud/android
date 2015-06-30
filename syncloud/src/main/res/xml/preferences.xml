@@ -11,13 +11,6 @@
             android:defaultValue="http://api.syncloud.it"
             />
 
-        <CheckBoxPreference
-            android:key="pref_debug_mode"
-            android:title="Debug mode"
-            android:summary="Shows more technical information"
-            android:defaultValue="false"
-            />
-
         <ListPreference
             android:key="pref_discovery_library"
             android:title="Discovery Library"
