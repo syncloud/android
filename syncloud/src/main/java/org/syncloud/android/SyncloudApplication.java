@@ -15,15 +15,12 @@ import org.acra.collector.CrashReportData;
 import org.acra.sender.ReportSender;
 import org.acra.sender.ReportSenderException;
 import org.syncloud.android.db.KeysStorage;
-import org.syncloud.android.log.ConfigureLog4J;
 import org.syncloud.redirect.IUserService;
 import org.syncloud.redirect.RedirectService;
 import org.syncloud.redirect.UserCachedService;
 import org.syncloud.redirect.UserStorage;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.acra.ReportField.*;
 

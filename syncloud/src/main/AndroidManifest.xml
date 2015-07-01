@@ -68,10 +68,6 @@
             android:theme="@style/DialogTheme" >
         </activity>
         <activity
-            android:name=".ui.LogsActivity"
-            android:label="@string/title_activity_logs" >
-        </activity>
-        <activity
             android:name=".ui.UPnPCheckActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_upnp_check" >

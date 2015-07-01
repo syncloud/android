@@ -78,13 +78,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
-        findPreference(Preferences.KEY_PREF_LOGS).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            public boolean onPreferenceClick(Preference preference) {
-                startActivity(new Intent(SettingsFragment.this.getActivity(), LogsActivity.class));
-                return true;
-            }
-        });
-
         findPreference(Preferences.KEY_PREF_UPNP).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(SettingsFragment.this.getActivity(), UPnPCheckActivity.class);
@@ -101,10 +94,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
         updateSummary(preferences, Preferences.KEY_PREF_EMAIL);
         updateRemoveAccountPref(preferences);
-
-//        systemCategory = (PreferenceCategory) findPreference(Preferences.KEY_CATEGORY_SYSTEM);
-//        systemCategory.addPreference(preferenceSshMode);
-//        systemCategory.addPreference(preferenceRelease);
     }
 
     private void updateRemoveAccountPref(SharedPreferences sharedPreferences) {

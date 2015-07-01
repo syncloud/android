@@ -1,4 +1,4 @@
-package org.syncloud.android.log;
+package org.syncloud.android;
 
 import org.apache.log4j.EnhancedPatternLayout;
 import org.apache.log4j.Layout;
