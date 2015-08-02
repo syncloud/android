@@ -5,14 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.ui.DevicesSavedActivity;
-import org.syncloud.platform.ssh.model.DomainModel;
+import org.syncloud.android.core.platform.model.DomainModel;
 
 public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
     private final Preferences preferences;

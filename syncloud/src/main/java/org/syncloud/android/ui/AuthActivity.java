@@ -17,8 +17,8 @@ import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
-import org.syncloud.redirect.IUserService;
-import org.syncloud.redirect.model.User;
+import org.syncloud.android.core.redirect.IUserService;
+import org.syncloud.android.core.redirect.model.User;
 
 public class AuthActivity extends Activity {
 

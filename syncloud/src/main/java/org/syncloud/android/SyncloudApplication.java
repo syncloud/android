@@ -15,10 +15,10 @@ import org.acra.collector.CrashReportData;
 import org.acra.sender.ReportSender;
 import org.acra.sender.ReportSenderException;
 import org.syncloud.android.db.KeysStorage;
-import org.syncloud.redirect.IUserService;
-import org.syncloud.redirect.RedirectService;
-import org.syncloud.redirect.UserCachedService;
-import org.syncloud.redirect.UserStorage;
+import org.syncloud.android.core.redirect.IUserService;
+import org.syncloud.android.core.redirect.RedirectService;
+import org.syncloud.android.core.redirect.UserCachedService;
+import org.syncloud.android.core.redirect.UserStorage;
 
 import java.io.File;
 

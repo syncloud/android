@@ -69,9 +69,8 @@ android {
 
 
 dependencies {
-    compile project(':platform')
-    compile project(':redirect')
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'log4j:log4j:1.2.17'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
     compile 'javax.jmdns:jmdns:3.4.1'
     compile 'org.bitlet:weupnp:0.1.2'
     compile 'org.apache.commons:commons-lang3:3.3.2'

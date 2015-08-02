@@ -22,11 +22,10 @@ import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.db.KeysStorage;
-import org.syncloud.platform.ssh.model.Credentials;
-import org.syncloud.platform.ssh.model.Device;
-import org.syncloud.platform.ssh.model.DomainModel;
-import org.syncloud.platform.ssh.model.Endpoint;
-import org.syncloud.platform.ssh.model.Key;
+import org.syncloud.android.core.platform.model.Credentials;
+import org.syncloud.android.core.platform.model.DomainModel;
+import org.syncloud.android.core.platform.model.Endpoint;
+import org.syncloud.android.core.platform.model.Key;
 
 import java.io.IOException;
 

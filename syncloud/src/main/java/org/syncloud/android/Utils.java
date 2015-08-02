@@ -2,14 +2,14 @@ package org.syncloud.android;
 
 import com.google.common.base.Optional;
 
-import org.syncloud.redirect.model.Domain;
-import org.syncloud.redirect.model.Service;
-import org.syncloud.platform.ssh.model.Credentials;
-import org.syncloud.platform.ssh.model.Device;
-import org.syncloud.platform.ssh.model.DomainModel;
-import org.syncloud.platform.ssh.model.Endpoint;
-import org.syncloud.platform.ssh.model.Identification;
-import org.syncloud.platform.ssh.model.Key;
+import org.syncloud.android.core.redirect.model.Domain;
+import org.syncloud.android.core.redirect.model.Service;
+import org.syncloud.android.core.platform.model.Credentials;
+import org.syncloud.android.core.platform.model.Device;
+import org.syncloud.android.core.platform.model.DomainModel;
+import org.syncloud.android.core.platform.model.Endpoint;
+import org.syncloud.android.core.platform.model.Identification;
+import org.syncloud.android.core.platform.model.Key;
 
 import java.util.List;
 

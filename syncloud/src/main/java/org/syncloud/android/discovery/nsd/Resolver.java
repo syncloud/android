@@ -6,7 +6,7 @@ import android.net.nsd.NsdServiceInfo;
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.android.discovery.DiscoveryManager;
-import org.syncloud.platform.ssh.model.Endpoint;
+import org.syncloud.android.core.platform.model.Endpoint;
 
 import java.net.InetAddress;
 import java.util.LinkedList;

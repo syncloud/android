@@ -25,10 +25,10 @@ import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.android.discovery.DiscoveryManager;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.ui.dialog.WifiDialog;
-import org.syncloud.common.WebService;
-import org.syncloud.platform.ssh.Tools;
-import org.syncloud.platform.ssh.model.Endpoint;
-import org.syncloud.platform.ssh.model.IdentifiedEndpoint;
+import org.syncloud.android.core.common.WebService;
+import org.syncloud.android.core.platform.Tools;
+import org.syncloud.android.core.platform.model.Endpoint;
+import org.syncloud.android.core.platform.model.IdentifiedEndpoint;
 
 import java.util.Map;
 
