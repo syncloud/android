@@ -6,7 +6,6 @@ import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
 import org.syncloud.common.Result;
-import org.syncloud.common.SyncloudException;
 import org.syncloud.common.WebService;
 import org.syncloud.platform.ssh.model.Identification;
 

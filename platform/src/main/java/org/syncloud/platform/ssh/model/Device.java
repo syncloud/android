@@ -1,7 +1,5 @@
 package org.syncloud.platform.ssh.model;
 
-import com.google.common.base.Optional;
-
 import java.io.Serializable;
 
 public class Device implements Serializable {

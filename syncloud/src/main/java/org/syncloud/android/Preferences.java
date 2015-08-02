@@ -3,17 +3,13 @@ package org.syncloud.android;
 import android.content.SharedPreferences;
 
 import org.apache.log4j.Logger;
-import org.syncloud.platform.sam.Release;
-import org.syncloud.platform.ssh.EndpointPreference;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Preferences implements EndpointPreference, Release{
+public class Preferences {
 
     private static Logger logger = Logger.getLogger(Preferences.class);
-
-    public static final String KEY_CATEGORY_SYSTEM = "system";
 
     public static final String KEY_PREF_API_URL = "pref_api_url";
     public static final String KEY_PREF_ACCOUNT_REMOVE = "pref_account_remove";
@@ -21,7 +17,6 @@ public class Preferences implements EndpointPreference, Release{
     public static final String KEY_PREF_PASSWORD = "pref_password";
     public static final String KEY_PREF_FEEDBACK_SEND= "pref_feedback_send";
     public static final String KEY_PREF_DISCOVERY_LIBRARY = "pref_discovery_library";
-    public static final String KEY_PREF_LOGS = "pref_logs";
     public static final String KEY_PREF_UPNP = "pref_upnp";
     public static final String KEY_PREF_SSH_MODE = "pref_ssh_mode";
     public static final String KEY_PREF_RELEASE = "pref_release";
@@ -72,12 +67,10 @@ public class Preferences implements EndpointPreference, Release{
         return preferences.getString(KEY_PREF_RELEASE, null);
     }
 
-    @Override
     public boolean isRemote() {
         return preferences.getString(KEY_PREF_SSH_MODE, "Local").equals("Remote");
     }
 
-    @Override
     public void swap() {
         logger.info("swapping ssh mode preference");
         SharedPreferences.Editor editor = preferences.edit();

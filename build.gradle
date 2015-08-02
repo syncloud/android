@@ -1,72 +1,8 @@
-import static java.lang.Math.max
-
 allprojects {
-    apply plugin: 'jacoco'
-
     repositories {
         mavenCentral()
-        maven {
-            url "http://4thline.org/m2/"
-        }
-    }
-
-    jacoco {
-        toolVersion = '0.7.1.201405082137'
-    }
-
-}
-
-subprojects {
-
-    task printCoverage << {
-
-        ext {
-            missed = 0
-            covered = 0
-            percent = 0
-        }
-
-        def coverageFile = new File("${buildDir}/reports/jacoco/test/jacocoTestReport.csv")
-        if (coverageFile.exists()) {
-
-            println()
-            println("#############################VVV COVERAGE (${project.name}) VVV#############################")
-            println()
-
-            coverageFile.eachLine { line ->
-                ext.column = line.split(",")
-                print(column[0])
-                print(" ".multiply(max(0, 10 - column[0].length())))
-                print(column[1])
-                print(" ".multiply(max(0, 30 - column[1].length())))
-                print(column[2])
-                print(" ".multiply(max(0, 50 - column[2].length())))
-                if (column[3].isNumber()) {
-                    missed += column[3].toInteger()
-                }
-                print(column[3])
-                print(" ".multiply(max(0, 20 - column[3].length())))
-                if (column[4].isNumber()) {
-                    covered += column[4].toInteger()
-                }
-                print(column[4])
-                print(" ".multiply(max(0, 20 - column[4].length())))
-                println()
-            }
-            println()
-            percent = covered / (missed + covered) * 100
-            println("Total: ${percent.toInteger()} % covered")
-            println()
-            println("#############################^^^ COVERAGE (${project.name}) ^^^#############################")
-            println()
-
-        } else {
-            println(coverageFile)
-            println("coverage file does not exist")
-        }
     }
 }
-
 
 buildscript {
     repositories {

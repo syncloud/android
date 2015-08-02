@@ -70,12 +70,13 @@ android {
 
 dependencies {
     compile project(':platform')
-    compile project(':apps')
     compile project(':redirect')
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'javax.jmdns:jmdns:3.4.1'
     compile 'org.bitlet:weupnp:0.1.2'
+    compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.3'
+    compile 'com.google.guava:guava:18.0'
     compile 'com.android.support:support-v4:20.0.0'
     compile 'com.android.support:appcompat-v7:20.0.0'
     compile 'de.mindpipe.android:android-logging-log4j:1.0.3'
