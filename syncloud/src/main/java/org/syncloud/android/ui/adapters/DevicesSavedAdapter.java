@@ -19,7 +19,7 @@ public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
     private String mainDomain;
 
     public DevicesSavedAdapter(DevicesSavedActivity activity) {
-        super(activity, R.layout.layout_device_saved);
+        super(activity, R.layout.layout_device_item);
         this.activity = activity;
         preferences = ((SyncloudApplication) activity.getApplication()).getPreferences();
         mainDomain = preferences.getDomain();
@@ -29,7 +29,7 @@ public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         LayoutInflater inflater = activity.getLayoutInflater();
-        View rowView = inflater.inflate(R.layout.layout_device_saved, null);
+        View rowView = inflater.inflate(R.layout.layout_device_item, null);
 
         TextView txtBoldTitle = (TextView) rowView.findViewById(R.id.txt_bold_title);
         TextView txtAdditionalLine = (TextView) rowView.findViewById(R.id.txt_additional_line);
