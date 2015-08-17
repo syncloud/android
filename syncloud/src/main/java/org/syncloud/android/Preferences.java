@@ -2,14 +2,10 @@ package org.syncloud.android;
 
 import android.content.SharedPreferences;
 
-import org.apache.log4j.Logger;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Preferences {
-
-    private static Logger logger = Logger.getLogger(Preferences.class);
 
     public static final String KEY_PREF_API_URL = "pref_api_url";
     public static final String KEY_PREF_ACCOUNT_REMOVE = "pref_account_remove";
@@ -18,8 +14,6 @@ public class Preferences {
     public static final String KEY_PREF_FEEDBACK_SEND= "pref_feedback_send";
     public static final String KEY_PREF_DISCOVERY_LIBRARY = "pref_discovery_library";
     public static final String KEY_PREF_UPNP = "pref_upnp";
-    public static final String KEY_PREF_SSH_MODE = "pref_ssh_mode";
-    public static final String KEY_PREF_RELEASE = "pref_release";
     public static final String KEY_PREF_CHECK_NEEDED = "pref_check_needed";
 
     private SharedPreferences preferences;
@@ -61,21 +55,6 @@ public class Preferences {
 
     public String getDiscoveryLibrary() {
         return preferences.getString(KEY_PREF_DISCOVERY_LIBRARY, "JmDNS");
-    }
-
-    public String getVersion() {
-        return preferences.getString(KEY_PREF_RELEASE, null);
-    }
-
-    public boolean isRemote() {
-        return preferences.getString(KEY_PREF_SSH_MODE, "Local").equals("Remote");
-    }
-
-    public void swap() {
-        logger.info("swapping ssh mode preference");
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(KEY_PREF_SSH_MODE, isRemote() ? "Local" : "Remote");
-        editor.apply();
     }
 
     public boolean isCheckNeeded() { return preferences.getBoolean(KEY_PREF_CHECK_NEEDED, true); }

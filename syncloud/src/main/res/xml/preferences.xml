@@ -42,19 +42,11 @@
         <ListPreference
             android:key="pref_api_url"
             android:title="Public Name Service"
-            android:dialogTitle="Url"
+            android:dialogTitle="Public Name Service"
             android:entries="@array/pref_api_url_titles"
             android:entryValues="@array/pref_api_url_values"
             android:defaultValue="http://api.syncloud.it"
             />
-
-        <ListPreference
-            android:key="pref_release"
-            android:title="Release"
-            android:dialogTitle="Release"
-            android:entries="@array/pref_release_titles"
-            android:entryValues="@array/pref_release_values"
-            android:defaultValue="0.8" />
 
         <ListPreference
             android:key="pref_discovery_library"
@@ -63,15 +55,6 @@
             android:entries="@array/pref_discovery_titles"
             android:entryValues="@array/pref_discovery_values"
             android:defaultValue="JmDNS" />
-
-        <ListPreference
-            android:key="pref_ssh_mode"
-            android:title="Current connection mode"
-            android:dialogTitle="Connection mode"
-            android:entries="@array/pref_ssh_mode_titles"
-            android:entryValues="@array/pref_ssh_mode_values"
-            android:defaultValue="Local"
-            android:selectable="false"/>
 
     </PreferenceCategory>
 

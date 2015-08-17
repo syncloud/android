@@ -19,8 +19,6 @@ import java.util.Set;
 import static org.syncloud.android.Preferences.KEY_PREF_API_URL;
 import static org.syncloud.android.Preferences.KEY_PREF_DISCOVERY_LIBRARY;
 import static org.syncloud.android.Preferences.KEY_PREF_EMAIL;
-import static org.syncloud.android.Preferences.KEY_PREF_RELEASE;
-import static org.syncloud.android.Preferences.KEY_PREF_SSH_MODE;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -31,15 +29,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private SyncloudApplication application;
     private Set<String> summaryUpdatable = Sets.newHashSet(
             KEY_PREF_API_URL,
-            KEY_PREF_DISCOVERY_LIBRARY,
-            KEY_PREF_SSH_MODE,
-            KEY_PREF_RELEASE
-    //        KEY_PREF_EMAIL,
+            KEY_PREF_DISCOVERY_LIBRARY
     );
 
     private PreferenceCategory systemCategory;
-    private Preference preferenceSshMode;
-    private Preference preferenceRelease;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,9 +41,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         application = (SyncloudApplication) getActivity().getApplication();
 
         addPreferencesFromResource(R.xml.preferences);
-
-        preferenceSshMode = findPreference(KEY_PREF_SSH_MODE);
-        preferenceRelease = findPreference(KEY_PREF_RELEASE);
 
         removeAccountPref = findPreference(Preferences.KEY_PREF_ACCOUNT_REMOVE);
         removeAccountPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

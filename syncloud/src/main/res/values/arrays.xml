@@ -9,15 +9,6 @@
         <item>http://api.syncloud.info:81</item>
     </string-array>
 
-    <string-array name="pref_release_titles">
-        <item>Stable: 0.8</item>
-        <item>Next: 0.9</item>
-    </string-array>
-    <string-array name="pref_release_values">
-        <item>0.8</item>
-        <item>0.9</item>
-    </string-array>
-
     <string-array name="pref_discovery_titles">
         <item>JmDNS</item>
         <item>Android NSD</item>
@@ -25,15 +16,6 @@
     <string-array name="pref_discovery_values">
         <item>JmDNS</item>
         <item>Android NSD</item>
-    </string-array>
-
-    <string-array name="pref_ssh_mode_titles">
-        <item>Remote</item>
-        <item>Local</item>
-    </string-array>
-    <string-array name="pref_ssh_mode_values">
-        <item>Remote</item>
-        <item>Local</item>
     </string-array>
 
 </resources>

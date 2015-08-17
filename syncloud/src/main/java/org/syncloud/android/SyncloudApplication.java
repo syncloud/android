@@ -40,12 +40,8 @@ import static org.acra.ReportField.*;
 public class SyncloudApplication extends Application {
 
     private String TAG = SyncloudApplication.class.getSimpleName();
-    public static String DOMAIN = "domain";
 
     public static String DEVICE_ENDPOINT = "device_endpoint";
-    public static final String DEVICE_ID = "device_id";
-    public static final String DEVICE_DISCOVERY = "device_discovery";
-    public static final String DEVICE_OPEN = "device_open";
 
     private KeysStorage keysStorage;
     private Preferences preferences;
@@ -78,11 +74,6 @@ public class SyncloudApplication extends Application {
         RedirectService redirectService = new RedirectService(preferences.getApiUrl());
         UserCachedService userService = new UserCachedService(redirectService, userStorage);
         return userService;
-    }
-
-    public RedirectService redirectService() {
-        RedirectService redirectService = new RedirectService(preferences.getApiUrl());
-        return redirectService;
     }
 
     public Preferences getPreferences() {
