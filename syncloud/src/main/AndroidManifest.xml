@@ -70,12 +70,13 @@
         <activity
             android:name=".ui.UPnPCheckActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_upnp_check" >
+            android:label="@string/title_activity_upnp_check"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".ui.DeviceWebView"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_device_web_view" >
+            android:name=".ui.ActivateActivity"
+            android:label="@string/title_activity_activate"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 

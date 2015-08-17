@@ -62,5 +62,28 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_device_web_view">DeviceWebView</string>
+    <string name="title_activity_activate">Activate</string>
+    <string name="prompt_domain">Domain</string>
+    <string name="prompt_device_login">Device login</string>
+    <string name="prompt_device_password">Device password</string>
+
+    <string name="title_activity_auth_credentials">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_up">Sign up</string>
+
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+
+    <string name="admin_login">Admin  Login</string>
+    <string name="admin_password">Admin Password</string>
+    <string name="use_https">Use HTTPS</string>
+
+    <string name="action_activate">Activate</string>
 
 </resources>

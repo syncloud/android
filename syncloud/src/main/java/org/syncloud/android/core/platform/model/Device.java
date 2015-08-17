@@ -1,14 +1,16 @@
 package org.syncloud.android.core.platform.model;
 
+import com.google.common.base.Optional;
+
 import java.io.Serializable;
 
 public class Device implements Serializable {
     private Identification id;
     private Endpoint remoteEndpoint;
     private Endpoint localEndpoint;
-    private Credentials credentials;
+    private Optional<Credentials> credentials;
 
-    public Device(Identification id, Endpoint localEndpoint, Endpoint remoteEndpoint, Credentials credentials) {
+    public Device(Identification id, Endpoint localEndpoint, Endpoint remoteEndpoint, Optional<Credentials> credentials) {
         this.id = id;
         this.localEndpoint = localEndpoint;
         this.remoteEndpoint = remoteEndpoint;
@@ -21,7 +23,7 @@ public class Device implements Serializable {
 
     public Identification id() { return id; }
 
-    public Credentials credentials() { return credentials; }
+    public Optional<Credentials> credentials() { return credentials; }
 
     @Override
     public String toString() {

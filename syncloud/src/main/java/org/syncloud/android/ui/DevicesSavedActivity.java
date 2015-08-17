@@ -2,6 +2,7 @@ package org.syncloud.android.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -10,11 +11,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.common.base.Optional;
+
+import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.Utils;
 import org.syncloud.android.db.KeysStorage;
+import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DevicesSavedAdapter;
 import org.syncloud.android.core.redirect.IUserService;
@@ -27,8 +32,11 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static java.util.Collections.sort;
+import static org.syncloud.android.network.Helpers.findAccessibleUrl;
 
 public class DevicesSavedActivity extends Activity {
+
+    private static Logger logger = Logger.getLogger(DevicesSavedActivity.class);
 
     private KeysStorage keysStorage;
     private DevicesSavedAdapter adapter;
@@ -110,14 +118,47 @@ public class DevicesSavedActivity extends Activity {
     }
 
 
-    private void open(DomainModel device) {
-//        Intent intent = new Intent(this, DeviceAppsActivity.class);
-//        intent.putExtra(SyncloudApplication.DOMAIN, device);
+    private void open(final DomainModel device) {
+        new ProgressAsyncTask<Void, Optional<String>>()
+                .setTitle("Activating device")
+//                .setProgress(progress)
+                .doWork(new ProgressAsyncTask.Work<Void, Optional<String>>() {
+                    @Override
+                    public Optional<String> run(Void... args) {
+                        return findAccessibleUrl(device);
+                    }
+                })
+                .onCompleted(new ProgressAsyncTask.Completed<Optional<String>>() {
+                    @Override
+                    public void run(AsyncResult<Optional<String>> result) {
+                        onOpenDevice(result);
+                    }
+                })
+                .execute();
+    }
 
-        Intent intent = new Intent(this, DeviceWebView.class);
+    private void onOpenDevice(AsyncResult<Optional<String>> result) {
+        if (!result.hasValue()) {
+            logger.error("unable to connect ");
+            return;
+        }
 
-        intent.putExtra(SyncloudApplication.DEVICE_OPEN, device);
-        startActivityForResult(intent, 1);
+        Optional<String> baseUrl = result.getValue();
+
+        if (!baseUrl.isPresent()) {
+            logger.error("unable to connect ");
+            return;
+        }
+
+        String url = format("%s/server/html/login.html", baseUrl.get());
+
+//            Optional<Credentials> credentials = device.device().credentials();
+//            if (credentials.isPresent()) {
+//                String postData = "name=" + credentials.get().login() + "&" + "password=" + credentials.get().password();
+//            }
+
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
     }
 
     @Override
@@ -144,5 +185,4 @@ public class DevicesSavedActivity extends Activity {
     public void discover(View view) {
         startActivityForResult(new Intent(this, DevicesDiscoveryActivity.class), 1);
     }
-
 }

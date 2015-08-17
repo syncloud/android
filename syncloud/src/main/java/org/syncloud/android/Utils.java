@@ -34,11 +34,9 @@ public class Utils {
             if (domain.local_ip != null && domain.ip != null && id != null && rest != null) {
                 Endpoint localEndpoint = new Endpoint(domain.local_ip, rest.local_port);
                 Endpoint remoteEndpoint = new Endpoint(domain.ip, rest.port);
-                if (credentials.isPresent()) {
-                    Device device = new Device(id, localEndpoint, remoteEndpoint, credentials.get());
-                    DomainModel model = new DomainModel(domain.user_domain, device);
-                    devices.add(model);
-                }
+                Device device = new Device(id, localEndpoint, remoteEndpoint, credentials);
+                DomainModel model = new DomainModel(domain.user_domain, device);
+                devices.add(model);
             }
 
 

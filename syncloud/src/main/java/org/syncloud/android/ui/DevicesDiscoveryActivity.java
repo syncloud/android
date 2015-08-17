@@ -52,6 +52,8 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
     private Tools tools;
     private SyncloudApplication application;
 
+    private static int REQUEST_SETTINGS = 1;
+    private static int REQUEST_ACTIVATE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,9 +102,12 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==WifiDialog.WIFI_SETTINGS)
-        {
+        if (requestCode == WifiDialog.WIFI_SETTINGS) {
             checkWiFiAndDiscover();
+        }
+        if (requestCode == REQUEST_ACTIVATE && resultCode == Activity.RESULT_OK) {
+            setResult(Activity.RESULT_OK);
+            finish();
         }
     }
 
@@ -116,7 +121,8 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            startActivityForResult(new Intent(this, SettingsActivity.class), 1);
+            Intent intentSettings = new Intent(this, SettingsActivity.class);
+            startActivityForResult(intentSettings, REQUEST_SETTINGS);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -130,19 +136,9 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
                     .show();
         } else {
 
-            /*Intent intent = new Intent(this, DeviceActivateActivity.class);
-            intent.putExtra(SyncloudApplication.DEVICE_ENDPOINT, endpoint.endpoint());
-            intent.putExtra(SyncloudApplication.DEVICE_ID, endpoint.id().get());
-            startActivity(intent);
-            setResult(Activity.RESULT_OK, new Intent(this, DevicesSavedActivity.class));*/
-
-            Intent intent = new Intent(this, DeviceWebView.class);
-            intent.putExtra(SyncloudApplication.DEVICE_DISCOVERY, endpoint.endpoint());
-
-            startActivity(intent);
-            setResult(Activity.RESULT_OK, new Intent(this, DeviceWebView.class));
-
-            finish();
+            Intent intentActivate = new Intent(this, ActivateActivity.class);
+            intentActivate.putExtra(SyncloudApplication.DEVICE_ENDPOINT, endpoint.endpoint());
+            startActivityForResult(intentActivate, REQUEST_ACTIVATE);
         }
     }
 
