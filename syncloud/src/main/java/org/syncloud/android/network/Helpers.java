@@ -2,10 +2,10 @@ package org.syncloud.android.network;
 
 import com.google.common.base.Optional;
 
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.ClientPNames;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.params.HttpParams;
 import org.apache.log4j.Logger;
 import org.syncloud.android.core.platform.model.DomainModel;
@@ -37,7 +37,9 @@ public class Helpers {
     public static boolean checkUrl(String baseUrl) {
         try {
             logger.info("trying " + baseUrl);
-            CloseableHttpClient httpClient = HttpClients.createDefault();
+            HttpClientBuilder builder = HttpClientBuilder.create();
+            builder.disableAutomaticRetries();
+            HttpClient httpClient = builder.build();
             HttpGet httpGet = new HttpGet(baseUrl);
             HttpParams params = httpGet.getParams();
             params.setParameter(ClientPNames.HANDLE_REDIRECTS, Boolean.FALSE);

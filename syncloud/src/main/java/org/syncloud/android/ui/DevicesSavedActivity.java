@@ -1,6 +1,7 @@
 package org.syncloud.android.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,11 +11,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
+import org.syncloud.android.Progress;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.Utils;
@@ -42,6 +46,26 @@ public class DevicesSavedActivity extends Activity {
     private DevicesSavedAdapter adapter;
     private SyncloudApplication application;
     private Preferences preferences;
+    private ProgressBar progressBar;
+
+    private Progress progress = new ProgressImpl();
+
+    public class ProgressImpl extends Progress.Empty {
+        @Override
+        public void start() {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void stop() {
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
+        public void error(String message) {
+
+        }
+    }
 
 
     @Override
@@ -57,7 +81,7 @@ public class DevicesSavedActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Object obj = listview.getItemAtPosition(position);
-                DomainModel domain = (DomainModel)obj;
+                DomainModel domain = (DomainModel) obj;
                 if (domain.hasDevice())
                     open(domain);
             }
@@ -68,6 +92,7 @@ public class DevicesSavedActivity extends Activity {
 
         application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
+        progressBar = (ProgressBar) findViewById(R.id.open_progress);
 
         keysStorage = application.keysStorage();
 
@@ -121,7 +146,7 @@ public class DevicesSavedActivity extends Activity {
     private void open(final DomainModel device) {
         new ProgressAsyncTask<Void, Optional<String>>()
                 .setTitle("Activating device")
-//                .setProgress(progress)
+                .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, Optional<String>>() {
                     @Override
                     public Optional<String> run(Void... args) {
@@ -140,6 +165,7 @@ public class DevicesSavedActivity extends Activity {
     private void onOpenDevice(AsyncResult<Optional<String>> result) {
         if (!result.hasValue()) {
             logger.error("unable to connect ");
+            showError();
             return;
         }
 
@@ -147,6 +173,7 @@ public class DevicesSavedActivity extends Activity {
 
         if (!baseUrl.isPresent()) {
             logger.error("unable to connect ");
+            showError();
             return;
         }
 
@@ -159,6 +186,14 @@ public class DevicesSavedActivity extends Activity {
 
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browserIntent);
+    }
+
+    private void showError() {
+        new AlertDialog.Builder(this)
+                .setTitle("Can't connect to the device")
+                .setMessage("Device is not reachable or it is set to internal mode only.")
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     @Override
