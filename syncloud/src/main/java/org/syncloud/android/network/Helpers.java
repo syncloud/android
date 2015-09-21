@@ -26,7 +26,7 @@ public class Helpers {
             return Optional.of(url1);
 
         String url2 = format("http://%s:%s",
-                device.device().remoteEndpoint().host(),
+                device.userDomain() + ".syncloud.it",
                 device.device().remoteEndpoint().port());
         if (checkUrl(url2))
             return Optional.of(url2);
