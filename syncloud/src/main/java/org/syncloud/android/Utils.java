@@ -23,18 +23,16 @@ public class Utils {
         return Optional.absent();
     }
 
-    public static List<DomainModel> toDevices(List<Domain> domains, List<Key> keys) {
+    public static List<DomainModel> toDevices(List<Domain> domains) {
         List<DomainModel> devices = newArrayList();
         for (Domain domain: domains) {
-            Optional<Credentials> credentials = find(keys, domain.device_mac_address);
-
             Service rest = domain.service("server");
             Identification id = deviceId(domain);
 
             if (domain.local_ip != null && domain.ip != null && id != null && rest != null) {
                 Endpoint localEndpoint = new Endpoint(domain.local_ip, rest.local_port);
                 Endpoint remoteEndpoint = new Endpoint(domain.ip, rest.port);
-                Device device = new Device(id, localEndpoint, remoteEndpoint, credentials);
+                Device device = new Device(id, localEndpoint, remoteEndpoint);
                 DomainModel model = new DomainModel(domain.user_domain, device);
                 devices.add(model);
             }

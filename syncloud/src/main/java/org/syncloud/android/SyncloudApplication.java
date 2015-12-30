@@ -14,7 +14,6 @@ import org.acra.annotation.ReportsCrashes;
 import org.acra.collector.CrashReportData;
 import org.acra.sender.ReportSender;
 import org.acra.sender.ReportSenderException;
-import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.core.redirect.IUserService;
 import org.syncloud.android.core.redirect.RedirectService;
 import org.syncloud.android.core.redirect.UserCachedService;
@@ -43,7 +42,6 @@ public class SyncloudApplication extends Application {
 
     public static String DEVICE_ENDPOINT = "device_endpoint";
 
-    private KeysStorage keysStorage;
     private Preferences preferences;
     private UserStorage userStorage;
 
@@ -61,14 +59,11 @@ public class SyncloudApplication extends Application {
         ConfigureLog4J.configure();
 
         super.onCreate();
-        keysStorage = new KeysStorage(getApplicationContext());
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         preferences = new Preferences(sharedPreferences);
         userStorage = new UserStorage(new File(getApplicationContext().getFilesDir(), "user.json"));
     }
-
-    public KeysStorage keysStorage() { return keysStorage; }
 
     public IUserService userServiceCached() {
         RedirectService redirectService = new RedirectService(preferences.getApiUrl());

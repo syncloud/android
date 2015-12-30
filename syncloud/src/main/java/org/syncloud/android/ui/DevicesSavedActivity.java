@@ -22,7 +22,6 @@ import org.syncloud.android.Progress;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
 import org.syncloud.android.Utils;
-import org.syncloud.android.db.KeysStorage;
 import org.syncloud.android.tasks.AsyncResult;
 import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.ui.adapters.DevicesSavedAdapter;
@@ -42,7 +41,6 @@ public class DevicesSavedActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(DevicesSavedActivity.class);
 
-    private KeysStorage keysStorage;
     private DevicesSavedAdapter adapter;
     private SyncloudApplication application;
     private Preferences preferences;
@@ -94,8 +92,6 @@ public class DevicesSavedActivity extends Activity {
         preferences = application.getPreferences();
         progressBar = (ProgressBar) findViewById(R.id.open_progress);
 
-        keysStorage = application.keysStorage();
-
         refreshDevices();
     }
 
@@ -121,8 +117,7 @@ public class DevicesSavedActivity extends Activity {
     }
 
     private void updateUser(User user) {
-        List<Key> keys = keysStorage.list();
-        List<DomainModel> domains = Utils.toDevices(user.domains, keys);
+        List<DomainModel> domains = Utils.toDevices(user.domains);
 
         Comparator<DomainModel> noDevicesLast = new Comparator<DomainModel>() {
             @Override

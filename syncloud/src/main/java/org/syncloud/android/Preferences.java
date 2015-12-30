@@ -13,7 +13,6 @@ public class Preferences {
     public static final String KEY_PREF_PASSWORD = "pref_password";
     public static final String KEY_PREF_FEEDBACK_SEND= "pref_feedback_send";
     public static final String KEY_PREF_DISCOVERY_LIBRARY = "pref_discovery_library";
-    public static final String KEY_PREF_UPNP = "pref_upnp";
     public static final String KEY_PREF_CHECK_NEEDED = "pref_check_needed";
 
     private SharedPreferences preferences;
@@ -56,8 +55,6 @@ public class Preferences {
     public String getDiscoveryLibrary() {
         return preferences.getString(KEY_PREF_DISCOVERY_LIBRARY, "JmDNS");
     }
-
-    public boolean isCheckNeeded() { return preferences.getBoolean(KEY_PREF_CHECK_NEEDED, true); }
 
     public void setCheckNeeded(boolean value) {
         SharedPreferences.Editor editor = preferences.edit();

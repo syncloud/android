@@ -68,15 +68,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
-        findPreference(Preferences.KEY_PREF_UPNP).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(SettingsFragment.this.getActivity(), UPnPCheckActivity.class);
-                intent.putExtra(UPnPCheckActivity.PARAM_FIRST_TIME, false);
-                startActivity(intent);
-                return true;
-            }
-        });
-
         SharedPreferences preferences = getPreferenceScreen().getSharedPreferences();
         preferences.registerOnSharedPreferenceChangeListener(this);
         for (String pref : summaryUpdatable) {

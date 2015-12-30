@@ -44,13 +44,7 @@ public class AuthActivity extends Activity {
         TextView learnMoreText = (TextView) findViewById(R.id.auth_learn_more);
         learnMoreText.setMovementMethod(LinkMovementMethod.getInstance());
 
-        if (preferences.isCheckNeeded()) {
-            Intent intent = new Intent(AuthActivity.this, UPnPCheckActivity.class);
-            intent.putExtra(UPnPCheckActivity.PARAM_FIRST_TIME, true);
-            startActivityForResult(intent, REQUEST_CHECK);
-        } else {
-            proceedWithLogin();
-        }
+        proceedWithLogin();
     }
 
     private Progress progress = new ProgressImpl();
@@ -66,15 +60,6 @@ public class AuthActivity extends Activity {
         public void stop() {
             signInOrOut.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==REQUEST_CHECK)
-        {
-            proceedWithLogin();
         }
     }
 
