@@ -8,15 +8,10 @@ public class Domain implements Serializable {
     public String device_mac_address;
     public String device_name;
     public String device_title;
+    public String web_protocol;
+    public Integer web_local_port;
+    public Integer web_port;
     public String ip;
     public String local_ip;
     public String last_update;
-    public List<Service> services;
-
-    public Service service(String name) {
-        for (Service s: services)
-            if (s.name.equals(name))
-                return s;
-        return null;
-    }
 }

@@ -3,7 +3,6 @@ package org.syncloud.android;
 import com.google.common.base.Optional;
 
 import org.syncloud.android.core.redirect.model.Domain;
-import org.syncloud.android.core.redirect.model.Service;
 import org.syncloud.android.core.platform.model.Credentials;
 import org.syncloud.android.core.platform.model.Device;
 import org.syncloud.android.core.platform.model.DomainModel;
@@ -26,12 +25,11 @@ public class Utils {
     public static List<DomainModel> toDevices(List<Domain> domains) {
         List<DomainModel> devices = newArrayList();
         for (Domain domain: domains) {
-            Service rest = domain.service("server");
             Identification id = deviceId(domain);
 
-            if (domain.local_ip != null && domain.ip != null && id != null && rest != null) {
-                Endpoint localEndpoint = new Endpoint(domain.local_ip, rest.local_port);
-                Endpoint remoteEndpoint = new Endpoint(domain.ip, rest.port);
+            if (domain.local_ip != null && domain.ip != null && id != null) {
+                Endpoint localEndpoint = new Endpoint(domain.local_ip, domain.web_local_port);
+                Endpoint remoteEndpoint = new Endpoint(domain.ip, domain.web_port);
                 Device device = new Device(id, localEndpoint, remoteEndpoint);
                 DomainModel model = new DomainModel(domain.user_domain, device);
                 devices.add(model);
