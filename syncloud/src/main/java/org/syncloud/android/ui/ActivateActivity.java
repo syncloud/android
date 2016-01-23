@@ -41,6 +41,8 @@ public class ActivateActivity extends Activity {
 
     private Internal deviceInternal = new Internal();
 
+    private SyncloudApplication application;
+
     class ProgressImpl implements Progress {
         @Override
         public void start() {
@@ -73,7 +75,7 @@ public class ActivateActivity extends Activity {
         editPassword = (EditText) findViewById(R.id.edit_password);
         viewProgress = (ProgressBar) findViewById(R.id.progress);
 
-        SyncloudApplication application = (SyncloudApplication) getApplication();
+        application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
 
         endpoint = (Endpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
@@ -144,6 +146,8 @@ public class ActivateActivity extends Activity {
 
         deviceInternal.activate(
             endpoint.host(),
+            application.getPreferences().getApiUrl(),
+            application.getPreferences().getDomain(),
             preferences.getEmail(),
             preferences.getPassword(),
             domain,

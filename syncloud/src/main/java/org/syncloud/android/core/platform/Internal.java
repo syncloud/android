@@ -24,6 +24,8 @@ public class Internal {
 
     public Optional<Identification> activate(
             String host,
+            String redirectApiUrl,
+            String redirectDomain,
             String redirectEmail,
             String redirectPassword,
             String domain,
@@ -31,6 +33,8 @@ public class Internal {
             String password) {
 
         ArrayList<NameValuePair> parameters = new ArrayList<NameValuePair>();
+        parameters.add(new BasicNameValuePair("api-url", redirectApiUrl));
+        parameters.add(new BasicNameValuePair("domain", redirectDomain));
         parameters.add(new BasicNameValuePair("redirect-email", redirectEmail));
         parameters.add(new BasicNameValuePair("redirect-password", redirectPassword));
         parameters.add(new BasicNameValuePair("redirect-domain", domain));

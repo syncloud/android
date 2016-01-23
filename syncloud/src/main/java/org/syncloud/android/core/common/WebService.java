@@ -41,9 +41,20 @@ public class WebService {
         return execute(type, url, new ArrayList<NameValuePair>());
     }
 
+    private String parametersToString(List<NameValuePair> parameters) {
+        StringBuilder builder = new StringBuilder();
+        for(NameValuePair pair: parameters){
+            builder.append(pair.getName());
+            builder.append("=");
+            builder.append(pair.getValue());
+            builder.append(" ");
+        }
+        return builder.toString();
+    }
+
     public String execute(String type, String url, List<NameValuePair> parameters) {
         String fullUrl = apiUrl + url;
-        logger.info("calling: " + fullUrl);
+        logger.info("calling: " + fullUrl + " with parameters: " + parametersToString(parameters));
         HttpUriRequest request = request(type, fullUrl, parameters);
         Response response = getResponse(request);
 
