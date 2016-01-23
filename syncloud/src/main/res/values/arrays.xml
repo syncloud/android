@@ -2,11 +2,11 @@
 
     <string-array name="pref_api_url_titles">
         <item>Main: api.syncloud.it</item>
-        <item>Test: api.syncloud.info:81</item>
+        <item>Test: api.syncloud.info</item>
     </string-array>
     <string-array name="pref_api_url_values">
         <item>http://api.syncloud.it</item>
-        <item>http://api.syncloud.info:81</item>
+        <item>http://api.syncloud.info</item>
     </string-array>
 
     <string-array name="pref_discovery_titles">
