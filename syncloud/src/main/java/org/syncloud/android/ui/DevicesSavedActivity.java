@@ -28,7 +28,6 @@ import org.syncloud.android.ui.adapters.DevicesSavedAdapter;
 import org.syncloud.android.core.redirect.IUserService;
 import org.syncloud.android.core.redirect.model.User;
 import org.syncloud.android.core.platform.model.DomainModel;
-import org.syncloud.android.core.platform.model.Key;
 
 import java.util.Comparator;
 import java.util.List;
