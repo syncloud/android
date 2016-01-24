@@ -12,35 +12,32 @@ import org.syncloud.android.core.platform.model.DomainModel;
 
 import java.io.IOException;
 
-import static java.lang.String.format;
-
 public class Helpers {
     private static Logger logger = Logger.getLogger(Helpers.class);
 
-    public static Optional<String> findAccessibleUrl(DomainModel device) {
+    public static Optional<String> findAccessibleUrl(String mainDomain, DomainModel domain) {
+        String dnsUrl = domain.getDnsUrl(mainDomain);
+        if (dnsUrl != null && checkUrl(dnsUrl))
+            return Optional.of(dnsUrl);
 
-        String url1 = format("http://%s:%s",
-                device.device().localEndpoint().host(),
-                device.device().localEndpoint().port());
-        if (checkUrl(url1))
-            return Optional.of(url1);
+        String externalUrl = domain.getExternalUrl();
+        if (externalUrl != null && checkUrl(externalUrl))
+            return Optional.of(externalUrl);
 
-        String url2 = format("http://%s:%s",
-                device.userDomain() + ".syncloud.it",
-                device.device().remoteEndpoint().port());
-        if (checkUrl(url2))
-            return Optional.of(url2);
+        String internalUrl = domain.getInternalUrl();
+        if (internalUrl != null && checkUrl(internalUrl))
+            return Optional.of(internalUrl);
 
         return Optional.absent();
     }
 
-    public static boolean checkUrl(String baseUrl) {
+    public static boolean checkUrl(String url) {
         try {
-            logger.info("trying " + baseUrl);
+            logger.info("Trying: " + url);
             HttpClientBuilder builder = HttpClientBuilder.create();
             builder.disableAutomaticRetries();
             HttpClient httpClient = builder.build();
-            HttpGet httpGet = new HttpGet(baseUrl);
+            HttpGet httpGet = new HttpGet(url);
             HttpParams params = httpGet.getParams();
             params.setParameter(ClientPNames.HANDLE_REDIRECTS, Boolean.FALSE);
             httpGet.setParams(params);
@@ -49,7 +46,7 @@ public class Helpers {
             if (statusCode == 302)
                 return true;
         } catch (IOException e) {
-            logger.info(baseUrl + " failed with " + e.getMessage() + ", trying another endpoint");
+            logger.info("Trying " + url + " failed with error: " + e.getMessage());
         }
         return false;
     }

@@ -8,6 +8,7 @@ public class Domain implements Serializable {
     public String device_mac_address;
     public String device_name;
     public String device_title;
+    public Boolean map_local_address;
     public String web_protocol;
     public Integer web_local_port;
     public Integer web_port;

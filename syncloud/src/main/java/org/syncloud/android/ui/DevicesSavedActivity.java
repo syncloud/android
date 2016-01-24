@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.google.common.base.Optional;
 
@@ -64,7 +63,6 @@ public class DevicesSavedActivity extends Activity {
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,8 +77,7 @@ public class DevicesSavedActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Object obj = listview.getItemAtPosition(position);
                 DomainModel domain = (DomainModel) obj;
-                if (domain.hasDevice())
-                    open(domain);
+                open(domain);
             }
         });
 
@@ -116,16 +113,12 @@ public class DevicesSavedActivity extends Activity {
     }
 
     private void updateUser(User user) {
-        List<DomainModel> domains = Utils.toDevices(user.domains);
+        List<DomainModel> domains = Utils.toModels(user.domains);
 
         Comparator<DomainModel> noDevicesLast = new Comparator<DomainModel>() {
             @Override
             public int compare(DomainModel first, DomainModel second) {
-                if (!second.hasDevice() && first.hasDevice())
-                    return -1;
-                if (second.hasDevice() && !first.hasDevice())
-                    return 1;
-                return 0;
+                return first.userDomain().compareTo(second.userDomain());
             }
         };
 
@@ -144,7 +137,7 @@ public class DevicesSavedActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, Optional<String>>() {
                     @Override
                     public Optional<String> run(Void... args) {
-                        return findAccessibleUrl(device);
+                        return findAccessibleUrl(preferences.getDomain(), device);
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<Optional<String>>() {

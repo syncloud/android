@@ -4,9 +4,11 @@ import org.syncloud.android.core.redirect.model.Domain;
 
 import java.io.Serializable;
 
+import static java.lang.String.format;
+
 public class DomainModel implements Serializable {
-    private String  userDomain;
-    private Device device;
+    private Domain domain;
+    private Identification id;
 
     private static Identification deviceId(Domain domain) {
         if (domain.device_mac_address != null && domain.device_name != null && domain.device_title != null)
@@ -15,55 +17,48 @@ public class DomainModel implements Serializable {
     }
 
     public DomainModel(Domain domain) {
-        Identification id = deviceId(domain);
-
-        if (id != null) {
-            Endpoint localEndpoint = null;
-            if (domain.local_ip != null && domain.web_local_port != null)
-                localEndpoint = new Endpoint(domain.local_ip, domain.web_local_port);
-
-            Endpoint remoteEndpoint= null;
-            if (domain.ip != null && domain.web_port != null)
-                remoteEndpoint = new Endpoint(domain.ip, domain.web_port);
-
-            this.device = new Device(id, localEndpoint, remoteEndpoint);
-            this.userDomain = domain.user_domain;
-        }
+        this.domain  = domain;
+        this.id = deviceId(domain);
     }
 
     public String userDomain() {
-        return userDomain;
+        return domain.user_domain;
     }
 
-    public Device device() { return device; }
+    public Identification id() {
+        return id;
+    }
+
+    public String getDnsUrl(String mainDomain) {
+        Integer port = domain.map_local_address ? domain.web_local_port : domain.web_port;
+        if (port == null) return null;
+        return getUrl(domain.web_protocol, format("%s.%s", domain.user_domain, mainDomain), port);
+    }
+
+    public String getExternalUrl() {
+        if (domain.ip == null || domain.web_port == null)
+            return null;
+        return getUrl(domain.web_protocol, domain.ip, domain.web_port);
+    }
+
+    public String getInternalUrl() {
+        if (domain.local_ip == null || domain.web_local_port == null)
+            return null;
+        return getUrl(domain.web_protocol, domain.local_ip, domain.web_local_port);
+    }
+
+    private static String getUrl(String protocol, String address, int port) {
+        String url = format("%s://%s", protocol, address);
+        if (port != 80)
+            url += ":"+ Integer.toString(port);
+        return url;
+    }
 
     @Override
     public String toString() {
-        return "DomainModel{" + "userDomain='" + userDomain + '\'' + ", device=" + device + '}';
-    }
-
-    public boolean hasDevice() {
-        return device != null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DomainModel that = (DomainModel) o;
-
-        if (device != null ? !device.equals(that.device) : that.device != null) return false;
-        if (userDomain != null ? !userDomain.equals(that.userDomain) : that.userDomain != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = userDomain != null ? userDomain.hashCode() : 0;
-        result = 31 * result + (device != null ? device.hashCode() : 0);
-        return result;
+        return "DomainModel{" +
+                "domain=" + domain +
+                ", id=" + id +
+                '}';
     }
 }

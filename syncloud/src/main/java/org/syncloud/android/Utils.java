@@ -8,15 +8,15 @@ import java.util.List;
 import static com.google.common.collect.Lists.newArrayList;
 
 public class Utils {
-    public static List<DomainModel> toDevices(List<Domain> domains) {
-        List<DomainModel> devices = newArrayList();
+    public static List<DomainModel> toModels(List<Domain> domains) {
+        List<DomainModel> models = newArrayList();
         for (Domain domain: domains) {
             if (hasDeviceInfo(domain)) {
                 DomainModel domainModel = new DomainModel(domain);
-                devices.add(domainModel);
+                models.add(domainModel);
             }
         }
-        return devices;
+        return models;
     }
 
     private static boolean hasDeviceInfo(Domain domain) {

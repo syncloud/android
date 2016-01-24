@@ -20,4 +20,13 @@ public class Identification implements Serializable {
     public String name() { return name; }
 
     public String title() { return title; }
+
+    @Override
+    public String toString() {
+        return "Identification{" +
+                "name='" + name + '\'' +
+                ", title='" + title + '\'' +
+                ", mac_address='" + mac_address + '\'' +
+                '}';
+    }
 }

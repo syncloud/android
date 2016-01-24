@@ -39,14 +39,7 @@ public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
         String fullDomainName = domain.userDomain()+"."+mainDomain;
         txtBoldTitle.setText(fullDomainName);
 
-        txtBoldTitle.setTextColor(domain.hasDevice() ? Color.BLACK : Color.GRAY);
-
-        txtAdditionalLine.setVisibility(domain.hasDevice() ? View.VISIBLE : View.INVISIBLE);
-
-
-        if (domain.hasDevice()) {
-            txtAdditionalLine.setText(domain.device().id().title());
-        }
+        txtAdditionalLine.setText(domain.id().title());
 
         return rowView;
     }
