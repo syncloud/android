@@ -161,6 +161,7 @@ public class ActivateActivity extends Activity {
             setResult(Activity.RESULT_OK);
             finish();
         } else {
+            boolean errorShown= false;
             if (result.getException() instanceof SyncloudResultException) {
                 SyncloudResultException apiError = (SyncloudResultException)result.getException();
                 List<ParameterMessages> messages = apiError.result.parameters_messages;
@@ -171,12 +172,14 @@ public class ActivateActivity extends Activity {
                             String message = join(pm.messages, '\n');
                             control.setError(message);
                             control.requestFocus();
+                            errorShown = true;
                         }
                     }
-
-                    return;
                 }
+
             }
+            if (errorShown)
+                return;
 
             new ErrorDialog(this, "Unable to activate").show();
         }
