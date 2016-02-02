@@ -91,7 +91,7 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
     private void checkWiFiAndDiscover() {
         listAdapter.clear();
         if (application.isWifiConnected()) {
-            new DiscoveryTask().execute(preferences.getDiscoveryLibrary());
+            new DiscoveryTask().execute();
         } else {
             WifiDialog dialog = new WifiDialog();
             dialog.setMessage("Discovery is possible only in the same Wi-Fi network where you have Syncloud device connected.");
@@ -153,7 +153,7 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
         checkWiFiAndDiscover();
     }
 
-    public class DiscoveryTask extends AsyncTask<String, Progress, Void> {
+    public class DiscoveryTask extends AsyncTask<Void, Progress, Void> {
 
         private final DeviceEndpointListener deviceEndpointListener;
 
@@ -182,8 +182,8 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
         }
 
         @Override
-        protected Void doInBackground(String... libraries) {
-            discoveryManager.run(libraries[0], 20, deviceEndpointListener);
+        protected Void doInBackground(Void... params) {
+            discoveryManager.run(20, deviceEndpointListener);
             return null;
         }
 

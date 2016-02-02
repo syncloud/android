@@ -81,7 +81,6 @@ public class Resolver {
             if (host != null) {
                 String address = host.getHostAddress();
                 if (!address.contains(":")) {
-                    int port = serviceInfo.getPort();
                     Endpoint device = new Endpoint(address, DiscoveryManager.ACTIVATION_PORT);
                     deviceFound(device);
                 }

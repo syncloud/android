@@ -3,19 +3,12 @@ package org.syncloud.android.discovery;
 import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
 
-import com.google.common.base.Optional;
-
 import org.apache.log4j.Logger;
 import org.syncloud.android.discovery.nsd.NsdDiscovery;
-import org.syncloud.android.discovery.jmdns.JmdnsDiscovery;
-import org.syncloud.android.network.Network;
-
-import java.net.InetAddress;
 
 public class DiscoveryManager {
 
     private static Logger logger = Logger.getLogger(DiscoveryManager.class.getName());
-    private final Network network;
 
     private MulticastLock lock;
 
@@ -27,26 +20,15 @@ public class DiscoveryManager {
 
     public DiscoveryManager(WifiManager wifi, NsdManager manager) {
         lock = new MulticastLock(wifi);
-        network = new Network(wifi);
         this.manager = manager;
     }
 
-    public void run(final String discoveryLibrary, int timeoutSeconds, DeviceEndpointListener deviceEndpointListener) {
+    public void run(int timeoutSeconds, DeviceEndpointListener deviceEndpointListener) {
         canceled = false;
         logger.info("starting discovery");
         if (discovery == null) {
             lock.acquire();
-            if ("Android NSD".equals(discoveryLibrary)) {
-                discovery = new NsdDiscovery(manager, deviceEndpointListener, "syncloud");
-            } else {
-                Optional<InetAddress> ip = network.inetAddress();
-                if (ip.isPresent()) {
-                    discovery = new JmdnsDiscovery(ip.get(), deviceEndpointListener, "syncloud");
-                } else {
-                    logger.error("unable to get local ip");
-                    return;
-                }
-            }
+            discovery = new NsdDiscovery(manager, deviceEndpointListener, "syncloud");
             discovery.start();
             try {
                 logger.info("waiting for " + timeoutSeconds + " seconds");

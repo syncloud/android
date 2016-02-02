@@ -38,14 +38,6 @@
             android:defaultValue="http://api.syncloud.it"
             />
 
-        <ListPreference
-            android:key="pref_discovery_library"
-            android:title="Discovery Library"
-            android:dialogTitle="Discovery Library"
-            android:entries="@array/pref_discovery_titles"
-            android:entryValues="@array/pref_discovery_values"
-            android:defaultValue="JmDNS" />
-
     </PreferenceCategory>
 
 </PreferenceScreen>
