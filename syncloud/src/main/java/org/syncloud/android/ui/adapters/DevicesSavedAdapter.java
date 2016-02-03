@@ -1,6 +1,5 @@
 package org.syncloud.android.ui.adapters;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +21,7 @@ public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
         super(activity, R.layout.layout_device_item);
         this.activity = activity;
         preferences = ((SyncloudApplication) activity.getApplication()).getPreferences();
-        mainDomain = preferences.getDomain();
+        mainDomain = preferences.getMainDomain();
     }
 
     @Override

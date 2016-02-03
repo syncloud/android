@@ -16,6 +16,10 @@ import static org.syncloud.android.core.common.jackson.Jackson.createObjectMappe
 
 public class RedirectService implements IUserService {
 
+    public static String getApiUrl(String mainDomain) {
+        return "http://api."+mainDomain;
+    }
+
     private static Logger logger = Logger.getLogger(RedirectService.class);
 
     private WebService webService;

@@ -22,6 +22,7 @@ import org.syncloud.android.core.redirect.UserStorage;
 import java.io.File;
 
 import static org.acra.ReportField.*;
+import static org.syncloud.android.core.redirect.RedirectService.getApiUrl;
 
 @ReportsCrashes(
         formKey = "", // will not be used
@@ -66,7 +67,7 @@ public class SyncloudApplication extends Application {
     }
 
     public IUserService userServiceCached() {
-        RedirectService redirectService = new RedirectService(preferences.getApiUrl());
+        RedirectService redirectService = new RedirectService(getApiUrl(preferences.getMainDomain()));
         UserCachedService userService = new UserCachedService(redirectService, userStorage);
         return userService;
     }

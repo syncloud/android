@@ -146,8 +146,7 @@ public class ActivateActivity extends Activity {
 
         deviceInternal.activate(
             endpoint.host(),
-            application.getPreferences().getApiUrl(),
-            application.getPreferences().getDomain(),
+            application.getPreferences().getMainDomain(),
             preferences.getEmail(),
             preferences.getPassword(),
             domain,

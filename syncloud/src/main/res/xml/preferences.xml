@@ -30,12 +30,12 @@
     <PreferenceCategory android:title="Advanced">
 
         <ListPreference
-            android:key="pref_api_url"
-            android:title="Public Name Service"
-            android:dialogTitle="Public Name Service"
-            android:entries="@array/pref_api_url_titles"
-            android:entryValues="@array/pref_api_url_values"
-            android:defaultValue="http://api.syncloud.it"
+            android:key="pref_main_domain"
+            android:title="Domain Name Service"
+            android:dialogTitle="Domain Name Service"
+            android:entries="@array/pref_main_domain_titles"
+            android:entryValues="@array/pref_main_domain_values"
+            android:defaultValue="syncloud.it"
             />
 
     </PreferenceCategory>

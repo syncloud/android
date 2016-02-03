@@ -16,7 +16,7 @@ import org.syncloud.android.SyncloudApplication;
 
 import java.util.Set;
 
-import static org.syncloud.android.Preferences.KEY_PREF_API_URL;
+import static org.syncloud.android.Preferences.KEY_PREF_MAIN_DOMAIN;
 import static org.syncloud.android.Preferences.KEY_PREF_EMAIL;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -26,7 +26,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private Preference removeAccountPref;
     private Preference feedbackPref;
     private SyncloudApplication application;
-    private Set<String> summaryUpdatable = Sets.newHashSet(KEY_PREF_API_URL);
+    private Set<String> summaryUpdatable = Sets.newHashSet(KEY_PREF_MAIN_DOMAIN);
 
     private PreferenceCategory systemCategory;
 

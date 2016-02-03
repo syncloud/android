@@ -2,12 +2,9 @@ package org.syncloud.android;
 
 import android.content.SharedPreferences;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 public class Preferences {
 
-    public static final String KEY_PREF_API_URL = "pref_api_url";
+    public static final String KEY_PREF_MAIN_DOMAIN = "pref_main_domain";
     public static final String KEY_PREF_ACCOUNT_REMOVE = "pref_account_remove";
     public static final String KEY_PREF_EMAIL = "pref_email";
     public static final String KEY_PREF_PASSWORD = "pref_password";
@@ -19,16 +16,8 @@ public class Preferences {
         this.preferences = preferences;
     }
 
-    public String getApiUrl() {
-        return preferences.getString(KEY_PREF_API_URL, "");
-    }
-
-    public String getDomain() {
-        try {
-            return new URL(getApiUrl()).getHost().replace("api.", "");
-        } catch (MalformedURLException e) {
-            return "syncloud.it";
-        }
+    public String getMainDomain() {
+        return preferences.getString(KEY_PREF_MAIN_DOMAIN, "syncloud.it");
     }
 
     public void setCredentials(String email, String password) {

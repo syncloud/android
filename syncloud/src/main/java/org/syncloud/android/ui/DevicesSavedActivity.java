@@ -137,7 +137,7 @@ public class DevicesSavedActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, Optional<String>>() {
                     @Override
                     public Optional<String> run(Void... args) {
-                        return findAccessibleUrl(preferences.getDomain(), device);
+                        return findAccessibleUrl(preferences.getMainDomain(), device);
                     }
                 })
                 .onCompleted(new ProgressAsyncTask.Completed<Optional<String>>() {
