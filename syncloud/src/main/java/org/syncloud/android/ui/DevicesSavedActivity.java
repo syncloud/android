@@ -93,8 +93,8 @@ public class DevicesSavedActivity extends Activity {
 
     private void refreshDevices() {
         final IUserService userService = application.userServiceCached();
-        final String email = preferences.getEmail();
-        final String password = preferences.getPassword();
+        final String email = preferences.getRedirectEmail();
+        final String password = preferences.getRedirectPassword();
 
         new ProgressAsyncTask<Void, User>()
                 .doWork(new ProgressAsyncTask.Work<Void, User>() {

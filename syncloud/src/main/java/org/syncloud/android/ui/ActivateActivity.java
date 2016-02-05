@@ -118,9 +118,9 @@ public class ActivateActivity extends Activity {
     public void activate(View view) {
         if (!validate()) return;
 
-        final String domain = editDomain.getText().toString().toLowerCase();
-        final String login = editLogin.getText().toString();
-        final String password = editPassword.getText().toString();
+        final String userDomain = editDomain.getText().toString().toLowerCase();
+        final String deviceUsername = editLogin.getText().toString();
+        final String devicePassword = editPassword.getText().toString();
 
         new ProgressAsyncTask<Void, String>()
                 .setTitle("Activating device")
@@ -128,7 +128,7 @@ public class ActivateActivity extends Activity {
                 .doWork(new ProgressAsyncTask.Work<Void, String>() {
                     @Override
                     public String run(Void... args) {
-                        doActivate(domain, login, password);
+                        doActivate(userDomain, deviceUsername, devicePassword);
                         return "placeholder";
                     }
                 })
@@ -141,17 +141,17 @@ public class ActivateActivity extends Activity {
                 .execute();
     }
 
-    private void doActivate(String domain, String login, String password) {
-        logger.info("activate " + domain);
+    private void doActivate(String userDomain, String deviceUsername, String devicePassword) {
+        logger.info("activate " + userDomain);
 
         deviceInternal.activate(
             endpoint.host(),
             application.getPreferences().getMainDomain(),
-            preferences.getEmail(),
-            preferences.getPassword(),
-            domain,
-            login,
-            password
+            preferences.getRedirectEmail(),
+            preferences.getRedirectPassword(),
+            userDomain,
+            deviceUsername,
+            devicePassword
         );
     }
 

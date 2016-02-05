@@ -106,8 +106,8 @@ public class AuthCredentialsActivity extends Activity {
         }
 
         if (preferences.hasCredentials()) {
-            String email = preferences.getEmail();
-            String password = preferences.getPassword();
+            String email = preferences.getRedirectEmail();
+            String password = preferences.getRedirectPassword();
 
             emailView.setText(email);
             passwordView.setText(password);

@@ -24,20 +24,20 @@ public class Internal {
 
     public Optional<Identification> activate(
             String host,
-            String redirectDomain,
+            String mainDomain,
             String redirectEmail,
             String redirectPassword,
-            String domain,
-            String login,
-            String password) {
+            String userDomain,
+            String deviceUsername,
+            String devicePassword) {
 
         ArrayList<NameValuePair> parameters = new ArrayList<NameValuePair>();
-        parameters.add(new BasicNameValuePair("domain", redirectDomain));
-        parameters.add(new BasicNameValuePair("redirect-email", redirectEmail));
-        parameters.add(new BasicNameValuePair("redirect-password", redirectPassword));
-        parameters.add(new BasicNameValuePair("redirect-domain", domain));
-        parameters.add(new BasicNameValuePair("name", login));
-        parameters.add(new BasicNameValuePair("password", password));
+        parameters.add(new BasicNameValuePair("main_domain", mainDomain));
+        parameters.add(new BasicNameValuePair("redirect_email", redirectEmail));
+        parameters.add(new BasicNameValuePair("redirect_password", redirectPassword));
+        parameters.add(new BasicNameValuePair("user_domain", userDomain));
+        parameters.add(new BasicNameValuePair("device_username", deviceUsername));
+        parameters.add(new BasicNameValuePair("device_password", devicePassword));
 
         WebService webService = new WebService(format("http://%s:81/server/rest", host));
         String json = webService.execute("POST", "/activate", parameters);

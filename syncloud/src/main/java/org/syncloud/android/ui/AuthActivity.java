@@ -71,8 +71,8 @@ public class AuthActivity extends Activity {
     }
 
     private void login() {
-        final String email = preferences.getEmail();
-        final String password = preferences.getPassword();
+        final String email = preferences.getRedirectEmail();
+        final String password = preferences.getRedirectPassword();
 
         new ProgressAsyncTask<Void, User>()
                 .setProgress(progress)

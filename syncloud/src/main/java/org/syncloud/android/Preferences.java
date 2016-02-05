@@ -27,15 +27,15 @@ public class Preferences {
         editor.apply();
     }
 
-    public String getEmail() {
+    public String getRedirectEmail() {
         return preferences.getString(KEY_PREF_EMAIL, null);
     }
 
-    public String getPassword() {
+    public String getRedirectPassword() {
         return preferences.getString(KEY_PREF_PASSWORD, null);
     }
 
     public boolean hasCredentials() {
-        return getEmail() != null;
+        return getRedirectEmail() != null;
     }
 }
