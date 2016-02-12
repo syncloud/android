@@ -11,10 +11,8 @@
     <string name="rescan_label">Refresh</string>
     <string name="name_email">Email:</string>
     <string name="name_registration">Do not enter domain name if you have an account</string>
-    <string name="name_example">For browser: [login].syncloud.it</string>
     <string name="name_password_label">Password:</string>
     <string name="name_login_label">Domain name:</string>
-    <string name="name_for_app_label">For app: device.[login].syncloud.it:[externalPort]/owncloud</string>
     <string name="title_activity_device">Apps</string>
     <string name="title_activity_app_store">Manage Apps</string>
     <string name="device_label">Device:</string>
