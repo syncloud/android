@@ -15,17 +15,16 @@ import org.syncloud.android.core.platform.model.DomainModel;
 public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
     private final Preferences preferences;
     private DevicesSavedActivity activity;
-    private String mainDomain;
 
     public DevicesSavedAdapter(DevicesSavedActivity activity) {
         super(activity, R.layout.layout_device_item);
         this.activity = activity;
         preferences = ((SyncloudApplication) activity.getApplication()).getPreferences();
-        mainDomain = preferences.getMainDomain();
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        String mainDomain = preferences.getMainDomain();
 
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_device_item, null);

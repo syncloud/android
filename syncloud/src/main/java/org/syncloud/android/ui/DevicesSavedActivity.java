@@ -166,11 +166,6 @@ public class DevicesSavedActivity extends Activity {
 
         String url = format("%s/server/html/login.html", baseUrl.get());
 
-//            Optional<Credentials> credentials = device.device().credentials();
-//            if (credentials.isPresent()) {
-//                String postData = "name=" + credentials.get().login() + "&" + "password=" + credentials.get().password();
-//            }
-
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browserIntent);
     }

@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
@@ -36,6 +37,7 @@ public class ActivateActivity extends Activity {
     private EditText editDomain;
     private EditText editLogin;
     private EditText editPassword;
+    private TextView labelDomain;
 
     private Progress progress = new ProgressImpl();
 
@@ -74,11 +76,20 @@ public class ActivateActivity extends Activity {
         editLogin = (EditText) findViewById(R.id.edit_login);
         editPassword = (EditText) findViewById(R.id.edit_password);
         viewProgress = (ProgressBar) findViewById(R.id.progress);
+        labelDomain = (TextView) findViewById(R.id.label_domain);
 
         application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
 
+        labelDomain.setText("."+preferences.getMainDomain());
+
         endpoint = (Endpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        labelDomain.setText("."+preferences.getMainDomain());
     }
 
     private EditText getControl(String parameter) {
