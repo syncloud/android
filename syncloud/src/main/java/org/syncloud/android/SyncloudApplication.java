@@ -14,6 +14,7 @@ import org.acra.annotation.ReportsCrashes;
 import org.acra.collector.CrashReportData;
 import org.acra.sender.ReportSender;
 import org.acra.sender.ReportSenderException;
+import org.apache.log4j.Logger;
 import org.syncloud.android.core.redirect.IUserService;
 import org.syncloud.android.core.redirect.RedirectService;
 import org.syncloud.android.core.redirect.UserCachedService;
@@ -25,17 +26,19 @@ import static org.acra.ReportField.*;
 import static org.syncloud.android.core.redirect.RedirectService.getApiUrl;
 
 @ReportsCrashes(
-        formKey = "", // will not be used
-        mailTo = "support@syncloud.it",
+        customReportContent = { APP_VERSION_CODE, ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, LOGCAT },
+
         mode = ReportingInteractionMode.DIALOG,
-        customReportContent = {USER_COMMENT, APP_VERSION_CODE, ANDROID_VERSION, PHONE_MODEL, CUSTOM_DATA, STACK_TRACE, LOGCAT },
         resToastText = R.string.crash_toast_text, // optional, displayed as soon as the crash occurs, before collecting data which can take a few seconds
         resDialogText = R.string.crash_dialog_text,
         resDialogIcon = R.drawable.ic_launcher, //optional. default is a warning sign
         resDialogTitle = R.string.crash_dialog_title, // optional. default is your application name
         resDialogOkToast = R.string.crash_dialog_ok_toast, // optional. displays a Toast message when the user accepts to send a report.
+
         logcatArguments = { "-t", "500", "-v", "long", "*:D"},
-        logcatFilterByPid = false
+        logcatFilterByPid = false,
+
+        reportSenderFactoryClasses = { AcraLogEmailerFactory.class }
 )
 public class SyncloudApplication extends Application {
 
@@ -50,14 +53,12 @@ public class SyncloudApplication extends Application {
     public void onCreate() {
 
         ACRA.init(this);
-        ACRA.getErrorReporter().addReportSender(new ReportSender() {
-            @Override
-            public void send(CrashReportData errorContent) throws ReportSenderException {
-                Log.e(TAG, errorContent.getProperty(STACK_TRACE));
-            }
-        });
 
         ConfigureLog4J.configure();
+
+        Logger logger = Logger.getLogger(SyncloudApplication.class);
+        logger.info("Starting Syncloud App");
+
 
         super.onCreate();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
