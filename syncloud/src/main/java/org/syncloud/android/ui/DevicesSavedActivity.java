@@ -46,6 +46,7 @@ public class DevicesSavedActivity extends Activity {
     private Preferences preferences;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Button btnDiscovery;
+    private View emptyView;
 
     private Progress progress = new ProgressImpl();
 
@@ -77,8 +78,10 @@ public class DevicesSavedActivity extends Activity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         setContentView(R.layout.activity_devices_saved);
+
+        emptyView = findViewById(android.R.id.empty);
+
         listview = (ListView) findViewById(R.id.devices_saved);
-        listview.setEmptyView(findViewById(android.R.id.empty));
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -117,16 +120,23 @@ public class DevicesSavedActivity extends Activity {
         final String email = preferences.getRedirectEmail();
         final String password = preferences.getRedirectPassword();
 
+        emptyView.setVisibility(View.GONE);
+        listview.setEmptyView(null);
+        adapter.clear();
+
         new ProgressAsyncTask<Void, User>()
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, User>() {
                     @Override
                     public User run(Void... args) {
-                        try {
-                            Thread.sleep(3000);
-                        } catch (Throwable th) {
-                        }
                         return userService.getUser(email, password);
+                    }
+                })
+                .onCompleted(new ProgressAsyncTask.Completed<User>() {
+                    @Override
+                    public void run(AsyncResult<User> result) {
+                        emptyView.setVisibility(View.VISIBLE);
+                        listview.setEmptyView(emptyView);
                     }
                 })
                 .onSuccess(new ProgressAsyncTask.Success<User>() {
