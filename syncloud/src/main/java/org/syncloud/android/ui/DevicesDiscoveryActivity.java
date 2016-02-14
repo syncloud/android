@@ -9,6 +9,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,8 +44,9 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
 
     private DiscoveryManager discoveryManager;
     private Button refreshBtn;
-    private ProgressBar progressBar;
     private DevicesDiscoveredAdapter listAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private View emptyView;
 
     private ListView resultsList;
 
@@ -64,8 +66,19 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
         tools = new Tools(new WebService());
         setContentView(R.layout.activity_devices_discovery);
 
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.logo_blue, R.color.logo_green);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                checkWiFiAndDiscover();
+            }
+        });
+
+        emptyView = findViewById(android.R.id.empty);
+
         resultsList = (ListView) findViewById(R.id.devices_discovered);
-        progressBar = (ProgressBar) findViewById(R.id.discovery_progress);
+
         refreshBtn = (Button) findViewById(R.id.discovery_refresh_btn);
         listAdapter = new DevicesDiscoveredAdapter(this);
         resultsList.setAdapter(listAdapter);
@@ -74,7 +87,7 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Object obj = resultsList.getItemAtPosition(position);
-                IdentifiedEndpoint ie = (IdentifiedEndpoint)obj;
+                IdentifiedEndpoint ie = (IdentifiedEndpoint) obj;
                 open(ie);
             }
         });
@@ -85,7 +98,12 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
                 (WifiManager) getSystemService(Context.WIFI_SERVICE),
                 (NsdManager) getSystemService(Context.NSD_SERVICE));
 
-        checkWiFiAndDiscover();
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                checkWiFiAndDiscover();
+            }
+        });
     }
 
     private void checkWiFiAndDiscover() {
@@ -176,7 +194,11 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
         @Override
         protected void onPreExecute() {
             refreshBtn.setEnabled(false);
-            progressBar.setVisibility(View.VISIBLE);
+            swipeRefreshLayout.setRefreshing(true);
+            emptyView.setVisibility(View.GONE);
+            resultsList.setEmptyView(null);
+            listAdapter.clear();
+
             //use for testing without wi-fi
             //listAdapter.add(new DirectEndpoint("localhost", 22, "vsapronov", "somepassword", null));
         }
@@ -189,8 +211,9 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            logger.info("show controls");
-            progressBar.setVisibility(View.INVISIBLE);
+            emptyView.setVisibility(View.VISIBLE);
+            resultsList.setEmptyView(emptyView);
+            swipeRefreshLayout.setRefreshing(false);
             refreshBtn.setEnabled(true);
         }
 
