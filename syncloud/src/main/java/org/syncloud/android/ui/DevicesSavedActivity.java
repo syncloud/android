@@ -6,12 +6,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import com.google.common.base.Optional;
 
@@ -39,22 +40,28 @@ public class DevicesSavedActivity extends Activity {
 
     private static Logger logger = Logger.getLogger(DevicesSavedActivity.class);
 
+    private ListView listview;
     private DevicesSavedAdapter adapter;
     private SyncloudApplication application;
     private Preferences preferences;
-    private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private Button btnDiscovery;
 
     private Progress progress = new ProgressImpl();
 
     public class ProgressImpl extends Progress.Empty {
         @Override
         public void start() {
-            progressBar.setVisibility(View.VISIBLE);
+            swipeRefreshLayout.setRefreshing(true);
+            listview.setEnabled(false);
+            btnDiscovery.setEnabled(false);
         }
 
         @Override
         public void stop() {
-            progressBar.setVisibility(View.INVISIBLE);
+            swipeRefreshLayout.setRefreshing(false);
+            listview.setEnabled(true);
+            btnDiscovery.setEnabled(true);
         }
 
         @Override
@@ -70,7 +77,7 @@ public class DevicesSavedActivity extends Activity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         setContentView(R.layout.activity_devices_saved);
-        final ListView listview = (ListView) findViewById(R.id.devices_saved);
+        listview = (ListView) findViewById(R.id.devices_saved);
         listview.setEmptyView(findViewById(android.R.id.empty));
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -81,14 +88,28 @@ public class DevicesSavedActivity extends Activity {
             }
         });
 
+        btnDiscovery = (Button) findViewById(R.id.discovery_btn);
+
         adapter = new DevicesSavedAdapter(this);
         listview.setAdapter(adapter);
 
         application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
-        progressBar = (ProgressBar) findViewById(R.id.open_progress);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.logo_blue, R.color.logo_green);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshDevices();
+            }
+        });
 
-        refreshDevices();
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                refreshDevices();
+            }
+        });
     }
 
     private void refreshDevices() {
@@ -97,9 +118,14 @@ public class DevicesSavedActivity extends Activity {
         final String password = preferences.getRedirectPassword();
 
         new ProgressAsyncTask<Void, User>()
+                .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, User>() {
                     @Override
                     public User run(Void... args) {
+                        try {
+                            Thread.sleep(3000);
+                        } catch (Throwable th) {
+                        }
                         return userService.getUser(email, password);
                     }
                 })
@@ -132,7 +158,7 @@ public class DevicesSavedActivity extends Activity {
 
     private void open(final DomainModel device) {
         new ProgressAsyncTask<Void, Optional<String>>()
-                .setTitle("Activating device")
+                .setTitle("Opening device")
                 .setProgress(progress)
                 .doWork(new ProgressAsyncTask.Work<Void, Optional<String>>() {
                     @Override
