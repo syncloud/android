@@ -7,8 +7,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
@@ -33,11 +35,13 @@ public class ActivateActivity extends Activity {
     private Preferences preferences;
     private Endpoint endpoint;
 
-    private ProgressBar viewProgress;
+    private CircleProgressBar progressBar;
     private EditText editDomain;
     private EditText editLogin;
     private EditText editPassword;
     private TextView labelDomain;
+
+    private LinearLayout viewActivateForm;
 
     private Progress progress = new ProgressImpl();
 
@@ -48,12 +52,16 @@ public class ActivateActivity extends Activity {
     class ProgressImpl implements Progress {
         @Override
         public void start() {
-            viewProgress.setVisibility(View.VISIBLE);
+            setLayoutEnabled(viewActivateForm, false);
+            progressBar.onAnimationStart();
+            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void stop() {
-            viewProgress.setVisibility(View.INVISIBLE);
+            setLayoutEnabled(viewActivateForm, true);
+            progressBar.onAnimationEnd();
+            progressBar.setVisibility(View.INVISIBLE);
         }
 
         @Override
@@ -75,15 +83,27 @@ public class ActivateActivity extends Activity {
         editDomain = (EditText) findViewById(R.id.edit_domain);
         editLogin = (EditText) findViewById(R.id.edit_login);
         editPassword = (EditText) findViewById(R.id.edit_password);
-        viewProgress = (ProgressBar) findViewById(R.id.progress);
+        progressBar = (CircleProgressBar) findViewById(R.id.progress);
         labelDomain = (TextView) findViewById(R.id.label_domain);
+        viewActivateForm = (LinearLayout) findViewById(R.id.activity_form);
 
         application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
 
+        progressBar.setColorSchemeResources(R.color.logo_blue, R.color.logo_green);
+
         labelDomain.setText("."+preferences.getMainDomain());
 
         endpoint = (Endpoint) getIntent().getSerializableExtra(SyncloudApplication.DEVICE_ENDPOINT);
+    }
+
+    private void setLayoutEnabled(LinearLayout layout, boolean enabled) {
+        for (int i = 0; i < layout.getChildCount(); i++) {
+            View view = layout.getChildAt(i);
+            if (view instanceof LinearLayout)
+                setLayoutEnabled((LinearLayout)view, enabled);
+            view.setEnabled(enabled);
+        }
     }
 
     @Override
