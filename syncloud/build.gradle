@@ -1,15 +1,17 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.0.1"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 16
+        targetSdkVersion 23
         versionCode 138
         versionName "1.38"
     }
+
+    useLibrary 'org.apache.http.legacy'
 
     productFlavors {
         beta {
@@ -76,6 +78,6 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.3'
     compile 'com.google.guava:guava:18.0'
-    compile 'com.android.support:support-v4:21.0.0'
+    compile 'com.android.support:support-v4:23.1.1'
     compile 'com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE'
 }
