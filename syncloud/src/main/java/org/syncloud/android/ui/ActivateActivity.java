@@ -53,14 +53,12 @@ public class ActivateActivity extends Activity {
         @Override
         public void start() {
             setLayoutEnabled(viewActivateForm, false);
-            progressBar.onAnimationStart();
             progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void stop() {
             setLayoutEnabled(viewActivateForm, true);
-            progressBar.onAnimationEnd();
             progressBar.setVisibility(View.INVISIBLE);
         }
 
