@@ -20,6 +20,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
+
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.Progress;
@@ -54,7 +56,9 @@ public class AuthCredentialsActivity extends Activity {
     private EditText emailView;
     private EditText passwordView;
     private Button signInButton;
-    private View progressView;
+    private CircleProgressBar progressBar;
+
+
     private String purpose;
 
     @Override
@@ -91,7 +95,8 @@ public class AuthCredentialsActivity extends Activity {
             }
         });
 
-        progressView = findViewById(R.id.login_progress);
+        progressBar = (CircleProgressBar) findViewById(R.id.progress);
+        progressBar.setColorSchemeResources(R.color.logo_blue, R.color.logo_green);
 
         Intent intent = getIntent();
         purpose = intent.getStringExtra(PARAM_PURPOSE);
@@ -145,7 +150,7 @@ public class AuthCredentialsActivity extends Activity {
     }
 
     public void showProgress(final boolean show) {
-        progressView.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        progressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
         setLayoutEnabled(emailLoginFormView, !show);
     }
 
