@@ -8,8 +8,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 
 import org.syncloud.android.Preferences;
 import org.syncloud.android.Progress;
@@ -24,7 +25,8 @@ public class AuthActivity extends Activity {
 
     private Preferences preferences;
 
-    private ProgressBar progressBar;
+    private CircleProgressBar progressBar;
+
     private LinearLayout signInOrOut;
 
     private IUserService userService;
@@ -38,7 +40,9 @@ public class AuthActivity extends Activity {
         preferences = application.getPreferences();
         userService = application.userServiceCached();
 
-        progressBar = (ProgressBar) findViewById(R.id.progress_check_user);
+        progressBar = (CircleProgressBar) findViewById(R.id.progress);
+        progressBar.setColorSchemeResources(R.color.logo_blue, R.color.logo_green);
+
         signInOrOut = (LinearLayout) findViewById(R.id.sign_in_or_up);
 
         TextView learnMoreText = (TextView) findViewById(R.id.auth_learn_more);
