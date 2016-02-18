@@ -49,7 +49,8 @@ public class DomainModel implements Serializable {
 
     private static String getUrl(String protocol, String address, int port) {
         String url = format("%s://%s", protocol, address);
-        if (port != 80)
+        if ((protocol.equals("http") && port != 80) ||
+            (protocol.equals("https") && port != 443))
             url += ":"+ Integer.toString(port);
         return url;
     }
