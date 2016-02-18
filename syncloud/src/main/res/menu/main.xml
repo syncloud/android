@@ -1,11 +1,13 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="org.syncloud.android.ui.DevicesSavedActivity">
 
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:icon="@drawable/ic_settings_white"
-        android:showAsAction="always"
+        app:showAsAction="always"
         />
 
 </menu>
