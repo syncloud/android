@@ -10,7 +10,7 @@
 
         <Preference
             android:key="pref_account_remove"
-            android:title="Remove Account"
+            android:title="Sign out from Syncloud"
             android:summary="Removes Syncloud account information"
             />
 
@@ -21,8 +21,8 @@
 
         <Preference
             android:key="pref_feedback_send"
-            android:title="Send logs"
-            android:summary="Sends developers application logs"
+            android:title="Send log file"
+            android:summary="Sends developers application log"
             />
 
     </PreferenceCategory>
@@ -31,8 +31,8 @@
 
         <ListPreference
             android:key="pref_main_domain"
-            android:title="Domain Name Service"
-            android:dialogTitle="Domain Name Service"
+            android:title="Server"
+            android:dialogTitle="Server"
             android:entries="@array/pref_main_domain_titles"
             android:entryValues="@array/pref_main_domain_values"
             android:defaultValue="syncloud.it"
