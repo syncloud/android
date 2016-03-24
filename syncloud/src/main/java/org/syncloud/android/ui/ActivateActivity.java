@@ -3,6 +3,7 @@ package org.syncloud.android.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +30,7 @@ import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.join;
 
-public class ActivateActivity extends Activity {
+public class ActivateActivity extends ActionBarActivity {
     private static Logger logger = Logger.getLogger(ActivateActivity.class);
 
     private Preferences preferences;
@@ -76,6 +77,9 @@ public class ActivateActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.ic_launcher);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
         setContentView(R.layout.activity_activate);
 
         editDomain = (EditText) findViewById(R.id.edit_domain);

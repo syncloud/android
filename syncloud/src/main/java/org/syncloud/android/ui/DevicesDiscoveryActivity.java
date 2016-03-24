@@ -8,15 +8,14 @@ import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
@@ -34,16 +33,15 @@ import org.syncloud.android.core.platform.model.IdentifiedEndpoint;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
-import static java.lang.String.format;
 
-public class DevicesDiscoveryActivity extends FragmentActivity {
+public class DevicesDiscoveryActivity extends ActionBarActivity {
 
     private static Logger logger = Logger.getLogger(DevicesDiscoveryActivity.class.getName());
 
     private Preferences preferences;
 
     private DiscoveryManager discoveryManager;
-    private Button refreshBtn;
+    private FloatingActionButton refreshBtn;
     private DevicesDiscoveredAdapter listAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private View emptyView;
@@ -60,11 +58,14 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.ic_launcher);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+        setContentView(R.layout.activity_devices_discovery);
 
         application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
         tools = new Tools(new WebService());
-        setContentView(R.layout.activity_devices_discovery);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeResources(R.color.logo_blue, R.color.logo_green);
@@ -79,7 +80,7 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
 
         resultsList = (ListView) findViewById(R.id.devices_discovered);
 
-        refreshBtn = (Button) findViewById(R.id.discovery_refresh_btn);
+        refreshBtn = (FloatingActionButton) findViewById(R.id.discovery_refresh_btn);
         listAdapter = new DevicesDiscoveredAdapter(this);
         resultsList.setAdapter(listAdapter);
 
@@ -193,7 +194,7 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
 
         @Override
         protected void onPreExecute() {
-            refreshBtn.setEnabled(false);
+            refreshBtn.setVisibility(View.GONE);
             swipeRefreshLayout.setRefreshing(true);
             emptyView.setVisibility(View.GONE);
             resultsList.setEmptyView(null);
@@ -214,7 +215,7 @@ public class DevicesDiscoveryActivity extends FragmentActivity {
             emptyView.setVisibility(View.VISIBLE);
             resultsList.setEmptyView(emptyView);
             swipeRefreshLayout.setRefreshing(false);
-            refreshBtn.setEnabled(true);
+            refreshBtn.setVisibility(View.VISIBLE);
         }
 
         @Override

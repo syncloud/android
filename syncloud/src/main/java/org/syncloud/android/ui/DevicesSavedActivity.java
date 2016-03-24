@@ -1,17 +1,17 @@
 package org.syncloud.android.ui;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.google.common.base.Optional;
@@ -36,7 +36,7 @@ import static java.lang.String.format;
 import static java.util.Collections.sort;
 import static org.syncloud.android.network.Helpers.findAccessibleUrl;
 
-public class DevicesSavedActivity extends Activity {
+public class DevicesSavedActivity extends ActionBarActivity {
 
     private static Logger logger = Logger.getLogger(DevicesSavedActivity.class);
 
@@ -45,7 +45,7 @@ public class DevicesSavedActivity extends Activity {
     private SyncloudApplication application;
     private Preferences preferences;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private Button btnDiscovery;
+    private FloatingActionButton btnDiscovery;
     private View emptyView;
 
     private Progress progress = new ProgressImpl();
@@ -55,14 +55,14 @@ public class DevicesSavedActivity extends Activity {
         public void start() {
             swipeRefreshLayout.setRefreshing(true);
             listview.setEnabled(false);
-            btnDiscovery.setEnabled(false);
+            btnDiscovery.setVisibility(View.GONE);
         }
 
         @Override
         public void stop() {
             swipeRefreshLayout.setRefreshing(false);
             listview.setEnabled(true);
-            btnDiscovery.setEnabled(true);
+            btnDiscovery.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -74,10 +74,12 @@ public class DevicesSavedActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.ic_launcher);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+        setContentView(R.layout.activity_devices_saved);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-
-        setContentView(R.layout.activity_devices_saved);
 
         emptyView = findViewById(android.R.id.empty);
 
@@ -91,7 +93,7 @@ public class DevicesSavedActivity extends Activity {
             }
         });
 
-        btnDiscovery = (Button) findViewById(R.id.discovery_btn);
+        btnDiscovery = (FloatingActionButton) findViewById(R.id.discovery_btn);
 
         adapter = new DevicesSavedAdapter(this);
         listview.setAdapter(adapter);
