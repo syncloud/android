@@ -1,6 +1,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="Account">
+    <PreferenceCategory android:title="ACCOUNT">
 
         <Preference
             android:key="pref_email"
@@ -17,7 +17,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Feedback">
+    <PreferenceCategory android:title="FEEDBACK">
 
         <Preference
             android:key="pref_feedback_send"
@@ -27,7 +27,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Advanced">
+    <PreferenceCategory android:title="ADVANCED">
 
         <ListPreference
             android:key="pref_main_domain"

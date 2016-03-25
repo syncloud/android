@@ -5,8 +5,8 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
+    android:paddingTop="@dimen/two_lines_item_padding"
+    android:paddingBottom="@dimen/two_lines_item_padding"
     android:descendantFocusability="blocksDescendants"
     >
 
@@ -15,9 +15,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="somedomain.syncloud.it"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textStyle="bold"
-        android:padding="2dp"
+        android:paddingLeft="@dimen/item_padding_left"
         />
 
     <TextView
@@ -25,8 +25,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Device name"
-        android:textSize="20sp"
-        android:padding="2dp"
+        android:textSize="14sp"
+        android:paddingLeft="@dimen/item_padding_left"
         />
 
 </LinearLayout>
