@@ -17,10 +17,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.common.base.Optional;
+
 import org.apache.log4j.Logger;
 import org.syncloud.android.Preferences;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
+import org.syncloud.android.core.platform.model.Identification;
 import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.android.discovery.DiscoveryManager;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
@@ -178,8 +181,11 @@ public class DevicesDiscoveryActivity extends ActionBarActivity {
             deviceEndpointListener = new DeviceEndpointListener() {
                 @Override
                 public void added(final Endpoint endpoint) {
-                    IdentifiedEndpoint ie = new IdentifiedEndpoint(endpoint, tools.getId(endpoint.host()));
-                    publishProgress(new Progress(true, endpoint, ie));
+                    Optional<Identification> id = tools.getId(endpoint.host());
+                    if (id.isPresent()) {
+                        IdentifiedEndpoint ie = new IdentifiedEndpoint(endpoint, id);
+                        publishProgress(new Progress(true, endpoint, ie));
+                    }
                 }
 
                 @Override

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
+import org.syncloud.android.core.common.SyncloudException;
 import org.syncloud.android.core.platform.model.Identification;
 import org.syncloud.android.core.common.Result;
 import org.syncloud.android.core.common.WebService;
@@ -25,7 +26,14 @@ public class Tools {
     }
 
     public Optional<Identification> getId(String host) {
-        String json = webService.execute("GET", format("http://%s:81/server/rest/id", host));
+        String json;
+        try {
+            json = webService.execute("GET", format("http://%s:81/server/rest/id", host));
+        } catch (SyncloudException e) {
+            String message = "Unable to get identification response";
+            logger.error(message, e);
+            return Optional.absent();
+        }
 
         try {
             Result<Identification> result = JSON.readValue(json, new TypeReference<Result<Identification>>() {});
