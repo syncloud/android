@@ -29,21 +29,21 @@ public class Helpers {
 
     public static Optional<String> findAccessibleUrl(String mainDomain, DomainModel domain) {
         String dnsUrl = domain.getDnsUrl(mainDomain);
-        if (dnsUrl != null && checkUrl(dnsUrl))
+        if (dnsUrl != null && checkUrl(dnsUrl, 302))
             return Optional.of(dnsUrl);
 
         String externalUrl = domain.getExternalUrl();
-        if (externalUrl != null && checkUrl(externalUrl))
+        if (externalUrl != null && checkUrl(externalUrl, 302))
             return Optional.of(externalUrl);
 
         String internalUrl = domain.getInternalUrl();
-        if (internalUrl != null && checkUrl(internalUrl))
+        if (internalUrl != null && checkUrl(internalUrl, 302))
             return Optional.of(internalUrl);
 
         return Optional.absent();
     }
 
-    public static boolean checkUrl(String url) {
+    public static boolean checkUrl(String url, int wnatedStatusCode) {
         try {
             logger.info("Trying: " + url);
             HttpClient httpClient = getNewHttpClient();
@@ -53,7 +53,7 @@ public class Helpers {
             httpGet.setParams(params);
             int statusCode = httpClient.execute(httpGet).getStatusLine().getStatusCode();
             logger.info("status code: " + statusCode);
-            if (statusCode == 302)
+            if (statusCode == wnatedStatusCode)
                 return true;
         } catch (IOException e) {
             logger.info("Trying " + url + " failed with error: " + e.getMessage());
