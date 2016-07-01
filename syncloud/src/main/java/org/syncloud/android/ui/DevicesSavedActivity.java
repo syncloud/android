@@ -200,7 +200,7 @@ public class DevicesSavedActivity extends ActionBarActivity {
             return;
         }
 
-        String url = format("%s/server/html/login.html", baseUrl.get());
+        String url = baseUrl.get();
 
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browserIntent);
