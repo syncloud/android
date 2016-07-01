@@ -52,11 +52,8 @@
     <string name="title_activity_logs">Logs</string>
     <string name="title_activity_git_bucket">GitBucket</string>
     <string name="title_activity_upnp_check">Router Check</string>
-
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_device_web_view">DeviceWebView</string>
     <string name="title_activity_activate">Activate</string>
+
     <string name="prompt_domain">Domain</string>
     <string name="prompt_device_login">Device login</string>
     <string name="prompt_device_password">Device password</string>
