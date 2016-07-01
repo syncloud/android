@@ -19,8 +19,37 @@ import static java.lang.String.format;
 
 public class Internal {
 
-    private static Logger logger = Logger.getLogger(Tools.class);
+    private static Logger logger = Logger.getLogger(Internal.class);
     public static final ObjectMapper JSON = new ObjectMapper();
+
+    private String getRestUrl(String host) {
+        return format("http://%s:81/server/rest", host);
+    }
+
+    private WebService getRestWebService(String host) {
+        return new WebService(getRestUrl(host));
+    }
+
+    public Optional<Identification> getId(String host) {
+        WebService webService = getRestWebService(host);
+        String json;
+        try {
+            json = webService.execute("GET", "/id");
+        } catch (SyncloudException e) {
+            String message = "Unable to get identification response";
+            logger.error(message, e);
+            return Optional.absent();
+        }
+
+        try {
+            Result<Identification> result = JSON.readValue(json, new TypeReference<Result<Identification>>() {});
+            return Optional.of(result.data);
+        } catch (IOException e) {
+            String message = "Unable to parse identification response";
+            logger.error(message+" "+json, e);
+            return Optional.absent();
+        }
+    }
 
     public Optional<Identification> activate(
             String host,
@@ -39,7 +68,7 @@ public class Internal {
         parameters.add(new BasicNameValuePair("device_username", deviceUsername));
         parameters.add(new BasicNameValuePair("device_password", devicePassword));
 
-        WebService webService = new WebService(format("http://%s:81/server/rest", host));
+        WebService webService = getRestWebService(host);
         String json = webService.execute("POST", "/activate", parameters);
 
         try {

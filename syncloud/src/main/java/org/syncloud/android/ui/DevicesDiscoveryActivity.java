@@ -28,8 +28,7 @@ import org.syncloud.android.discovery.DeviceEndpointListener;
 import org.syncloud.android.discovery.DiscoveryManager;
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter;
 import org.syncloud.android.ui.dialog.WifiDialog;
-import org.syncloud.android.core.common.WebService;
-import org.syncloud.android.core.platform.Tools;
+import org.syncloud.android.core.platform.Internal;
 import org.syncloud.android.core.platform.model.Endpoint;
 import org.syncloud.android.core.platform.model.IdentifiedEndpoint;
 
@@ -52,7 +51,7 @@ public class DevicesDiscoveryActivity extends ActionBarActivity {
     private ListView resultsList;
 
     private Map<Endpoint, IdentifiedEndpoint> map;
-    private Tools tools;
+    private Internal internal;
     private SyncloudApplication application;
 
     private static int REQUEST_SETTINGS = 1;
@@ -66,7 +65,7 @@ public class DevicesDiscoveryActivity extends ActionBarActivity {
 
         application = (SyncloudApplication) getApplication();
         preferences = application.getPreferences();
-        tools = new Tools(new WebService());
+        internal = new Internal();
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeResources(R.color.logo_blue, R.color.logo_green);
@@ -181,7 +180,7 @@ public class DevicesDiscoveryActivity extends ActionBarActivity {
             deviceEndpointListener = new DeviceEndpointListener() {
                 @Override
                 public void added(final Endpoint endpoint) {
-                    Optional<Identification> id = tools.getId(endpoint.host());
+                    Optional<Identification> id = internal.getId(endpoint.host());
                     if (id.isPresent()) {
                         IdentifiedEndpoint ie = new IdentifiedEndpoint(endpoint, id);
                         publishProgress(new Progress(true, endpoint, ie));
