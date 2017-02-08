@@ -18,7 +18,6 @@
         android:name="android.permission.INTERNET"
         android:required="true" />
     <uses-permission android:name="android.permission.READ_LOGS" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
         android:name=".SyncloudApplication"
