@@ -1,15 +1,11 @@
 package org.syncloud.android.ui;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
-import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,14 +24,12 @@ import org.syncloud.android.Preferences;
 import org.syncloud.android.Progress;
 import org.syncloud.android.R;
 import org.syncloud.android.SyncloudApplication;
-import org.syncloud.android.tasks.AsyncResult;
-import org.syncloud.android.tasks.ProgressAsyncTask;
 import org.syncloud.android.core.common.ParameterMessages;
 import org.syncloud.android.core.common.SyncloudResultException;
 import org.syncloud.android.core.redirect.IUserService;
 import org.syncloud.android.core.redirect.model.User;
-
-import java.util.regex.Pattern;
+import org.syncloud.android.tasks.AsyncResult;
+import org.syncloud.android.tasks.ProgressAsyncTask;
 
 import static org.apache.commons.lang3.StringUtils.join;
 
@@ -75,7 +69,6 @@ public class AuthCredentialsActivity extends ActionBarActivity {
         emailLoginFormView = (LinearLayout) findViewById(R.id.email_login_form);
 
         emailView = (EditText) findViewById(R.id.email);
-        emailView.setText(suggestEMail());
 
         passwordView = (EditText) findViewById(R.id.password);
         passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -154,17 +147,6 @@ public class AuthCredentialsActivity extends ActionBarActivity {
     public void showProgress(final boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
         setLayoutEnabled(emailLoginFormView, !show);
-    }
-
-    private String suggestEMail() {
-        Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
-        Account[] accounts = AccountManager.get(this).getAccounts();
-        for (Account account : accounts) {
-            if (emailPattern.matcher(account.name).matches()) {
-                return  account.name;
-            }
-        }
-        return "";
     }
 
     @Override
