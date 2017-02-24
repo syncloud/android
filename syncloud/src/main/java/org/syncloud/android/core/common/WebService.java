@@ -54,7 +54,7 @@ public class WebService {
 
     public String execute(String type, String url, List<NameValuePair> parameters) {
         String fullUrl = apiUrl + url;
-        logger.info("calling: " + fullUrl + " with parameters: " + parametersToString(parameters));
+        logger.info("calling: " + fullUrl);
         HttpUriRequest request = request(type, fullUrl, parameters);
         Response response = getResponse(request);
 
