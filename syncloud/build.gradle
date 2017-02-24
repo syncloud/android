@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 17010
-        versionName "17.01"
+        versionCode 17011
+        versionName "17.01.1"
     }
 
     useLibrary 'org.apache.http.legacy'
