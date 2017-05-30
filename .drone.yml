@@ -2,6 +2,6 @@ platform: linux/amd64
 
 pipeline:
   build:
-    image: beevelop/android
+    image: syncloud/android-sdk
     commands:
       - ./gradlew clean test assemble
