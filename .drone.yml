@@ -1,0 +1,6 @@
+platform: linux/amd64
+
+pipeline:
+  image: beevelop/android
+  commands:
+    - ./gradlew clean test assemble
