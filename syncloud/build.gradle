@@ -52,8 +52,11 @@ android {
     allprojects {
         afterEvaluate { project ->
                      
-            if (System.properties.containsKey('ANDROID_STORE_FILE')) {
-                android.signingConfigs['release'].storeFile = file(System.properties['ANDROID_STORE_FILE'])
+            if (System.properties.containsKey('KEY_STORE')) {
+                def storeFile = new File(System.properties['ANDROID_STORE_FILE'])
+                storeFile.append(System.properties['KEY_STORE'].decodeBase64())
+                
+                android.signingConfigs['release'].storeFile = storeFile
                 android.signingConfigs['release'].storePassword = System.properties['ANDROID_STORE_PASSWORD']
                 android.signingConfigs['release'].keyAlias = System.properties['ANDROID_KEY_ALIAS']
                 android.signingConfigs['release'].keyPassword = System.properties['ANDROID_KEY_PASSWORD']
