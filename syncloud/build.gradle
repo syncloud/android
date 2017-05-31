@@ -51,17 +51,17 @@ android {
 
     allprojects {
         afterEvaluate { project ->
-                     
-            if (System.properties.containsKey('KEY_STORE')) {
-                def storeFile = new File(System.properties['ANDROID_STORE_FILE'])
-                storeFile.append(System.properties['KEY_STORE'].decodeBase64())
+            def env = System.getenv        
+            if (env.containsKey('KEY_STORE')) {
+                def storeFile = new File(env['ANDROID_STORE_FILE'])
+                storeFile.append(env['KEY_STORE'].decodeBase64())
                 
                 android.signingConfigs['release'].storeFile = storeFile
-                android.signingConfigs['release'].storePassword = System.properties['ANDROID_STORE_PASSWORD']
-                android.signingConfigs['release'].keyAlias = System.properties['ANDROID_KEY_ALIAS']
-                android.signingConfigs['release'].keyPassword = System.properties['ANDROID_KEY_PASSWORD']
+                android.signingConfigs['release'].storePassword = env['ANDROID_STORE_PASSWORD']
+                android.signingConfigs['release'].keyAlias = env['ANDROID_KEY_ALIAS']
+                android.signingConfigs['release'].keyPassword = env['ANDROID_KEY_PASSWORD']
             } else {
-                logger.warn('ANDROID_* are not available, will not be able to publish to Google Play')
+                logger.warn('KEY_STORE is not available, will not be able to publish to Google Play')
             }
         }
     }
