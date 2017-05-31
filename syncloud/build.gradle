@@ -51,7 +51,7 @@ android {
 
     allprojects {
         afterEvaluate { project ->
-            def env = System.getenv        
+            def env = System.getenv()        
             if (env.containsKey('KEY_STORE')) {
                 def storeFile = new File(env['ANDROID_STORE_FILE'])
                 storeFile.append(env['KEY_STORE'].decodeBase64())
