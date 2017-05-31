@@ -51,18 +51,14 @@ android {
 
     allprojects {
         afterEvaluate { project ->
-
-            def props = new Properties()
-            def keystoreProperies = System.properties['user.home'] + '/keystore.properties'
-            def keyProps = rootProject.file(keystoreProperies)
-            if (keyProps.exists()) {
-                props.load(new FileInputStream(keyProps))
-                android.signingConfigs['release'].storeFile = file(props['storeFile'])
-                android.signingConfigs['release'].storePassword = props['storePassword']
-                android.signingConfigs['release'].keyAlias = props['keyAlias']
-                android.signingConfigs['release'].keyPassword = props['keyPassword']
+                     
+            if (System.properties.containsKey('ANDROID_STORE_FILE')) {
+                android.signingConfigs['release'].storeFile = file(System.properties['ANDROID_STORE_FILE'])
+                android.signingConfigs['release'].storePassword = System.properties['ANDROID_STORE_PASSWORD']
+                android.signingConfigs['release'].keyAlias = System.properties['ANDROID_KEY_ALIAS']
+                android.signingConfigs['release'].keyPassword = System.properties['ANDROID_KEY_PASSWORD']
             } else {
-                logger.warn(keystoreProperies + ' is not available, will not be able to publish to Google Play')
+                logger.warn('ANDROID_* are not available, will not be able to publish to Google Play')
             }
         }
     }
