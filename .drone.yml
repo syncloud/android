@@ -6,8 +6,10 @@ pipeline:
     secrets: [KEY_STORE, ANDROID_STORE_FILE, ANDROID_STORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD]
     commands:
       - ./gradlew clean test assemble
+
   upload:
     image: debian:8
     secrets: [ARTIFACT_SSH_KEY]
+    commands:
       - ./upload-artifact.sh syncloud/build/outputs/apk/syncloud-prod-release.apk
       
