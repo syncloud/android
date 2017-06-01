@@ -11,5 +11,6 @@ pipeline:
     image: syncloud/rootfs-amd64
     secrets: [ARTIFACT_SSH_KEY]
     commands:
-      - ./upload-artifact.sh syncloud/build/outputs/apk/syncloud-prod-release.apk
+      - cd syncloud/build/outputs/apk
+      - ./upload-artifact.sh syncloud-prod-release.apk
       
