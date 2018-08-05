@@ -10,7 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +36,7 @@ import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
 
-public class DevicesDiscoveryActivity extends ActionBarActivity {
+public class DevicesDiscoveryActivity extends AppCompatActivity {
 
     private static Logger logger = Logger.getLogger(DevicesDiscoveryActivity.class.getName());
 
