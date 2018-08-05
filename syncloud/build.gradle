@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 26
     buildToolsVersion '27.0.3'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 26
         versionCode 18005
         versionName "18.08"
     }
@@ -77,8 +77,8 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.3.2'
     implementation 'org.apache.httpcomponents:httpclient-android:4.3.3'
     implementation 'com.google.guava:guava:18.0'
-    implementation 'com.android.support:design:23.1.1'
-    implementation 'com.android.support:support-v4:23.1.1'
-    implementation 'com.android.support:appcompat-v7:23.1.1'
+    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE'
 }
