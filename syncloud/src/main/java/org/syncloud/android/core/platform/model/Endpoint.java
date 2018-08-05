@@ -20,6 +20,10 @@ public class Endpoint implements Serializable {
         return port;
     }
 
+    public String activationUrl() {
+        return "http://" + host + ":81";
+    }
+
     @Override
     public String toString() {
         return host + ":" + port;

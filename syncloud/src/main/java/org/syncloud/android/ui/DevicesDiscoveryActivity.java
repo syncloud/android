@@ -1,9 +1,9 @@
 package org.syncloud.android.ui;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -55,7 +55,6 @@ public class DevicesDiscoveryActivity extends ActionBarActivity {
     private SyncloudApplication application;
 
     private static int REQUEST_SETTINGS = 1;
-    private static int REQUEST_ACTIVATE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,9 +122,7 @@ public class DevicesDiscoveryActivity extends ActionBarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == WifiDialog.WIFI_SETTINGS) {
             checkWiFiAndDiscover();
-        }
-        if (requestCode == REQUEST_ACTIVATE && resultCode == Activity.RESULT_OK) {
-            setResult(Activity.RESULT_OK);
+        } else {
             finish();
         }
     }
@@ -155,9 +152,9 @@ public class DevicesDiscoveryActivity extends ActionBarActivity {
                     .show();
         } else {
 
-            Intent intentActivate = new Intent(this, ActivateActivity.class);
-            intentActivate.putExtra(SyncloudApplication.DEVICE_ENDPOINT, endpoint.endpoint());
-            startActivityForResult(intentActivate, REQUEST_ACTIVATE);
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(endpoint.endpoint().activationUrl()));
+            startActivity(browserIntent);
+
         }
     }
 

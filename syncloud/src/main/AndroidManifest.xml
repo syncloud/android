@@ -66,11 +66,6 @@
             android:launchMode="singleInstance"
             android:theme="@style/DialogTheme" >
         </activity>
-        <activity
-            android:name=".ui.ActivateActivity"
-            android:label="@string/title_activity_activate"
-            android:screenOrientation="portrait" >
-        </activity>
     </application>
 
 </manifest>
