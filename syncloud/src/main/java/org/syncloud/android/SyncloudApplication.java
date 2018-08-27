@@ -6,14 +6,11 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import org.acra.ACRA;
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
-import org.acra.collector.CrashReportData;
-import org.acra.sender.ReportSender;
-import org.acra.sender.ReportSenderException;
+import org.acra.annotation.AcraCore;
+import org.acra.annotation.AcraDialog;
+import org.acra.data.StringFormat;
 import org.apache.log4j.Logger;
 import org.syncloud.android.core.redirect.IUserService;
 import org.syncloud.android.core.redirect.RedirectService;
@@ -25,40 +22,40 @@ import java.io.File;
 import static org.acra.ReportField.*;
 import static org.syncloud.android.core.redirect.RedirectService.getApiUrl;
 
-@ReportsCrashes(
-        customReportContent = { APP_VERSION_CODE, ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, LOGCAT },
-
-        mode = ReportingInteractionMode.DIALOG,
-        resToastText = R.string.crash_toast_text, // optional, displayed as soon as the crash occurs, before collecting data which can take a few seconds
-        resDialogText = R.string.crash_dialog_text,
-        resDialogIcon = R.drawable.ic_launcher, //optional. default is a warning sign
-        resDialogTitle = R.string.crash_dialog_title, // optional. default is your application name
-        resDialogOkToast = R.string.crash_dialog_ok_toast, // optional. displays a Toast message when the user accepts to send a report.
+@AcraDialog(
+        resText = R.string.crash_dialog_text,
+        resIcon = R.drawable.ic_launcher, //optional. default is a warning sign
+        resTitle = R.string.crash_dialog_title // optional. default is your application name
+)
+@AcraCore(
+        buildConfigClass = BuildConfig.class,
+        reportContent = { APP_VERSION_CODE, ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, LOGCAT },
 
         logcatArguments = { "-t", "500", "-v", "long", "*:D"},
         logcatFilterByPid = false,
 
-        reportSenderFactoryClasses = { AcraLogEmailerFactory.class }
+        reportSenderFactoryClasses = { AcraLogEmailerFactory.class },
+        reportFormat = StringFormat.KEY_VALUE_LIST
+
 )
 public class SyncloudApplication extends Application {
-
-    private String TAG = SyncloudApplication.class.getSimpleName();
-
-    public static String DEVICE_ENDPOINT = "device_endpoint";
 
     private Preferences preferences;
     private UserStorage userStorage;
 
     @Override
-    public void onCreate() {
-
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
         ACRA.init(this);
+    }
+
+    @Override
+    public void onCreate() {
 
         ConfigureLog4J.configure();
 
         Logger logger = Logger.getLogger(SyncloudApplication.class);
         logger.info("Starting Syncloud App");
-
 
         super.onCreate();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);

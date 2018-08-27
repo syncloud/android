@@ -3,38 +3,33 @@ package org.syncloud.android;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
+import android.support.annotation.NonNull;
 
 import org.acra.ReportField;
-import org.acra.collector.CrashReportData;
-import org.acra.config.ACRAConfig;
+import org.acra.collections.ImmutableSet;
+import org.acra.config.CoreConfiguration;
+import org.acra.data.CrashReportData;
 import org.acra.sender.ReportSender;
 import org.acra.sender.ReportSenderException;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 import static org.acra.ReportField.ANDROID_VERSION;
 import static org.acra.ReportField.APP_VERSION_NAME;
 import static org.acra.ReportField.BRAND;
-import static org.acra.ReportField.ENVIRONMENT;
-import static org.acra.ReportField.LOGCAT;
 import static org.acra.ReportField.PHONE_MODEL;
 import static org.acra.ReportField.STACK_TRACE;
 
 public class AcraLogEmailer implements ReportSender {
 
     private final Context mContext;
-    private final ACRAConfig config;
+    private final CoreConfiguration config;
 
-    public AcraLogEmailer(Context ctx, ACRAConfig config) {
+    public AcraLogEmailer(Context ctx, CoreConfiguration config) {
         this.mContext = ctx;
         this.config = config;
     }
 
     @Override
-    public void send(Context context, CrashReportData errorContent) throws ReportSenderException {
+    public void send(@NonNull Context context, @NonNull CrashReportData errorContent) throws ReportSenderException {
         final String mailTo = "support@syncloud.it";
         final String subject = "Syncloud Android Report";
         final String body = buildBodyText(errorContent);
@@ -48,28 +43,28 @@ public class AcraLogEmailer implements ReportSender {
     }
 
     private String buildBodyText(CrashReportData errorContent) {
-        ReportField[] fields = config.customReportContent();
-        if(fields.length == 0) {
-            fields = new ReportField[] {
-                ANDROID_VERSION,
-                APP_VERSION_NAME,
-                BRAND,
-                PHONE_MODEL,
-                STACK_TRACE
-            };
+        ImmutableSet<ReportField> fields = config.reportContent();
+        if(fields.isEmpty()) {
+            fields = new ImmutableSet<>(
+                    ANDROID_VERSION,
+                    APP_VERSION_NAME,
+                    BRAND,
+                    PHONE_MODEL,
+                    STACK_TRACE
+            );
         }
 
         final StringBuilder builder = new StringBuilder();
         for (ReportField field : fields) {
             if (field != ReportField.LOGCAT) {
                 builder.append(field.toString()).append("=");
-                builder.append(errorContent.get(field));
+                builder.append(errorContent.getString(field));
                 builder.append('\n');
             }
         }
         builder.append("LOGCAT");
         builder.append('\n');
-        builder.append(errorContent.get(ReportField.LOGCAT));
+        builder.append(errorContent.getString(ReportField.LOGCAT));
         return builder.toString();
     }
 }
