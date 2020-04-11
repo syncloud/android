@@ -8,15 +8,15 @@ import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
@@ -194,7 +194,7 @@ public class DevicesDiscoveryActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            refreshBtn.setVisibility(View.GONE);
+            refreshBtn.hide();
             swipeRefreshLayout.setRefreshing(true);
             emptyView.setVisibility(View.GONE);
             resultsList.setEmptyView(null);
@@ -215,7 +215,7 @@ public class DevicesDiscoveryActivity extends AppCompatActivity {
             emptyView.setVisibility(View.VISIBLE);
             resultsList.setEmptyView(emptyView);
             swipeRefreshLayout.setRefreshing(false);
-            refreshBtn.setVisibility(View.VISIBLE);
+            refreshBtn.show();
         }
 
         @Override

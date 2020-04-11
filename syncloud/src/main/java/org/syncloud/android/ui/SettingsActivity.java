@@ -3,16 +3,14 @@ package org.syncloud.android.ui;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.Nullable;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
 import android.view.MenuInflater;
 import android.view.View;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
 import android.view.ViewGroup;
-
-import org.syncloud.android.R;
 
 public class SettingsActivity extends PreferenceActivity {
     private AppCompatDelegate mDelegate;

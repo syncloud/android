@@ -5,15 +5,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
@@ -55,14 +55,14 @@ public class DevicesSavedActivity extends AppCompatActivity {
         public void start() {
             swipeRefreshLayout.setRefreshing(true);
             listview.setEnabled(false);
-            btnDiscovery.setVisibility(View.GONE);
+            btnDiscovery.hide();
         }
 
         @Override
         public void stop() {
             swipeRefreshLayout.setRefreshing(false);
             listview.setEnabled(true);
-            btnDiscovery.setVisibility(View.VISIBLE);
+            btnDiscovery.show();
         }
 
         @Override
