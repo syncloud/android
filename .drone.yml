@@ -25,13 +25,17 @@ steps:
 
 - name: artifact
   image: appleboy/drone-scp
-  settings:                                         command_timeout: 2m
-    host:                                             from_secret: artifact_host
+  settings:
+    command_timeout: 2m
+    host:
+        from_secret: artifact_host
     key:
       from_secret: artifact_key
     source: syncloud/build/outputs/apk/prod/release/*
-    strip_components: 1                             target: /home/artifact/repo/redirect/${DRONE_BUILD_NUMBER}
-    timeout: 2m                                     username: artifact
+    strip_components: 1
+    target: /home/artifact/repo/redirect/${DRONE_BUILD_NUMBER}
+    timeout: 2m
+    username: artifact
   when:
     status:
     - failure
