@@ -1,4 +1,10 @@
----                                             kind: pipeline                                  name: redirect                                                                                  platform:                                         os: linux                                       arch: amd64
+---
+kind: pipeline
+name: android
+
+platform:
+  os: linux
+  arch: amd64
 
 steps:
 - name: build:
