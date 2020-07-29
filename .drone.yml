@@ -20,8 +20,8 @@ steps:
       from_secret: ANDROID_KEY_ALIAS
     ANDROID_KEY_PASSWORD:
       from_secret: ANDROID_KEY_PASSWORD
-    commands:
-      - ./gradlew clean test assemble
+  commands:
+    - ./gradlew clean test assemble
 
 - name: artifact
   image: appleboy/drone-scp
