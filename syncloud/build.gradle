@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 30
     buildToolsVersion '29.0.2'
 
     compileOptions {
@@ -11,9 +11,9 @@ android {
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 30
         versionCode 20070
-        versionName "20.07.00"
+        versionName "20.07"
     }
 
     useLibrary 'org.apache.http.legacy'
