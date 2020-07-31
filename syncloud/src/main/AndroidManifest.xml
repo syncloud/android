@@ -66,6 +66,9 @@
             android:launchMode="singleInstance"
             android:theme="@style/DialogTheme" >
         </activity>
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+
     </application>
 
 </manifest>

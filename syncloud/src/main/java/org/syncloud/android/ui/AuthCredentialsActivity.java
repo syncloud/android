@@ -292,6 +292,7 @@ public class AuthCredentialsActivity extends AppCompatActivity {
                 return;
             }
         }
+        logger.error("auth error", error);
         showErrorDialog(error.getMessage());
     }
 
