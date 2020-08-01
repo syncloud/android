@@ -8,6 +8,9 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
@@ -18,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,13 +92,19 @@ public class WebService {
     private Response getResponse(HttpUriRequest request) {
         CloseableHttpResponse response = null;
         try {
-            CloseableHttpClient http = HttpClients.createDefault();
+            CloseableHttpClient http = HttpClients
+                    .custom()
+                    .setHostnameVerifier(new AllowAllHostnameVerifier()).
+                    setSslcontext(new SSLContextBuilder()
+                            .loadTrustMaterial(null, (arg0, arg1) -> true)
+                            .build()
+                    ).build();
             response = http.execute(request);
             InputStream jsonResponse = response.getEntity().getContent();
             String textJsonResponse = readText(jsonResponse);
             int statusCode = response.getStatusLine().getStatusCode();
             return new Response(statusCode, textJsonResponse);
-        } catch (IOException e) {
+        } catch (Exception e) {
             String message = "Failed to get response";
             logger.error("Failed to get response", e);
             throw new SyncloudException(message);

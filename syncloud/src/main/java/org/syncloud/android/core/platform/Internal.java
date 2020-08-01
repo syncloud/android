@@ -24,11 +24,7 @@ public class Internal {
     public static final ObjectMapper JSON = new ObjectMapper();
 
     private String getRestUrl(String host) {
-        //TODO: This is needed only for compatibility with releases prior 16.06. New rest URL should be used always.
-        String newRestUrl = format("http://%s:81/rest", host);
-        if (checkUrl(newRestUrl + "/id", 200))
-            return newRestUrl;
-        return format("http://%s:81/server/rest", host);
+        return format("https://%s/rest", host);
     }
 
     private WebService getRestWebService(String host) {
