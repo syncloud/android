@@ -12,7 +12,6 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
@@ -29,21 +28,21 @@ public class Helpers {
 
     public static Optional<String> findAccessibleUrl(String mainDomain, DomainModel domain) {
         String dnsUrl = domain.getDnsUrl(mainDomain);
-        if (dnsUrl != null && checkUrl(dnsUrl, 302))
+        if (dnsUrl != null && checkUrl(dnsUrl, 200))
             return Optional.of(dnsUrl);
 
         String externalUrl = domain.getExternalUrl();
-        if (externalUrl != null && checkUrl(externalUrl, 302))
+        if (externalUrl != null && checkUrl(externalUrl, 200))
             return Optional.of(externalUrl);
 
         String internalUrl = domain.getInternalUrl();
-        if (internalUrl != null && checkUrl(internalUrl, 302))
+        if (internalUrl != null && checkUrl(internalUrl, 200))
             return Optional.of(internalUrl);
 
         return Optional.absent();
     }
 
-    public static boolean checkUrl(String url, int wnatedStatusCode) {
+    public static boolean checkUrl(String url, int wantedStatusCode) {
         try {
             logger.info("Trying: " + url);
             HttpClient httpClient = getNewHttpClient();
@@ -53,7 +52,7 @@ public class Helpers {
             httpGet.setParams(params);
             int statusCode = httpClient.execute(httpGet).getStatusLine().getStatusCode();
             logger.info("status code: " + statusCode);
-            if (statusCode == wnatedStatusCode)
+            if (statusCode == wantedStatusCode)
                 return true;
         } catch (IOException e) {
             logger.info("Trying " + url + " failed with error: " + e.getMessage());
