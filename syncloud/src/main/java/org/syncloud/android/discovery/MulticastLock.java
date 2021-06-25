@@ -20,7 +20,7 @@ public class MulticastLock {
         logger.info("creating multicast lock");
         try {
             lock = wifi.createMulticastLock(MULTICAST_LOCK_TAG);
-            lock.setReferenceCounted(false);
+            lock.setReferenceCounted(true);
             lock.acquire();
         } catch (Exception e) {
             logger.error("failed to acquire multicast lock", e);
