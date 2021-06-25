@@ -40,18 +40,7 @@ public class WebService {
     private static ObjectMapper mapper = Jackson.createObjectMapper();
 
     public String execute(String type, String url) {
-        return execute(type, url, new ArrayList<NameValuePair>());
-    }
-
-    private String parametersToString(List<NameValuePair> parameters) {
-        StringBuilder builder = new StringBuilder();
-        for(NameValuePair pair: parameters){
-            builder.append(pair.getName());
-            builder.append("=");
-            builder.append(pair.getValue());
-            builder.append(" ");
-        }
-        return builder.toString();
+        return execute(type, url, new ArrayList<>());
     }
 
     public String execute(String type, String url, List<NameValuePair> parameters) {
