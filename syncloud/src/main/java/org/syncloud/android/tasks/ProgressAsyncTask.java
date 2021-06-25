@@ -114,12 +114,9 @@ public class ProgressAsyncTask<TParams, TResult> extends AsyncTask<TParams, Void
 
     public static void execute(final Runnable runnable) {
         new ProgressAsyncTask<Void, Void>()
-                .doWork(new Work<Void, Void>() {
-                    @Override
-                    public Void run(Void... args) {
-                        runnable.run();
-                        return null;
-                    }
+                .doWork(args -> {
+                    runnable.run();
+                    return null;
                 })
                 .execute();
 

@@ -21,6 +21,7 @@ steps:
     ANDROID_KEY_PASSWORD:
       from_secret: ANDROID_KEY_PASSWORD
   commands:
+    - yes | /opt/android/tools/bin/sdkmanager "build-tools;30.0.2"
     - ./gradlew clean test assemble
 
 - name: artifact

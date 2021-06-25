@@ -4,12 +4,12 @@ package org.syncloud.android.ui.dialog;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 
 public class WifiDialog extends DialogFragment {
 
@@ -30,16 +30,8 @@ public class WifiDialog extends DialogFragment {
         builder.setTitle("Wi-Fi Connection");
         builder.setMessage("You are not connected to Wi-Fi network. " + message)
                 .setCancelable(false)
-                .setPositiveButton("Wi-Fi Settings", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
-                        openWiFiSettings();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
-                        context.finish();
-                    }
-                });
+                .setPositiveButton("Wi-Fi Settings", (dialog, id) -> openWiFiSettings())
+                .setNegativeButton("Cancel", (dialog, id) -> context.finish());
 
         return builder.create();
     }

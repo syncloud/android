@@ -29,12 +29,12 @@ public class DevicesSavedAdapter extends ArrayAdapter<DomainModel> {
         LayoutInflater inflater = activity.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.layout_device_item, null);
 
-        TextView txtBoldTitle = (TextView) rowView.findViewById(R.id.txt_bold_title);
-        TextView txtAdditionalLine = (TextView) rowView.findViewById(R.id.txt_additional_line);
+        TextView txtBoldTitle = rowView.findViewById(R.id.txt_bold_title);
+        TextView txtAdditionalLine = rowView.findViewById(R.id.txt_additional_line);
 
         final DomainModel domain = getItem(position);
 
-        String fullDomainName = domain.userDomain()+"."+mainDomain;
+        String fullDomainName = domain.name();
         txtBoldTitle.setText(fullDomainName);
 
         txtAdditionalLine.setText(domain.id().title());
