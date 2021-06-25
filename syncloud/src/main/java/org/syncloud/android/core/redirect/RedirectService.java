@@ -17,7 +17,7 @@ import static org.syncloud.android.core.common.jackson.Jackson.createObjectMappe
 public class RedirectService implements IUserService {
 
     public static String getApiUrl(String mainDomain) {
-        return "http://api."+mainDomain;
+        return "https://api."+mainDomain;
     }
 
     private static Logger logger = Logger.getLogger(RedirectService.class);
@@ -64,12 +64,4 @@ public class RedirectService implements IUserService {
         }
     }
 
-    public void dropDevice(String email, String password, String user_domain) {
-        List<NameValuePair> parameters = new ArrayList<NameValuePair>();
-        parameters.add(new BasicNameValuePair("email", email));
-        parameters.add(new BasicNameValuePair("password", password));
-        parameters.add(new BasicNameValuePair("user_domain", user_domain));
-
-        webService.execute("POST", "/domain/drop_device", parameters);
-    }
 }

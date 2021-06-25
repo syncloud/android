@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.syncloud.android.core.common.Result;
 import org.syncloud.android.core.common.SyncloudException;
@@ -13,10 +11,8 @@ import org.syncloud.android.core.common.WebService;
 import org.syncloud.android.core.platform.model.Identification;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static java.lang.String.format;
-import static org.syncloud.android.network.Helpers.checkUrl;
 
 public class Internal {
 

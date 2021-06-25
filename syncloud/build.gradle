@@ -19,10 +19,6 @@ android {
     useLibrary 'org.apache.http.legacy'
     flavorDimensions "full"
     productFlavors {
-        beta {
-            applicationId "org.syncloud.android.beta"
-        }
-
         prod {
             applicationId "org.syncloud.android"
         }
@@ -87,4 +83,6 @@ dependencies {
     implementation 'com.android.support:support-v4:27.0.2'
     implementation 'com.android.support:appcompat-v7:27.0.2'
     implementation 'com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE'
+    testImplementation 'junit:junit:4.10'
+    testImplementation 'org.mockito:mockito-all:1.9.5'
 }
