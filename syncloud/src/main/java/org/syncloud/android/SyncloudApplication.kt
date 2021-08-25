@@ -4,14 +4,15 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.preference.PreferenceManager
-import com.google.common.collect.Lists.newArrayList
 import org.acra.ACRA
+import org.acra.BuildConfig
 import org.acra.ReportField
 import org.acra.annotation.AcraCore
 import org.acra.annotation.AcraDialog
 import org.acra.data.StringFormat
 import org.apache.log4j.Logger
 import org.syncloud.android.ConfigureLog4J.configure
+import org.syncloud.android.core.common.WebService
 import org.syncloud.android.core.redirect.IUserService
 import org.syncloud.android.core.redirect.RedirectService
 import org.syncloud.android.core.redirect.UserCachedService
@@ -56,9 +57,6 @@ class SyncloudApplication : Application() {
         _preferences = Preferences(sharedPreferences)
         _userStorage = UserStorage(File(applicationContext.filesDir, "user.json"))
         _userService = webServiceAuthWithFileBackedCache()
-
-        // used for testing without proper ssl certificates and valid login
-        //_userService = bypassLoginHack()
     }
 
     override fun attachBaseContext(base: Context) {
@@ -67,25 +65,10 @@ class SyncloudApplication : Application() {
     }
 
     private fun webServiceAuthWithFileBackedCache(): UserCachedService {
-        val redirectService = RedirectService(RedirectService.getApiUrl(_preferences.mainDomain))
+        val apiUrl = RedirectService.getApiUrl(_preferences.mainDomain)
+        val redirectService = RedirectService(WebService(apiUrl))
         return UserCachedService(redirectService, _userStorage)
     }
 
     fun reportError() = ACRA.getErrorReporter().handleSilentException(null)
-}
-
-fun bypassLoginHack() : IUserService {
-    return object : IUserService {
-        override fun getUser(email: String?, password: String?): User? {
-            val user = User()
-            user.active = true
-            user.email = "fakeBypassService@fake.com"
-            user.domains = newArrayList()
-            return user
-        }
-
-        override fun createUser(email: String?, password: String?): User? {
-            throw NotImplementedError("This is not implemented as it is irrelevant")
-        }
-    }
 }

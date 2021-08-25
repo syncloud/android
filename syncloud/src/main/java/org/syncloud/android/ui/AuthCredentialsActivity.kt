@@ -70,11 +70,11 @@ class AuthCredentialsActivity : AppCompatActivity() {
             setTitle(R.string.action_sign_up)
             signInButton.setText(R.string.action_sign_up)
         }
-        if (preferences.hasCredentials()) {
-            val email = preferences.redirectEmail
-            val password = preferences.redirectPassword
-            emailView.setText(email)
-            passwordView.setText(password)
+        val redirectEmail = preferences.redirectEmail
+        val redirectPassword = preferences.redirectPassword
+        if (redirectEmail != null && redirectPassword != null) {
+            emailView.setText(redirectEmail)
+            passwordView.setText(redirectPassword)
             val checkExisting = intent.getBooleanExtra(AuthConstants.PARAM_CHECK_EXISTING, false)
             if (checkExisting) {
                 AlertDialog.Builder(this@AuthCredentialsActivity)

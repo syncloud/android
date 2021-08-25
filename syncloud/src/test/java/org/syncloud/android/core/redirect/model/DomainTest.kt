@@ -1,10 +1,8 @@
-package org.syncloud.android.ui
+package org.syncloud.android.core.redirect.model
 
 import junit.framework.Assert
 import junit.framework.Assert.assertEquals
 import org.junit.Test
-import org.syncloud.android.core.redirect.model.Domain
-import org.syncloud.android.core.redirect.model.toModels
 
 class DomainTest {
     @Test
@@ -22,7 +20,7 @@ class DomainTest {
             assertEquals("aDeviceName", it.id!!.name)
             assertEquals("aDeviceTitle", it.id!!.title)
             assertEquals("aDeviceMacAddress", it.id!!.mac_address )
-            assertEquals("aDomain", it.name!!)
+            assertEquals("aDomain", it.name)
         }
     }
 }

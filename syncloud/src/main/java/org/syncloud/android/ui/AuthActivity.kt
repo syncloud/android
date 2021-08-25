@@ -22,7 +22,6 @@ import org.syncloud.android.tasks.ProgressAsyncTask.Completed
 import org.syncloud.android.tasks.ProgressAsyncTask.Work
 
 const val REQUEST_AUTHENTICATE = 1
-const val REQUEST_CHECK = 2
 
 class AuthActivity : Activity() {
     private lateinit var preferences: Preferences
@@ -46,31 +45,31 @@ class AuthActivity : Activity() {
     }
 
     private fun proceedWithLogin() {
-        if (preferences.hasCredentials()) {
-            login()
+        val redirectEmail = preferences.redirectEmail
+        val redirectPassword = preferences.redirectPassword
+        if (redirectEmail != null && redirectPassword != null) {
+            login(redirectEmail, redirectPassword)
         }
     }
 
-    private fun login() {
-        val email = preferences.redirectEmail
-        val password = preferences.redirectPassword
-        ProgressAsyncTask<Void, User>()
+    private fun login(email: String, password: String) {
+        ProgressAsyncTask<Void, User?>()
             .setProgress(progress)
-            .doWork(object : Work<Void, User> {
-                override fun run(vararg args: Void): User {
-                    return userService.getUser(email, password)!!
+            .doWork(object : Work<Void, User?> {
+                override fun run(vararg args: Void): User? {
+                    return userService.getUser(email, password)
                 }
             })
-            .onCompleted(object : Completed<User> {
-                override fun run(result: AsyncResult<User>?) {
-                    onLoginCompleted(result!!)
+            .onCompleted(object : Completed<User?> {
+                override fun run(result: AsyncResult<User?>?) {
+                    onLoginCompleted(result)
                 }
             })
             .execute()
     }
 
-    private fun onLoginCompleted(result: AsyncResult<User>) {
-        if (result.hasValue()) {
+    private fun onLoginCompleted(result: AsyncResult<User?>?) {
+        if (result?.hasValue() == true) {
             val intent = Intent(this@AuthActivity, DevicesSavedActivity::class.java)
             startActivity(intent)
             finish()

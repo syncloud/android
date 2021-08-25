@@ -8,7 +8,6 @@ class Preferences(private val preferences: SharedPreferences) {
     val redirectEmail: String? get() = preferences.getString(PreferencesConstants.KEY_PREF_EMAIL, null)
     val redirectPassword: String? get() = preferences.getString(PreferencesConstants.KEY_PREF_PASSWORD, null)
 
-    fun hasCredentials(): Boolean = redirectEmail != null
     fun setCredentials(email: String?, password: String?) {
         val editor = preferences.edit()
         editor.putString(PreferencesConstants.KEY_PREF_EMAIL, email)
