@@ -37,17 +37,6 @@ class ProgressAsyncTask<TParams, TResult> @JvmOverloads constructor(
             null
         }
     }
-
-    fun setErrorMessage(message: String): ProgressAsyncTask<TParams, TResult> {
-        errorMessage = message
-        return this
-    }
-
-    fun setTitle(title: String): ProgressAsyncTask<TParams, TResult> {
-        this.title = title
-        return this
-    }
-
     fun setProgress(progress: Progress): ProgressAsyncTask<TParams, TResult> {
         this.progress = progress
         return this
@@ -93,15 +82,4 @@ class ProgressAsyncTask<TParams, TResult> @JvmOverloads constructor(
         }
     }
 
-    companion object {
-        fun execute(runnable: Runnable) {
-            ProgressAsyncTask<Void, Unit>()
-                .doWork(object : Work<Void, Unit> {
-                    override fun run(vararg args: Void): Unit {
-                        return runnable.run()
-                    }
-                })
-                .execute()
-        }
-    }
 }

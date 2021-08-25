@@ -13,6 +13,7 @@ import org.acra.data.StringFormat
 import org.apache.log4j.Logger
 import org.syncloud.android.ConfigureLog4J.configure
 import org.syncloud.android.core.common.WebService
+import org.syncloud.android.core.common.http.HttpClient
 import org.syncloud.android.core.redirect.IUserService
 import org.syncloud.android.core.redirect.RedirectService
 import org.syncloud.android.core.redirect.UserCachedService
@@ -66,7 +67,7 @@ class SyncloudApplication : Application() {
 
     private fun webServiceAuthWithFileBackedCache(): UserCachedService {
         val apiUrl = RedirectService.getApiUrl(_preferences.mainDomain)
-        val redirectService = RedirectService(WebService(apiUrl))
+        val redirectService = RedirectService(WebService(HttpClient(apiUrl)))
         return UserCachedService(redirectService, _userStorage)
     }
 

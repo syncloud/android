@@ -7,13 +7,13 @@ import org.apache.log4j.Logger
 import org.syncloud.android.core.common.Result
 import org.syncloud.android.core.common.SyncloudException
 import org.syncloud.android.core.common.WebService
-import org.syncloud.android.core.platform.Internal
+import org.syncloud.android.core.common.http.HttpClient
 import org.syncloud.android.core.platform.model.Identification
 import java.io.IOException
 
 class Internal {
     private fun getRestUrl(host: String): String = String.format("https://%s/rest", host)
-    private fun getRestWebService(host: String): WebService = WebService(getRestUrl(host))
+    private fun getRestWebService(host: String): WebService = WebService(HttpClient(getRestUrl(host)))
     fun getId(host: String): Optional<Identification?> {
         val webService = getRestWebService(host)
         val json: String
