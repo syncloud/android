@@ -1,60 +1,31 @@
 package org.syncloud.android.core.common
 
-import org.syncloud.android.core.common.jackson.Jackson.createObjectMapper
-import org.apache.http.NameValuePair
-import kotlin.jvm.JvmOverloads
-import org.syncloud.android.core.common.WebService
-import org.apache.http.client.methods.HttpUriRequest
-import org.syncloud.android.core.common.BaseResult
-import org.syncloud.android.core.common.SyncloudException
-import org.syncloud.android.core.common.SyncloudResultException
+import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.CloseableHttpResponse
-import org.apache.http.impl.client.CloseableHttpClient
-import org.apache.http.impl.client.HttpClients
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier
 import org.apache.http.conn.ssl.SSLContextBuilder
-import org.apache.http.conn.ssl.TrustStrategy
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.syncloud.android.core.common.jackson.Jackson
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.client.entity.UrlEncodedFormEntity
-import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.HttpClients
+import org.apache.http.message.BasicNameValuePair
 import org.apache.log4j.Logger
+import org.syncloud.android.core.common.jackson.Jackson.createObjectMapper
 import java.io.*
-import java.lang.Exception
-import java.lang.StringBuilder
 import java.net.URLEncoder
 import java.security.cert.X509Certificate
-import java.util.ArrayList
-import kotlin.Throws
 
-class WebService {
-    private var apiUrl = ""
+open class WebService(private val apiUrl: String) {
 
-    constructor() {}
-    constructor(apiUrl: String) {
-        this.apiUrl = apiUrl
-    }
+    private val logger = Logger.getLogger(WebService::class.java)
+    private val mapper = createObjectMapper()
 
-    private fun parametersToString(parameters: List<NameValuePair>): String {
-        val builder = StringBuilder()
-        for (pair in parameters) {
-            builder.append(pair.name)
-            builder.append("=")
-            builder.append(pair.value)
-            builder.append(" ")
-        }
-        return builder.toString()
-    }
-
-    @JvmOverloads
-    fun execute(type: String, url: String, parameters: List<NameValuePair> = ArrayList()): String {
+    open fun execute(type: String, url: String, parameters: List<Pair<String, String>> = ArrayList()): String {
         val fullUrl = apiUrl + url
         logger.info("calling: $fullUrl")
         val request = request(type, fullUrl, parameters)
         val response = getResponse(request)
-        val jsonBaseResponse: BaseResult
-        jsonBaseResponse = try {
+        val jsonBaseResponse: BaseResult = try {
             mapper.readValue(response.output, BaseResult::class.java)
         } catch (e: IOException) {
             val message = "Failed to deserialize json"
@@ -97,50 +68,47 @@ class WebService {
         }
     }
 
-    companion object {
-        private val logger = Logger.getLogger(WebService::class.java)
-        private val mapper = createObjectMapper()
-        private fun request(
+    private fun request(
             type: String,
             url: String,
-            parameters: List<NameValuePair>
-        ): HttpUriRequest {
-            try {
-                if (type.toUpperCase() == "POST") {
-                    val post = HttpPost(url)
-                    post.entity = UrlEncodedFormEntity(parameters)
-                    return post
-                }
-                if (type.toUpperCase() == "GET") {
-                    var urlFull: String? = url
-                    for (pair in parameters) {
-                        val first = pair === parameters[0]
-                        urlFull += if (first) "?" else "&"
-                        urlFull += pair.name
-                        urlFull += "="
-                        urlFull += URLEncoder.encode(pair.value, "utf-8")
-                    }
-                    return HttpGet(urlFull)
-                }
-            } catch (e: UnsupportedEncodingException) {
-                val message = "Failed to form request"
-                logger.error(message, e)
-                throw SyncloudException(message)
+            parameters: List<Pair<String, String>>
+    ): HttpUriRequest {
+        try {
+            if (type.uppercase() == "POST") {
+                val post = HttpPost(url)
+                post.entity = UrlEncodedFormEntity(parameters.map { (name, value) -> BasicNameValuePair(name, value) })
+                return post
             }
-            val message = "Unknown request type $type"
-            logger.error(message)
+            if (type.uppercase() == "GET") {
+                var urlFull: String? = url
+                for (pair in parameters) {
+                    val first = pair === parameters[0]
+                    urlFull += if (first) "?" else "&"
+                    urlFull += pair.first
+                    urlFull += "="
+                    urlFull += URLEncoder.encode(pair.second, "utf-8")
+                }
+                return HttpGet(urlFull)
+            }
+        } catch (e: UnsupportedEncodingException) {
+            val message = "Failed to form request"
+            logger.error(message, e)
             throw SyncloudException(message)
         }
-
-        @Throws(IOException::class)
-        private fun readText(inputStream: InputStream): String {
-            val r = BufferedReader(InputStreamReader(inputStream))
-            val total = StringBuilder()
-            var line: String?
-            while (r.readLine().also { line = it } != null) {
-                total.append(line)
-            }
-            return total.toString()
-        }
+        val message = "Unknown request type $type"
+        logger.error(message)
+        throw SyncloudException(message)
     }
+
+    @Throws(IOException::class)
+    private fun readText(inputStream: InputStream): String {
+        val r = BufferedReader(InputStreamReader(inputStream))
+        val total = StringBuilder()
+        var line: String?
+        while (r.readLine().also { line = it } != null) {
+            total.append(line)
+        }
+        return total.toString()
+    }
+
 }

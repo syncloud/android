@@ -1,26 +1,22 @@
 package org.syncloud.android.core.redirect
 
-import org.apache.http.NameValuePair
-import org.apache.http.message.BasicNameValuePair
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.apache.log4j.Logger
 import org.syncloud.android.core.common.SyncloudException
 import org.syncloud.android.core.common.WebService
-import org.syncloud.android.core.common.jackson.Jackson.createObjectMapper
-import org.syncloud.android.core.redirect.RedirectService
 import org.syncloud.android.core.redirect.model.User
 import org.syncloud.android.core.redirect.model.UserResult
 import java.io.IOException
-import java.util.*
 
-class RedirectService(apiUrl: String) : IUserService {
-    private val webService: WebService = WebService(apiUrl)
-    override fun getUser(email: String?, password: String?): User? {
-        val parameters: MutableList<NameValuePair> = ArrayList()
-        parameters.add(BasicNameValuePair("email", email))
-        parameters.add(BasicNameValuePair("password", password))
-        val json = webService.execute("GET", "/user/get", parameters)
+class RedirectService(private val webService: WebService) : IUserService {
+    val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+    override fun getUser(email: String, password: String): User? {
+        val json = webService.execute("GET", "/user/get", listOf(Pair("email", email), Pair("password", password)))
         return try {
-            val restUser = mapper.readValue(json, UserResult::class.java)
+            val restUser = mapper.readValue<UserResult>(json)
             restUser.data
         } catch (e: IOException) {
             val message = "Failed to deserialize json"
@@ -29,11 +25,8 @@ class RedirectService(apiUrl: String) : IUserService {
         }
     }
 
-    override fun createUser(email: String?, password: String?): User? {
-        val parameters: MutableList<NameValuePair> = ArrayList()
-        parameters.add(BasicNameValuePair("email", email))
-        parameters.add(BasicNameValuePair("password", password))
-        val json = webService.execute("POST", "/user/create", parameters)
+    override fun createUser(email: String, password: String): User? {
+        val json = webService.execute("POST", "/user/create", listOf(Pair("email", email), Pair("password", password)))
         return try {
             val restUser = mapper.readValue(json, UserResult::class.java)
             restUser.data
@@ -47,6 +40,5 @@ class RedirectService(apiUrl: String) : IUserService {
     companion object {
         fun getApiUrl(mainDomain: String): String = "https://api.$mainDomain"
         private val logger = Logger.getLogger(RedirectService::class.java)
-        private val mapper = createObjectMapper()
     }
 }

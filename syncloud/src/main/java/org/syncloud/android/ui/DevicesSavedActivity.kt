@@ -60,30 +60,33 @@ class DevicesSavedActivity : AppCompatActivity() {
 
     private fun refreshDevices() {
         val userService = application.userServiceCached
-        val email = preferences.redirectEmail
-        val password = preferences.redirectPassword
-        emptyView.visibility = View.GONE
-        listview.emptyView = null
-        adapter.clear()
-        ProgressAsyncTask<Void, User>()
-            .setProgress(progress)
-            .doWork ( object : ProgressAsyncTask.Work<Void, User> {
-                override fun run(vararg args: Void): User {
-                    return userService.getUser(email, password)!!
-                }
-            })
-            .onCompleted( object: ProgressAsyncTask.Completed<User> {
-                override fun run(result: AsyncResult<User>?) {
-                    emptyView.visibility = View.VISIBLE
-                    listview.emptyView = emptyView
-                }
-            })
-            .onSuccess( object: ProgressAsyncTask.Success<User> {
-                override fun run(user: User?) {
-                    updateUser(user)
-                }
-            })
-            .execute()
+        val redirectEmail = preferences.redirectEmail
+        val redirectPassword = preferences.redirectPassword
+        if (redirectEmail != null && redirectPassword != null) {
+            emptyView.visibility = View.GONE
+            listview.emptyView = null
+            adapter.clear()
+            ProgressAsyncTask<Void, User>()
+                    .setProgress(progress)
+                    .doWork(object : ProgressAsyncTask.Work<Void, User> {
+                        override fun run(vararg args: Void): User {
+                            return userService.getUser(redirectEmail, redirectPassword)!!
+                        }
+                    })
+                    .onCompleted(object : ProgressAsyncTask.Completed<User> {
+                        override fun run(result: AsyncResult<User>?) {
+                            emptyView.visibility = View.VISIBLE
+                            listview.emptyView = emptyView
+                        }
+                    })
+                    .onSuccess(object : ProgressAsyncTask.Success<User> {
+                        override fun run(user: User?) {
+                            updateUser(user)
+                        }
+                    })
+                    .execute()
+
+        }
     }
 
     private fun updateUser(user: User?) {

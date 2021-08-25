@@ -6,7 +6,7 @@ import org.syncloud.android.core.redirect.model.User
 
 class UserCachedService(private val service: IUserService, private val storage: UserStorage) :
     IUserService {
-    override fun getUser(email: String?, password: String?): User? {
+    override fun getUser(email: String, password: String): User? {
         return try {
             val user = service.getUser(email, password)
             storage.save(user)
@@ -20,7 +20,7 @@ class UserCachedService(private val service: IUserService, private val storage: 
         }
     }
 
-    override fun createUser(email: String?, password: String?): User? {
+    override fun createUser(email: String, password: String): User? {
         val user = service.createUser(email, password)
         storage.save(user)
         return user
