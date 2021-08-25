@@ -11,7 +11,7 @@ import org.syncloud.android.core.redirect.model.UserResult
 import java.io.IOException
 
 class RedirectService(private val webService: WebService) : IUserService {
-    val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     override fun getUser(email: String, password: String): User? {
         val json = webService.execute("GET", "/user/get", listOf(Pair("email", email), Pair("password", password)))
