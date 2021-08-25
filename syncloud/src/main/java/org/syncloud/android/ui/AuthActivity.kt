@@ -21,53 +21,44 @@ import org.syncloud.android.tasks.ProgressAsyncTask
 import org.syncloud.android.tasks.ProgressAsyncTask.Completed
 import org.syncloud.android.tasks.ProgressAsyncTask.Work
 
+const val REQUEST_AUTHENTICATE = 1
+const val REQUEST_CHECK = 2
+
 class AuthActivity : Activity() {
     private lateinit var preferences: Preferences
     private lateinit var progressBar: CircleProgressBar
     private lateinit var signInOrOut: LinearLayout
     private lateinit var userService: IUserService
+    private val progress: Progress = ProgressImpl()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
         val application = application as SyncloudApplication
-        preferences = application.Preferences
-        userService = application.userServiceCached()
+        preferences = application.preferences
+        userService = application.userServiceCached
         progressBar = findViewById<View>(R.id.progress) as CircleProgressBar
-        progressBar!!.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
+        progressBar.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
         signInOrOut = findViewById<View>(R.id.sign_in_or_up) as LinearLayout
         val learnMoreText = findViewById<View>(R.id.auth_learn_more) as TextView
         learnMoreText.movementMethod = LinkMovementMethod.getInstance()
         proceedWithLogin()
     }
 
-    private val progress: Progress = ProgressImpl()
-
-    inner class ProgressImpl : Progress.Empty() {
-        override fun start() {
-            signInOrOut!!.visibility = View.INVISIBLE
-            progressBar!!.visibility = View.VISIBLE
-        }
-
-        override fun stop() {
-            signInOrOut!!.visibility = View.VISIBLE
-            progressBar!!.visibility = View.INVISIBLE
-        }
-    }
-
     private fun proceedWithLogin() {
-        if (preferences!!.hasCredentials()) {
+        if (preferences.hasCredentials()) {
             login()
         }
     }
 
     private fun login() {
-        val email = preferences!!.redirectEmail
-        val password = preferences!!.redirectPassword
+        val email = preferences.redirectEmail
+        val password = preferences.redirectPassword
         ProgressAsyncTask<Void, User>()
             .setProgress(progress)
             .doWork(object : Work<Void, User> {
                 override fun run(vararg args: Void): User {
-                    return userService!!.getUser(email, password)!!
+                    return userService.getUser(email, password)!!
                 }
             })
             .onCompleted(object : Completed<User> {
@@ -86,10 +77,10 @@ class AuthActivity : Activity() {
         } else {
             val intent = Intent(this@AuthActivity, AuthCredentialsActivity::class.java)
             intent.putExtra(
-                AuthCredentialsActivity.PARAM_PURPOSE,
-                AuthCredentialsActivity.PURPOSE_SIGN_IN
+                AuthConstants.PARAM_PURPOSE,
+                AuthConstants.PURPOSE_SIGN_IN
             )
-            intent.putExtra(AuthCredentialsActivity.PARAM_CHECK_EXISTING, true)
+            intent.putExtra(AuthConstants.PARAM_CHECK_EXISTING, true)
             startActivityForResult(intent, REQUEST_AUTHENTICATE)
         }
     }
@@ -109,8 +100,8 @@ class AuthActivity : Activity() {
     fun signIn(view: View?) {
         val credentialsIntent = Intent(this, AuthCredentialsActivity::class.java)
         credentialsIntent.putExtra(
-            AuthCredentialsActivity.PARAM_PURPOSE,
-            AuthCredentialsActivity.PURPOSE_SIGN_IN
+            AuthConstants.PARAM_PURPOSE,
+            AuthConstants.PURPOSE_SIGN_IN
         )
         startActivityForResult(credentialsIntent, REQUEST_AUTHENTICATE)
     }
@@ -118,14 +109,21 @@ class AuthActivity : Activity() {
     fun signUp(view: View?) {
         val credentialsIntent = Intent(this, AuthCredentialsActivity::class.java)
         credentialsIntent.putExtra(
-            AuthCredentialsActivity.PARAM_PURPOSE,
-            AuthCredentialsActivity.PURPOSE_REGISTER
+            AuthConstants.PARAM_PURPOSE,
+            AuthConstants.PURPOSE_REGISTER
         )
         startActivityForResult(credentialsIntent, REQUEST_AUTHENTICATE)
     }
 
-    companion object {
-        var REQUEST_AUTHENTICATE = 1
-        var REQUEST_CHECK = 2
+    inner class ProgressImpl : Progress.Empty() {
+        override fun start() {
+            signInOrOut.visibility = View.INVISIBLE
+            progressBar.visibility = View.VISIBLE
+        }
+
+        override fun stop() {
+            signInOrOut.visibility = View.VISIBLE
+            progressBar.visibility = View.INVISIBLE
+        }
     }
 }

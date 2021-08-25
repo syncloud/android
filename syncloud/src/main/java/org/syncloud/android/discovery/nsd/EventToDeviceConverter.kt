@@ -9,12 +9,12 @@ import org.apache.log4j.Logger
 
 class EventToDeviceConverter(
     private val manager: NsdManager,
-    lookForServiceName: String,
-    resolver: Resolver
-) : DiscoveryListener {
-    private val lookForServiceName: String
+    lookForServiceNameInput: String,
     private val resolver: Resolver
+) : DiscoveryListener {
+    private val lookForServiceName: String = lookForServiceNameInput.lowercase()
     private val discoveredServices: MutableList<String> = Lists.newArrayList()
+
     override fun onStartDiscoveryFailed(s: String, i: Int) {
         val text = "start discovery failed $s"
         logger.error(text)
@@ -38,7 +38,7 @@ class EventToDeviceConverter(
     }
 
     override fun onServiceFound(serviceInfo: NsdServiceInfo) {
-        val serviceName = serviceInfo.serviceName.toLowerCase()
+        val serviceName = serviceInfo.serviceName.lowercase()
         var text = "service found $serviceName"
         logger.info(text)
         if (!discoveredServices.contains(serviceName)) {
@@ -57,13 +57,6 @@ class EventToDeviceConverter(
     }
 
     companion object {
-        private val logger = Logger.getLogger(
-            EventToDeviceConverter::class.java.name
-        )
-    }
-
-    init {
-        this.lookForServiceName = lookForServiceName.toLowerCase()
-        this.resolver = resolver
+        private val logger = Logger.getLogger(EventToDeviceConverter::class.java.name)
     }
 }

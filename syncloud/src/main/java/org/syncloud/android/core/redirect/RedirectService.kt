@@ -12,8 +12,8 @@ import org.syncloud.android.core.redirect.model.UserResult
 import java.io.IOException
 import java.util.*
 
-class RedirectService(apiUrl: String?) : IUserService {
-    private val webService: WebService
+class RedirectService(apiUrl: String) : IUserService {
+    private val webService: WebService = WebService(apiUrl)
     override fun getUser(email: String?, password: String?): User? {
         val parameters: MutableList<NameValuePair> = ArrayList()
         parameters.add(BasicNameValuePair("email", email))
@@ -49,13 +49,7 @@ class RedirectService(apiUrl: String?) : IUserService {
             return "https://api.$mainDomain"
         }
 
-        private val logger = Logger.getLogger(
-            RedirectService::class.java
-        )
+        private val logger = Logger.getLogger(RedirectService::class.java)
         private val mapper = createObjectMapper()
-    }
-
-    init {
-        webService = WebService(apiUrl!!)
     }
 }

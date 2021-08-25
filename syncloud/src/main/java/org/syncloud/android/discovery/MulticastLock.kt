@@ -10,7 +10,7 @@ class MulticastLock(private val wifi: WifiManager) {
     fun acquire() {
         logger.info("creating multicast lock")
         try {
-            lock = wifi.createMulticastLock(MULTICAST_LOCK_TAG)
+            lock = wifi.createMulticastLock(MulticastLock::class.java.toString())
             lock?.also {
                 it.setReferenceCounted(true)
                 it.acquire()
@@ -35,6 +35,5 @@ class MulticastLock(private val wifi: WifiManager) {
 
     companion object {
         private val logger = Logger.getLogger(MulticastLock::class.java.name)
-        val MULTICAST_LOCK_TAG = MulticastLock::class.java.toString()
     }
 }

@@ -12,14 +12,8 @@ import org.syncloud.android.core.platform.model.Identification
 import java.io.IOException
 
 class Internal {
-    private fun getRestUrl(host: String): String {
-        return String.format("https://%s/rest", host)
-    }
-
-    private fun getRestWebService(host: String): WebService {
-        return WebService(getRestUrl(host))
-    }
-
+    private fun getRestUrl(host: String): String = String.format("https://%s/rest", host)
+    private fun getRestWebService(host: String): WebService = WebService(getRestUrl(host))
     fun getId(host: String): Optional<Identification?> {
         val webService = getRestWebService(host)
         val json: String

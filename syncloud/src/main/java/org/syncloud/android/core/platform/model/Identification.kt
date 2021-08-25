@@ -14,18 +14,6 @@ class Identification : Serializable {
         this.mac_address = mac_address
     }
 
-    fun macAddress(): String? {
-        return mac_address
-    }
-
-    fun name(): String? {
-        return name
-    }
-
-    fun title(): String? {
-        return title
-    }
-
     override fun toString(): String {
         return "Identification{" +
                 "name='" + name + '\'' +

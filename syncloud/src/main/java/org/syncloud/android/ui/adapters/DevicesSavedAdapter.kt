@@ -10,24 +10,21 @@ import org.syncloud.android.SyncloudApplication
 import org.syncloud.android.core.platform.model.DomainModel
 import org.syncloud.android.ui.DevicesSavedActivity
 
-class DevicesSavedAdapter(private val activity: DevicesSavedActivity) : ArrayAdapter<DomainModel?>(
+class DevicesSavedAdapter(private val activity: DevicesSavedActivity) : ArrayAdapter<DomainModel>(
     activity, R.layout.layout_device_item
 ) {
-    private val preferences: Preferences?
+    private var preferences: Preferences = (activity.application as SyncloudApplication).preferences
+
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val mainDomain = preferences!!.mainDomain
+        val mainDomain = preferences.mainDomain
         val inflater = activity.layoutInflater
         val rowView = inflater.inflate(R.layout.layout_device_item, null)
         val txtBoldTitle = rowView.findViewById<TextView>(R.id.txt_bold_title)
         val txtAdditionalLine = rowView.findViewById<TextView>(R.id.txt_additional_line)
-        val domain = getItem(position)
-        val fullDomainName = domain!!.name()
+        val domain = getItem(position)!!
+        val fullDomainName = domain.name
         txtBoldTitle.text = fullDomainName
-        txtAdditionalLine.text = domain.id()!!.title()
+        txtAdditionalLine.text = domain.id!!.title
         return rowView
-    }
-
-    init {
-        preferences = (activity.application as SyncloudApplication).Preferences
     }
 }

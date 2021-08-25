@@ -26,38 +26,41 @@ import org.syncloud.android.core.platform.model.Endpoint
 import org.syncloud.android.core.platform.model.IdentifiedEndpoint
 import org.syncloud.android.discovery.DeviceEndpointListener
 import org.syncloud.android.discovery.DiscoveryManager
-import org.syncloud.android.ui.DevicesDiscoveryActivity
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter
+import org.syncloud.android.ui.dialog.WIFI_SETTINGS
 import org.syncloud.android.ui.dialog.WifiDialog
 
+const val REQUEST_SETTINGS = 1
+
 class DevicesDiscoveryActivity : AppCompatActivity() {
-    private var preferences: Preferences? = null
-    private var discoveryManager: DiscoveryManager? = null
-    private var refreshBtn: FloatingActionButton? = null
-    private var listAdapter: DevicesDiscoveredAdapter? = null
-    private var swipeRefreshLayout: SwipeRefreshLayout? = null
-    private var emptyView: View? = null
-    private var resultsList: ListView? = null
-    private var map: MutableMap<Endpoint?, IdentifiedEndpoint>? = null
-    private var internal: Internal? = null
-    private var application: SyncloudApplication? = null
+    private lateinit var preferences: Preferences
+    private lateinit var discoveryManager: DiscoveryManager
+    private lateinit var refreshBtn: FloatingActionButton
+    private lateinit var listAdapter: DevicesDiscoveredAdapter
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var emptyView: View
+    private lateinit var resultsList: ListView
+    private lateinit var map: MutableMap<Endpoint?, IdentifiedEndpoint>
+    private lateinit var internal: Internal
+    private lateinit var application: SyncloudApplication
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
         setContentView(R.layout.activity_devices_discovery)
         application = getApplication() as SyncloudApplication
-        preferences = application!!.Preferences
+        preferences = application.preferences
         internal = Internal()
         swipeRefreshLayout = findViewById<View>(R.id.swipe_refresh_layout) as SwipeRefreshLayout
-        swipeRefreshLayout!!.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
-        swipeRefreshLayout!!.setOnRefreshListener { checkWiFiAndDiscover() }
+        swipeRefreshLayout.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
+        swipeRefreshLayout.setOnRefreshListener { checkWiFiAndDiscover() }
         emptyView = findViewById(android.R.id.empty)
         resultsList = findViewById<View>(R.id.devices_discovered) as ListView
         refreshBtn = findViewById<View>(R.id.discovery_refresh_btn) as FloatingActionButton
         listAdapter = DevicesDiscoveredAdapter(this)
-        resultsList!!.adapter = listAdapter
-        resultsList!!.onItemClickListener = OnItemClickListener { adapterView, view, position, l ->
-            val obj = resultsList!!.getItemAtPosition(position)
+        resultsList.adapter = listAdapter
+        resultsList.onItemClickListener = OnItemClickListener { _, _, position, _ ->
+            val obj = resultsList.getItemAtPosition(position)
             val ie = obj as IdentifiedEndpoint
             open(ie)
         }
@@ -66,12 +69,12 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
             applicationContext.getSystemService(WIFI_SERVICE) as WifiManager,
             applicationContext.getSystemService(NSD_SERVICE) as NsdManager
         )
-        swipeRefreshLayout!!.post { checkWiFiAndDiscover() }
+        swipeRefreshLayout.post { checkWiFiAndDiscover() }
     }
 
     private fun checkWiFiAndDiscover() {
-        listAdapter!!.clear()
-        if (application!!.isWifiConnected) {
+        listAdapter.clear()
+        if (application.isWifiConnected) {
             DiscoveryTask().execute()
         } else {
             val dialog = WifiDialog()
@@ -82,7 +85,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == WifiDialog.WIFI_SETTINGS) {
+        if (requestCode == WIFI_SETTINGS) {
             checkWiFiAndDiscover()
         } else {
             finish()
@@ -104,7 +107,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
     }
 
     private fun open(endpoint: IdentifiedEndpoint) {
-        if (!endpoint.id().isPresent) {
+        if (!endpoint.id.isPresent) {
             AlertDialog.Builder(this)
                 .setTitle("Can't identify device")
                 .setMessage("Sorry, there's no identification information for this device. Most probably it is running old release of Syncloud. Please upgrade it to latest release and try to activate again.")
@@ -112,7 +115,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
                 .show()
         } else {
             val browserIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(endpoint.endpoint().activationUrl()))
+                Intent(Intent.ACTION_VIEW, Uri.parse(endpoint.endpoint.activationUrl))
             startActivity(browserIntent)
         }
     }
@@ -120,7 +123,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         logger.info("leaving the screen")
-        discoveryManager!!.cancel()
+        discoveryManager.cancel()
     }
 
     fun refresh(view: View?) {
@@ -129,46 +132,45 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
 
     inner class DiscoveryTask : AsyncTask<Void, Progress, Void>() {
         private val deviceEndpointListener: DeviceEndpointListener
+
         override fun onPreExecute() {
-            refreshBtn!!.visibility = View.GONE
-            swipeRefreshLayout!!.isRefreshing = true
-            emptyView!!.visibility = View.GONE
-            resultsList!!.emptyView = null
-            listAdapter!!.clear()
+            refreshBtn.visibility = View.GONE
+            swipeRefreshLayout.isRefreshing = true
+            emptyView.visibility = View.GONE
+            resultsList.emptyView = null
+            listAdapter.clear()
 
             //use for testing without wi-fi
             //listAdapter.add(new DirectEndpoint("localhost", 22, "vsapronov", "somepassword", null));
         }
 
         protected override fun doInBackground(vararg params: Void): Void? {
-            discoveryManager!!.run(20, deviceEndpointListener)
+            discoveryManager.run(20, deviceEndpointListener)
             return null
         }
 
         override fun onPostExecute(aVoid: Void?) {
-            emptyView!!.visibility = View.VISIBLE
-            resultsList!!.emptyView = emptyView
-            swipeRefreshLayout!!.isRefreshing = false
-            refreshBtn!!.visibility = View.VISIBLE
+            emptyView.visibility = View.VISIBLE
+            resultsList.emptyView = emptyView
+            swipeRefreshLayout.isRefreshing = false
+            refreshBtn.visibility = View.VISIBLE
         }
 
         protected override fun onProgressUpdate(vararg progresses: Progress) {
             val progress = progresses[0]
             val ie = progress.identifiedEndpoint
             if (progress.isAdded) {
-                map!![progress.endpoint] = ie
-                listAdapter!!.add(ie)
+                map[progress.endpoint] = ie
+                listAdapter.add(ie)
             } else {
-                listAdapter!!.remove(ie)
+                listAdapter.remove(ie)
             }
         }
 
         init {
             deviceEndpointListener = object : DeviceEndpointListener {
                 override fun added(endpoint: Endpoint?) {
-                    val id = internal!!.getId(
-                        endpoint!!.host()
-                    )
+                    val id = internal.getId(endpoint!!.host)
                     if (id.isPresent) {
                         val ie = IdentifiedEndpoint(endpoint, Optional.of(id.get()))
                         publishProgress(Progress(true, endpoint, ie))
@@ -176,7 +178,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
                 }
 
                 override fun removed(endpoint: Endpoint?) {
-                    val ie = map!!.remove(endpoint)
+                    val ie = map.remove(endpoint)
                     publishProgress(Progress(false, endpoint!!, ie!!))
                 }
             }
@@ -200,9 +202,6 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val logger = Logger.getLogger(
-            DevicesDiscoveryActivity::class.java.name
-        )
-        private const val REQUEST_SETTINGS = 1
+        private val logger = Logger.getLogger(DevicesDiscoveryActivity::class.java.name)
     }
 }

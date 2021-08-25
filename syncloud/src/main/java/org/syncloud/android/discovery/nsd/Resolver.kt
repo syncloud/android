@@ -5,18 +5,17 @@ import org.syncloud.android.discovery.DeviceEndpointListener
 import android.net.nsd.NsdServiceInfo
 import org.apache.log4j.Logger
 import org.syncloud.android.core.platform.model.Endpoint
+import org.syncloud.android.discovery.DISCOVERY_MANAGER_ACTIVATION_PORT
 import org.syncloud.android.discovery.DiscoveryManager
 import java.util.*
 
 class Resolver(
     private val manager: NsdManager,
-    private val deviceEndpointListener: DeviceEndpointListener?
+    private val deviceEndpointListener: DeviceEndpointListener
 ) {
     private var isBusy = false
     private val queue: Queue<NsdServiceInfo> = LinkedList()
-    private val resolveListener: ResolveListener
-
-    inner class QueueItem(var serviceName: String, var serviceInfo: NsdServiceInfo)
+    private val resolveListener: ResolveListener = ResolveListener()
 
     fun resolve(serviceInfo: NsdServiceInfo) {
         queue.add(serviceInfo)
@@ -38,9 +37,7 @@ class Resolver(
         checkQueue()
     }
 
-    private fun deviceFound(device: Endpoint) {
-        deviceEndpointListener?.added(device)
-    }
+    private fun deviceFound(device: Endpoint) = deviceEndpointListener.added(device)
 
     inner class ResolveListener : NsdManager.ResolveListener {
         override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
@@ -58,8 +55,11 @@ class Resolver(
             if (host != null) {
                 val address = host.hostAddress
                 if (!address.contains(":")) {
-                    val device = Endpoint(address, DiscoveryManager.ACTIVATION_PORT)
+                    val device = Endpoint(address, DISCOVERY_MANAGER_ACTIVATION_PORT)
                     deviceFound(device)
+                }
+                else {
+                    logger.info("device was successfully detected, however IPV6 addresses are not supported.")
                 }
             }
             endResolving()
@@ -68,9 +68,5 @@ class Resolver(
 
     companion object {
         private val logger = Logger.getLogger(Resolver::class.java.name)
-    }
-
-    init {
-        resolveListener = ResolveListener()
     }
 }

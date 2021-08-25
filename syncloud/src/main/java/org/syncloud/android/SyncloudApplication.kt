@@ -33,12 +33,18 @@ import java.io.File
     reportFormat = StringFormat.KEY_VALUE_LIST
 )
 class SyncloudApplication : Application() {
-    private lateinit var preferences: Preferences
-    private lateinit var userStorage: UserStorage
-    private lateinit var userService : IUserService
+    private lateinit var _preferences: Preferences
+    private lateinit var _userStorage: UserStorage
+    private lateinit var _userService : IUserService
 
-    val Preferences : Preferences
-        get () = preferences
+    val preferences : Preferences get () = _preferences
+    val userServiceCached : IUserService get() = _userService
+    val isWifiConnected: Boolean
+        get() {
+            val connManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+            val mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+            return mWifi!!.isConnected
+        }
 
     override fun onCreate() {
         configure()
@@ -47,9 +53,12 @@ class SyncloudApplication : Application() {
         super.onCreate()
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
-        preferences = Preferences(sharedPreferences)
-        userStorage = UserStorage(File(applicationContext.filesDir, "user.json"))
-        userService = webServiceAuthWithFileBackedCache()
+        _preferences = Preferences(sharedPreferences)
+        _userStorage = UserStorage(File(applicationContext.filesDir, "user.json"))
+        _userService = webServiceAuthWithFileBackedCache()
+
+        // used for testing without proper ssl certificates and valid login
+        //_userService = bypassLoginHack()
     }
 
     override fun attachBaseContext(base: Context) {
@@ -57,25 +66,12 @@ class SyncloudApplication : Application() {
         ACRA.init(this)
     }
 
-    fun userServiceCached() : IUserService = userService
-
     private fun webServiceAuthWithFileBackedCache(): UserCachedService {
-        val redirectService = RedirectService(
-            RedirectService.getApiUrl(preferences!!.mainDomain)
-        )
-        return UserCachedService(redirectService, userStorage)
+        val redirectService = RedirectService(RedirectService.getApiUrl(_preferences.mainDomain))
+        return UserCachedService(redirectService, _userStorage)
     }
 
-    fun reportError() {
-        ACRA.getErrorReporter().handleSilentException(null)
-    }
-
-    val isWifiConnected: Boolean
-        get() {
-            val connManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-            val mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
-            return mWifi!!.isConnected
-        }
+    fun reportError() = ACRA.getErrorReporter().handleSilentException(null)
 }
 
 fun bypassLoginHack() : IUserService {

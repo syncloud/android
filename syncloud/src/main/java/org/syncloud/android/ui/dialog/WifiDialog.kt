@@ -10,6 +10,8 @@ import android.provider.Settings
 import androidx.fragment.app.DialogFragment
 import org.syncloud.android.ui.dialog.WifiDialog
 
+const val WIFI_SETTINGS = 3
+
 class WifiDialog : DialogFragment() {
     private var message = ""
     fun setMessage(message: String) {
@@ -27,14 +29,9 @@ class WifiDialog : DialogFragment() {
         return builder.create()
     }
 
-    fun openWiFiSettings() {
+    private fun openWiFiSettings() {
         val context: Activity? = activity
         val intent = Intent(Settings.ACTION_WIFI_SETTINGS)
         context!!.startActivityForResult(intent, WIFI_SETTINGS)
-    }
-
-    companion object {
-        @JvmField
-        var WIFI_SETTINGS = 3
     }
 }

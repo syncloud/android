@@ -5,20 +5,18 @@ import org.syncloud.android.core.platform.model.Identification
 import org.syncloud.android.core.platform.model.DomainModel
 import java.io.Serializable
 
+fun deviceId(domain: Domain): Identification? {
+    return if (domain.device_mac_address != null && domain.device_name != null && domain.device_title != null)
+        Identification(domain.device_mac_address, domain.device_name, domain.device_title)
+    else null
+}
+
 class DomainModel(private val domain: Domain) : Serializable {
-    private val id: Identification?
+    val name: String
+        get() = domain.name
 
-    init {
-        id = deviceId(domain)
-    }
-
-    fun name(): String {
-        return domain.name
-    }
-
-    fun id(): Identification? {
-        return id
-    }
+    val id : Identification?
+        get() = deviceId(domain)
 
     val dnsUrl: String
         get() {
@@ -36,16 +34,4 @@ class DomainModel(private val domain: Domain) : Serializable {
                 ", id=" + id +
                 '}'
     }
-
-    companion object {
-        private fun deviceId(domain: Domain): Identification? {
-            return if (domain.device_mac_address != null && domain.device_name != null && domain.device_title != null) Identification(
-                domain.device_mac_address,
-                domain.device_name,
-                domain.device_title
-            ) else null
-        }
-    }
-
-
 }

@@ -27,8 +27,6 @@ import org.syncloud.android.tasks.AsyncResult
 import org.syncloud.android.tasks.ProgressAsyncTask
 import org.syncloud.android.tasks.ProgressAsyncTask.Completed
 import org.syncloud.android.tasks.ProgressAsyncTask.Work
-import org.syncloud.android.ui.AuthActivity
-import org.syncloud.android.ui.AuthCredentialsActivity
 
 class AuthCredentialsActivity : AppCompatActivity() {
     private lateinit var preferences: Preferences
@@ -39,17 +37,19 @@ class AuthCredentialsActivity : AppCompatActivity() {
     private lateinit var signInButton: Button
     private lateinit var progressBar: CircleProgressBar
     private var purpose: String? = null
+    private val progress: Progress = ProgressImpl()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
         setContentView(R.layout.activity_auth_credentials)
         val application = application as SyncloudApplication
-        preferences = application.Preferences
-        userService = application.userServiceCached()
+        preferences = application.preferences
+        userService = application.userServiceCached
         emailLoginFormView = findViewById<View>(R.id.email_login_form) as LinearLayout
         emailView = findViewById<View>(R.id.email) as EditText
         passwordView = findViewById<View>(R.id.password) as EditText
-        passwordView!!.setOnEditorActionListener(OnEditorActionListener { textView, id, keyEvent ->
+        passwordView.setOnEditorActionListener(OnEditorActionListener { textView, id, keyEvent ->
             if (id == R.id.login || id == EditorInfo.IME_NULL) {
                 attemptLogin()
                 return@OnEditorActionListener true
@@ -57,25 +57,25 @@ class AuthCredentialsActivity : AppCompatActivity() {
             false
         })
         signInButton = findViewById<View>(R.id.sign_in_button) as Button
-        signInButton!!.setOnClickListener { attemptLogin() }
+        signInButton.setOnClickListener { attemptLogin() }
         progressBar = findViewById<View>(R.id.progress) as CircleProgressBar
-        progressBar!!.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
+        progressBar.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
         val intent = intent
-        purpose = intent.getStringExtra(PARAM_PURPOSE)
-        if (purpose == PURPOSE_SIGN_IN) {
+        purpose = intent.getStringExtra(AuthConstants.PARAM_PURPOSE)
+        if (purpose == AuthConstants.PURPOSE_SIGN_IN) {
             setTitle(R.string.action_sign_in)
-            signInButton!!.setText(R.string.action_sign_in)
+            signInButton.setText(R.string.action_sign_in)
         }
-        if (purpose == PURPOSE_REGISTER) {
+        if (purpose == AuthConstants.PURPOSE_REGISTER) {
             setTitle(R.string.action_sign_up)
-            signInButton!!.setText(R.string.action_sign_up)
+            signInButton.setText(R.string.action_sign_up)
         }
-        if (preferences!!.hasCredentials()) {
-            val email = preferences!!.redirectEmail
-            val password = preferences!!.redirectPassword
-            emailView!!.setText(email)
-            passwordView!!.setText(password)
-            val checkExisting = intent.getBooleanExtra(PARAM_CHECK_EXISTING, false)
+        if (preferences.hasCredentials()) {
+            val email = preferences.redirectEmail
+            val password = preferences.redirectPassword
+            emailView.setText(email)
+            passwordView.setText(password)
+            val checkExisting = intent.getBooleanExtra(AuthConstants.PARAM_CHECK_EXISTING, false)
             if (checkExisting) {
                 AlertDialog.Builder(this@AuthCredentialsActivity)
                     .setTitle(getString(R.string.check_credentials))
@@ -83,18 +83,6 @@ class AuthCredentialsActivity : AppCompatActivity() {
                     .setPositiveButton(android.R.string.ok, null)
                     .show()
             }
-        }
-    }
-
-    private val progress: Progress = ProgressImpl()
-
-    inner class ProgressImpl : Progress.Empty() {
-        override fun start() {
-            showProgress(true)
-        }
-
-        override fun stop() {
-            showProgress(false)
         }
     }
 
@@ -106,7 +94,7 @@ class AuthCredentialsActivity : AppCompatActivity() {
     }
 
     fun showProgress(show: Boolean) {
-        progressBar!!.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        progressBar.visibility = if (show) View.VISIBLE else View.INVISIBLE
         setLayoutEnabled(emailLoginFormView, !show)
     }
 
@@ -123,36 +111,31 @@ class AuthCredentialsActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun isEmailValid(email: String): Boolean {
-        return email.contains("@")
-    }
-
-    private fun isPasswordValid(password: String): Boolean {
-        return password.length > 4
-    }
+    private fun isEmailValid(email: String): Boolean = email.contains("@")
+    private fun isPasswordValid(password: String): Boolean = password.length > 4
 
     private fun validate(): Boolean {
-        emailView!!.error = null
-        passwordView!!.error = null
-        val email = emailView!!.text.toString()
-        val password = passwordView!!.text.toString()
+        emailView.error = null
+        passwordView.error = null
+        val email = emailView.text.toString()
+        val password = passwordView.text.toString()
         var hasErrors = false
         var focusView: View? = null
         if (TextUtils.isEmpty(password)) {
-            passwordView!!.error = getString(R.string.error_field_required)
+            passwordView.error = getString(R.string.error_field_required)
             focusView = passwordView
             hasErrors = true
         } else if (!isPasswordValid(password)) {
-            passwordView!!.error = getString(R.string.error_invalid_password)
+            passwordView.error = getString(R.string.error_invalid_password)
             focusView = passwordView
             hasErrors = true
         }
         if (TextUtils.isEmpty(email)) {
-            emailView!!.error = getString(R.string.error_field_required)
+            emailView.error = getString(R.string.error_field_required)
             focusView = emailView
             hasErrors = true
         } else if (!isEmailValid(email)) {
-            emailView!!.error = getString(R.string.error_invalid_email)
+            emailView.error = getString(R.string.error_invalid_email)
             focusView = emailView
             hasErrors = true
         }
@@ -165,14 +148,14 @@ class AuthCredentialsActivity : AppCompatActivity() {
 
     private fun attemptLogin() {
         if (!validate()) return
-        val email = emailView!!.text.toString()
-        val password = passwordView!!.text.toString()
-        val register = purpose == PURPOSE_REGISTER
+        val email = emailView.text.toString()
+        val password = passwordView.text.toString()
+        val register = purpose == AuthConstants.PURPOSE_REGISTER
         ProgressAsyncTask<Void, User>()
             .setProgress(progress)
             .doWork(object : Work<Void,User> {
                 override fun run(vararg args: Void): User {
-                    return doUserTask(register, email, password)!!
+                    return doUserTask(register, email, password)
                 }
             })
             .onCompleted(object : Completed<User> {
@@ -184,20 +167,18 @@ class AuthCredentialsActivity : AppCompatActivity() {
     }
 
     private fun doUserTask(register: Boolean, email: String, password: String): User {
-        val user: User
-        user = if (register) {
-            userService!!.createUser(email, password)!!
+        return if (register) {
+            userService.createUser(email, password)!!
         } else {
-            userService!!.getUser(email, password)!!
+            userService.getUser(email, password)!!
         }
-        return user
     }
 
     private fun onUserTaskCompleted(result: AsyncResult<User>) {
         if (result.hasValue()) {
-            val email = emailView!!.text.toString()
-            val password = passwordView!!.text.toString()
-            preferences!!.setCredentials(email, password)
+            val email = emailView.text.toString()
+            val password = passwordView.text.toString()
+            preferences.setCredentials(email, password)
             finishSuccess()
         } else {
             showError(result.exception.get())
@@ -205,7 +186,7 @@ class AuthCredentialsActivity : AppCompatActivity() {
     }
 
     private fun showErrorDialog(message: String?) {
-        val register = purpose == PURPOSE_REGISTER
+        val register = purpose == AuthConstants.PURPOSE_REGISTER
         val errorMessage: String
         errorMessage = if (register) "Unable to register new user" else "Unable to login"
         AlertDialog.Builder(this@AuthCredentialsActivity)
@@ -246,11 +227,12 @@ class AuthCredentialsActivity : AppCompatActivity() {
         finish()
     }
 
+    inner class ProgressImpl : Progress.Empty() {
+        override fun start() = showProgress(true)
+        override fun stop() = showProgress(false)
+    }
+
     companion object {
         private val logger = Logger.getLogger(AuthCredentialsActivity::class.java)
-        const val PARAM_PURPOSE = "paramPurpose"
-        const val PARAM_CHECK_EXISTING = "paramCheckExisting"
-        const val PURPOSE_SIGN_IN = "purposeSignIn"
-        const val PURPOSE_REGISTER = "purposeRegister"
     }
 }

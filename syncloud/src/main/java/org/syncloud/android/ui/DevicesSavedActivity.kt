@@ -8,11 +8,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.syncloud.android.Preferences
 import org.syncloud.android.Progress
@@ -23,35 +21,18 @@ import org.syncloud.android.core.redirect.model.User
 import org.syncloud.android.core.redirect.model.toModels
 import org.syncloud.android.tasks.AsyncResult
 import org.syncloud.android.tasks.ProgressAsyncTask
-import org.syncloud.android.ui.DevicesDiscoveryActivity
 import org.syncloud.android.ui.adapters.DevicesSavedAdapter
 import java.util.*
 
 class DevicesSavedActivity : AppCompatActivity() {
     private lateinit var listview: ListView
-    private var adapter: DevicesSavedAdapter? = null
-    private var application: SyncloudApplication? = null
-    private var preferences: Preferences? = null
+    private lateinit var adapter: DevicesSavedAdapter
+    private lateinit var application: SyncloudApplication
+    private lateinit var preferences: Preferences
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private var btnDiscovery: FloatingActionButton? = null
-    private var emptyView: View? = null
+    private lateinit var btnDiscovery: FloatingActionButton
+    private lateinit var emptyView: View
     private val progress: Progress = ProgressImpl()
-
-    inner class ProgressImpl : Progress.Empty() {
-        override fun start() {
-            swipeRefreshLayout!!.isRefreshing = true
-            listview!!.isEnabled = false
-            btnDiscovery!!.visibility = View.GONE
-        }
-
-        override fun stop() {
-            swipeRefreshLayout!!.isRefreshing = false
-            listview!!.isEnabled = true
-            btnDiscovery!!.visibility = View.VISIBLE
-        }
-
-        override fun error(message: String?) {}
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +42,7 @@ class DevicesSavedActivity : AppCompatActivity() {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
         emptyView = findViewById(android.R.id.empty)
         listview = findViewById(R.id.devices_saved)
-        listview.setOnItemClickListener(OnItemClickListener { adapterView: AdapterView<*>?, view: View?, position: Int, l: Long ->
+        listview.setOnItemClickListener({ adapterView: AdapterView<*>?, view: View?, position: Int, l: Long ->
             val obj = listview.getItemAtPosition(position)
             val domain = obj as DomainModel
             open(domain)
@@ -70,20 +51,20 @@ class DevicesSavedActivity : AppCompatActivity() {
         adapter = DevicesSavedAdapter(this)
         listview.setAdapter(adapter)
         application = getApplication() as SyncloudApplication
-        preferences = application!!.Preferences
+        preferences = application.preferences
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
         swipeRefreshLayout.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
-        swipeRefreshLayout.setOnRefreshListener(OnRefreshListener { refreshDevices() })
-        swipeRefreshLayout.post(Runnable { refreshDevices() })
+        swipeRefreshLayout.setOnRefreshListener({ refreshDevices() })
+        swipeRefreshLayout.post({ refreshDevices() })
     }
 
     private fun refreshDevices() {
-        val userService = application!!.userServiceCached()
-        val email = preferences!!.redirectEmail
-        val password = preferences!!.redirectPassword
-        emptyView!!.visibility = View.GONE
-        listview!!.emptyView = null
-        adapter!!.clear()
+        val userService = application.userServiceCached
+        val email = preferences.redirectEmail
+        val password = preferences.redirectPassword
+        emptyView.visibility = View.GONE
+        listview.emptyView = null
+        adapter.clear()
         ProgressAsyncTask<Void, User>()
             .setProgress(progress)
             .doWork ( object : ProgressAsyncTask.Work<Void, User> {
@@ -93,8 +74,8 @@ class DevicesSavedActivity : AppCompatActivity() {
             })
             .onCompleted( object: ProgressAsyncTask.Completed<User> {
                 override fun run(result: AsyncResult<User>?) {
-                    emptyView!!.visibility = View.VISIBLE
-                    listview!!.emptyView = emptyView
+                    emptyView.visibility = View.VISIBLE
+                    listview.emptyView = emptyView
                 }
             })
             .onSuccess( object: ProgressAsyncTask.Success<User> {
@@ -108,11 +89,11 @@ class DevicesSavedActivity : AppCompatActivity() {
     private fun updateUser(user: User?) {
         val domains = user!!.domains!!.toModels()
         val noDevicesLast = Comparator { first: DomainModel, second: DomainModel ->
-            first.name().compareTo(second.name())
+            first.name.compareTo(second.name)
         }
         Collections.sort(domains, noDevicesLast)
-        adapter!!.clear()
-        for (domain in domains) adapter!!.add(domain)
+        adapter.clear()
+        for (domain in domains) adapter.add(domain)
     }
 
     private fun open(device: DomainModel) {
@@ -140,5 +121,21 @@ class DevicesSavedActivity : AppCompatActivity() {
 
     fun discover(view: View?) {
         startActivityForResult(Intent(this, DevicesDiscoveryActivity::class.java), 1)
+    }
+
+    inner class ProgressImpl : Progress.Empty() {
+        override fun start() {
+            swipeRefreshLayout.isRefreshing = true
+            listview.isEnabled = false
+            btnDiscovery.visibility = View.GONE
+        }
+
+        override fun stop() {
+            swipeRefreshLayout.isRefreshing = false
+            listview.isEnabled = true
+            btnDiscovery.visibility = View.VISIBLE
+        }
+
+        override fun error(message: String?) {}
     }
 }

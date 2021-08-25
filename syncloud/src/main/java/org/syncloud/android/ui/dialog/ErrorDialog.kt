@@ -10,11 +10,8 @@ import android.widget.TextView
 import org.syncloud.android.R
 import org.syncloud.android.SyncloudApplication
 
-class ErrorDialog(private val context: Activity, message: String) : AlertDialog(
-    context
-) {
-    private val application: SyncloudApplication
-    private val message: String
+class ErrorDialog(private val context: Activity, private val message: String) : AlertDialog(context) {
+    private val application: SyncloudApplication = context.application as SyncloudApplication
     override fun onCreate(savedInstanceState: Bundle) {
         val inflater = LayoutInflater.from(context)
         val view = inflater.inflate(R.layout.dialog_error, null)
@@ -26,13 +23,9 @@ class ErrorDialog(private val context: Activity, message: String) : AlertDialog(
         super.onCreate(savedInstanceState)
     }
 
-    fun reportError() {
-        application.reportError()
-    }
+    fun reportError() = application.reportError()
 
     init {
-        application = context.application as SyncloudApplication
-        this.message = message
         setCancelable(true)
     }
 }

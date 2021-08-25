@@ -9,13 +9,16 @@ import org.syncloud.android.discovery.nsd.NsdDiscovery
 import org.syncloud.android.discovery.nsd.EventToDeviceConverter
 import java.lang.Exception
 
+const val TYPE = "_ssh._tcp."
+
 class NsdDiscovery(
     private val manager: NsdManager,
-    deviceEndpointListener: DeviceEndpointListener?,
-    serviceName: String?
+    deviceEndpointListener: DeviceEndpointListener,
+    serviceName: String
 ) : Discovery {
     private val listener: DiscoveryListener
     private var started = false
+
     override fun start() {
         logger.info("starting discovery")
         if (started) {
@@ -49,16 +52,11 @@ class NsdDiscovery(
     }
 
     companion object {
-        private val logger = Logger.getLogger(
-            NsdDiscovery::class.java.name
-        )
-        const val TYPE = "_ssh._tcp."
+        private val logger = Logger.getLogger(NsdDiscovery::class.java.name)
     }
 
     init {
-        val resolver = Resolver(
-            manager, deviceEndpointListener
-        )
-        listener = EventToDeviceConverter(manager, serviceName!!, resolver)
+        val resolver = Resolver(manager, deviceEndpointListener)
+        listener = EventToDeviceConverter(manager, serviceName, resolver)
     }
 }

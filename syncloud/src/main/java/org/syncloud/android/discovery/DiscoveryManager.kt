@@ -6,12 +6,14 @@ import org.apache.log4j.Logger
 import org.syncloud.android.discovery.DiscoveryManager
 import org.syncloud.android.discovery.nsd.NsdDiscovery
 
-class DiscoveryManager(wifi: WifiManager, manager: NsdManager) {
-    private val lock: MulticastLock
+const val DISCOVERY_MANAGER_ACTIVATION_PORT = 81
+
+class DiscoveryManager(wifi: WifiManager, private val manager: NsdManager) {
+    private val lock: MulticastLock = MulticastLock(wifi)
     private var discovery: Discovery? = null
-    private val manager: NsdManager
     private var canceled = false
-    fun run(timeoutSeconds: Int, deviceEndpointListener: DeviceEndpointListener?) {
+
+    fun run(timeoutSeconds: Int, deviceEndpointListener: DeviceEndpointListener) {
         canceled = false
         logger.info("starting discovery")
         if (discovery == null) {
@@ -49,14 +51,6 @@ class DiscoveryManager(wifi: WifiManager, manager: NsdManager) {
     }
 
     companion object {
-        private val logger = Logger.getLogger(
-            DiscoveryManager::class.java.name
-        )
-        var ACTIVATION_PORT = 81
-    }
-
-    init {
-        lock = MulticastLock(wifi!!)
-        this.manager = manager
+        private val logger = Logger.getLogger(DiscoveryManager::class.java.name)
     }
 }
