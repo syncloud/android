@@ -247,9 +247,7 @@ class AuthCredentialsActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val logger = Logger.getLogger(
-            AuthCredentialsActivity::class.java
-        )
+        private val logger = Logger.getLogger(AuthCredentialsActivity::class.java)
         const val PARAM_PURPOSE = "paramPurpose"
         const val PARAM_CHECK_EXISTING = "paramCheckExisting"
         const val PURPOSE_SIGN_IN = "purposeSignIn"

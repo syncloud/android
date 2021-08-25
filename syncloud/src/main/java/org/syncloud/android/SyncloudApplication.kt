@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.preference.PreferenceManager
+import com.google.common.collect.Lists.newArrayList
 import org.acra.ACRA
 import org.acra.ReportField
 import org.acra.annotation.AcraCore
@@ -15,6 +16,7 @@ import org.syncloud.android.core.redirect.IUserService
 import org.syncloud.android.core.redirect.RedirectService
 import org.syncloud.android.core.redirect.UserCachedService
 import org.syncloud.android.core.redirect.UserStorage
+import org.syncloud.android.core.redirect.model.User
 import java.io.File
 
 @AcraDialog(
@@ -33,6 +35,7 @@ import java.io.File
 class SyncloudApplication : Application() {
     private lateinit var preferences: Preferences
     private lateinit var userStorage: UserStorage
+    private lateinit var userService : IUserService
 
     val Preferences : Preferences
         get () = preferences
@@ -46,6 +49,7 @@ class SyncloudApplication : Application() {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
         preferences = Preferences(sharedPreferences)
         userStorage = UserStorage(File(applicationContext.filesDir, "user.json"))
+        userService = webServiceAuthWithFileBackedCache()
     }
 
     override fun attachBaseContext(base: Context) {
@@ -53,7 +57,9 @@ class SyncloudApplication : Application() {
         ACRA.init(this)
     }
 
-    fun userServiceCached(): IUserService {
+    fun userServiceCached() : IUserService = userService
+
+    private fun webServiceAuthWithFileBackedCache(): UserCachedService {
         val redirectService = RedirectService(
             RedirectService.getApiUrl(preferences!!.mainDomain)
         )
@@ -70,4 +76,20 @@ class SyncloudApplication : Application() {
             val mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
             return mWifi!!.isConnected
         }
+}
+
+fun bypassLoginHack() : IUserService {
+    return object : IUserService {
+        override fun getUser(email: String?, password: String?): User? {
+            val user = User()
+            user.active = true
+            user.email = "fakeBypassService@fake.com"
+            user.domains = newArrayList()
+            return user
+        }
+
+        override fun createUser(email: String?, password: String?): User? {
+            throw NotImplementedError("This is not implemented as it is irrelevant")
+        }
+    }
 }

@@ -5,10 +5,10 @@ import android.content.SharedPreferences
 class Preferences(private val preferences: SharedPreferences) {
     val mainDomain: String
         get() = preferences.getString(KEY_PREF_MAIN_DOMAIN, "syncloud.it")!!
-    val redirectEmail: String
-        get() = preferences.getString(KEY_PREF_EMAIL, null)!!
-    val redirectPassword: String
-        get() = preferences.getString(KEY_PREF_PASSWORD, null)!!
+    val redirectEmail: String?
+        get() = preferences.getString(KEY_PREF_EMAIL, null)
+    val redirectPassword: String?
+        get() = preferences.getString(KEY_PREF_PASSWORD, null)
 
     fun hasCredentials(): Boolean = redirectEmail != null
 

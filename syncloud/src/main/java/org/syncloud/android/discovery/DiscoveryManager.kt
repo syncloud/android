@@ -8,7 +8,7 @@ import org.syncloud.android.discovery.nsd.NsdDiscovery
 
 class DiscoveryManager(wifi: WifiManager, manager: NsdManager) {
     private val lock: MulticastLock
-    private lateinit var discovery: Discovery
+    private var discovery: Discovery? = null
     private val manager: NsdManager
     private var canceled = false
     fun run(timeoutSeconds: Int, deviceEndpointListener: DeviceEndpointListener?) {
@@ -17,7 +17,7 @@ class DiscoveryManager(wifi: WifiManager, manager: NsdManager) {
         if (discovery == null) {
             lock.acquire()
             discovery = NsdDiscovery(manager, deviceEndpointListener, "syncloud")
-            discovery.start()
+            (discovery as NsdDiscovery).start()
             try {
                 logger.info("waiting for $timeoutSeconds seconds")
                 var count = 0

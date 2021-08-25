@@ -21,7 +21,6 @@ class SettingsFragment : PreferenceFragment(), OnSharedPreferenceChangeListener 
     private lateinit var feedbackPref: Preference
     private var application: SyncloudApplication? = null
     private val summaryUpdatable: Set<String> = Sets.newHashSet(Preferences.KEY_PREF_MAIN_DOMAIN)
-    private val systemCategory: PreferenceCategory? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         application = activity.application as SyncloudApplication

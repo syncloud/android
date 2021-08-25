@@ -96,7 +96,6 @@ class DevicesSavedActivity : AppCompatActivity() {
                     emptyView!!.visibility = View.VISIBLE
                     listview!!.emptyView = emptyView
                 }
-
             })
             .onSuccess( object: ProgressAsyncTask.Success<User> {
                 override fun run(user: User?) {
