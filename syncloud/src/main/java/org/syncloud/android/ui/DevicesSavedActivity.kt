@@ -18,9 +18,9 @@ import org.syncloud.android.Preferences
 import org.syncloud.android.Progress
 import org.syncloud.android.R
 import org.syncloud.android.SyncloudApplication
-import org.syncloud.android.Utils.toModels
 import org.syncloud.android.core.platform.model.DomainModel
 import org.syncloud.android.core.redirect.model.User
+import org.syncloud.android.core.redirect.model.toModels
 import org.syncloud.android.tasks.AsyncResult
 import org.syncloud.android.tasks.ProgressAsyncTask
 import org.syncloud.android.ui.DevicesDiscoveryActivity
@@ -106,9 +106,7 @@ class DevicesSavedActivity : AppCompatActivity() {
     }
 
     private fun updateUser(user: User?) {
-        val domains = toModels(
-            user!!.domains!!
-        )
+        val domains = user!!.domains!!.toModels()
         val noDevicesLast = Comparator { first: DomainModel, second: DomainModel ->
             first.name().compareTo(second.name())
         }
