@@ -45,10 +45,7 @@ class RedirectService(apiUrl: String) : IUserService {
     }
 
     companion object {
-        fun getApiUrl(mainDomain: String): String {
-            return "https://api.$mainDomain"
-        }
-
+        fun getApiUrl(mainDomain: String): String = "https://api.$mainDomain"
         private val logger = Logger.getLogger(RedirectService::class.java)
         private val mapper = createObjectMapper()
     }

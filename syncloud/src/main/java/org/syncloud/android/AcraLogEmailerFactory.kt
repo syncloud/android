@@ -7,6 +7,5 @@ import org.acra.sender.ReportSender
 import org.syncloud.android.AcraLogEmailer
 
 class AcraLogEmailerFactory : ReportSenderFactory {
-    override fun create(context: Context, config: CoreConfiguration): ReportSender =
-        AcraLogEmailer(context, config)
+    override fun create(context: Context, config: CoreConfiguration): ReportSender = AcraLogEmailer(context, config)
 }

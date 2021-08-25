@@ -12,12 +12,8 @@ fun deviceId(domain: Domain): Identification? {
 }
 
 class DomainModel(private val domain: Domain) : Serializable {
-    val name: String
-        get() = domain.name
-
-    val id : Identification?
-        get() = deviceId(domain)
-
+    val name: String get() = domain.name
+    val id : Identification? get() = deviceId(domain)
     val dnsUrl: String
         get() {
             val port = if (domain.map_local_address) domain.web_local_port else domain.web_port

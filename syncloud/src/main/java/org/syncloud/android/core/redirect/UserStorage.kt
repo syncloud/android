@@ -31,9 +31,7 @@ class UserStorage(private val file: File) {
     }
 
     companion object {
-        private val logger = Logger.getLogger(
-            UserStorage::class.java
-        )
+        private val logger = Logger.getLogger(UserStorage::class.java)
         private val mapper = createObjectMapper()
     }
 }
