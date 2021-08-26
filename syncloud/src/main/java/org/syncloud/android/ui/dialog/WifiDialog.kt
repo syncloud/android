@@ -1,22 +1,17 @@
 package org.syncloud.android.ui.dialog
 
-import android.os.Bundle
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Bundle
 import android.provider.Settings
 import androidx.fragment.app.DialogFragment
-import org.syncloud.android.ui.dialog.WifiDialog
 
 const val WIFI_SETTINGS = 3
 
-class WifiDialog : DialogFragment() {
-    private var message = ""
-    fun setMessage(message: String) {
-        this.message = message
-    }
+class WifiDialog(val message: String) : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context: Activity? = activity
@@ -24,8 +19,8 @@ class WifiDialog : DialogFragment() {
         builder.setTitle("Wi-Fi Connection")
         builder.setMessage("You are not connected to Wi-Fi network. $message")
             .setCancelable(false)
-            .setPositiveButton("Wi-Fi Settings") { dialog: DialogInterface?, id: Int -> openWiFiSettings() }
-            .setNegativeButton("Cancel") { dialog: DialogInterface?, id: Int -> context!!.finish() }
+            .setPositiveButton("Wi-Fi Settings") { _: DialogInterface?, _: Int -> openWiFiSettings() }
+            .setNegativeButton("Cancel") { _: DialogInterface?, _: Int -> context!!.finish() }
         return builder.create()
     }
 

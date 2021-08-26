@@ -1,17 +1,15 @@
 package org.syncloud.android.discovery.nsd
 
 import android.net.nsd.NsdManager
-import org.syncloud.android.discovery.DeviceEndpointListener
 import android.net.nsd.NsdServiceInfo
 import org.apache.log4j.Logger
 import org.syncloud.android.core.platform.model.Endpoint
 import org.syncloud.android.discovery.DISCOVERY_MANAGER_ACTIVATION_PORT
-import org.syncloud.android.discovery.DiscoveryManager
 import java.util.*
 
 class Resolver(
     private val manager: NsdManager,
-    private val deviceEndpointListener: DeviceEndpointListener
+    val added: (endpoint: Endpoint) -> Unit
 ) {
     private var isBusy = false
     private val queue: Queue<NsdServiceInfo> = LinkedList()
@@ -37,7 +35,7 @@ class Resolver(
         checkQueue()
     }
 
-    private fun deviceFound(device: Endpoint) = deviceEndpointListener.added(device)
+    private fun deviceFound(device: Endpoint) = added(device)
 
     inner class ResolveListener : NsdManager.ResolveListener {
         override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {

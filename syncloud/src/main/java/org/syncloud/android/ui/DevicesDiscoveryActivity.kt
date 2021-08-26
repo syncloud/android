@@ -24,7 +24,6 @@ import org.syncloud.android.core.common.http.HttpClient
 import org.syncloud.android.core.platform.Internal
 import org.syncloud.android.core.platform.model.Endpoint
 import org.syncloud.android.core.platform.model.IdentifiedEndpoint
-import org.syncloud.android.discovery.DeviceEndpointListener
 import org.syncloud.android.discovery.DiscoveryManager
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter
 import org.syncloud.android.ui.dialog.WIFI_SETTINGS
@@ -74,11 +73,10 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
 
     private fun checkWiFiAndDiscover() {
         listAdapter.clear()
-        if (application.isWifiConnected) {
+        if (application.isWifiConnected()) {
             DiscoveryTask().execute()
         } else {
-            val dialog = WifiDialog()
-            dialog.setMessage("Discovery is possible only in the same Wi-Fi network where you have Syncloud device connected.")
+            val dialog = WifiDialog("Discovery is possible only in the same Wi-Fi network where you have Syncloud device connected.")
             dialog.show(supportFragmentManager, "discovery_wifi_dialog")
         }
     }
@@ -123,7 +121,6 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
     }
 
     inner class DiscoveryTask : AsyncTask<Void, Progress, Void>() {
-        private val deviceEndpointListener: DeviceEndpointListener
 
         override fun onPreExecute() {
             refreshBtn.visibility = View.GONE
@@ -133,8 +130,14 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
             listAdapter.clear()
         }
 
-        protected override fun doInBackground(vararg params: Void): Void? {
-            discoveryManager.run(20, deviceEndpointListener)
+        override fun doInBackground(vararg params: Void): Void? {
+            discoveryManager.run(20) { endpoint: Endpoint ->
+                val id = internal.getId(endpoint.host)
+                if (id != null) {
+                    val ie = IdentifiedEndpoint(endpoint, id)
+                    publishProgress(Progress(true, endpoint, ie))
+                }
+            }
             return null
         }
 
@@ -145,7 +148,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
             refreshBtn.visibility = View.VISIBLE
         }
 
-        protected override fun onProgressUpdate(vararg progresses: Progress) {
+        override fun onProgressUpdate(vararg progresses: Progress) {
             val progress = progresses[0]
             val ie = progress.identifiedEndpoint
             if (progress.isAdded) {
@@ -156,38 +159,6 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
             }
         }
 
-        init {
-            deviceEndpointListener = object : DeviceEndpointListener {
-                override fun added(endpoint: Endpoint) {
-                    val id = internal.getId(endpoint.host)
-                    if (id != null) {
-                        val ie = IdentifiedEndpoint(endpoint, id)
-                        publishProgress(Progress(true, endpoint, ie))
-                    }
-                }
-
-                override fun removed(endpoint: Endpoint) {
-                    val ie = map.remove(endpoint)
-                    publishProgress(Progress(false, endpoint, ie!!))
-                }
-            }
-        }
-    }
-
-    inner class Progress(
-        isAdded: Boolean,
-        endpoint: Endpoint,
-        identifiedEndpoint: IdentifiedEndpoint
-    ) {
-        var isAdded = true
-        var endpoint: Endpoint
-        var identifiedEndpoint: IdentifiedEndpoint
-
-        init {
-            this.isAdded = isAdded
-            this.endpoint = endpoint
-            this.identifiedEndpoint = identifiedEndpoint
-        }
     }
 
     companion object {

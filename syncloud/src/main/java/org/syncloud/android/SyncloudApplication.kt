@@ -3,7 +3,10 @@ package org.syncloud.android
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
-import android.preference.PreferenceManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.os.Build
+import androidx.preference.PreferenceManager
 import org.acra.ACRA
 import org.acra.BuildConfig
 import org.acra.ReportField
@@ -18,7 +21,6 @@ import org.syncloud.android.core.redirect.IUserService
 import org.syncloud.android.core.redirect.RedirectService
 import org.syncloud.android.core.redirect.UserCachedService
 import org.syncloud.android.core.redirect.UserStorage
-import org.syncloud.android.core.redirect.model.User
 import java.io.File
 
 @AcraDialog(
@@ -41,12 +43,19 @@ class SyncloudApplication : Application() {
 
     val preferences : Preferences get () = _preferences
     val userServiceCached : IUserService get() = _userService
-    val isWifiConnected: Boolean
-        get() {
-            val connManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-            val mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
-            return mWifi!!.isConnected
+
+    fun isWifiConnected(): Boolean {
+        val connMgr = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        connMgr?: return false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network: Network = connMgr.activeNetwork ?: return false
+            val capabilities = connMgr.getNetworkCapabilities(network)
+            return capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+        } else {
+            val networkInfo = connMgr.activeNetworkInfo ?: return false
+            return networkInfo.isConnected && networkInfo.type == ConnectivityManager.TYPE_WIFI
         }
+    }
 
     override fun onCreate() {
         configure()
