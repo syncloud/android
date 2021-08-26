@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 30
@@ -52,11 +53,11 @@ android {
 
     allprojects {
         afterEvaluate { project ->
-            def env = System.getenv()        
+            def env = System.getenv()
             if (env.containsKey('KEY_STORE')) {
                 def storeFile = new File(env['ANDROID_STORE_FILE'])
                 storeFile.append(env['KEY_STORE'].decodeBase64())
-                
+
                 android.signingConfigs['release'].storeFile = storeFile
                 android.signingConfigs['release'].storePassword = env['ANDROID_STORE_PASSWORD']
                 android.signingConfigs['release'].keyAlias = env['ANDROID_KEY_ALIAS']
@@ -85,4 +86,6 @@ dependencies {
     implementation 'com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE'
     testImplementation 'junit:junit:4.10'
     testImplementation 'org.mockito:mockito-all:1.9.5'
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.30-M1"
 }
