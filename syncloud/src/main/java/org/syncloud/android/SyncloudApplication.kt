@@ -66,8 +66,7 @@ class SyncloudApplication : Application() {
     }
 
     private fun webServiceAuthWithFileBackedCache(): UserCachedService {
-        val apiUrl = RedirectService.getApiUrl(_preferences.mainDomain)
-        val redirectService = RedirectService(WebService(HttpClient(apiUrl)))
+        val redirectService = RedirectService(_preferences.mainDomain, WebService(HttpClient()))
         return UserCachedService(redirectService, _userStorage)
     }
 

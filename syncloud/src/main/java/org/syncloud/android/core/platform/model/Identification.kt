@@ -1,19 +1,6 @@
 package org.syncloud.android.core.platform.model
 
-import java.io.Serializable
-
-class Identification : Serializable {
-    var name: String? = null
-    var title: String? = null
-    var mac_address: String? = null
-
-    constructor() {}
-    constructor(mac_address: String?, name: String?, title: String?) {
-        this.name = name
-        this.title = title
-        this.mac_address = mac_address
-    }
-
+data class Identification(val mac_address: String?, val name: String?, val title: String?) {
     override fun toString(): String {
         return "Identification{" +
                 "name='" + name + '\'' +

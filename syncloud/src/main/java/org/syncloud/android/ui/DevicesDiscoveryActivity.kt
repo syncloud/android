@@ -1,6 +1,5 @@
 package org.syncloud.android.ui
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.net.nsd.NsdManager
@@ -15,12 +14,13 @@ import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.common.base.Optional
 import com.google.common.collect.Maps
 import org.apache.log4j.Logger
 import org.syncloud.android.Preferences
 import org.syncloud.android.R
 import org.syncloud.android.SyncloudApplication
+import org.syncloud.android.core.common.WebService
+import org.syncloud.android.core.common.http.HttpClient
 import org.syncloud.android.core.platform.Internal
 import org.syncloud.android.core.platform.model.Endpoint
 import org.syncloud.android.core.platform.model.IdentifiedEndpoint
@@ -40,7 +40,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var emptyView: View
     private lateinit var resultsList: ListView
-    private lateinit var map: MutableMap<Endpoint?, IdentifiedEndpoint>
+    private lateinit var map: MutableMap<Endpoint, IdentifiedEndpoint>
     private lateinit var internal: Internal
     private lateinit var application: SyncloudApplication
 
@@ -50,7 +50,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_devices_discovery)
         application = getApplication() as SyncloudApplication
         preferences = application.preferences
-        internal = Internal()
+        internal = Internal(WebService(HttpClient()))
         swipeRefreshLayout = findViewById<View>(R.id.swipe_refresh_layout) as SwipeRefreshLayout
         swipeRefreshLayout.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
         swipeRefreshLayout.setOnRefreshListener { checkWiFiAndDiscover() }
@@ -107,17 +107,9 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
     }
 
     private fun open(endpoint: IdentifiedEndpoint) {
-        if (!endpoint.id.isPresent) {
-            AlertDialog.Builder(this)
-                .setTitle("Can't identify device")
-                .setMessage("Sorry, there's no identification information for this device. Most probably it is running old release of Syncloud. Please upgrade it to latest release and try to activate again.")
-                .setPositiveButton("OK", null)
-                .show()
-        } else {
-            val browserIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(endpoint.endpoint.activationUrl))
-            startActivity(browserIntent)
-        }
+        val browserIntent =
+            Intent(Intent.ACTION_VIEW, Uri.parse(endpoint.endpoint.activationUrl))
+        startActivity(browserIntent)
     }
 
     override fun onDestroy() {
@@ -139,9 +131,6 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
             emptyView.visibility = View.GONE
             resultsList.emptyView = null
             listAdapter.clear()
-
-            //use for testing without wi-fi
-            //listAdapter.add(new DirectEndpoint("localhost", 22, "vsapronov", "somepassword", null));
         }
 
         protected override fun doInBackground(vararg params: Void): Void? {
@@ -169,17 +158,17 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
 
         init {
             deviceEndpointListener = object : DeviceEndpointListener {
-                override fun added(endpoint: Endpoint?) {
-                    val id = internal.getId(endpoint!!.host)
-                    if (id.isPresent) {
-                        val ie = IdentifiedEndpoint(endpoint, Optional.of(id.get()))
+                override fun added(endpoint: Endpoint) {
+                    val id = internal.getId(endpoint.host)
+                    if (id != null) {
+                        val ie = IdentifiedEndpoint(endpoint, id)
                         publishProgress(Progress(true, endpoint, ie))
                     }
                 }
 
-                override fun removed(endpoint: Endpoint?) {
+                override fun removed(endpoint: Endpoint) {
                     val ie = map.remove(endpoint)
-                    publishProgress(Progress(false, endpoint!!, ie!!))
+                    publishProgress(Progress(false, endpoint, ie!!))
                 }
             }
         }

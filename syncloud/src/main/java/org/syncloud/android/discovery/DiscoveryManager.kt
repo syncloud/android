@@ -3,7 +3,6 @@ package org.syncloud.android.discovery
 import android.net.nsd.NsdManager
 import android.net.wifi.WifiManager
 import org.apache.log4j.Logger
-import org.syncloud.android.discovery.DiscoveryManager
 import org.syncloud.android.discovery.nsd.NsdDiscovery
 
 const val DISCOVERY_MANAGER_ACTIVATION_PORT = 81
@@ -42,7 +41,8 @@ class DiscoveryManager(wifi: WifiManager, private val manager: NsdManager) {
         logger.info("stopping discovery")
         if (discovery != null) {
             try {
-                discovery!!.stop()
+                discovery?.stop()
+                discovery = null
             } catch (e: Exception) {
                 logger.error("failed to stop discovery", e)
             }
