@@ -18,7 +18,7 @@ class DevicesDiscoveredAdapter(private val activity: DevicesDiscoveryActivity) :
         val txtBoldTitle = rowView.findViewById<View>(R.id.txt_bold_title) as TextView
         val txtAdditionalLine = rowView.findViewById<View>(R.id.txt_additional_line) as TextView
         val ie = getItem(position)!!
-        txtBoldTitle.text = ie.id.get().title
+        txtBoldTitle.text = ie.id.title
         txtAdditionalLine.text = ie.endpoint.host
         return rowView
     }

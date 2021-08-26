@@ -16,14 +16,13 @@ import java.io.*
 import java.net.URLEncoder
 import java.security.cert.X509Certificate
 
-open class HttpClient(private val apiUrl: String) {
+open class HttpClient {
 
     private val logger = Logger.getLogger(WebService::class.java)
 
     open fun execute(type: String, url: String, parameters: List<Pair<String, String>>): Response {
-        val fullUrl = apiUrl + url
-        logger.info("calling: $fullUrl")
-        val request = request(type, fullUrl, parameters)
+        logger.info("calling: $url")
+        val request = request(type, url, parameters)
         return getResponse(request)
     }
 

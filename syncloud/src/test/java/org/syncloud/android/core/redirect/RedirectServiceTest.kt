@@ -48,7 +48,7 @@ class RedirectServiceTest {
 
         val webService = mock(WebService::class.java)
         `when`(webService.execute(anyString(), anyString(), anyList())).thenReturn(json)
-        val service = RedirectService(webService)
+        val service = RedirectService("", webService)
         val user = service.createUser("email", "password")
 
 

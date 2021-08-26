@@ -10,11 +10,13 @@ import org.syncloud.android.core.redirect.model.User
 import org.syncloud.android.core.redirect.model.UserResult
 import java.io.IOException
 
-class RedirectService(private val webService: WebService) : IUserService {
+class RedirectService(private val apiUrl: String, private val webService: WebService) : IUserService {
+
+    private val logger = Logger.getLogger(RedirectService::class.java)
     private val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     override fun getUser(email: String, password: String): User? {
-        val json = webService.execute("GET", "/user/get", listOf(Pair("email", email), Pair("password", password)))
+        val json = webService.execute("GET", "https://api.$apiUrl/user/get", listOf(Pair("email", email), Pair("password", password)))
         return try {
             val restUser = mapper.readValue<UserResult>(json)
             restUser.data
@@ -26,7 +28,7 @@ class RedirectService(private val webService: WebService) : IUserService {
     }
 
     override fun createUser(email: String, password: String): User? {
-        val json = webService.execute("POST", "/user/create", listOf(Pair("email", email), Pair("password", password)))
+        val json = webService.execute("POST", "https://api.$apiUrl/user/create", listOf(Pair("email", email), Pair("password", password)))
         return try {
             val restUser = mapper.readValue(json, UserResult::class.java)
             restUser.data
@@ -35,10 +37,5 @@ class RedirectService(private val webService: WebService) : IUserService {
             logger.error("$message $json", e)
             throw SyncloudException(message)
         }
-    }
-
-    companion object {
-        fun getApiUrl(mainDomain: String): String = "https://api.$mainDomain"
-        private val logger = Logger.getLogger(RedirectService::class.java)
     }
 }
