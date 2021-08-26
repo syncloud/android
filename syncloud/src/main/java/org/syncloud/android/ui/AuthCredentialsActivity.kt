@@ -49,7 +49,7 @@ class AuthCredentialsActivity : AppCompatActivity() {
         emailLoginFormView = findViewById<View>(R.id.email_login_form) as LinearLayout
         emailView = findViewById<View>(R.id.email) as EditText
         passwordView = findViewById<View>(R.id.password) as EditText
-        passwordView.setOnEditorActionListener(OnEditorActionListener { textView, id, keyEvent ->
+        passwordView.setOnEditorActionListener(OnEditorActionListener { _, id, _ ->
             if (id == R.id.login || id == EditorInfo.IME_NULL) {
                 attemptLogin()
                 return@OnEditorActionListener true
@@ -106,7 +106,7 @@ class AuthCredentialsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.action_settings) {
-            startActivityForResult(Intent(this, SettingsActivity::class.java), 2)
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
         return super.onOptionsItemSelected(item)
     }
@@ -187,8 +187,7 @@ class AuthCredentialsActivity : AppCompatActivity() {
 
     private fun showErrorDialog(message: String?) {
         val register = purpose == AuthConstants.PURPOSE_REGISTER
-        val errorMessage: String
-        errorMessage = if (register) "Unable to register new user" else "Unable to login"
+        val errorMessage: String = if (register) "Unable to register new user" else "Unable to login"
         AlertDialog.Builder(this@AuthCredentialsActivity)
             .setTitle("Failed")
             .setMessage(errorMessage)
@@ -203,9 +202,8 @@ class AuthCredentialsActivity : AppCompatActivity() {
 
     private fun showError(error: Throwable) {
         if (error is SyncloudResultException) {
-            val apiError = error
-            if (apiError.result.parameters_messages != null) {
-                for (pm in apiError.result.parameters_messages!!) {
+            if (error.result.parameters_messages != null) {
+                for (pm in error.result.parameters_messages!!) {
                     val control = getControl(pm.parameter)
                     if (control != null) {
                         val message = StringUtils.join(pm.messages, '\n')
