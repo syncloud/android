@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.net.nsd.NsdManager
 import android.net.wifi.WifiManager
-import android.os.AsyncTask
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -15,6 +14,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.common.collect.Maps
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.apache.log4j.Logger
 import org.syncloud.android.Preferences
 import org.syncloud.android.R
@@ -65,8 +68,8 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
         }
         map = Maps.newHashMap()
         discoveryManager = DiscoveryManager(
-            applicationContext.getSystemService(WIFI_SERVICE) as WifiManager,
-            applicationContext.getSystemService(NSD_SERVICE) as NsdManager
+                applicationContext.getSystemService(WIFI_SERVICE) as WifiManager,
+                applicationContext.getSystemService(NSD_SERVICE) as NsdManager
         )
         swipeRefreshLayout.post { checkWiFiAndDiscover() }
     }
@@ -74,7 +77,15 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
     private fun checkWiFiAndDiscover() {
         listAdapter.clear()
         if (application.isWifiConnected()) {
-            DiscoveryTask().execute()
+            refreshBtn.visibility = View.GONE
+            swipeRefreshLayout.isRefreshing = true
+            emptyView.visibility = View.GONE
+            resultsList.emptyView = null
+            listAdapter.clear()
+
+            CoroutineScope(Dispatchers.Main).launch {
+                discover()
+            }
         } else {
             val dialog = WifiDialog("Discovery is possible only in the same Wi-Fi network where you have Syncloud device connected.")
             dialog.show(supportFragmentManager, "discovery_wifi_dialog")
@@ -106,7 +117,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
 
     private fun open(endpoint: IdentifiedEndpoint) {
         val browserIntent =
-            Intent(Intent.ACTION_VIEW, Uri.parse(endpoint.endpoint.activationUrl))
+                Intent(Intent.ACTION_VIEW, Uri.parse(endpoint.endpoint.activationUrl))
         startActivity(browserIntent)
     }
 
@@ -120,45 +131,26 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
         checkWiFiAndDiscover()
     }
 
-    inner class DiscoveryTask : AsyncTask<Void, Progress, Void>() {
-
-        override fun onPreExecute() {
-            refreshBtn.visibility = View.GONE
-            swipeRefreshLayout.isRefreshing = true
-            emptyView.visibility = View.GONE
-            resultsList.emptyView = null
-            listAdapter.clear()
+    private suspend fun discover() {
+        withContext(Dispatchers.IO) {
+            discoveryManager.run(20) { e -> added(e) }
         }
+        emptyView.visibility = View.VISIBLE
+        resultsList.emptyView = emptyView
+        swipeRefreshLayout.isRefreshing = false
+        refreshBtn.visibility = View.VISIBLE
 
-        override fun doInBackground(vararg params: Void): Void? {
-            discoveryManager.run(20) { endpoint: Endpoint ->
-                val id = internal.getId(endpoint.host)
-                if (id != null) {
-                    val ie = IdentifiedEndpoint(endpoint, id)
-                    publishProgress(Progress(true, endpoint, ie))
-                }
-            }
-            return null
-        }
+    }
 
-        override fun onPostExecute(aVoid: Void?) {
-            emptyView.visibility = View.VISIBLE
-            resultsList.emptyView = emptyView
-            swipeRefreshLayout.isRefreshing = false
-            refreshBtn.visibility = View.VISIBLE
-        }
-
-        override fun onProgressUpdate(vararg progresses: Progress) {
-            val progress = progresses[0]
-            val ie = progress.identifiedEndpoint
-            if (progress.isAdded) {
-                map[progress.endpoint] = ie
+    private suspend fun added(endpoint: Endpoint) {
+        val id = internal.getId(endpoint.host)
+        if (id != null) {
+            val ie = IdentifiedEndpoint(endpoint, id)
+            withContext(Dispatchers.Main) {
+                map[endpoint] = ie
                 listAdapter.add(ie)
-            } else {
-                listAdapter.remove(ie)
             }
         }
-
     }
 
     companion object {

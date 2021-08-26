@@ -9,10 +9,11 @@ const val TYPE = "_ssh._tcp."
 
 class NsdDiscovery(
         private val manager: NsdManager,
-        added: (endpoint: Endpoint) -> Unit,
+        added : suspend (endpoint: Endpoint) -> Unit,
         serviceName: String
 ) : Discovery {
-    private val listener = EventToDeviceConverter(manager, serviceName, Resolver(manager, added))
+    val resolver = Resolver(manager, added)
+    private val listener = EventToDeviceConverter(manager, serviceName, resolver)
     private var started = false
 
     override fun start() {

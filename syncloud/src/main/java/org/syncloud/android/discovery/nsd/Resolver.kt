@@ -2,6 +2,9 @@ package org.syncloud.android.discovery.nsd
 
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.apache.log4j.Logger
 import org.syncloud.android.core.platform.model.Endpoint
 import org.syncloud.android.discovery.DISCOVERY_MANAGER_ACTIVATION_PORT
@@ -9,7 +12,7 @@ import java.util.*
 
 class Resolver(
     private val manager: NsdManager,
-    val added: (endpoint: Endpoint) -> Unit
+    val added: suspend (endpoint: Endpoint) -> Unit
 ) {
     private var isBusy = false
     private val queue: Queue<NsdServiceInfo> = LinkedList()
@@ -35,7 +38,7 @@ class Resolver(
         checkQueue()
     }
 
-    private fun deviceFound(device: Endpoint) = added(device)
+    private suspend fun deviceFound(device: Endpoint) = added(device)
 
     inner class ResolveListener : NsdManager.ResolveListener {
         override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
@@ -47,14 +50,16 @@ class Resolver(
 
         override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
             val serviceName = serviceInfo.serviceName
-            val text = "service: $serviceName resovled"
+            val text = "service: $serviceName resolved"
             logger.info(text)
             val host = serviceInfo.host
             if (host != null) {
                 val address = host.hostAddress
                 if (!address.contains(":")) {
                     val device = Endpoint(address, DISCOVERY_MANAGER_ACTIVATION_PORT)
-                    deviceFound(device)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        deviceFound(device)
+                    }
                 }
                 else {
                     logger.info("device was successfully detected, however IPV6 addresses are not supported.")

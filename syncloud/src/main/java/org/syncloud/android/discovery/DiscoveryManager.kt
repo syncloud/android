@@ -2,6 +2,7 @@ package org.syncloud.android.discovery
 
 import android.net.nsd.NsdManager
 import android.net.wifi.WifiManager
+import kotlinx.coroutines.delay
 import org.apache.log4j.Logger
 import org.syncloud.android.core.platform.model.Endpoint
 import org.syncloud.android.discovery.nsd.NsdDiscovery
@@ -13,7 +14,7 @@ class DiscoveryManager(wifi: WifiManager, private val manager: NsdManager) {
     private var discovery: Discovery? = null
     private var canceled = false
 
-    fun run(timeoutSeconds: Int, added: (endpoint: Endpoint) -> Unit ) {
+    suspend fun run(timeoutSeconds: Int, added: suspend (endpoint: Endpoint) -> Unit ) {
         canceled = false
         logger.info("starting discovery")
         if (discovery == null) {
@@ -24,7 +25,7 @@ class DiscoveryManager(wifi: WifiManager, private val manager: NsdManager) {
                 logger.info("waiting for $timeoutSeconds seconds")
                 var count = 0
                 while (count < timeoutSeconds && !canceled) {
-                    Thread.sleep(1000)
+                    delay(1000)
                     count++
                 }
             } catch (e: InterruptedException) {
