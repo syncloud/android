@@ -7,13 +7,7 @@ platform:
   arch: amd64
 
 steps:
-- name: test
-  image: syncloud/android-sdk
-  commands:
-    - yes | /opt/android/tools/bin/sdkmanager "build-tools;30.0.2"
-    - ./gradlew clean test assembleDebug
-
-- name: apk
+- name: build
   image: syncloud/android-sdk
   environment:
     KEY_STORE:
@@ -29,9 +23,6 @@ steps:
   commands:
     - yes | /opt/android/tools/bin/sdkmanager "build-tools;30.0.2"
     - ./gradlew clean test assemble
-  when:
-    branch:
-    - stable
 
 - name: artifact
   image: appleboy/drone-scp
