@@ -51,10 +51,11 @@ class RedirectServiceTest {
         every { webService.post(any(), any()) } returns json
 
         val service = RedirectService("", webService)
-        val user = service.createUser("email", "password")
+        val user = service.getUser("email", "password")
 
 
         assertEquals(user?.email, "email@example.com")
         assertEquals(user?.domains?.get(0)?.device_name, "syncloud")
     }
 }
+
