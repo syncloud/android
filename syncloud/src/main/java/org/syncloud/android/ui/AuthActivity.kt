@@ -2,6 +2,7 @@ package org.syncloud.android.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.Menu
@@ -75,10 +76,6 @@ class AuthActivity : Activity() {
             finish()
         } else {
             val intent = Intent(this@AuthActivity, AuthCredentialsActivity::class.java)
-            intent.putExtra(
-                AuthConstants.PARAM_PURPOSE,
-                AuthConstants.PURPOSE_SIGN_IN
-            )
             intent.putExtra(AuthConstants.PARAM_CHECK_EXISTING, true)
             startActivityForResult(intent, REQUEST_AUTHENTICATE)
         }
@@ -98,20 +95,11 @@ class AuthActivity : Activity() {
 
     fun signIn(view: View?) {
         val credentialsIntent = Intent(this, AuthCredentialsActivity::class.java)
-        credentialsIntent.putExtra(
-            AuthConstants.PARAM_PURPOSE,
-            AuthConstants.PURPOSE_SIGN_IN
-        )
         startActivityForResult(credentialsIntent, REQUEST_AUTHENTICATE)
     }
 
     fun signUp(view: View?) {
-        val credentialsIntent = Intent(this, AuthCredentialsActivity::class.java)
-        credentialsIntent.putExtra(
-            AuthConstants.PARAM_PURPOSE,
-            AuthConstants.PURPOSE_REGISTER
-        )
-        startActivityForResult(credentialsIntent, REQUEST_AUTHENTICATE)
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.${preferences.mainDomain}/register")))
     }
 
     inner class ProgressImpl : Progress.Empty() {

@@ -17,7 +17,6 @@ android {
         multiDexEnabled true
     }
 
-    useLibrary 'org.apache.http.legacy'
     flavorDimensions "full"
     productFlavors {
         prod {
@@ -84,7 +83,6 @@ dependencies {
     implementation 'de.mindpipe.android:android-logging-log4j:1.0.3'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8'
     implementation 'org.apache.commons:commons-lang3:3.3.2'
-    implementation 'org.apache.httpcomponents:httpclient-android:4.3.3'
     implementation 'com.google.guava:guava:27.0.1-android'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
@@ -92,7 +90,8 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE'
     testImplementation 'junit:junit:4.10'
-    testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation "io.mockk:mockk:1.12.0"
     implementation "androidx.core:core-ktx:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.30-M1"
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
 }

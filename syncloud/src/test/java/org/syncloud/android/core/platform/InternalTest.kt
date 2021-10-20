@@ -1,10 +1,10 @@
 package org.syncloud.android.core.platform
 
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Assert.*
 
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.Mockito.*
 import org.syncloud.android.core.common.WebService
 
 class InternalTest {
@@ -22,8 +22,8 @@ class InternalTest {
   }
 }
         """.trimIndent()
-        val webService = mock(WebService::class.java)
-        `when`(webService.execute(anyString(), anyString(), anyList())).thenReturn(json)
+        val webService = mockk<WebService>()
+        every { webService.get(any()) } returns json
         val internal = Internal(webService)
         val id = internal.getId("host")
         assertEquals("syncloud", id?.name)

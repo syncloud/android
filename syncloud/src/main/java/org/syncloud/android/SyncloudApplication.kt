@@ -7,6 +7,7 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.preference.PreferenceManager
+import okhttp3.OkHttpClient
 import org.acra.ACRA
 import org.acra.BuildConfig
 import org.acra.ReportField

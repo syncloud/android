@@ -1,10 +1,14 @@
 package org.syncloud.android.core.common
 
+import io.mockk.every
+import io.mockk.mockk
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.*
 import org.junit.Test
-import org.mockito.Mockito.*
 import org.syncloud.android.core.common.http.HttpClient
-import org.syncloud.android.core.common.http.Response
+
 
 class WebServiceTest {
 
@@ -31,12 +35,21 @@ class WebServiceTest {
   ]
 }
 """
-        val httpClient = mock(HttpClient::class.java)
-        `when`(httpClient.execute(anyString(), anyString(), anyList())).thenReturn(Response(400, json))
+        val httpClient = mockk<HttpClient>()
+        val request = Request.Builder().url("http://url.com").build()
+        val response = Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(400)
+                .message("")
+                .body(json.toResponseBody("application/json".toMediaType()))
+                .build()
+        every { httpClient.execute(any()) } returns response
+
         val service = WebService(httpClient)
 
         try {
-            service.execute("", "", listOf())
+            service.post("", request.url.toString())
             fail()
         } catch (e: SyncloudResultException) {
             assertEquals(e.result.parameters_messages?.size, 2)
@@ -53,11 +66,20 @@ class WebServiceTest {
   "message": "all good"
 }
 """
-        val httpClient = mock(HttpClient::class.java)
-        `when`(httpClient.execute(anyString(), anyString(), anyList())).thenReturn(Response(400, json))
+        val httpClient = mockk<HttpClient>()
+        val request = Request.Builder().url("http://url.com").build()
+        val response = Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(400)
+                .message("")
+                .body(json.toResponseBody("application/json".toMediaType()))
+                .build()
+        every { httpClient.execute(any()) } returns response
+
         val service = WebService(httpClient)
 
-        val result = service.execute("", "", listOf())
+        val result = service.post("", request.url.toString())
         assertEquals(json, result)
     }
 }

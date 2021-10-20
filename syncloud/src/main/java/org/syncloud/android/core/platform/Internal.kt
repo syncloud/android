@@ -18,7 +18,7 @@ class Internal(private val webService: WebService) {
 
     fun getId(host: String): Identification? {
          try {
-             val json = webService.execute("GET", "https://$host/rest/id")
+             val json = webService.get("https://$host/rest/id")
              try {
                  val result = mapper.readValue<Result<Identification>>(json)
                  return result.data

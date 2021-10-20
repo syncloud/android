@@ -1,10 +1,7 @@
 package org.syncloud.android.ui
 
 object AuthConstants {
-    const val PARAM_PURPOSE = "paramPurpose"
     const val PARAM_CHECK_EXISTING = "paramCheckExisting"
-    const val PURPOSE_SIGN_IN = "purposeSignIn"
-    const val PURPOSE_REGISTER = "purposeRegister"
 }
 
 object PreferencesConstants {

@@ -61,15 +61,9 @@ class AuthCredentialsActivity : AppCompatActivity() {
         progressBar = findViewById<View>(R.id.progress) as CircleProgressBar
         progressBar.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
         val intent = intent
-        purpose = intent.getStringExtra(AuthConstants.PARAM_PURPOSE)
-        if (purpose == AuthConstants.PURPOSE_SIGN_IN) {
-            setTitle(R.string.action_sign_in)
-            signInButton.setText(R.string.action_sign_in)
-        }
-        if (purpose == AuthConstants.PURPOSE_REGISTER) {
-            setTitle(R.string.action_sign_up)
-            signInButton.setText(R.string.action_sign_up)
-        }
+        setTitle(R.string.action_sign_in)
+        signInButton.setText(R.string.action_sign_in)
+
         val redirectEmail = preferences.redirectEmail
         val redirectPassword = preferences.redirectPassword
         if (redirectEmail != null && redirectPassword != null) {
@@ -78,10 +72,10 @@ class AuthCredentialsActivity : AppCompatActivity() {
             val checkExisting = intent.getBooleanExtra(AuthConstants.PARAM_CHECK_EXISTING, false)
             if (checkExisting) {
                 AlertDialog.Builder(this@AuthCredentialsActivity)
-                    .setTitle(getString(R.string.check_credentials))
-                    .setMessage(getString(R.string.sign_in_failed))
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show()
+                        .setTitle(getString(R.string.check_credentials))
+                        .setMessage(getString(R.string.sign_in_failed))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show()
             }
         }
     }
@@ -150,28 +144,24 @@ class AuthCredentialsActivity : AppCompatActivity() {
         if (!validate()) return
         val email = emailView.text.toString()
         val password = passwordView.text.toString()
-        val register = purpose == AuthConstants.PURPOSE_REGISTER
         ProgressAsyncTask<Void, User>()
-            .setProgress(progress)
-            .doWork(object : Work<Void,User> {
-                override fun run(vararg args: Void): User {
-                    return doUserTask(register, email, password)
-                }
-            })
-            .onCompleted(object : Completed<User> {
-                override fun run(result: AsyncResult<User>?) {
-                    onUserTaskCompleted(result!!)
-                }
-            })
-            .execute()
+                .setProgress(progress)
+                .doWork(object : Work<Void, User> {
+                    override fun run(vararg args: Void): User {
+                        return doGetUser(email, password)
+                    }
+                })
+                .onCompleted(object : Completed<User> {
+                    override fun run(result: AsyncResult<User>?) {
+                        onUserTaskCompleted(result!!)
+                    }
+                })
+                .execute()
+
     }
 
-    private fun doUserTask(register: Boolean, email: String, password: String): User {
-        return if (register) {
-            userService.createUser(email, password)!!
-        } else {
-            userService.getUser(email, password)!!
-        }
+    private fun doGetUser(email: String, password: String): User {
+        return userService.getUser(email, password)!!
     }
 
     private fun onUserTaskCompleted(result: AsyncResult<User>) {
@@ -186,13 +176,11 @@ class AuthCredentialsActivity : AppCompatActivity() {
     }
 
     private fun showErrorDialog(message: String?) {
-        val register = purpose == AuthConstants.PURPOSE_REGISTER
-        val errorMessage: String = if (register) "Unable to register new user" else "Unable to login"
         AlertDialog.Builder(this@AuthCredentialsActivity)
-            .setTitle("Failed")
-            .setMessage(errorMessage)
-            .setPositiveButton(android.R.string.ok, null)
-            .show()
+                .setTitle("Failed")
+                .setMessage("Unable to login")
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
     }
 
     private fun getControl(parameter: String?): EditText? {

@@ -1,12 +1,13 @@
 package org.syncloud.android.core.redirect
 
+import io.mockk.every
+import io.mockk.mockk
 import org.apache.log4j.ConsoleAppender
 import org.apache.log4j.EnhancedPatternLayout
 import org.apache.log4j.Logger
 import org.junit.Assert.*
 
 import org.junit.Test
-import org.mockito.Mockito.*
 import org.syncloud.android.core.common.WebService
 
 class RedirectServiceTest {
@@ -46,8 +47,9 @@ class RedirectServiceTest {
 
         Logger.getRootLogger().addAppender(ConsoleAppender(EnhancedPatternLayout()))
 
-        val webService = mock(WebService::class.java)
-        `when`(webService.execute(anyString(), anyString(), anyList())).thenReturn(json)
+        val webService = mockk<WebService>()
+        every { webService.post(any(), any()) } returns json
+
         val service = RedirectService("", webService)
         val user = service.createUser("email", "password")
 

@@ -100,8 +100,7 @@ class DevicesSavedActivity : AppCompatActivity() {
     }
 
     private fun open(device: DomainModel) {
-        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(device.dnsUrl))
-        startActivity(browserIntent)
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(device.dnsUrl)))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

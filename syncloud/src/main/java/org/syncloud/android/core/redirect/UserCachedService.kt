@@ -20,9 +20,4 @@ class UserCachedService(private val service: IUserService, private val storage: 
         }
     }
 
-    override fun createUser(email: String, password: String): User? {
-        val user = service.createUser(email, password)
-        storage.save(user)
-        return user
-    }
 }
