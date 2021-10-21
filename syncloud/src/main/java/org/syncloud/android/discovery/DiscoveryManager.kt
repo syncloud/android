@@ -4,17 +4,14 @@ import android.net.nsd.NsdManager
 import android.net.wifi.WifiManager
 import kotlinx.coroutines.delay
 import org.apache.log4j.Logger
-import org.syncloud.android.core.platform.model.Endpoint
 import org.syncloud.android.discovery.nsd.NsdDiscovery
-
-const val DISCOVERY_MANAGER_ACTIVATION_PORT = 81
 
 class DiscoveryManager(wifi: WifiManager, private val manager: NsdManager) {
     private val lock: MulticastLock = MulticastLock(wifi)
     private var discovery: Discovery? = null
     private var canceled = false
 
-    suspend fun run(timeoutSeconds: Int, added: suspend (endpoint: Endpoint) -> Unit ) {
+    suspend fun run(timeoutSeconds: Int, added: suspend (device: String) -> Unit ) {
         canceled = false
         logger.info("starting discovery")
         if (discovery == null) {

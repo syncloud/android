@@ -4,19 +4,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import org.syncloud.android.Preferences
 import org.syncloud.android.R
-import org.syncloud.android.SyncloudApplication
 import org.syncloud.android.core.platform.model.DomainModel
 import org.syncloud.android.ui.DevicesSavedActivity
 
 class DevicesSavedAdapter(private val activity: DevicesSavedActivity) : ArrayAdapter<DomainModel>(
     activity, R.layout.layout_device_item
 ) {
-    private var preferences: Preferences = (activity.application as SyncloudApplication).preferences
-
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val mainDomain = preferences.mainDomain
         val inflater = activity.layoutInflater
         val rowView = inflater.inflate(R.layout.layout_device_item, null)
         val txtBoldTitle = rowView.findViewById<TextView>(R.id.txt_bold_title)

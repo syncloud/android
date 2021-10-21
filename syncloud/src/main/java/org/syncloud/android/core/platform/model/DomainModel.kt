@@ -1,8 +1,6 @@
 package org.syncloud.android.core.platform.model
 
 import org.syncloud.android.core.redirect.model.Domain
-import org.syncloud.android.core.platform.model.Identification
-import org.syncloud.android.core.platform.model.DomainModel
 import java.io.Serializable
 
 fun deviceId(domain: Domain): Identification? {

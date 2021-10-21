@@ -2,14 +2,13 @@ package org.syncloud.android.discovery.nsd
 
 import android.net.nsd.NsdManager
 import org.apache.log4j.Logger
-import org.syncloud.android.core.platform.model.Endpoint
 import org.syncloud.android.discovery.Discovery
 
 const val TYPE = "_ssh._tcp."
 
 class NsdDiscovery(
         private val manager: NsdManager,
-        added : suspend (endpoint: Endpoint) -> Unit,
+        added : suspend (device: String) -> Unit,
         serviceName: String
 ) : Discovery {
     val resolver = Resolver(manager, added)

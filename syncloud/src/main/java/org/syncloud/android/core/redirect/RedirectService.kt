@@ -11,13 +11,13 @@ import org.syncloud.android.core.redirect.model.UserCredentials
 import org.syncloud.android.core.redirect.model.UserResult
 import java.io.IOException
 
-class RedirectService(private val apiUrl: String, private val webService: WebService) : IUserService {
+class RedirectService(private val mainDomain: String, private val webService: WebService) : IUserService {
 
     private val logger = Logger.getLogger(RedirectService::class.java)
     private val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     override fun getUser(email: String, password: String): User? {
-        val url = "https://api.$apiUrl/user"
+        val url = "https://api.$mainDomain/user"
         val requestJson = mapper.writeValueAsString(UserCredentials(email, password))
         val json = webService.post(requestJson, url)
         return try {

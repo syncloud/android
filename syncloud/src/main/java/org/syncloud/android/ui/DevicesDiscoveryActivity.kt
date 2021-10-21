@@ -18,7 +18,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
 import org.apache.log4j.Logger
 import org.syncloud.android.Preferences
 import org.syncloud.android.R
@@ -26,7 +25,6 @@ import org.syncloud.android.SyncloudApplication
 import org.syncloud.android.core.common.WebService
 import org.syncloud.android.core.common.http.HttpClient
 import org.syncloud.android.core.platform.Internal
-import org.syncloud.android.core.platform.model.Endpoint
 import org.syncloud.android.core.platform.model.IdentifiedEndpoint
 import org.syncloud.android.discovery.DiscoveryManager
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter
@@ -43,7 +41,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var emptyView: View
     private lateinit var resultsList: ListView
-    private lateinit var map: MutableMap<Endpoint, IdentifiedEndpoint>
+    private lateinit var deviceToId: MutableMap<String, IdentifiedEndpoint>
     private lateinit var internal: Internal
     private lateinit var application: SyncloudApplication
 
@@ -67,7 +65,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
             val ie = obj as IdentifiedEndpoint
             open(ie)
         }
-        map = Maps.newHashMap()
+        deviceToId = Maps.newHashMap()
         discoveryManager = DiscoveryManager(
                 applicationContext.getSystemService(WIFI_SERVICE) as WifiManager,
                 applicationContext.getSystemService(NSD_SERVICE) as NsdManager
@@ -118,7 +116,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
 
     private fun open(endpoint: IdentifiedEndpoint) {
         val browserIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(endpoint.endpoint.activationUrl))
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://" + endpoint.device))
         startActivity(browserIntent)
     }
 
@@ -143,12 +141,12 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
 
     }
 
-    private suspend fun added(endpoint: Endpoint) {
-        val id = internal.getId(endpoint.host)
+    private suspend fun added(device: String) {
+        val id = internal.getId(device)
         if (id != null) {
-            val ie = IdentifiedEndpoint(endpoint, id)
+            val ie = IdentifiedEndpoint(device, id)
             withContext(Dispatchers.Main) {
-                map[endpoint] = ie
+                deviceToId[device] = ie
                 listAdapter.add(ie)
             }
         }
