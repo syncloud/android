@@ -44,7 +44,7 @@ class WebServiceTest {
                 .message("")
                 .body(json.toResponseBody("application/json".toMediaType()))
                 .build()
-        every { httpClient.execute(any()) } returns response
+        every { httpClient.execute(any(), any()) } returns response
 
         val service = WebService(httpClient)
 
@@ -75,7 +75,7 @@ class WebServiceTest {
                 .message("")
                 .body(json.toResponseBody("application/json".toMediaType()))
                 .build()
-        every { httpClient.execute(any()) } returns response
+        every { httpClient.execute(any(), any()) } returns response
 
         val service = WebService(httpClient)
 

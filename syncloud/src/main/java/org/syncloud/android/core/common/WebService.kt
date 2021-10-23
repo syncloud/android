@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import org.apache.log4j.Logger
 import org.syncloud.android.core.common.http.HttpClient
 import java.io.IOException
@@ -19,17 +20,19 @@ open class WebService(private val client: HttpClient) {
         val mediaType = "application/json; charset=utf-8".toMediaType()
         val body = requestJson.toRequestBody(mediaType)
         val request = Request.Builder().url(url).post(body).build()
-        return execute(request)
+        val response = client.execute(request)
+        return convert(response)
     }
 
-    open fun get(url: String): String {
+    open fun getUnverified(url: String): String {
         val request = Request.Builder().url(url).get().build()
-        return execute(request)
+        val response = client.executeUnverified(request)
+        return convert(response)
     }
 
-    private fun execute(request: Request): String {
-        client.execute(request).use { response ->
-            val responseBody = response.body
+    private fun convert(response: Response): String {
+        response.use { resp ->
+            val responseBody = resp.body
             if (responseBody != null) {
                 val json = responseBody.string()
                 try {

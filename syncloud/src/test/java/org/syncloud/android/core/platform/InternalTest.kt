@@ -23,7 +23,7 @@ class InternalTest {
 }
         """.trimIndent()
         val webService = mockk<WebService>()
-        every { webService.get(any()) } returns json
+        every { webService.getUnverified(any()) } returns json
         val internal = Internal(webService)
         val id = internal.getId("host")
         assertEquals("syncloud", id?.name)
