@@ -38,9 +38,8 @@ open class WebService(private val client: HttpClient) {
                 try {
                     val jsonBaseResponse = mapper.readValue<BaseResult>(json)
                     if (!jsonBaseResponse.success) {
-                        val message = "Returned JSON indicates an error"
-                        logger.error("$message $json")
-                        throw SyncloudResultException(message, jsonBaseResponse)
+                        logger.error("${jsonBaseResponse.message} $json")
+                        throw SyncloudResultException(jsonBaseResponse.message, jsonBaseResponse)
                     }
                     return json
 

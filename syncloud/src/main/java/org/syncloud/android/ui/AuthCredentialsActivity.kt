@@ -14,19 +14,17 @@ import android.widget.LinearLayout
 import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.app.AppCompatActivity
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
-import org.apache.commons.lang3.StringUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.apache.log4j.Logger
 import org.syncloud.android.Preferences
-import org.syncloud.android.Progress
 import org.syncloud.android.R
 import org.syncloud.android.SyncloudApplication
 import org.syncloud.android.core.common.SyncloudResultException
 import org.syncloud.android.core.redirect.IUserService
 import org.syncloud.android.core.redirect.model.User
-import org.syncloud.android.tasks.AsyncResult
-import org.syncloud.android.tasks.ProgressAsyncTask
-import org.syncloud.android.tasks.ProgressAsyncTask.Completed
-import org.syncloud.android.tasks.ProgressAsyncTask.Work
 
 class AuthCredentialsActivity : AppCompatActivity() {
     private lateinit var preferences: Preferences
@@ -36,12 +34,9 @@ class AuthCredentialsActivity : AppCompatActivity() {
     private lateinit var passwordView: EditText
     private lateinit var signInButton: Button
     private lateinit var progressBar: CircleProgressBar
-    private var purpose: String? = null
-    private val progress: Progress = ProgressImpl()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        supportActionBar!!.setDisplayShowHomeEnabled(true)
         setContentView(R.layout.activity_auth_credentials)
         val application = application as SyncloudApplication
         preferences = application.preferences
@@ -87,7 +82,7 @@ class AuthCredentialsActivity : AppCompatActivity() {
         }
     }
 
-    fun showProgress(show: Boolean) {
+    private fun showProgress(show: Boolean) {
         progressBar.visibility = if (show) View.VISIBLE else View.INVISIBLE
         setLayoutEnabled(emailLoginFormView, !show)
     }
@@ -141,44 +136,41 @@ class AuthCredentialsActivity : AppCompatActivity() {
     }
 
     private fun attemptLogin() {
-        if (!validate()) return
+        if (!validate())
+            return
+
         val email = emailView.text.toString()
         val password = passwordView.text.toString()
-        ProgressAsyncTask<Void, User>()
-                .setProgress(progress)
-                .doWork(object : Work<Void, User> {
-                    override fun run(vararg args: Void): User {
-                        return doGetUser(email, password)
+        showProgress(true)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val user = doGetUser(email, password)
+                withContext(Dispatchers.Main) {
+                    showProgress(false)
+                    if (user != null) {
+                        preferences.setCredentials(email, password)
+                        finishSuccess()
+                    } else {
+                        showErrorDialog("User not found")
                     }
-                })
-                .onCompleted(object : Completed<User> {
-                    override fun run(result: AsyncResult<User>?) {
-                        onUserTaskCompleted(result!!)
-                    }
-                })
-                .execute()
-
-    }
-
-    private fun doGetUser(email: String, password: String): User {
-        return userService.getUser(email, password)!!
-    }
-
-    private fun onUserTaskCompleted(result: AsyncResult<User>) {
-        if (result.hasValue()) {
-            val email = emailView.text.toString()
-            val password = passwordView.text.toString()
-            preferences.setCredentials(email, password)
-            finishSuccess()
-        } else {
-            showError(result.exception.get())
+                }
+            } catch (e: Throwable) {
+                withContext(Dispatchers.Main) {
+                    showProgress(false)
+                    showError(e)
+                }
+            }
         }
     }
 
+    private fun doGetUser(email: String, password: String): User? {
+        return userService.getUser(email, password)
+    }
+
     private fun showErrorDialog(message: String?) {
-        AlertDialog.Builder(this@AuthCredentialsActivity)
+        AlertDialog.Builder(this)
                 .setTitle("Failed")
-                .setMessage("Unable to login")
+                .setMessage(message ?: "Unable to login")
                 .setPositiveButton(android.R.string.ok, null)
                 .show()
     }
@@ -191,10 +183,10 @@ class AuthCredentialsActivity : AppCompatActivity() {
     private fun showError(error: Throwable) {
         if (error is SyncloudResultException) {
             if (error.result.parameters_messages != null) {
-                for (pm in error.result.parameters_messages!!) {
+                for (pm in error.result.parameters_messages?: listOf()) {
                     val control = getControl(pm.parameter)
                     if (control != null) {
-                        val message = StringUtils.join(pm.messages, '\n')
+                        val message = pm.messages?.joinToString("\n")
                         control.error = message
                         control.requestFocus()
                     }
@@ -211,11 +203,6 @@ class AuthCredentialsActivity : AppCompatActivity() {
         startActivity(intent)
         setResult(RESULT_OK, Intent(this@AuthCredentialsActivity, AuthActivity::class.java))
         finish()
-    }
-
-    inner class ProgressImpl : Progress.Empty() {
-        override fun start() = showProgress(true)
-        override fun stop() = showProgress(false)
     }
 
     companion object {
