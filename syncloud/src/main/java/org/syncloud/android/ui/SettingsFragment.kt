@@ -4,28 +4,25 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
-import android.preference.Preference
-import android.preference.Preference.OnPreferenceClickListener
-import android.preference.PreferenceCategory
-import android.preference.PreferenceFragment
+import androidx.preference.Preference
+import androidx.preference.Preference.OnPreferenceClickListener
+import androidx.preference.PreferenceFragmentCompat
 import com.google.common.collect.Sets
 import org.apache.log4j.Logger
 import org.syncloud.android.*
-import org.syncloud.android.ui.AuthActivity
-import org.syncloud.android.ui.SettingsFragment
 
-class SettingsFragment : PreferenceFragment(), OnSharedPreferenceChangeListener {
-    private lateinit var removeAccountPref: Preference
-    private lateinit var feedbackPref: Preference
+class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeListener {
+    private var removeAccountPref: Preference? = null
+    private var feedbackPref: Preference? = null
     private lateinit var application: SyncloudApplication
     private val summaryUpdatable: Set<String> = Sets.newHashSet(PreferencesConstants.KEY_PREF_MAIN_DOMAIN)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        application = activity.application as SyncloudApplication
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        application = activity?.application as SyncloudApplication
+
         addPreferencesFromResource(R.xml.preferences)
         removeAccountPref = findPreference(PreferencesConstants.KEY_PREF_ACCOUNT_REMOVE)
-        removeAccountPref.setOnPreferenceClickListener(OnPreferenceClickListener {
+        removeAccountPref?.onPreferenceClickListener = OnPreferenceClickListener {
             val preferences = preferenceScreen.sharedPreferences
             val editor = preferences.edit()
             editor.putString(PreferencesConstants.KEY_PREF_EMAIL, null)
@@ -36,12 +33,12 @@ class SettingsFragment : PreferenceFragment(), OnSharedPreferenceChangeListener 
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             true
-        })
+        }
         feedbackPref = findPreference(PreferencesConstants.KEY_PREF_FEEDBACK_SEND)
-        feedbackPref.setOnPreferenceClickListener(OnPreferenceClickListener {
+        feedbackPref?.onPreferenceClickListener = OnPreferenceClickListener {
             application.reportError()
             true
-        })
+        }
         val preferences = preferenceScreen.sharedPreferences
         preferences.registerOnSharedPreferenceChangeListener(this)
         for (pref in summaryUpdatable) {
@@ -53,7 +50,7 @@ class SettingsFragment : PreferenceFragment(), OnSharedPreferenceChangeListener 
 
     private fun updateRemoveAccountPref(sharedPreferences: SharedPreferences) {
         val email = sharedPreferences.getString(PreferencesConstants.KEY_PREF_EMAIL, null)
-        removeAccountPref.isEnabled = email != null
+        removeAccountPref?.isEnabled = email != null
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
@@ -68,7 +65,8 @@ class SettingsFragment : PreferenceFragment(), OnSharedPreferenceChangeListener 
         logger.debug("updating: $key")
         val summary = getSummary(sharedPreferences, key)
         logger.debug("summary: $summary")
-        findPreference(key).summary = summary
+        val findPreference: Preference? = findPreference(key)
+        findPreference?.summary = summary
     }
 
     private fun getSummary(sharedPreferences: SharedPreferences, key: String): String {
