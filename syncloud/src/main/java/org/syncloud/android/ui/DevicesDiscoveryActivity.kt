@@ -5,13 +5,14 @@ import android.net.Uri
 import android.net.nsd.NsdManager
 import android.net.wifi.WifiManager
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ListView
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -30,12 +31,11 @@ import org.syncloud.android.core.platform.Internal
 import org.syncloud.android.core.platform.model.IdentifiedEndpoint
 import org.syncloud.android.discovery.DiscoveryManager
 import org.syncloud.android.ui.adapters.DevicesDiscoveredAdapter
-import org.syncloud.android.ui.dialog.WIFI_SETTINGS
 import org.syncloud.android.ui.dialog.WifiDialog
 
-const val REQUEST_SETTINGS = 1
 
-class DevicesDiscoveryActivity : AppCompatActivity() {
+class DevicesDiscoveryActivity : AppCompatActivity(),
+        WifiDialog.NoticeDialogListener {
     private lateinit var preferences: Preferences
     private lateinit var discoveryManager: DiscoveryManager
     private lateinit var refreshBtn: FloatingActionButton
@@ -47,6 +47,8 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
     private lateinit var internal: Internal
     private lateinit var application: SyncloudApplication
     private lateinit var settingsLauncher: ActivityResultLauncher<Intent>
+    private lateinit var wifiSettingsLauncher: ActivityResultLauncher<Intent>
+    private val logger = Logger.getLogger(DevicesDiscoveryActivity::class.java.name)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,8 +77,11 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
         )
         swipeRefreshLayout.post { checkWiFiAndDiscover() }
 
-        settingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        settingsLauncher = registerForActivityResult(StartActivityForResult()) {
             finish()
+        }
+        wifiSettingsLauncher = registerForActivityResult(StartActivityForResult()) {
+            checkWiFiAndDiscover()
         }
     }
 
@@ -93,17 +98,8 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
                 discover()
             }
         } else {
-            val dialog = WifiDialog("Discovery is possible only in the same Wi-Fi network where you have Syncloud device connected.")
+            val dialog = WifiDialog("Discovery is only possible on Wi-Fi.")
             dialog.show(supportFragmentManager, "discovery_wifi_dialog")
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == WIFI_SETTINGS) {
-            checkWiFiAndDiscover()
-        } else {
-            finish()
         }
     }
 
@@ -154,7 +150,11 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
-        private val logger = Logger.getLogger(DevicesDiscoveryActivity::class.java.name)
+    override fun onDialogPositiveClick() {
+        wifiSettingsLauncher.launch(Intent(Settings.ACTION_WIFI_SETTINGS))
+    }
+
+    override fun onDialogNegativeClick() {
+        finish()
     }
 }

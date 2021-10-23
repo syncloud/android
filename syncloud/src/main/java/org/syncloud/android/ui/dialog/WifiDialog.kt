@@ -3,30 +3,48 @@ package org.syncloud.android.ui.dialog
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.DialogInterface
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
-import android.provider.Settings
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 
-const val WIFI_SETTINGS = 3
-
 class WifiDialog(val message: String) : DialogFragment() {
+    private lateinit var listener: NoticeDialogListener
+
+    interface NoticeDialogListener {
+        fun onDialogPositiveClick()
+        fun onDialogNegativeClick()
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context: Activity? = activity
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            context?.finish()
+        }
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Wi-Fi Connection")
         builder.setMessage("You are not connected to Wi-Fi network. $message")
-            .setCancelable(false)
-            .setPositiveButton("Wi-Fi Settings") { _: DialogInterface?, _: Int -> openWiFiSettings() }
-            .setNegativeButton("Cancel") { _: DialogInterface?, _: Int -> context!!.finish() }
+                .setCancelable(false)
+                .setPositiveButton("Wi-Fi Settings") { _, _ ->
+                    listener.onDialogPositiveClick()
+                }
+                .setNegativeButton("Cancel") { _, _ ->
+                    listener.onDialogNegativeClick()
+                }
         return builder.create()
     }
 
-    private fun openWiFiSettings() {
-        val context: Activity? = activity
-        val intent = Intent(Settings.ACTION_WIFI_SETTINGS)
-        context!!.startActivityForResult(intent, WIFI_SETTINGS)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        // Verify that the host activity implements the callback interface
+        try {
+            // Instantiate the NoticeDialogListener so we can send events to the host
+            listener = context as NoticeDialogListener
+        } catch (e: ClassCastException) {
+            // The activity doesn't implement the interface, throw exception
+            throw ClassCastException((context.toString() +
+                    " must implement NoticeDialogListener"))
+        }
     }
+
 }
