@@ -15,8 +15,7 @@
             android:id="@+id/layout_results"
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1">
+            android:layout_height="fill_parent">
 
             <ListView
                 android:id="@+id/devices_discovered"
@@ -48,7 +47,7 @@
                     android:paddingRight="30dp"
                     android:gravity="center"
                     android:textSize="18sp"
-                    android:text="No devices found.\nCheck that your syncloud device is on and connected to the router."
+                    android:text="@string/no_devices_found"
                     />
 
                 </LinearLayout>
@@ -61,11 +60,12 @@
             android:id="@+id/discovery_refresh_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
+            android:layout_gravity="bottom|end"
             android:layout_margin="24dp"
             android:clickable="true"
-            android:onClick="refresh"
-            android:src="@drawable/ic_refresh_white_24dp" />
+            android:focusable="true"
+            android:src="@drawable/ic_refresh_white_24dp"
+            android:contentDescription="@string/refresh_button" />
 
     </FrameLayout>
 

@@ -78,5 +78,7 @@
     <string name="action_activate">Activate</string>
     <string name="discover_devices">Discover devices in your network.</string>
     <string name="discovery_button">discovery button</string>
+    <string name="refresh_button">refresh button</string>
+    <string name="no_devices_found">No devices found.\nCheck that your syncloud device is on and connected to the router.</string>
 
 </resources>

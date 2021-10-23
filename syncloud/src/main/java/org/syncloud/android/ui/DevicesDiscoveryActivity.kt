@@ -10,6 +10,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ListView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -44,10 +46,10 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
     private lateinit var deviceToId: MutableMap<String, IdentifiedEndpoint>
     private lateinit var internal: Internal
     private lateinit var application: SyncloudApplication
+    private lateinit var settingsLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        supportActionBar!!.setDisplayShowHomeEnabled(true)
         setContentView(R.layout.activity_devices_discovery)
         application = getApplication() as SyncloudApplication
         preferences = application.preferences
@@ -57,7 +59,8 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
         swipeRefreshLayout.setOnRefreshListener { checkWiFiAndDiscover() }
         emptyView = findViewById(android.R.id.empty)
         resultsList = findViewById<View>(R.id.devices_discovered) as ListView
-        refreshBtn = findViewById<View>(R.id.discovery_refresh_btn) as FloatingActionButton
+        refreshBtn = findViewById(R.id.discovery_refresh_btn)
+        refreshBtn.setOnClickListener { checkWiFiAndDiscover() }
         listAdapter = DevicesDiscoveredAdapter(this)
         resultsList.adapter = listAdapter
         resultsList.onItemClickListener = OnItemClickListener { _, _, position, _ ->
@@ -71,6 +74,10 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
                 applicationContext.getSystemService(NSD_SERVICE) as NsdManager
         )
         swipeRefreshLayout.post { checkWiFiAndDiscover() }
+
+        settingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            finish()
+        }
     }
 
     private fun checkWiFiAndDiscover() {
@@ -108,8 +115,7 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.action_settings) {
-            val intentSettings = Intent(this, SettingsActivity::class.java)
-            startActivityForResult(intentSettings, REQUEST_SETTINGS)
+            settingsLauncher.launch(Intent(this, SettingsActivity::class.java))
         }
         return super.onOptionsItemSelected(item)
     }
@@ -124,10 +130,6 @@ class DevicesDiscoveryActivity : AppCompatActivity() {
         super.onDestroy()
         logger.info("leaving the screen")
         discoveryManager.cancel()
-    }
-
-    fun refresh(view: View?) {
-        checkWiFiAndDiscover()
     }
 
     private suspend fun discover() {

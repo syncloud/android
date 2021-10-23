@@ -40,9 +40,8 @@ class DevicesSavedActivity : AppCompatActivity() {
         emptyView = findViewById(android.R.id.empty)
         listview = findViewById(R.id.devices_saved)
         listview.setOnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
-            val obj = listview.getItemAtPosition(position)
-            val domain = obj as DomainModel
-            open(domain)
+            val domain = listview.getItemAtPosition(position) as DomainModel
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(domain.dnsUrl())))
         }
         btnDiscovery = findViewById(R.id.discovery_btn)
         btnDiscovery.setOnClickListener {
@@ -78,7 +77,7 @@ class DevicesSavedActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.IO).launch {
                 val user = userService.getUser(redirectEmail, redirectPassword)
                 val domains = user?.domains?.toModels() ?: listOf()
-                val sortedDomains = domains.sortedWith{ first, second ->
+                val sortedDomains = domains.sortedWith { first, second ->
                     first.name.compareTo(second.name)
                 }
                 withContext(Dispatchers.Main) {
@@ -92,10 +91,6 @@ class DevicesSavedActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun open(device: DomainModel) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(device.dnsUrl())))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
