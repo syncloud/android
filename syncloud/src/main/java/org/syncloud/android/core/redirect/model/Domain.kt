@@ -6,7 +6,6 @@ import java.io.Serializable
 
 data class Domain(
     val name: String,
-    val device_mac_address: String,
     val device_name : String,
     var device_title: String,
     var map_local_address: Boolean,
@@ -26,5 +25,4 @@ fun List<Domain>.toModels(): List<DomainModel> {
     return models
 }
 
-fun hasDeviceInfo(domain: Domain): Boolean =
-    domain.device_mac_address != null && domain.device_name != null && domain.device_title != null
+fun hasDeviceInfo(domain: Domain): Boolean = domain.device_title != null

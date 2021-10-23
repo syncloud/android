@@ -13,13 +13,11 @@ class DomainTest {
     @Test
     fun `can convert domains to domainModels`() {
         var domains = listOf(
-            Domain("aDomain", "aDeviceMacAddress", "aDeviceName", "aDeviceTitle", true, "http", 8080, 8081)
+            Domain("aDomain", "aDeviceName", "aDeviceTitle", true, "http", 8080, 8081)
         )
         var models = domains.toModels()
         models.forEach{
-            assertEquals("aDeviceName", it.id!!.name)
-            assertEquals("aDeviceTitle", it.id!!.title)
-            assertEquals("aDeviceMacAddress", it.id!!.mac_address )
+            assertEquals("aDeviceTitle", it.title)
             assertEquals("aDomain", it.name)
         }
     }

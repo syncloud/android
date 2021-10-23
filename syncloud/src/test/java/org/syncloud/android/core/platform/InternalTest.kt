@@ -26,6 +26,6 @@ class InternalTest {
         every { webService.getUnverified(any()) } returns json
         val internal = Internal(webService)
         val id = internal.getId("host")
-        assertEquals("syncloud", id?.name)
+        assertEquals("Syncloud", id?.title)
     }
 }

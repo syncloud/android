@@ -22,7 +22,6 @@ import org.syncloud.android.core.redirect.model.toModels
 import org.syncloud.android.tasks.AsyncResult
 import org.syncloud.android.tasks.ProgressAsyncTask
 import org.syncloud.android.ui.adapters.DevicesSavedAdapter
-import java.util.*
 
 class DevicesSavedActivity : AppCompatActivity() {
     private lateinit var listview: ListView
@@ -42,20 +41,20 @@ class DevicesSavedActivity : AppCompatActivity() {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
         emptyView = findViewById(android.R.id.empty)
         listview = findViewById(R.id.devices_saved)
-        listview.setOnItemClickListener({ adapterView: AdapterView<*>?, view: View?, position: Int, l: Long ->
+        listview.setOnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, l: Long ->
             val obj = listview.getItemAtPosition(position)
             val domain = obj as DomainModel
             open(domain)
-        })
+        }
         btnDiscovery = findViewById(R.id.discovery_btn)
         adapter = DevicesSavedAdapter(this)
-        listview.setAdapter(adapter)
+        listview.adapter = adapter
         application = getApplication() as SyncloudApplication
         preferences = application.preferences
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
         swipeRefreshLayout.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
-        swipeRefreshLayout.setOnRefreshListener({ refreshDevices() })
-        swipeRefreshLayout.post({ refreshDevices() })
+        swipeRefreshLayout.setOnRefreshListener { refreshDevices() }
+        swipeRefreshLayout.post { refreshDevices() }
     }
 
     private fun refreshDevices() {
@@ -80,8 +79,8 @@ class DevicesSavedActivity : AppCompatActivity() {
                         }
                     })
                     .onSuccess(object : ProgressAsyncTask.Success<User> {
-                        override fun run(user: User?) {
-                            updateUser(user)
+                        override fun run(result: User?) {
+                            updateUser(result)
                         }
                     })
                     .execute()
@@ -90,17 +89,16 @@ class DevicesSavedActivity : AppCompatActivity() {
     }
 
     private fun updateUser(user: User?) {
-        val domains = user!!.domains!!.toModels()
-        val noDevicesLast = Comparator { first: DomainModel, second: DomainModel ->
+        val domains = user?.domains?.toModels() ?: listOf()
+        val sortedDomains = domains.sortedWith{ first: DomainModel, second: DomainModel ->
             first.name.compareTo(second.name)
         }
-        Collections.sort(domains, noDevicesLast)
         adapter.clear()
-        for (domain in domains) adapter.add(domain)
+        adapter.addAll(sortedDomains)
     }
 
     private fun open(device: DomainModel) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(device.dnsUrl)))
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(device.dnsUrl())))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

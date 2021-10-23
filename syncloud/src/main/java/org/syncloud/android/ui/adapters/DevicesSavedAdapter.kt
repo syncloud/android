@@ -19,7 +19,7 @@ class DevicesSavedAdapter(private val activity: DevicesSavedActivity) : ArrayAda
         val domain = getItem(position)!!
         val fullDomainName = domain.name
         txtBoldTitle.text = fullDomainName
-        txtAdditionalLine.text = domain.id!!.title
+        txtAdditionalLine.text = domain.title
         return rowView
     }
 }

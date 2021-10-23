@@ -55,7 +55,7 @@ class RedirectServiceTest {
 
 
         assertEquals(user?.email, "email@example.com")
-        assertEquals(user?.domains?.get(0)?.device_name, "syncloud")
+        assertEquals(user?.domains?.get(0)?.device_title, "Syncloud")
     }
 }
 
