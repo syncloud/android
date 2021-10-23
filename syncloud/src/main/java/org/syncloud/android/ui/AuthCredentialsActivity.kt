@@ -149,7 +149,8 @@ class AuthCredentialsActivity : AppCompatActivity() {
                     showProgress(false)
                     if (user != null) {
                         preferences.setCredentials(email, password)
-                        finishSuccess()
+                        val intent = Intent(this@AuthCredentialsActivity, DevicesSavedActivity::class.java)
+                        startActivity(intent)
                     } else {
                         showErrorDialog("User not found")
                     }
@@ -195,14 +196,7 @@ class AuthCredentialsActivity : AppCompatActivity() {
             }
         }
         logger.error("auth error", error)
-        showErrorDialog(error.message)
-    }
-
-    private fun finishSuccess() {
-        val intent = Intent(this, DevicesSavedActivity::class.java)
-        startActivity(intent)
-        setResult(RESULT_OK, Intent(this@AuthCredentialsActivity, AuthActivity::class.java))
-        finish()
+        showErrorDialog("Wrong password or user does not exist (${error.message})")
     }
 
     companion object {

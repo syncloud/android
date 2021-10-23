@@ -1,6 +1,5 @@
 package org.syncloud.android.ui
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -10,26 +9,25 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.syncloud.android.Preferences
-import org.syncloud.android.Progress
 import org.syncloud.android.R
 import org.syncloud.android.SyncloudApplication
 import org.syncloud.android.core.redirect.IUserService
-import org.syncloud.android.core.redirect.model.User
-import org.syncloud.android.tasks.AsyncResult
-import org.syncloud.android.tasks.ProgressAsyncTask
-import org.syncloud.android.tasks.ProgressAsyncTask.Completed
-import org.syncloud.android.tasks.ProgressAsyncTask.Work
 
-const val REQUEST_AUTHENTICATE = 1
-
-class AuthActivity : Activity() {
+class AuthActivity : AppCompatActivity() {
     private lateinit var preferences: Preferences
     private lateinit var progressBar: CircleProgressBar
     private lateinit var signInOrOut: LinearLayout
     private lateinit var userService: IUserService
-    private val progress: Progress = ProgressImpl()
+    private lateinit var askCredentialsLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +38,19 @@ class AuthActivity : Activity() {
         progressBar = findViewById<View>(R.id.progress) as CircleProgressBar
         progressBar.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
         signInOrOut = findViewById<View>(R.id.sign_in_or_up) as LinearLayout
+        val singUpBtn = findViewById<View>(R.id.sign_up_button)
+        singUpBtn.setOnClickListener{
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.${preferences.mainDomain}/register")))
+        }
+        val signInBtn = findViewById<View>(R.id.sign_in_button)
+        signInBtn.setOnClickListener{
+            startActivity(Intent(this, AuthCredentialsActivity::class.java))
+        }
         val learnMoreText = findViewById<View>(R.id.auth_learn_more) as TextView
         learnMoreText.movementMethod = LinkMovementMethod.getInstance()
+        askCredentialsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            finish()
+        }
         proceedWithLogin()
     }
 
@@ -54,32 +63,35 @@ class AuthActivity : Activity() {
     }
 
     private fun login(email: String, password: String) {
-        ProgressAsyncTask<Void, User?>()
-            .setProgress(progress)
-            .doWork(object : Work<Void, User?> {
-                override fun run(vararg args: Void): User? {
-                    return userService.getUser(email, password)
+        progressStart()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val user = userService.getUser(email, password)
+                withContext(Dispatchers.Main) {
+                    progressStop()
+                    if (user != null) {
+                        val intent = Intent(this@AuthActivity, DevicesSavedActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        askCredentials()
+                    }
                 }
-            })
-            .onCompleted(object : Completed<User?> {
-                override fun run(result: AsyncResult<User?>?) {
-                    onLoginCompleted(result)
+            } catch (e: Throwable) {
+                withContext(Dispatchers.Main) {
+                    progressStop()
+                    askCredentials()
                 }
-            })
-            .execute()
-    }
-
-    private fun onLoginCompleted(result: AsyncResult<User?>?) {
-        if (result?.hasValue() == true) {
-            val intent = Intent(this@AuthActivity, DevicesSavedActivity::class.java)
-            startActivity(intent)
-            finish()
-        } else {
-            val intent = Intent(this@AuthActivity, AuthCredentialsActivity::class.java)
-            intent.putExtra(AuthConstants.PARAM_CHECK_EXISTING, true)
-            startActivityForResult(intent, REQUEST_AUTHENTICATE)
+            }
         }
     }
+
+    private fun askCredentials() {
+        val intent = Intent(this@AuthActivity, AuthCredentialsActivity::class.java)
+        intent.putExtra(AuthConstants.PARAM_CHECK_EXISTING, true)
+        startActivity(intent)
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
@@ -93,24 +105,13 @@ class AuthActivity : Activity() {
         } else super.onOptionsItemSelected(item)
     }
 
-    fun signIn(view: View?) {
-        val credentialsIntent = Intent(this, AuthCredentialsActivity::class.java)
-        startActivityForResult(credentialsIntent, REQUEST_AUTHENTICATE)
+    private fun progressStop() {
+        signInOrOut.visibility = View.VISIBLE
+        progressBar.visibility = View.INVISIBLE
     }
 
-    fun signUp(view: View?) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.${preferences.mainDomain}/register")))
-    }
-
-    inner class ProgressImpl : Progress.Empty() {
-        override fun start() {
-            signInOrOut.visibility = View.INVISIBLE
-            progressBar.visibility = View.VISIBLE
-        }
-
-        override fun stop() {
-            signInOrOut.visibility = View.VISIBLE
-            progressBar.visibility = View.INVISIBLE
-        }
+    private fun progressStart() {
+        signInOrOut.visibility = View.INVISIBLE
+        progressBar.visibility = View.VISIBLE
     }
 }

@@ -80,5 +80,8 @@
     <string name="discovery_button">discovery button</string>
     <string name="refresh_button">refresh button</string>
     <string name="no_devices_found">No devices found.\nCheck that your syncloud device is on and connected to the router.</string>
+    <string name="sign_up">Sign up</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="logo_image">logo image</string>
 
 </resources>
