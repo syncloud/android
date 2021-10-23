@@ -76,5 +76,7 @@
     <string name="use_https">Use HTTPS</string>
 
     <string name="action_activate">Activate</string>
+    <string name="discover_devices">Discover devices in your network.</string>
+    <string name="discovery_button">discovery button</string>
 
 </resources>
