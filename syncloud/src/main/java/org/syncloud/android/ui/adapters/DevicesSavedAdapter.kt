@@ -8,18 +8,18 @@ import org.syncloud.android.R
 import org.syncloud.android.core.platform.model.DomainModel
 import org.syncloud.android.ui.DevicesSavedActivity
 
-class DevicesSavedAdapter(private val activity: DevicesSavedActivity) : ArrayAdapter<DomainModel>(
-    activity, R.layout.layout_device_item
-) {
+class DevicesSavedAdapter(private val activity: DevicesSavedActivity) :
+        ArrayAdapter<DomainModel>(activity, R.layout.layout_device_item) {
+
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val inflater = activity.layoutInflater
-        val rowView = inflater.inflate(R.layout.layout_device_item, null)
-        val txtBoldTitle = rowView.findViewById<TextView>(R.id.txt_bold_title)
-        val txtAdditionalLine = rowView.findViewById<TextView>(R.id.txt_additional_line)
-        val domain = getItem(position)!!
-        val fullDomainName = domain.name
+        val view = convertView
+                ?: activity.layoutInflater.inflate(R.layout.layout_device_item, parent, false)
+        val txtBoldTitle = view.findViewById<TextView>(R.id.txt_bold_title)
+        val txtAdditionalLine = view.findViewById<TextView>(R.id.txt_additional_line)
+        val domain = getItem(position)
+        val fullDomainName = domain?.name
         txtBoldTitle.text = fullDomainName
-        txtAdditionalLine.text = domain.title
-        return rowView
+        txtAdditionalLine.text = domain?.title
+        return view
     }
 }

@@ -39,7 +39,7 @@ class DevicesSavedActivity : AppCompatActivity() {
         setContentView(R.layout.activity_devices_saved)
         emptyView = findViewById(android.R.id.empty)
         listview = findViewById(R.id.devices_saved)
-        listview.setOnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+        listview.setOnItemClickListener { _, _, position, _ ->
             val domain = listview.getItemAtPosition(position) as DomainModel
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(domain.dnsUrl())))
         }
