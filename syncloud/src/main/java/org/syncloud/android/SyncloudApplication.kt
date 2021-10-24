@@ -1,5 +1,6 @@
 package org.syncloud.android
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
@@ -7,7 +8,6 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.preference.PreferenceManager
-import okhttp3.OkHttpClient
 import org.acra.ACRA
 import org.acra.BuildConfig
 import org.acra.ReportField
@@ -24,30 +24,29 @@ import org.syncloud.android.core.redirect.UserCachedService
 import org.syncloud.android.core.redirect.UserStorage
 import java.io.File
 
+@SuppressLint("NonConstantResourceId")
 @AcraDialog(
-    resText = R.string.crash_dialog_text,
-    resIcon = R.drawable.ic_launcher,
-    resTitle = R.string.crash_dialog_title
+        resText = R.string.crash_dialog_text,
+        resIcon = R.drawable.ic_launcher,
+        resTitle = R.string.crash_dialog_title
 )
 @AcraCore(
-    buildConfigClass = BuildConfig::class,
-    reportContent = [ReportField.APP_VERSION_CODE, ReportField.ANDROID_VERSION, ReportField.PHONE_MODEL, ReportField.STACK_TRACE, ReportField.LOGCAT],
-    logcatArguments = ["-t", "500", "-v", "long", "*:D"],
-    logcatFilterByPid = false,
-    reportSenderFactoryClasses = [AcraLogEmailerFactory::class],
-    reportFormat = StringFormat.KEY_VALUE_LIST
+        buildConfigClass = BuildConfig::class,
+        reportContent = [ReportField.APP_VERSION_CODE, ReportField.ANDROID_VERSION, ReportField.PHONE_MODEL, ReportField.STACK_TRACE, ReportField.LOGCAT],
+        logcatArguments = ["-t", "500", "-v", "long", "*:D"],
+        logcatFilterByPid = false,
+        reportSenderFactoryClasses = [AcraLogEmailerFactory::class],
+        reportFormat = StringFormat.KEY_VALUE_LIST
 )
 class SyncloudApplication : Application() {
-    private lateinit var _preferences: Preferences
     private lateinit var _userStorage: UserStorage
-    private lateinit var _userService : IUserService
+    lateinit var preferences: Preferences
+    lateinit var userServiceCached: IUserService
 
-    val preferences : Preferences get () = _preferences
-    val userServiceCached : IUserService get() = _userService
-
+    @Suppress("DEPRECATION")
     fun isWifiConnected(): Boolean {
         val connMgr = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-        connMgr?: return false
+        connMgr ?: return false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val network: Network = connMgr.activeNetwork ?: return false
             val capabilities = connMgr.getNetworkCapabilities(network)
@@ -65,9 +64,9 @@ class SyncloudApplication : Application() {
         super.onCreate()
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
-        _preferences = Preferences(sharedPreferences)
+        preferences = Preferences(sharedPreferences)
         _userStorage = UserStorage(File(applicationContext.filesDir, "user.json"))
-        _userService = webServiceAuthWithFileBackedCache()
+        userServiceCached = webServiceAuthWithFileBackedCache()
     }
 
     override fun attachBaseContext(base: Context) {
@@ -76,7 +75,7 @@ class SyncloudApplication : Application() {
     }
 
     private fun webServiceAuthWithFileBackedCache(): UserCachedService {
-        val redirectService = RedirectService(_preferences.mainDomain, WebService(HttpClient()))
+        val redirectService = RedirectService(preferences.mainDomain, WebService(HttpClient()))
         return UserCachedService(redirectService, _userStorage)
     }
 

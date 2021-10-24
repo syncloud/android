@@ -11,7 +11,7 @@ object Jackson {
     @JvmStatic
     fun createObjectMapper(): ObjectMapper {
         val deserializer = RFC822DateTimeDeserializer()
-        val module = SimpleModule("RFC822DateTimeDeserializerModule", Version(1, 0, 0, null))
+        val module = SimpleModule("RFC822DateTimeDeserializerModule", Version(1, 0, 0, null, null, null))
         module.addDeserializer(Date::class.java, deserializer)
         val mapper = ObjectMapper()
         mapper.registerModule(module)

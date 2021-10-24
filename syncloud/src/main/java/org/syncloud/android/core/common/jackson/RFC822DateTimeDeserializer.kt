@@ -19,8 +19,7 @@ class RFC822DateTimeDeserializer : JsonDeserializer<Date?>() {
     ): Date? {
         val format: DateFormat = SimpleDateFormat()
         val dateStr = jsonparser.text
-        var date: Date? = null
-        date = try {
+        val date = try {
             format.parse(dateStr)
         } catch (e: ParseException) {
             throw IOException("Can't parse DateTime from RFC-822 format", e)
