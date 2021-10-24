@@ -23,7 +23,7 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:src="@drawable/syncloud_logo"
-            />
+            android:contentDescription="@string/logo_image" />
 
     </LinearLayout>
 
@@ -49,19 +49,18 @@
             android:id="@+id/sign_in_or_up"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0"
             android:orientation="vertical"
             >
 
             <Button
-                android:text="Sign up"
+                android:id="@+id/sign_up_button"
+                android:text="@string/sign_up"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:textStyle="bold"
-                android:onClick="signUp"
                 />
 
 
@@ -75,13 +74,14 @@
                 android:layout_gravity="center_horizontal"
                 >
                     <TextView
-                        android:text="Already have an account?"
+                        android:text="@string/already_have_an_account"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="18sp"
                         />
 
                     <TextView
+                        android:id="@+id/sign_in_button"
                         android:text="@string/sign_in_exclamation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:clickable="true"
-                        android:onClick="signIn"
+                        android:focusable="true"
                         android:textColor="#ff33b5e5"
                         />
 

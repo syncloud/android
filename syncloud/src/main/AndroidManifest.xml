@@ -29,18 +29,21 @@
             android:name=".ui.DevicesSavedActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:label="@string/title_devices"
+            android:exported="true"
             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.DevicesDiscoveryActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_discovery"
+            android:exported="true"
             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.AuthActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
+            android:exported="true"
             android:theme="@style/NoActionBarTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,12 +54,14 @@
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:exported="true"
             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.AuthCredentialsActivity"
             android:label="@string/title_activity_auth_credentials"
             android:screenOrientation="portrait"
+            android:exported="true"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
         <activity
@@ -64,10 +69,9 @@
             android:excludeFromRecents="true"
             android:finishOnTaskLaunch="true"
             android:launchMode="singleInstance"
+            android:exported="true"
             android:theme="@style/DialogTheme" >
         </activity>
-
-        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
 
     </application>
 
