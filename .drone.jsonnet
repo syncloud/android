@@ -28,7 +28,7 @@ local build() = {
                 },
             },
             commands: [
-                "yes | /opt/android/tools/bin/sdkmanager 'build-tools;31.0.0'",
+                "yes | /opt/android/tools/bin/sdkmanager 'build-tools;35.0.0'",
                 "./gradlew clean test assemble"
             ]
         },
