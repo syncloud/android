@@ -16,6 +16,7 @@ android {
     }
 
     defaultConfig {
+        compileSdk 33
         minSdkVersion 21
         targetSdkVersion 35
         versionCode 24000
@@ -79,7 +80,6 @@ android {
 
 dependencies {
     implementation 'log4j:log4j:1.2.17'
-    implementation 'ch.acra:acra:5.11.3'
     implementation 'ch.acra:acra-mail:5.11.3'
     implementation 'ch.acra:acra-dialog:5.11.3'
     implementation 'de.mindpipe.android:android-logging-log4j:1.0.3'

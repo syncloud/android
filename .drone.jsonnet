@@ -9,7 +9,7 @@ local build() = {
     steps: [
         {
             name: "build",
-            image: "syncloud/android-sdk",
+            image: "runmymind/docker-android-sdk:ubuntu-standalone-20240812",
             environment: {
                 KEY_STORE: {
                   from_secret: "KEY_STORE"
@@ -28,7 +28,7 @@ local build() = {
                 },
             },
             commands: [
-                "yes | /opt/android/tools/bin/sdkmanager 'build-tools;35.0.0'",
+                "sdkmanager 'build-tools;35.0.0'",
                 "./gradlew clean test assemble"
             ]
         },
