@@ -38,10 +38,13 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('syncloud.keystore')
-            storePassword ''
-            keyAlias ''
-            keyPassword ''
+            def env = System.getenv()
+            def sf = new File(env['ANDROID_STORE_FILE'])
+            sf.append(env['KEY_STORE'].decodeBase64())
+            storeFile sf
+            storePassword env['ANDROID_STORE_PASSWORD']
+            keyAlias env['ANDROID_KEY_ALIAS']
+            keyPassword env['ANDROID_KEY_PASSWORD']
         }
     }
 
@@ -56,25 +59,6 @@ android {
             excludes += ['META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'log4j.properties', 'about.html', 'META-INF/beans.xml']
         }
     }
-
-
-    allprojects {
-        afterEvaluate { project ->
-            def env = System.getenv()
-            if (env.containsKey('KEY_STORE')) {
-                def storeFile = new File(env['ANDROID_STORE_FILE'])
-                storeFile.append(env['KEY_STORE'].decodeBase64())
-
-                android.signingConfigs['release'].storeFile = storeFile
-                android.signingConfigs['release'].storePassword = env['ANDROID_STORE_PASSWORD']
-                android.signingConfigs['release'].keyAlias = env['ANDROID_KEY_ALIAS']
-                android.signingConfigs['release'].keyPassword = env['ANDROID_KEY_PASSWORD']
-            } else {
-                logger.warn('KEY_STORE is not available, will not be able to publish to Google Play')
-            }
-        }
-    }
-
 }
 
 
