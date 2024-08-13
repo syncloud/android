@@ -12,7 +12,9 @@ android {
     kotlin {
         jvmToolchain 11
 //        jvmTarget = "1.8"
+compilerOptions {
         allWarningsAsErrors = true
+}
     }
 
     defaultConfig {
