@@ -39,7 +39,7 @@ local build() = {
                     api_key: {
                         from_secret: "github_token"
                     },
-                    files: "syncloud/build/outputs/apk/prod/release/*",
+                    files: "syncloud/build/outputs/apk/release/*",
                     overwrite: true,
                     file_exists: "overwrite"
                 },
@@ -61,7 +61,7 @@ local build() = {
                 timeout: "2m",
                 command_timeout: "2m",
                 target: "/home/artifact/repo/android/${DRONE_BUILD_NUMBER}",
-                source: "syncloud/build/outputs/apk/prod/release/*.apk",
+                source: "syncloud/build/outputs/apk/release/*.apk",
                     strip_components: 6
             },
             when: {
