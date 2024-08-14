@@ -1,6 +1,5 @@
 package org.syncloud.android
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
@@ -11,9 +10,10 @@ import androidx.preference.PreferenceManager
 import org.acra.ACRA
 import org.acra.BuildConfig
 import org.acra.ReportField
-import org.acra.annotation.AcraCore
-import org.acra.annotation.AcraDialog
+import org.acra.config.dialog
+import org.acra.config.mailSender
 import org.acra.data.StringFormat
+import org.acra.ktx.initAcra
 import org.apache.log4j.Logger
 import org.syncloud.android.ConfigureLog4J.configure
 import org.syncloud.android.core.common.WebService
@@ -24,20 +24,6 @@ import org.syncloud.android.core.redirect.UserCachedService
 import org.syncloud.android.core.redirect.UserStorage
 import java.io.File
 
-@SuppressLint("NonConstantResourceId")
-@AcraDialog(
-        resText = R.string.crash_dialog_text,
-        resIcon = R.drawable.ic_launcher,
-        resTitle = R.string.crash_dialog_title
-)
-@AcraCore(
-        buildConfigClass = BuildConfig::class,
-        reportContent = [ReportField.APP_VERSION_CODE, ReportField.ANDROID_VERSION, ReportField.PHONE_MODEL, ReportField.STACK_TRACE, ReportField.LOGCAT],
-        logcatArguments = ["-t", "500", "-v", "long", "*:D"],
-        logcatFilterByPid = false,
-        reportSenderFactoryClasses = [AcraLogEmailerFactory::class],
-        reportFormat = StringFormat.KEY_VALUE_LIST
-)
 class SyncloudApplication : Application() {
     private lateinit var _userStorage: UserStorage
     lateinit var preferences: Preferences
@@ -71,7 +57,22 @@ class SyncloudApplication : Application() {
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
-        ACRA.init(this)
+        initAcra{
+            buildConfigClass = BuildConfig::class.java
+            reportContent = listOf(ReportField.APP_VERSION_CODE, ReportField.ANDROID_VERSION, ReportField.PHONE_MODEL, ReportField.STACK_TRACE, ReportField.LOGCAT)
+            logcatArguments = listOf("-t", "500", "-v", "long", "*:D")
+            logcatFilterByPid = false
+            reportFormat = StringFormat.KEY_VALUE_LIST
+            dialog {
+                text = getString(R.string.crash_dialog_text)
+                resIcon = R.drawable.ic_launcher
+                title = getString(R.string.crash_dialog_title)
+            }
+            mailSender {
+                mailTo = "support@syncloud.it"
+                subject = "Syncloud Android Report"
+            }
+        }
     }
 
     private fun webServiceAuthWithFileBackedCache(): UserCachedService {
@@ -79,5 +80,5 @@ class SyncloudApplication : Application() {
         return UserCachedService(redirectService, _userStorage)
     }
 
-    fun reportError() = ACRA.getErrorReporter().handleSilentException(null)
+    fun reportError() = ACRA.errorReporter.handleSilentException(null)
 }

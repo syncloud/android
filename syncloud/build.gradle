@@ -41,12 +41,19 @@ compilerOptions {
     signingConfigs {
         release {
             def env = System.getenv()
-            def sf = new File(env['ANDROID_STORE_FILE'])
-            sf.append(env['KEY_STORE'].decodeBase64())
-            storeFile sf
-            storePassword env['ANDROID_STORE_PASSWORD']
-            keyAlias env['ANDROID_KEY_ALIAS']
-            keyPassword env['ANDROID_KEY_PASSWORD']
+            if (env.containsKey('KEY_STORE')) {
+                def sf = new File(env['ANDROID_STORE_FILE'])
+                sf.append(env['KEY_STORE'].decodeBase64())
+                storeFile sf
+                storePassword env['ANDROID_STORE_PASSWORD']
+                keyAlias env['ANDROID_KEY_ALIAS']
+                keyPassword env['ANDROID_KEY_PASSWORD']
+            } else {
+                storeFile file('syncloud.keystore')
+                storePassword ''
+                keyAlias ''
+                keyPassword ''
+            }
         }
     }
 
@@ -85,6 +92,5 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.9.0"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3'
-    implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5"
     implementation 'org.conscrypt:conscrypt-android:2.5.0'
 }
