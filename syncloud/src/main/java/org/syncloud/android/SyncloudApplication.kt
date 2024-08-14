@@ -5,7 +5,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.os.Build
 import androidx.preference.PreferenceManager
 import org.acra.ACRA
 import org.acra.BuildConfig
@@ -29,18 +28,14 @@ class SyncloudApplication : Application() {
     lateinit var preferences: Preferences
     lateinit var userServiceCached: IUserService
 
-    @Suppress("DEPRECATION")
     fun isWifiConnected(): Boolean {
-        val connMgr = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        val connMgr =
+            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
         connMgr ?: return false
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val network: Network = connMgr.activeNetwork ?: return false
-            val capabilities = connMgr.getNetworkCapabilities(network)
-            return capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
-        } else {
-            val networkInfo = connMgr.activeNetworkInfo ?: return false
-            return networkInfo.isConnected && networkInfo.type == ConnectivityManager.TYPE_WIFI
-        }
+        val network: Network = connMgr.activeNetwork ?: return false
+        val capabilities = connMgr.getNetworkCapabilities(network)
+        return capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+
     }
 
     override fun onCreate() {
@@ -57,9 +52,15 @@ class SyncloudApplication : Application() {
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
-        initAcra{
+        initAcra {
             buildConfigClass = BuildConfig::class.java
-            reportContent = listOf(ReportField.APP_VERSION_CODE, ReportField.ANDROID_VERSION, ReportField.PHONE_MODEL, ReportField.STACK_TRACE, ReportField.LOGCAT)
+            reportContent = listOf(
+                ReportField.APP_VERSION_CODE,
+                ReportField.ANDROID_VERSION,
+                ReportField.PHONE_MODEL,
+                ReportField.STACK_TRACE,
+                ReportField.LOGCAT
+            )
             logcatArguments = listOf("-t", "500", "-v", "long", "*:D")
             logcatFilterByPid = false
             reportFormat = StringFormat.KEY_VALUE_LIST

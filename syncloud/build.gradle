@@ -3,34 +3,25 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace "org.syncloud.android"
-//    compileSdkVersion 35
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
-//        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlin {
         jvmToolchain 17
-//        jvmTarget = "1.8"
-compilerOptions {
-        allWarningsAsErrors = true
-}
+        compilerOptions {
+            allWarningsAsErrors = true
+        }
     }
 
     defaultConfig {
         compileSdk 33
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 35
         versionCode 24000
         versionName "24.00"
         multiDexEnabled true
     }
-
-//    productFlavors {
-//        prod {
-//            applicationId "org.syncloud.android"
-//        }
-//    }
 
     applicationVariants.configureEach { variant ->
         variant.outputs.configureEach {
@@ -84,13 +75,10 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE'
-    testImplementation 'junit:junit:4.10'
-    testImplementation "io.mockk:mockk:1.12.0"
     implementation "androidx.core:core-ktx:1.7.0"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.5.31"
     implementation "com.squareup.okhttp3:okhttp:4.9.0"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3'
-    implementation 'org.conscrypt:conscrypt-android:2.5.0'
+    testImplementation 'junit:junit:4.10'
+    testImplementation "io.mockk:mockk:1.12.0"
 }

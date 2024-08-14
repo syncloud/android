@@ -24,10 +24,10 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
         removeAccountPref = findPreference(PreferencesConstants.KEY_PREF_ACCOUNT_REMOVE)
         removeAccountPref?.onPreferenceClickListener = OnPreferenceClickListener {
             val preferences = preferenceScreen.sharedPreferences
-            val editor = preferences.edit()
-            editor.putString(PreferencesConstants.KEY_PREF_EMAIL, null)
-            editor.putString(PreferencesConstants.KEY_PREF_PASSWORD, null)
-            editor.apply()
+            val editor = preferences?.edit()
+            editor?.putString(PreferencesConstants.KEY_PREF_EMAIL, null)
+            editor?.putString(PreferencesConstants.KEY_PREF_PASSWORD, null)
+            editor?.apply()
             updateSummary(preferences, PreferencesConstants.KEY_PREF_EMAIL)
             val intent = Intent(this@SettingsFragment.activity, AuthActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -40,7 +40,7 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
             true
         }
         val preferences = preferenceScreen.sharedPreferences
-        preferences.registerOnSharedPreferenceChangeListener(this)
+        preferences?.registerOnSharedPreferenceChangeListener(this)
         for (pref in summaryUpdatable) {
             updateSummary(preferences, pref)
         }
@@ -48,12 +48,12 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
         updateRemoveAccountPref(preferences)
     }
 
-    private fun updateRemoveAccountPref(sharedPreferences: SharedPreferences) {
-        val email = sharedPreferences.getString(PreferencesConstants.KEY_PREF_EMAIL, null)
+    private fun updateRemoveAccountPref(sharedPreferences: SharedPreferences?) {
+        val email = sharedPreferences?.getString(PreferencesConstants.KEY_PREF_EMAIL, null)
         removeAccountPref?.isEnabled = email != null
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key == PreferencesConstants.KEY_PREF_EMAIL) {
             updateRemoveAccountPref(sharedPreferences)
         } else if (summaryUpdatable.contains(key)) {
@@ -61,7 +61,8 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
         }
     }
 
-    private fun updateSummary(sharedPreferences: SharedPreferences, key: String) {
+    private fun updateSummary(sharedPreferences: SharedPreferences?, key: String?) {
+        key ?: return
         logger.debug("updating: $key")
         val summary = getSummary(sharedPreferences, key)
         logger.debug("summary: $summary")
@@ -69,8 +70,8 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
         findPreference?.summary = summary
     }
 
-    private fun getSummary(sharedPreferences: SharedPreferences, key: String): String {
-        val summary = sharedPreferences.getString(key, null)
+    private fun getSummary(sharedPreferences: SharedPreferences?, key: String?): String {
+        val summary = sharedPreferences?.getString(key, null)
         if (summary != null) return summary
         return if (key == PreferencesConstants.KEY_PREF_EMAIL) "Not specified yet" else "None"
     }
