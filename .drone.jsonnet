@@ -62,7 +62,7 @@ local build() = {
                 command_timeout: "2m",
                 target: "/home/artifact/repo/android/${DRONE_BUILD_NUMBER}",
                 source: "syncloud/build/outputs/apk/release/*.apk",
-                    strip_components: 6
+                    strip_components: 5
             },
             when: {
                 status: [ "failure", "success" ]
