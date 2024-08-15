@@ -39,11 +39,6 @@ android {
                 storePassword env['ANDROID_STORE_PASSWORD']
                 keyAlias env['ANDROID_KEY_ALIAS']
                 keyPassword env['ANDROID_KEY_PASSWORD']
-            } else {
-                storeFile file('syncloud.keystore')
-                storePassword ''
-                keyAlias ''
-                keyPassword ''
             }
         }
     }
