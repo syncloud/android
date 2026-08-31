@@ -68,7 +68,10 @@ local build() = {
                 status: [ "failure", "success" ]
             }
         }
-    ]
+    ],
+    trigger: {
+        event: [ "push", "tag" ]
+    }
 };
 
 [
