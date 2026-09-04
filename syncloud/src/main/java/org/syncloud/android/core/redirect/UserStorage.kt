@@ -1,6 +1,6 @@
 package org.syncloud.android.core.redirect
 
-import org.apache.log4j.Logger
+import org.syncloud.android.Logger
 import org.syncloud.android.core.common.jackson.Jackson.createObjectMapper
 import org.syncloud.android.core.redirect.UserStorage
 import org.syncloud.android.core.redirect.model.User

@@ -2,10 +2,9 @@ package org.syncloud.android.discovery.nsd
 
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdManager.DiscoveryListener
-import com.google.common.collect.Lists
 import org.syncloud.android.discovery.nsd.EventToDeviceConverter
 import android.net.nsd.NsdServiceInfo
-import org.apache.log4j.Logger
+import org.syncloud.android.Logger
 
 class EventToDeviceConverter(
     private val manager: NsdManager,
@@ -13,7 +12,7 @@ class EventToDeviceConverter(
     private val resolver: Resolver
 ) : DiscoveryListener {
     private val lookForServiceName: String = lookForServiceNameInput.lowercase()
-    private val discoveredServices: MutableList<String> = Lists.newArrayList()
+    private val discoveredServices: MutableList<String> = mutableListOf()
 
     override fun onStartDiscoveryFailed(s: String, i: Int) {
         val text = "start discovery failed $s"

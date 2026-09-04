@@ -2,10 +2,6 @@ package org.syncloud.android
 
 import android.app.Application
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import androidx.preference.PreferenceManager
 import org.acra.ACRA
 import org.acra.BuildConfig
 import org.acra.ReportField
@@ -13,8 +9,6 @@ import org.acra.config.dialog
 import org.acra.config.mailSender
 import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
-import org.apache.log4j.Logger
-import org.syncloud.android.ConfigureLog4J.configure
 import org.syncloud.android.core.common.WebService
 import org.syncloud.android.core.common.http.HttpClient
 import org.syncloud.android.core.redirect.IUserService
@@ -28,24 +22,12 @@ class SyncloudApplication : Application() {
     lateinit var preferences: Preferences
     lateinit var userServiceCached: IUserService
 
-    fun isWifiConnected(): Boolean {
-        val connMgr =
-            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-        connMgr ?: return false
-        val network: Network = connMgr.activeNetwork ?: return false
-        val capabilities = connMgr.getNetworkCapabilities(network)
-        return capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
-
-    }
 
     override fun onCreate() {
-        configure()
         val logger = Logger.getLogger(SyncloudApplication::class.java)
         logger.info("Starting Syncloud App")
         super.onCreate()
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
-        preferences = Preferences(sharedPreferences)
+        preferences = Preferences(getSharedPreferences("${packageName}_preferences", MODE_PRIVATE))
         _userStorage = UserStorage(File(applicationContext.filesDir, "user.json"))
         userServiceCached = webServiceAuthWithFileBackedCache()
     }

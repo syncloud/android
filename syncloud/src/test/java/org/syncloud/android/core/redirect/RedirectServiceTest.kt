@@ -2,9 +2,6 @@ package org.syncloud.android.core.redirect
 
 import io.mockk.every
 import io.mockk.mockk
-import org.apache.log4j.ConsoleAppender
-import org.apache.log4j.EnhancedPatternLayout
-import org.apache.log4j.Logger
 import org.junit.Assert.*
 
 import org.junit.Test
@@ -44,8 +41,6 @@ class RedirectServiceTest {
     ]
   }
 }        """
-
-        Logger.getRootLogger().addAppender(ConsoleAppender(EnhancedPatternLayout()))
 
         val webService = mockk<WebService>()
         every { webService.post(any(), any()) } returns json

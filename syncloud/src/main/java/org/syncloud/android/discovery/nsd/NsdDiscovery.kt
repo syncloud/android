@@ -1,7 +1,7 @@
 package org.syncloud.android.discovery.nsd
 
 import android.net.nsd.NsdManager
-import org.apache.log4j.Logger
+import org.syncloud.android.Logger
 import org.syncloud.android.discovery.Discovery
 
 const val TYPE = "_ssh._tcp."

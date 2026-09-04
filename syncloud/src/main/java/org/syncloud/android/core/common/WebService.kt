@@ -7,7 +7,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import org.apache.log4j.Logger
+import org.syncloud.android.Logger
 import org.syncloud.android.core.common.http.HttpClient
 import java.io.IOException
 
@@ -32,25 +32,18 @@ open class WebService(private val client: HttpClient) {
 
     private fun convert(response: Response): String {
         response.use { resp ->
-            val responseBody = resp.body
-            if (responseBody != null) {
-                val json = responseBody.string()
-                try {
-                    val jsonBaseResponse = mapper.readValue<BaseResult>(json)
-                    if (!jsonBaseResponse.success) {
-                        logger.error("${jsonBaseResponse.message} $json")
-                        throw SyncloudResultException(jsonBaseResponse.message, jsonBaseResponse)
-                    }
-                    return json
-
-                } catch (e: IOException) {
-                    val message = "Failed to deserialize json"
-                    logger.error("$message $json", e)
-                    throw SyncloudException(message)
+            val json = resp.body.string()
+            try {
+                val jsonBaseResponse = mapper.readValue<BaseResult>(json)
+                if (!jsonBaseResponse.success) {
+                    logger.error("${jsonBaseResponse.message} $json")
+                    throw SyncloudResultException(jsonBaseResponse.message, jsonBaseResponse)
                 }
-            } else {
-                val message = "empty response"
-                logger.error(message)
+                return json
+
+            } catch (e: IOException) {
+                val message = "Failed to deserialize json"
+                logger.error("$message $json", e)
                 throw SyncloudException(message)
             }
         }

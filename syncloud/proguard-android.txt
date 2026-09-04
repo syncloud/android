@@ -78,7 +78,6 @@
 
 -keep class org.syncloud.** { *; }
 -keep class org.eclipse.jetty.** { *; }
--keep class org.apache.log4j.** { *; }
 -keep class org.fourthline.cling.** { *; }
 -keep class org.seamless.** { *; }
 -keep class com.google.common.base.** { *; }
@@ -88,7 +87,6 @@
 -keep class com.jcraft.** { *; }
 -keepnames class com.fasterxml.jackson.** { *; }
 
--dontwarn org.apache.log4j.**
 -dontwarn org.fourthline.cling.**
 -dontwarn org.seamless.**
 -dontwarn com.google.common.base.**
