@@ -3,17 +3,43 @@ package org.syncloud.android.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ListView
-import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.CoroutineScope
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,88 +47,123 @@ import org.syncloud.android.Preferences
 import org.syncloud.android.R
 import org.syncloud.android.SyncloudApplication
 import org.syncloud.android.core.platform.model.DomainModel
+import org.syncloud.android.core.redirect.IUserService
 import org.syncloud.android.core.redirect.model.toModels
-import org.syncloud.android.ui.adapters.DevicesSavedAdapter
+import org.syncloud.android.ui.theme.SyncloudTheme
 
-class DevicesSavedActivity : AppCompatActivity() {
-    private lateinit var listview: ListView
-    private lateinit var adapter: DevicesSavedAdapter
-    private lateinit var application: SyncloudApplication
-    private lateinit var preferences: Preferences
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private lateinit var btnDiscovery: FloatingActionButton
-    private lateinit var emptyView: View
-    private lateinit var activityLauncher: ActivityResultLauncher<Intent>
+class DevicesSavedActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_devices_saved)
-        emptyView = findViewById(android.R.id.empty)
-        listview = findViewById(R.id.devices_saved)
-        listview.setOnItemClickListener { _, _, position, _ ->
-            val domain = listview.getItemAtPosition(position) as DomainModel
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(domain.dnsUrl())))
-        }
-        btnDiscovery = findViewById(R.id.discovery_btn)
-        btnDiscovery.setOnClickListener {
-            activityLauncher.launch(Intent(this, DevicesDiscoveryActivity::class.java))
-        }
-        adapter = DevicesSavedAdapter(this)
-        listview.adapter = adapter
-        application = getApplication() as SyncloudApplication
-        preferences = application.preferences
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
-        swipeRefreshLayout.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
-        swipeRefreshLayout.setOnRefreshListener { refreshDevices() }
-        swipeRefreshLayout.post { refreshDevices() }
-
-        activityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            refreshDevices()
-        }
-    }
-
-    private fun refreshDevices() {
-        val userService = application.userServiceCached
-        val redirectEmail = preferences.redirectEmail
-        val redirectPassword = preferences.redirectPassword
-        if (redirectEmail != null && redirectPassword != null) {
-            emptyView.visibility = View.GONE
-            listview.emptyView = null
-            adapter.clear()
-
-            swipeRefreshLayout.isRefreshing = true
-            listview.isEnabled = false
-            btnDiscovery.visibility = View.GONE
-
-            CoroutineScope(Dispatchers.IO).launch {
-                val user = userService.getUser(redirectEmail, redirectPassword)
-                val domains = user?.domains?.toModels() ?: listOf()
-                val sortedDomains = domains.sortedWith { first, second ->
-                    first.name.compareTo(second.name)
-                }
-                withContext(Dispatchers.Main) {
-                    adapter.clear()
-                    adapter.addAll(sortedDomains)
-                    swipeRefreshLayout.isRefreshing = false
-                    listview.isEnabled = true
-                    btnDiscovery.visibility = View.VISIBLE
-                    emptyView.visibility = View.VISIBLE
-                    listview.emptyView = emptyView
-                }
+        enableEdgeToEdge()
+        val application = application as SyncloudApplication
+        setContent {
+            SyncloudTheme {
+                DevicesSavedScreen(
+                    preferences = application.preferences,
+                    userService = application.userServiceCached
+                )
             }
         }
     }
+}
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
-        return true
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DevicesSavedScreen(
+    preferences: Preferences,
+    userService: IUserService
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val domains = remember { mutableStateListOf<DomainModel>() }
+    var refreshing by remember { mutableStateOf(false) }
+    var loaded by remember { mutableStateOf(false) }
+
+    suspend fun refresh() {
+        val email = preferences.redirectEmail
+        val password = preferences.redirectPassword
+        if (email == null || password == null) return
+        refreshing = true
+        val loadedDomains = withContext(Dispatchers.IO) {
+            val user = runCatching { userService.getUser(email, password) }.getOrNull()
+            user?.domains?.toModels().orEmpty().sortedBy { it.name }
+        }
+        domains.clear()
+        domains.addAll(loadedDomains)
+        refreshing = false
+        loaded = true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.action_settings) {
-            activityLauncher.launch(Intent(this, SettingsActivity::class.java))
+    val discoveryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { scope.launch { refresh() } }
+
+    LaunchedEffect(Unit) { refresh() }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.title_devices)) },
+                actions = {
+                    TextButton(
+                        onClick = { context.startActivity(Intent(context, SettingsActivity::class.java)) },
+                        modifier = Modifier.testTag("settings_action")
+                    ) {
+                        Text(stringResource(R.string.action_settings))
+                    }
+                }
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    discoveryLauncher.launch(Intent(context, DevicesDiscoveryActivity::class.java))
+                },
+                modifier = Modifier.testTag("discovery_button")
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_add_white_24dp),
+                    contentDescription = stringResource(R.string.discovery_button)
+                )
+            }
         }
-        return super.onOptionsItemSelected(item)
+    ) { contentPadding ->
+        PullToRefreshBox(
+            isRefreshing = refreshing,
+            onRefresh = { scope.launch { refresh() } },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+                .testTag("devices_saved_screen")
+        ) {
+            if (domains.isEmpty() && loaded) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = stringResource(R.string.no_devices_found),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(32.dp)
+                            .testTag("devices_saved_empty")
+                    )
+                }
+            }
+            LazyColumn(Modifier.fillMaxSize()) {
+                items(domains) { domain ->
+                    ListItem(
+                        headlineContent = { Text(domain.name) },
+                        supportingContent = { Text(domain.title) },
+                        modifier = Modifier
+                            .clickable {
+                                context.startActivity(
+                                    Intent(Intent.ACTION_VIEW, Uri.parse(domain.dnsUrl()))
+                                )
+                            }
+                            .testTag("device_${domain.name}")
+                    )
+                    HorizontalDivider()
+                }
+            }
+        }
     }
 }

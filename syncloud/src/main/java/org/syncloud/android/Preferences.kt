@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import org.syncloud.android.ui.PreferencesConstants
 
 class Preferences(private val preferences: SharedPreferences) {
-    val mainDomain: String get() = preferences.getString(PreferencesConstants.KEY_PREF_MAIN_DOMAIN, "syncloud.it")!!
+    val mainDomain: String get() = preferences.getString(PreferencesConstants.KEY_PREF_MAIN_DOMAIN, DEFAULT_MAIN_DOMAIN)!!
     val redirectEmail: String? get() = preferences.getString(PreferencesConstants.KEY_PREF_EMAIL, null)
     val redirectPassword: String? get() = preferences.getString(PreferencesConstants.KEY_PREF_PASSWORD, null)
 
@@ -13,5 +13,16 @@ class Preferences(private val preferences: SharedPreferences) {
         editor.putString(PreferencesConstants.KEY_PREF_EMAIL, email)
         editor.putString(PreferencesConstants.KEY_PREF_PASSWORD, password)
         editor.apply()
+    }
+
+    fun setMainDomain(domain: String) {
+        val editor = preferences.edit()
+        editor.putString(PreferencesConstants.KEY_PREF_MAIN_DOMAIN, domain)
+        editor.apply()
+    }
+
+    companion object {
+        const val DEFAULT_MAIN_DOMAIN = "syncloud.it"
+        val MAIN_DOMAINS = listOf("syncloud.it", "syncloud.info")
     }
 }

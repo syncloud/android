@@ -3,115 +3,149 @@ package org.syncloud.android.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.method.LinkMovementMethod
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
-import kotlinx.coroutines.CoroutineScope
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.syncloud.android.Preferences
 import org.syncloud.android.R
 import org.syncloud.android.SyncloudApplication
 import org.syncloud.android.core.redirect.IUserService
+import org.syncloud.android.ui.theme.SyncloudTheme
 
-class AuthActivity : AppCompatActivity() {
-    private lateinit var preferences: Preferences
-    private lateinit var progressBar: CircleProgressBar
-    private lateinit var signInOrOut: LinearLayout
-    private lateinit var userService: IUserService
-    private lateinit var askCredentialsLauncher: ActivityResultLauncher<Intent>
+class AuthActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_auth)
+        enableEdgeToEdge()
         val application = application as SyncloudApplication
-        preferences = application.preferences
-        userService = application.userServiceCached
-        progressBar = findViewById<View>(R.id.progress) as CircleProgressBar
-        progressBar.setColorSchemeResources(R.color.logo_blue, R.color.logo_green)
-        signInOrOut = findViewById<View>(R.id.sign_in_or_up) as LinearLayout
-        val singUpBtn = findViewById<View>(R.id.sign_up_button)
-        singUpBtn.setOnClickListener{
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.${preferences.mainDomain}/register")))
-        }
-        val signInBtn = findViewById<View>(R.id.sign_in_button)
-        signInBtn.setOnClickListener{
-            startActivity(Intent(this, AuthCredentialsActivity::class.java))
-        }
-        val learnMoreText = findViewById<View>(R.id.auth_learn_more) as TextView
-        learnMoreText.movementMethod = LinkMovementMethod.getInstance()
-        askCredentialsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            finish()
-        }
-        proceedWithLogin()
-    }
-
-    private fun proceedWithLogin() {
-        val redirectEmail = preferences.redirectEmail
-        val redirectPassword = preferences.redirectPassword
-        if (redirectEmail != null && redirectPassword != null) {
-            login(redirectEmail, redirectPassword)
-        }
-    }
-
-    private fun login(email: String, password: String) {
-        progressStart()
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val user = userService.getUser(email, password)
-                withContext(Dispatchers.Main) {
-                    progressStop()
-                    if (user != null) {
-                        val intent = Intent(this@AuthActivity, DevicesSavedActivity::class.java)
-                        startActivity(intent)
+        setContent {
+            SyncloudTheme {
+                AuthScreen(
+                    preferences = application.preferences,
+                    userService = application.userServiceCached,
+                    onSignedIn = {
+                        startActivity(Intent(this, DevicesSavedActivity::class.java))
                         finish()
-                    } else {
-                        askCredentials()
+                    },
+                    onCredentialsNeeded = { checkExisting ->
+                        val intent = Intent(this, AuthCredentialsActivity::class.java)
+                        intent.putExtra(AuthConstants.PARAM_CHECK_EXISTING, checkExisting)
+                        startActivity(intent)
                     }
-                }
-            } catch (e: Throwable) {
-                withContext(Dispatchers.Main) {
-                    progressStop()
-                    askCredentials()
-                }
+                )
             }
         }
     }
+}
 
-    private fun askCredentials() {
-        val intent = Intent(this@AuthActivity, AuthCredentialsActivity::class.java)
-        intent.putExtra(AuthConstants.PARAM_CHECK_EXISTING, true)
-        startActivity(intent)
+@Composable
+fun AuthScreen(
+    preferences: Preferences,
+    userService: IUserService,
+    onSignedIn: () -> Unit,
+    onCredentialsNeeded: (Boolean) -> Unit
+) {
+    val context = LocalContext.current
+    var busy by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        val email = preferences.redirectEmail
+        val password = preferences.redirectPassword
+        if (email != null && password != null) {
+            busy = true
+            val user = withContext(Dispatchers.IO) {
+                runCatching { userService.getUser(email, password) }.getOrNull()
+            }
+            busy = false
+            if (user != null) onSignedIn() else onCredentialsNeeded(true)
+        }
     }
 
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        return if (id == R.id.action_settings) {
-            true
-        } else super.onOptionsItemSelected(item)
-    }
-
-    private fun progressStop() {
-        signInOrOut.visibility = View.VISIBLE
-        progressBar.visibility = View.INVISIBLE
-    }
-
-    private fun progressStart() {
-        signInOrOut.visibility = View.INVISIBLE
-        progressBar.visibility = View.VISIBLE
+    Scaffold { contentPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+                .padding(24.dp)
+                .testTag("auth_screen"),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.syncloud_logo),
+                contentDescription = stringResource(R.string.logo_image)
+            )
+            Spacer(Modifier.height(32.dp))
+            if (busy) {
+                CircularProgressIndicator(modifier = Modifier.testTag("auth_progress"))
+            } else {
+                Button(
+                    onClick = { onCredentialsNeeded(false) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("sign_in_button")
+                ) {
+                    Text(stringResource(R.string.action_sign_in))
+                }
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = {
+                        context.startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://www.${preferences.mainDomain}/register")
+                            )
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("sign_up_button")
+                ) {
+                    Text(stringResource(R.string.action_sign_up))
+                }
+                Spacer(Modifier.height(24.dp))
+                Text(
+                    text = stringResource(R.string.build_your_own_server),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                TextButton(onClick = {
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse("https://syncloud.org"))
+                    )
+                }) {
+                    Text(stringResource(R.string.learn_more))
+                }
+            }
+        }
     }
 }

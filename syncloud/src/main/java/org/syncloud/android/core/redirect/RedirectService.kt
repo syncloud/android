@@ -3,7 +3,7 @@ package org.syncloud.android.core.redirect
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.apache.log4j.Logger
+import org.syncloud.android.Logger
 import org.syncloud.android.core.common.SyncloudException
 import org.syncloud.android.core.common.WebService
 import org.syncloud.android.core.redirect.model.User

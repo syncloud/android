@@ -1,7 +1,7 @@
 package org.syncloud.android.discovery
 
 import android.net.wifi.WifiManager
-import org.apache.log4j.Logger
+import org.syncloud.android.Logger
 import java.lang.Exception
 
 class MulticastLock(private val wifi: WifiManager) {

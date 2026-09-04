@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.apache.log4j.Logger
+import org.syncloud.android.Logger
 import org.syncloud.android.core.common.WebService
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
