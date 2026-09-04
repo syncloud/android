@@ -36,7 +36,7 @@ local build() = {
                 },
             },
             commands: [
-                "./gradlew clean testDebugUnitTest assemble assembleDebugAndroidTest"
+                "./gradlew clean testDebugUnitTest assemble assembleDebugAndroidTest bundleRelease"
             ]
         },
         {
@@ -59,6 +59,7 @@ local build() = {
                 "mkdir -p artifact/screenshots",
                 "VERSION=$(grep versionName syncloud/build.gradle | head -1 | cut -d'\"' -f2)",
                 "for apk in syncloud/build/outputs/apk/release/*.apk; do [ -f \"$apk\" ] && cp \"$apk\" artifact/syncloud-$VERSION.apk; done || true",
+                "for aab in syncloud/build/outputs/bundle/release/*.aab; do [ -f \"$aab\" ] && cp \"$aab\" artifact/syncloud-$VERSION.aab; done || true",
                 "cp syncloud/build/outputs/roborazzi/*.png artifact/screenshots/ || true",
                 "adb connect redroid:5555 >/dev/null 2>&1 || true",
                 "adb -s redroid:5555 exec-out run-as org.syncloud.android cat files/screenshots/discovery-with-device.png > " + screenshot + " || true",
@@ -78,7 +79,7 @@ local build() = {
                 api_key: {
                     from_secret: "github_token"
                 },
-                files: "artifact/*.apk",
+                files: [ "artifact/*.apk", "artifact/*.aab" ],
                 overwrite: true,
                 file_exists: "overwrite"
             },
