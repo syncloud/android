@@ -43,14 +43,14 @@ local build() = {
             name: "discovery",
             image: "runmymind/docker-android-sdk:" + sdk,
             commands: [
-                "sh ci/discovery.sh"
+                "ci/discovery.sh"
             ]
         },
         {
             name: "collect",
             image: "runmymind/docker-android-sdk:" + sdk,
             commands: [
-                "sh ci/collect.sh"
+                "ci/collect.sh"
             ],
             when: {
                 status: [ "failure", "success" ]
@@ -80,7 +80,7 @@ local build() = {
                 }
             },
             commands: [
-                "sh ci/publish.sh"
+                "ci/publish.sh"
             ],
             when: {
                 branch: [ "master", "stable" ],
