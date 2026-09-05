@@ -61,10 +61,10 @@ local build() = {
                 "for apk in syncloud/build/outputs/apk/release/*.apk; do [ -f \"$apk\" ] && cp \"$apk\" artifact/syncloud-$VERSION.apk; done || true",
                 "for aab in syncloud/build/outputs/bundle/release/*.aab; do [ -f \"$aab\" ] && cp \"$aab\" artifact/syncloud-$VERSION.aab; done || true",
                 "cp syncloud/build/outputs/roborazzi/*.png artifact/screenshots/ || true",
-                "adb connect redroid:5555 >/dev/null 2>&1 || true",
-                "adb -s redroid:5555 exec-out run-as org.syncloud.android cat files/screenshots/discovery-with-device.png > " + screenshot + " || true",
+                "timeout 30 adb connect redroid:5555 >/dev/null 2>&1 || true",
+                "timeout 60 adb -s redroid:5555 exec-out run-as org.syncloud.android cat files/screenshots/discovery-with-device.png > " + screenshot + " || true",
                 "head -c 8 " + screenshot + " 2>/dev/null | grep -q PNG || rm -f " + screenshot,
-                "adb -s redroid:5555 logcat -d -s NsdDiscovery Resolver EventToDeviceConverter DiscoveryManager MulticastLock UnicastDiscovery NsdService serviceDiscovery > artifact/discovery-logcat.txt || true",
+                "timeout 60 adb -s redroid:5555 logcat -d -s NsdDiscovery Resolver EventToDeviceConverter DiscoveryManager MulticastLock UnicastDiscovery NsdService serviceDiscovery > artifact/discovery-logcat.txt || true",
                 "cp instrument.log artifact/instrument.log || true",
                 "ls -la artifact artifact/screenshots"
             ],
