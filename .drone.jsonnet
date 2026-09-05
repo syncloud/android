@@ -1,9 +1,14 @@
 local platform = "26.08.01";
 local distro = "bookworm";
-local redroid = "redroid/redroid:14.0.0-latest";
-local sdk = "runmymind/docker-android-sdk:ubuntu-standalone-20240812";
-local instrumentation = "org.syncloud.android.test/androidx.test.runner.AndroidJUnitRunner";
-local screenshot = "artifact/screenshots/discovery-with-device.png";
+local redroid = "14.0.0-latest";
+local sdk = "ubuntu-standalone-20240812";
+local python = "3.12-slim-bookworm";
+local docker = "27-cli";
+local github_release = "1.0.0";
+
+local platform_image = "syncloud/platform-" + distro + ":" + platform;
+local redroid_image = "redroid/redroid:" + redroid;
+local sdk_image = "runmymind/docker-android-sdk:" + sdk;
 
 local build() = {
     kind: "pipeline",
@@ -17,7 +22,7 @@ local build() = {
     steps: [
         {
             name: "build",
-            image: sdk,
+            image: sdk_image,
             environment: {
                 KEY_STORE: {
                   from_secret: "KEY_STORE"
@@ -41,7 +46,7 @@ local build() = {
         },
         {
             name: "discovery",
-            image: sdk,
+            image: sdk_image,
             commands: [
                 "getent hosts redroid",
                 "for i in $(seq 1 90); do adb disconnect redroid:5555 >/dev/null 2>&1 || true; adb connect redroid:5555 >/dev/null 2>&1 || true; [ \"$(adb -s redroid:5555 shell getprop sys.boot_completed 2>/dev/null | tr -d '\\r')\" = \"1\" ] && break; if [ $(( i % 15 )) = 0 ]; then echo \"still waiting for redroid after $(( i * 10 ))s\"; adb kill-server >/dev/null 2>&1 || true; fi; sleep 10; done",
@@ -50,13 +55,13 @@ local build() = {
                 "adb -s redroid:5555 shell getprop ro.build.version.sdk",
                 "adb -s redroid:5555 install -r -t syncloud/build/outputs/apk/debug/*.apk",
                 "adb -s redroid:5555 install -r -t syncloud/build/outputs/apk/androidTest/debug/*.apk",
-                "adb -s redroid:5555 shell am instrument -w " + instrumentation + " 2>&1 | tee instrument.log",
+                "adb -s redroid:5555 shell am instrument -w org.syncloud.android.test/androidx.test.runner.AndroidJUnitRunner 2>&1 | tee instrument.log",
                 "grep -q 'OK (' instrument.log"
             ]
         },
         {
             name: "collect",
-            image: sdk,
+            image: sdk_image,
             commands: [
                 "mkdir -p artifact/screenshots",
                 "VERSION=$(grep versionName syncloud/build.gradle | head -1 | cut -d'\"' -f2)",
@@ -64,8 +69,8 @@ local build() = {
                 "for aab in syncloud/build/outputs/bundle/release/*.aab; do [ -f \"$aab\" ] && cp \"$aab\" artifact/syncloud-$VERSION.aab; done || true",
                 "cp syncloud/build/outputs/roborazzi/*.png artifact/screenshots/ || true",
                 "timeout 30 adb connect redroid:5555 >/dev/null 2>&1 || true",
-                "timeout 60 adb -s redroid:5555 exec-out run-as org.syncloud.android cat files/screenshots/discovery-with-device.png > " + screenshot + " || true",
-                "head -c 8 " + screenshot + " 2>/dev/null | grep -q PNG || rm -f " + screenshot,
+                "timeout 60 adb -s redroid:5555 exec-out run-as org.syncloud.android cat files/screenshots/discovery-with-device.png > artifact/screenshots/discovery-with-device.png || true",
+                "head -c 8 artifact/screenshots/discovery-with-device.png 2>/dev/null | grep -q PNG || rm -f artifact/screenshots/discovery-with-device.png",
                 "timeout 60 adb -s redroid:5555 logcat -d -s NsdDiscovery Resolver EventToDeviceConverter DiscoveryManager MulticastLock UnicastDiscovery NsdService serviceDiscovery > artifact/discovery-logcat.txt || true",
                 "mkdir -p artifact/diagnostics",
                 "timeout 90 adb -s redroid:5555 logcat -d > artifact/diagnostics/logcat-full.txt || true",
@@ -78,7 +83,7 @@ local build() = {
         },
         {
             name: "publish to github",
-            image: "plugins/github-release:1.0.0",
+            image: "plugins/github-release:" + github_release,
             settings: {
                 api_key: {
                     from_secret: "github_token"
@@ -93,7 +98,7 @@ local build() = {
         },
         {
             name: "publish to play",
-            image: "python:3.12-slim-bookworm",
+            image: "python:" + python,
             environment: {
                 PLAY_SERVICE_ACCOUNT: {
                     from_secret: "PLAY_SERVICE_ACCOUNT"
@@ -112,10 +117,10 @@ local build() = {
         },
         {
             name: "diagnostics",
-            image: "docker:27-cli",
+            image: "docker:" + docker,
             volumes: [ { name: "dockersock", path: "/var/run/docker.sock" } ],
             commands: [
-                "sh ci/diagnostics.sh " + redroid + " syncloud/platform-" + distro + ":" + platform
+                "sh ci/diagnostics.sh " + redroid_image + " " + platform_image
             ],
             when: {
                 status: [ "failure", "success" ]
@@ -146,7 +151,7 @@ local build() = {
     services: [
         {
             name: "device." + distro + ".com",
-            image: "syncloud/platform-" + distro + ":" + platform,
+            image: platform_image,
             privileged: true,
             volumes: [
                 { name: "dbus", path: "/var/run/dbus" },
@@ -155,7 +160,7 @@ local build() = {
         },
         {
             name: "redroid",
-            image: redroid,
+            image: redroid_image,
             privileged: true,
             command: [ "androidboot.redroid_gpu_mode=guest" ],
             volumes: [
