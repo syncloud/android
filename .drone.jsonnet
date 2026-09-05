@@ -43,7 +43,9 @@ local build() = {
             name: "discovery",
             image: sdk,
             commands: [
+                "getent hosts redroid || echo 'REDROID DNS DOES NOT RESOLVE - container is gone'",
                 "for i in $(seq 1 60); do adb connect redroid:5555 >/dev/null 2>&1; [ \"$(adb -s redroid:5555 shell getprop sys.boot_completed 2>/dev/null | tr -d '\\r')\" = \"1\" ] && break; sleep 5; done",
+                "getent hosts redroid || echo 'REDROID DNS GONE AFTER WAIT'",
                 "adb devices",
                 "adb -s redroid:5555 shell getprop ro.build.version.sdk",
                 "adb -s redroid:5555 install -r -t syncloud/build/outputs/apk/debug/*.apk",
