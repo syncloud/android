@@ -4,7 +4,13 @@ Finds Syncloud devices on the local network over mDNS and opens them.
 
 ### Build
 
-    ./gradlew clean testDebugUnitTest assemble bundleRelease
+    ./gradlew clean testDebugUnitTest assemble bundleRelease -Pversion=26.09
+
+The version is a build property, not a value in the source. CI passes the git
+tag, so `26.09` produces versionName `26.09` and versionCode `26009`. Tags are
+`year.month` and the code is `year * 1000 + month`, which keeps the ordering
+Play requires and matches every release published so far. Without the property
+the build is `0.00`, which is fine for local work and can never be published.
 
 Release signing comes from the environment, not from a file. CI supplies
 `KEY_STORE` (base64 keystore), `ANDROID_STORE_FILE`, `ANDROID_STORE_PASSWORD`,
@@ -23,7 +29,10 @@ push and tag, and publishes to `/home/artifact/repo/android/<build>`:
     discovery-logcat.txt                       device log, discovery tags only
     instrument.log                             instrumented test output
 
-Tagging publishes the apk and the aab to a github release.
+Tagging is the only way to release. It publishes the apk and the aab to a
+github release and uploads the bundle to the play internal track, from where
+you promote it in the console. Pushes to any branch build and test but publish
+nothing.
 
 ### Tests
 

@@ -36,7 +36,7 @@ local build() = {
                 },
             },
             commands: [
-                "./gradlew clean testDebugUnitTest assemble assembleDebugAndroidTest bundleRelease"
+                "./gradlew clean testDebugUnitTest assemble assembleDebugAndroidTest bundleRelease -Pversion=${DRONE_TAG:-0.00}"
             ]
         },
         {
@@ -83,8 +83,7 @@ local build() = {
                 "ci/publish.sh"
             ],
             when: {
-                branch: [ "master", "stable" ],
-                event: [ "push" ]
+                event: [ "tag" ]
             }
         },
         {

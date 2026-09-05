@@ -1,3 +1,11 @@
+static int androidVersionCode(String name) {
+    def parts = name.tokenize(".")
+    if (parts.size() != 2 || !parts.every { it.isInteger() }) {
+        throw new GradleException("version must be year.month, got '" + name + "'")
+    }
+    return parts[0].toInteger() * 1000 + parts[1].toInteger()
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 
@@ -13,8 +21,8 @@ android {
     defaultConfig {
         minSdk = 23
         targetSdk = 36
-        versionCode = 26000
-        versionName = "26.00"
+        versionName = project.findProperty("version") ?: "0.00"
+        versionCode = androidVersionCode(versionName)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
