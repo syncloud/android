@@ -16,6 +16,13 @@ local build() = {
     },
     steps: [
         {
+            name: "wait for redroid",
+            image: "runmymind/docker-android-sdk:" + sdk,
+            commands: [
+                "ci/wait_redroid.sh"
+            ]
+        },
+        {
             name: "build",
             image: "runmymind/docker-android-sdk:" + sdk,
             environment: {
