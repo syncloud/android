@@ -10,7 +10,7 @@ The version is a build property, not a value in the source. CI passes the git
 tag, so `26.09` produces versionName `26.09` and versionCode `26009`. Tags are
 `year.month` and the code is `year * 1000 + month`, which keeps the ordering
 Play requires and matches every release published so far. Without the property
-the build is `0.00`, which is fine for local work and can never be published.
+the build is `0.01`, which is fine for local work and can never be published.
 
 Release signing comes from the environment, not from a file. CI supplies
 `KEY_STORE` (base64 keystore), `ANDROID_STORE_FILE`, `ANDROID_STORE_PASSWORD`,

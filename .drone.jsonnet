@@ -36,7 +36,7 @@ local build() = {
                 },
             },
             commands: [
-                "./gradlew clean testDebugUnitTest assemble assembleDebugAndroidTest bundleRelease -Pversion=${DRONE_TAG:-0.00}"
+                "./gradlew clean testDebugUnitTest assemble assembleDebugAndroidTest bundleRelease -Pversion=${DRONE_TAG:-0.01}"
             ]
         },
         {

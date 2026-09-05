@@ -21,7 +21,7 @@ android {
     defaultConfig {
         minSdk = 23
         targetSdk = 36
-        versionName = project.findProperty("version") ?: "0.00"
+        versionName = project.findProperty("version") ?: "0.01"
         versionCode = androidVersionCode(versionName)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

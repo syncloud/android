@@ -4,7 +4,7 @@ SHOT=artifact/screenshots/discovery-with-device.png
 TAGS="NsdDiscovery Resolver EventToDeviceConverter DiscoveryManager MulticastLock UnicastDiscovery NsdService serviceDiscovery"
 
 mkdir -p artifact/screenshots artifact/diagnostics
-VERSION=${DRONE_TAG:-0.00}
+VERSION=${DRONE_TAG:-0.01}
 
 for apk in syncloud/build/outputs/apk/release/*.apk; do
     [ -f "$apk" ] && cp "$apk" "artifact/syncloud-$VERSION.apk"
