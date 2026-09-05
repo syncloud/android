@@ -5,10 +5,6 @@ local sdk = "ubuntu-standalone-20240812";
 local python = "3.12-slim-bookworm";
 local github_release = "1.0.0";
 
-local platform_image = "syncloud/platform-" + distro + ":" + platform;
-local redroid_image = "redroid/redroid:" + redroid;
-local sdk_image = "runmymind/docker-android-sdk:" + sdk;
-
 local build() = {
     kind: "pipeline",
     type: "docker",
@@ -21,7 +17,7 @@ local build() = {
     steps: [
         {
             name: "build",
-            image: sdk_image,
+            image: "runmymind/docker-android-sdk:" + sdk,
             environment: {
                 KEY_STORE: {
                   from_secret: "KEY_STORE"
@@ -45,14 +41,14 @@ local build() = {
         },
         {
             name: "discovery",
-            image: sdk_image,
+            image: "runmymind/docker-android-sdk:" + sdk,
             commands: [
                 "sh ci/discovery.sh"
             ]
         },
         {
             name: "collect",
-            image: sdk_image,
+            image: "runmymind/docker-android-sdk:" + sdk,
             commands: [
                 "sh ci/collect.sh"
             ],
@@ -116,7 +112,7 @@ local build() = {
     services: [
         {
             name: "device." + distro + ".com",
-            image: platform_image,
+            image: "syncloud/platform-" + distro + ":" + platform,
             privileged: true,
             volumes: [
                 { name: "dbus", path: "/var/run/dbus" },
@@ -125,7 +121,7 @@ local build() = {
         },
         {
             name: "redroid",
-            image: redroid_image,
+            image: "redroid/redroid:" + redroid,
             privileged: true,
             command: [ "androidboot.redroid_gpu_mode=guest" ],
             volumes: [
