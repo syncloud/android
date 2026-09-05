@@ -3,7 +3,6 @@ local distro = "bookworm";
 local redroid = "14.0.0-latest";
 local sdk = "ubuntu-standalone-20240812";
 local python = "3.12-slim-bookworm";
-local docker = "27-cli";
 local github_release = "1.0.0";
 
 local platform_image = "syncloud/platform-" + distro + ":" + platform;
@@ -93,17 +92,6 @@ local build() = {
             }
         },
         {
-            name: "diagnostics",
-            image: "docker:" + docker,
-            volumes: [ { name: "dockersock", path: "/var/run/docker.sock" } ],
-            commands: [
-                "sh ci/diagnostics.sh " + redroid_image + " " + platform_image
-            ],
-            when: {
-                status: [ "failure", "success" ]
-            }
-        },
-        {
             name: "artifact",
             image: "appleboy/drone-scp",
             settings: {
@@ -148,8 +136,7 @@ local build() = {
     volumes: [
         { name: "dbus", host: { path: "/var/run/dbus" } },
         { name: "dev", host: { path: "/dev" } },
-        { name: "redroid-data", temp: {} },
-        { name: "dockersock", host: { path: "/var/run/docker.sock" } }
+        { name: "redroid-data", temp: {} }
     ],
     trigger: {
         event: [ "push", "tag" ]
