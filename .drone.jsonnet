@@ -88,6 +88,25 @@ local build() = {
             }
         },
         {
+            name: "publish to play",
+            image: "python:3.12-slim-bookworm",
+            environment: {
+                PLAY_SERVICE_ACCOUNT: {
+                    from_secret: "PLAY_SERVICE_ACCOUNT"
+                }
+            },
+            commands: [
+                "pip install --quiet google-auth google-api-python-client",
+                "VERSION=$(grep versionName syncloud/build.gradle | head -1 | cut -d'\"' -f2)",
+                "if [ \"$DRONE_BRANCH\" = stable ]; then TRACK=production; else TRACK=internal; fi",
+                "python3 ci/play_publish.py artifact/syncloud-$VERSION.aab $TRACK"
+            ],
+            when: {
+                branch: [ "master", "stable" ],
+                event: [ "push" ]
+            }
+        },
+        {
             name: "artifact",
             image: "appleboy/drone-scp",
             settings: {
