@@ -43,10 +43,10 @@ local build() = {
             name: "discovery",
             image: sdk,
             commands: [
-                "getent hosts redroid || echo 'REDROID DNS DOES NOT RESOLVE - container is gone'",
-                "for i in $(seq 1 60); do adb connect redroid:5555 >/dev/null 2>&1; [ \"$(adb -s redroid:5555 shell getprop sys.boot_completed 2>/dev/null | tr -d '\\r')\" = \"1\" ] && break; sleep 5; done",
-                "getent hosts redroid || echo 'REDROID DNS GONE AFTER WAIT'",
+                "getent hosts redroid",
+                "for i in $(seq 1 90); do adb disconnect redroid:5555 >/dev/null 2>&1 || true; adb connect redroid:5555 >/dev/null 2>&1 || true; [ \"$(adb -s redroid:5555 shell getprop sys.boot_completed 2>/dev/null | tr -d '\\r')\" = \"1\" ] && break; if [ $(( i % 15 )) = 0 ]; then echo \"still waiting for redroid after $(( i * 10 ))s\"; adb kill-server >/dev/null 2>&1 || true; fi; sleep 10; done",
                 "adb devices",
+                "adb -s redroid:5555 shell getprop sys.boot_completed | tr -d '\\r' | grep -q 1 || (echo 'redroid never became ready'; getent hosts redroid; adb devices; exit 1)",
                 "adb -s redroid:5555 shell getprop ro.build.version.sdk",
                 "adb -s redroid:5555 install -r -t syncloud/build/outputs/apk/debug/*.apk",
                 "adb -s redroid:5555 install -r -t syncloud/build/outputs/apk/androidTest/debug/*.apk",
@@ -67,6 +67,8 @@ local build() = {
                 "timeout 60 adb -s redroid:5555 exec-out run-as org.syncloud.android cat files/screenshots/discovery-with-device.png > " + screenshot + " || true",
                 "head -c 8 " + screenshot + " 2>/dev/null | grep -q PNG || rm -f " + screenshot,
                 "timeout 60 adb -s redroid:5555 logcat -d -s NsdDiscovery Resolver EventToDeviceConverter DiscoveryManager MulticastLock UnicastDiscovery NsdService serviceDiscovery > artifact/discovery-logcat.txt || true",
+                "mkdir -p artifact/diagnostics",
+                "timeout 90 adb -s redroid:5555 logcat -d > artifact/diagnostics/logcat-full.txt || true",
                 "cp instrument.log artifact/instrument.log || true",
                 "ls -la artifact artifact/screenshots"
             ],
@@ -106,6 +108,17 @@ local build() = {
             when: {
                 branch: [ "master", "stable" ],
                 event: [ "push" ]
+            }
+        },
+        {
+            name: "diagnostics",
+            image: "docker:27-cli",
+            volumes: [ { name: "dockersock", path: "/var/run/docker.sock" } ],
+            commands: [
+                "sh ci/diagnostics.sh " + redroid + " syncloud/platform-" + distro + ":" + platform
+            ],
+            when: {
+                status: [ "failure", "success" ]
             }
         },
         {
@@ -153,7 +166,8 @@ local build() = {
     volumes: [
         { name: "dbus", host: { path: "/var/run/dbus" } },
         { name: "dev", host: { path: "/dev" } },
-        { name: "redroid-data", temp: {} }
+        { name: "redroid-data", temp: {} },
+        { name: "dockersock", host: { path: "/var/run/docker.sock" } }
     ],
     trigger: {
         event: [ "push", "tag" ]
