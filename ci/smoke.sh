@@ -1,10 +1,9 @@
 #!/bin/sh -e
-DEVICE=redroid:5555
+DEVICE=$(ci/adb_device.sh)
 PKG=org.syncloud.android
 LOG=artifact/diagnostics/smoke-logcat.txt
 
 mkdir -p artifact/diagnostics
-adb connect $DEVICE >/dev/null 2>&1 || true
 adb -s $DEVICE uninstall $PKG >/dev/null 2>&1 || true
 adb -s $DEVICE install -r syncloud/build/outputs/apk/release/*.apk
 adb -s $DEVICE logcat -c

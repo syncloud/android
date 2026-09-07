@@ -22,6 +22,12 @@ device list at runtime. Instrumented tests run against the debug build, so
 they cannot catch that; the `smoke` CI step installs the real minified release
 on the device and fails the build if it does not start.
 
+The runner attaches two docker networks to every container, and android
+configures only one interface, so the `redroid` hostname can resolve to the
+address android never brought up and adb fails with no route to host.
+`ci/adb_device.sh` probes for an endpoint that actually answers and caches it
+for the later steps, instead of trusting dns.
+
 Release signing comes from the environment, not from a file. CI supplies
 `KEY_STORE` (base64 keystore), `ANDROID_STORE_FILE`, `ANDROID_STORE_PASSWORD`,
 `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD` as Drone secrets. Without them

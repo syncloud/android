@@ -1,8 +1,7 @@
 #!/bin/sh -e
-DEVICE=redroid:5555
+DEVICE=$(ci/adb_device.sh)
 RUNNER=org.syncloud.android.test/androidx.test.runner.AndroidJUnitRunner
 
-adb connect $DEVICE >/dev/null 2>&1 || true
 adb devices
 
 adb -s $DEVICE shell getprop ro.build.version.sdk

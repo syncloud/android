@@ -5,3 +5,7 @@
 keystore.properties
 build
 *.iml
+.adb-device
+artifact
+instrument.log
+start.log
