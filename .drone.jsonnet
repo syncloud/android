@@ -86,6 +86,21 @@ local build() = {
             }
         },
         {
+            name: "check play",
+            image: "python:" + python,
+            environment: {
+                PLAY_SERVICE_ACCOUNT: {
+                    from_secret: "PLAY_SERVICE_ACCOUNT"
+                }
+            },
+            commands: [
+                "ci/check.sh"
+            ],
+            when: {
+                event: [ "tag" ]
+            }
+        },
+        {
             name: "publish to play",
             image: "python:" + python,
             environment: {
