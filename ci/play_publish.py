@@ -40,5 +40,8 @@ edits.tracks().update(
     body={"releases": [{"versionCodes": [str(version_code)], "status": "completed"}]},
 ).execute()
 
+edits.validate(packageName=PACKAGE, editId=edit_id).execute()
+print("edit validated", flush=True)
+
 edits.commit(packageName=PACKAGE, editId=edit_id).execute()
 print("released version code %s to %s" % (version_code, track), flush=True)

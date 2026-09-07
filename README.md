@@ -46,6 +46,12 @@ push and tag, and publishes to `/home/artifact/repo/android/<build>`:
     instrument.log                             instrumented test output
     diagnostics/smoke-logcat.txt               device log from the minified release
 
+Before a tag publishes, `check play` queries the play developer reporting api
+for crash and anr anomalies and fails the build if any are open, and the
+publish itself validates the edit before committing it, which is where missing
+store declarations surface. Neither check can see the app optimization
+warnings in the console, as those have no api.
+
 Tagging is the only way to release. It publishes the apk and the aab to a
 github release and uploads the bundle to the play internal track, from where
 you promote it in the console. Pushes to any branch build and test but publish
