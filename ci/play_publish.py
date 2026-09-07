@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+import pathlib
 import sys
 
 from google.oauth2 import service_account
@@ -11,6 +12,9 @@ SCOPE = "https://www.googleapis.com/auth/androidpublisher"
 
 bundle_path = sys.argv[1]
 track = sys.argv[2]
+
+notes_file = pathlib.Path("release-notes.txt")
+notes = notes_file.read_text().strip() if notes_file.exists() else ""
 
 encoded = os.environ.get("PLAY_SERVICE_ACCOUNT")
 if not encoded:
@@ -37,7 +41,11 @@ edits.tracks().update(
     packageName=PACKAGE,
     editId=edit_id,
     track=track,
-    body={"releases": [{"versionCodes": [str(version_code)], "status": "completed"}]},
+    body={"releases": [{
+        "versionCodes": [str(version_code)],
+        "status": "completed",
+        "releaseNotes": [{"language": "en-US", "text": notes}] if notes else [],
+    }]},
 ).execute()
 
 edits.commit(packageName=PACKAGE, editId=edit_id).execute()

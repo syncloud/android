@@ -1,0 +1,6 @@
+Rebuilt interface with Material 3.
+
+Device discovery now also works on networks that block multicast, and
+over Ethernet or a VPN rather than Wi-Fi only.
+
+Updated for Android 16.

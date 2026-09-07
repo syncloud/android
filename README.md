@@ -29,6 +29,10 @@ push and tag, and publishes to `/home/artifact/repo/android/<build>`:
     discovery-logcat.txt                       device log, discovery tags only
     instrument.log                             instrumented test output
 
+Release notes come from `release-notes.txt` and are attached to the play
+release. Play shows them as the what's new text, so write them for users and
+keep them under 500 characters.
+
 Tagging is the only way to release. It publishes the apk and the aab to a
 github release and uploads the bundle to the play internal track, from where
 you promote it in the console. Pushes to any branch build and test but publish
