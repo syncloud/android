@@ -4,13 +4,29 @@ Finds Syncloud devices on the local network over mDNS and opens them.
 
 ### Build
 
-    ./gradlew clean testDebugUnitTest assemble bundleRelease -Pversion=26.09
+    ./gradlew clean testDebugUnitTest assemble bundleRelease -Pversion=26.09.1
 
 The version is a build property, not a value in the source. CI passes the git
-tag, so `26.09` produces versionName `26.09` and versionCode `26009`. Tags are
-`year.month` and the code is `year * 1000 + month`, which keeps the ordering
-Play requires and matches every release published so far. Without the property
-the build is `0.01`, which is fine for local work and can never be published.
+tag. Tags are `year.month` or `year.month.patch` and the code is
+`year * 10000 + month * 100 + patch`, so `26.09.1` gives versionCode `260901`.
+The patch component exists so a second release inside the same month still
+increases the code, which is what Play requires; without it the only way to
+ship twice in one month is to invent a fake month and wedge every real one
+after it. Without the property the build is `0.01`, which is fine for local
+work and can never be published.
+
+The release build is minified and obfuscated by R8. `proguard-rules.pro` keeps
+the `core.*.model` classes and the three result types intact, because jackson
+maps those to json by field name and renaming them breaks sign-in and the
+device list at runtime. Instrumented tests run against the debug build, so
+they cannot catch that; the `smoke` CI step installs the real minified release
+on the device and fails the build if it does not start.
+
+The runner attaches two docker networks to every container, and android
+configures only one interface, so the `redroid` hostname can resolve to the
+address android never brought up and adb fails with no route to host.
+`ci/adb_device.sh` probes for an endpoint that actually answers and caches it
+for the later steps, instead of trusting dns.
 
 Release signing comes from the environment, not from a file. CI supplies
 `KEY_STORE` (base64 keystore), `ANDROID_STORE_FILE`, `ANDROID_STORE_PASSWORD`,
@@ -28,6 +44,7 @@ push and tag, and publishes to `/home/artifact/repo/android/<build>`:
     screenshots/01-auth .. 06-settings.png     every screen, rendered by robolectric
     discovery-logcat.txt                       device log, discovery tags only
     instrument.log                             instrumented test output
+    diagnostics/smoke-logcat.txt               device log from the minified release
 
 Tagging is the only way to release. It publishes the apk and the aab to a
 github release and uploads the bundle to the play internal track, from where

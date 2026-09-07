@@ -1,5 +1,5 @@
 #!/bin/sh
-DEVICE=redroid:5555
+DEVICE=$(ci/adb_device.sh || echo none)
 SHOT=artifact/screenshots/discovery-with-device.png
 TAGS="NsdDiscovery Resolver EventToDeviceConverter DiscoveryManager MulticastLock UnicastDiscovery NsdService serviceDiscovery"
 
@@ -14,7 +14,6 @@ for aab in syncloud/build/outputs/bundle/release/*.aab; do
 done
 cp syncloud/build/outputs/roborazzi/*.png artifact/screenshots/ 2>/dev/null || true
 
-timeout 30 adb connect $DEVICE >/dev/null 2>&1 || true
 timeout 60 adb -s $DEVICE exec-out run-as org.syncloud.android \
     cat files/screenshots/discovery-with-device.png > "$SHOT" 2>/dev/null || true
 head -c 8 "$SHOT" 2>/dev/null | grep -q PNG || rm -f "$SHOT"
