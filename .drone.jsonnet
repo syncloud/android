@@ -64,6 +64,13 @@ local build() = {
             }
         },
         {
+            name: "smoke",
+            image: "runmymind/docker-android-sdk:" + sdk,
+            commands: [
+                "ci/smoke.sh"
+            ]
+        },
+        {
             name: "publish to github",
             image: "plugins/github-release:" + github_release,
             settings: {
