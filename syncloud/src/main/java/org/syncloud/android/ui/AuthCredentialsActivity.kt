@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -80,10 +81,10 @@ fun AuthCredentialsScreen(
     onSettings: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var email by remember { mutableStateOf(preferences.redirectEmail ?: "") }
-    var password by remember { mutableStateOf(preferences.redirectPassword ?: "") }
-    var emailError by remember { mutableStateOf<String?>(null) }
-    var passwordError by remember { mutableStateOf<String?>(null) }
+    var email by rememberSaveable { mutableStateOf(preferences.redirectEmail ?: "") }
+    var password by rememberSaveable { mutableStateOf(preferences.redirectPassword ?: "") }
+    var emailError by rememberSaveable { mutableStateOf<String?>(null) }
+    var passwordError by rememberSaveable { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     var dialog by remember {
         mutableStateOf(
