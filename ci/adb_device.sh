@@ -14,8 +14,8 @@ rm -f "$CACHE"
 
 candidates() {
     getent hosts redroid 2>/dev/null | awk '{ print $1 }'
-    ip -o -4 addr show 2>/dev/null | awk '{ print $4 }' | while read -r cidr; do
-        prefix=$(echo "$cidr" | cut -d. -f1-3)
+    for own in $(hostname -I 2>/dev/null); do
+        prefix=$(echo "$own" | cut -d. -f1-3)
         for host in 2 3 4 5 6 7 8 9; do
             echo "$prefix.$host"
         done

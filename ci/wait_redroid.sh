@@ -17,6 +17,6 @@ done
 
 echo "redroid never became reachable"
 echo "dns:"; getent hosts redroid || true
-echo "our interfaces:"; ip -o -4 addr show || true
+echo "our addresses:"; hostname -I || true
 echo "adb:"; adb devices || true
 exit 1
