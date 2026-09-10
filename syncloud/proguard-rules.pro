@@ -1,5 +1,7 @@
 -keepattributes Signature, InnerClasses, EnclosingMethod, *Annotation*, RuntimeVisibleAnnotations
 
+-keep class * extends com.fasterxml.jackson.core.type.TypeReference { *; }
+-keep class com.fasterxml.jackson.** { *; }
 -keep class org.syncloud.android.core.redirect.model.** { *; }
 -keep class org.syncloud.android.core.platform.model.** { *; }
 -keep class org.syncloud.android.core.common.BaseResult { *; }
